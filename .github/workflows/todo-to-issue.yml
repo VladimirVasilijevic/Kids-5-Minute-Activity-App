@@ -1,4 +1,4 @@
-name: Test TODO to Issues
+name: TODO to Issue Automation
 
 on:
   push:
@@ -16,11 +16,10 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: Show TODO.md content
-        run: cat TODO.md
+        run: cat docs/TODO.md
 
       - name: Create/update issues from TODO.md
-        uses: juulsn/todo-issue@v1.1.4
+        uses: alstr/todo-to-issue-action@v4
         with:
-          label: 'todo-automation'
-          autoAssign: false
-          reopenClosed: false
+          FILE_PATTERN: 'docs/TODO.md'
+          ID_PATTERN: '<!-- id: ([^ ]*) -->'
