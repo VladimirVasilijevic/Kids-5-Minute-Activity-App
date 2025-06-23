@@ -14,10 +14,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+
+      - name: Show TODO.md content
+        run: cat TODO.md
+
+      - name: Show TODO tasks grep
+        run: grep '^TODO:' TODO.md || echo "No TODO lines found"
+
       - name: Create/update issues from TODO.md
         uses: juulsn/todo-issue@v1.1.4
         with:
-          excludePattern: '^(?!((docs/)?TODO\.md)$).*'
+          excludePattern: '^(?!TODO\.md$).*'
           label: 'todo-automation'
           autoAssign: false
           reopenClosed: false
