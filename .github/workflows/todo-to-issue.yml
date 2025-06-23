@@ -13,7 +13,11 @@ jobs:
   todo:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            docs/TODO.md
+          sparse-checkout-cone-mode: false
 
       - name: Show TODO.md content
         run: cat docs/TODO.md
