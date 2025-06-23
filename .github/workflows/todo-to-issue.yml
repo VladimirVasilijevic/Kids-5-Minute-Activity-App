@@ -1,4 +1,4 @@
-name: TODO to Issue Automation
+name: TODO to GitHub Issues
 
 on:
   push:
@@ -8,13 +8,9 @@ on:
 jobs:
   todo:
     runs-on: ubuntu-latest
-    name: Convert TODOs to GitHub Issues
     steps:
       - uses: actions/checkout@v3
-      - uses: alstr/todo-to-issue-action@v3
+      - name: Create issues from TODOs
+        uses: JasonEtco/todo@v1
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          filePattern: 'TODO.md'
-          label: 'todo-automation'
-          reopenClosed: false
-          autoAssign: false
+          file: TODO.md

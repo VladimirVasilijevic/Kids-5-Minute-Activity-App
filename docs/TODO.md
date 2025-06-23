@@ -2,28 +2,28 @@
 
 ## 🧱 Phase 1: Project Initialization & Structure
 
-- [ ] Phase 1: Initialize Angular project with Capacitor and setup Angular Material  
+- [ ] Phase 1: Initialize Angular project with Capacitor and setup Angular Material <!-- id: task-001 -->
 **Acceptance Criteria**  
 - [ ] Angular project created via `ng new` with routing  
 - [ ] Capacitor installed and linked with `npx cap init`  
 - [ ] Angular Material added and a basic theme applied (`ng add @angular/material`)  
 - [ ] App runs on `localhost` and Android simulator
 
-- [ ] Phase 1: Create app shell with routing and basic layout  
+- [ ] Phase 1: Create app shell with routing and basic layout <!-- id: task-002 -->
 **Acceptance Criteria**  
 - [ ] Routes set up for Home, Activity List, Activity Detail, and Settings  
 - [ ] Basic layout with Angular Material toolbar and bottom nav  
 - [ ] Dummy content shown for each screen  
 - [ ] Navigation works between views without reloads
 
-- [ ] Phase 1: Implement global language support with ngx-translate  
+- [ ] Phase 1: Implement global language support with ngx-translate <!-- id: task-003 -->
 **Acceptance Criteria**  
 - [ ] `ngx-translate` and `@ngx-translate/http-loader` installed  
 - [ ] `assets/i18n/sr.json` and `en.json` created with test keys  
 - [ ] Language switcher toggle or dropdown works from Settings  
 - [ ] Translations reflect instantly across the app
 
-- [ ] Phase 1: Set up unit testing environment with Jasmine + Karma  
+- [ ] Phase 1: Set up unit testing environment with Jasmine + Karma <!-- id: task-004 -->
 **Acceptance Criteria**  
 - [ ] Jasmine/Karma configured to run via `ng test`  
 - [ ] At least one simple passing test added for `AppComponent`  
@@ -32,21 +32,21 @@
 
 ## 📄 Phase 2: Content Integration & Rendering
 
-- [ ] Phase 2: Design and implement Activity List screen  
+- [ ] Phase 2: Design and implement Activity List screen <!-- id: task-005 -->
 **Acceptance Criteria**  
 - [ ] Screen displays all activities from static JSON  
 - [ ] Shows localized title and description  
 - [ ] Activity cards use Angular Material  
 - [ ] Each card links to Activity Detail screen
 
-- [ ] Phase 2: Design and implement Activity Detail screen  
+- [ ] Phase 2: Design and implement Activity Detail screen <!-- id: task-006 -->
 **Acceptance Criteria**  
 - [ ] Shows localized title and description from JSON  
 - [ ] Video displayed inline with `<video>` or embedded YouTube player  
 - [ ] Layout follows UX spec with clear sectioning  
 - [ ] Fallback message for missing video
 
-- [ ] Phase 2: Integrate JSON content loading and version tracking  
+- [ ] Phase 2: Integrate JSON content loading and version tracking <!-- id: task-007 -->
 **Acceptance Criteria**  
 - [ ] Static JSON file loaded on app start from `/assets/`  
 - [ ] JSON structure matches app schema  
@@ -55,14 +55,14 @@
 
 ## 🌐 Phase 3: Content Update & Storage
 
-- [ ] Phase 3: Implement remote content fetch and version check on app start  
+- [ ] Phase 3: Implement remote content fetch and version check on app start <!-- id: task-008 -->
 **Acceptance Criteria**  
 - [ ] App checks remote JSON (e.g. from Firebase) for updates  
 - [ ] Compares `version` field to local  
 - [ ] If new version, replaces local JSON  
 - [ ] Logs or alerts on update success/failure
 
-- [ ] Phase 3: Store JSON in IndexedDB and implement offline fallback  
+- [ ] Phase 3: Store JSON in IndexedDB and implement offline fallback <!-- id: task-009 -->
 **Acceptance Criteria**  
 - [ ] Uses IndexedDB (via `localForage` or Angular service)  
 - [ ] On startup, falls back to cached JSON if offline  
@@ -71,21 +71,21 @@
 
 ## 🎥 Phase 4: Video Integration
 
-- [ ] Phase 4: Stream video content from YouTube or Firebase Storage  
+- [ ] Phase 4: Stream video content from YouTube or Firebase Storage <!-- id: task-010 -->
 **Acceptance Criteria**  
 - [ ] Activity Detail screen streams video from URL  
 - [ ] Player is responsive and consistent across web/mobile  
 - [ ] Handles fallback if video fails to load  
 - [ ] Test with both Firebase and YouTube links
 
-- [ ] Phase 4: Add support for video downloading and offline playback  
+- [ ] Phase 4: Add support for video downloading and offline playback <!-- id: task-011 -->
 **Acceptance Criteria**  
 - [ ] Video can be downloaded manually or automatically  
 - [ ] Downloaded videos stored via Capacitor Filesystem or IndexedDB Blob  
 - [ ] User notified when video is ready offline  
 - [ ] Test offline playback works reliably
 
-- [ ] Phase 4: Auto-remove old videos based on configurable storage threshold  
+- [ ] Phase 4: Auto-remove old videos based on configurable storage threshold <!-- id: task-012 -->
 **Acceptance Criteria**  
 - [ ] Track used storage space for cached videos  
 - [ ] Remove least recently used videos once over threshold  
@@ -95,21 +95,21 @@
 
 ## 🧪 Phase 5: Testing & Deployment
 
-- [ ] Phase 5: Write unit tests for JSON service and version checking logic  
+- [ ] Phase 5: Write unit tests for JSON service and version checking logic <!-- id: task-013 -->
 **Acceptance Criteria**  
 - [ ] Test JSON load, parse, version comparison, fallback  
 - [ ] Edge case coverage (bad version, missing file)  
 - [ ] Code coverage > 80% for service  
 - [ ] Tests run without flakiness on CI
 
-- [ ] Phase 5: Write e2e tests for basic user flow (list → detail → settings)  
+- [ ] Phase 5: Write e2e tests for basic user flow (list → detail → settings) <!-- id: task-014 -->
 **Acceptance Criteria**  
 - [ ] Uses Cypress or Playwright  
 - [ ] Navigates through main views  
 - [ ] Checks that language switch updates UI  
 - [ ] Runs headless in CI
 
-- [ ] Phase 5: Implement PWA service worker for offline HTML + assets  
+- [ ] Phase 5: Implement PWA service worker for offline HTML + assets <!-- id: task-015 -->
 **Acceptance Criteria**  
 - [ ] `ng add @angular/pwa` configured correctly  
 - [ ] App shell, translations, JSON cached offline  
@@ -118,20 +118,20 @@
 
 ## 🚀 Phase 6: Build & Publish
 
-- [ ] Phase 6: Configure Firebase Hosting for web/PWA  
+- [ ] Phase 6: Configure Firebase Hosting for web/PWA <!-- id: task-016 -->
 **Acceptance Criteria**  
 - [ ] Firebase project set up with hosting enabled  
 - [ ] Angular build deployed to Firebase via CLI  
 - [ ] Web app loads successfully online and offline
 
-- [ ] Phase 6: Build Android APK using Capacitor and test on real devices  
+- [ ] Phase 6: Build Android APK using Capacitor and test on real devices <!-- id: task-017 -->
 **Acceptance Criteria**  
 - [ ] `npx cap build android` creates functional APK  
 - [ ] App works on Android 8+ devices  
 - [ ] Offline playback verified  
 - [ ] Firebase storage access secure via rules
 
-- [ ] Phase 6: Setup GitHub Actions for CI/CD  
+- [ ] Phase 6: Setup GitHub Actions for CI/CD <!-- id: task-018 -->
 **Acceptance Criteria**  
 - [ ] Pipeline runs on push to main  
 - [ ] Unit and e2e tests executed in pipeline  
@@ -140,7 +140,7 @@
 
 ## 🌿 Optional MVP Enhancement
 
-- [ ] Optional: Mark activity as completed (toggle or visual cue)  
+- [ ] Optional: Mark activity as completed (toggle or visual cue) <!-- id: task-019 -->
 **Acceptance Criteria**  
 - [ ] UI toggle or button to mark activity as “done”  
 - [ ] State stored in LocalStorage/IndexedDB  
