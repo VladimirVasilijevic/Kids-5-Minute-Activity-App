@@ -23,5 +23,7 @@ jobs:
 
 
       - name: Run TODO parser script
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: python .github/scripts/todo_parser.py
 
