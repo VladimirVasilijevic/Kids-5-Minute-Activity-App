@@ -16,10 +16,10 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: Show TODO.md content
-        run: cat docs/TODO.md
+        run: cat TODO.md
 
       - name: Show TODO tasks grep
-        run: grep '^TODO:' docs/TODO.md || echo "No TODO lines found"
+        run: grep '^TODO:' TODO.md || echo "No TODO lines found"
 
       - name: Create/update issues from TODO.md
         uses: juulsn/todo-issue@v1.1.4
