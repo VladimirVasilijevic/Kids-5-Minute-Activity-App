@@ -19,17 +19,25 @@ def extract_todos(content):
         task_id = match.group(2).strip()
         criteria_raw = match.group(3)
         checklist = ""
+        all_completed = True
 
         if criteria_raw:
             checklist_lines = []
             for line in criteria_raw.strip().splitlines():
                 checklist_lines.append(line.strip())
+                # Check if this line is a checkbox and if it's checked
+                if line.strip().startswith('- [ ]'):
+                    all_completed = False
+                elif line.strip().startswith('- [x]'):
+                    # This criterion is completed
+                    pass
             checklist = "\n".join(checklist_lines)
 
         todos.append({
             'id': task_id,
             'title': title,
-            'body': f"## Acceptance Criteria\n{checklist}" if checklist else ""
+            'body': f"## Acceptance Criteria\n{checklist}" if checklist else "",
+            'all_completed': all_completed and bool(checklist)  # Only mark as completed if there are criteria and all are checked
         })
     return todos
 
@@ -109,11 +117,27 @@ if __name__ == "__main__":
     for todo in todos:
         phase_label = determine_phase_label(todo['title'])
         processed_ids.add(todo['id'])
+        
         if todo['id'] in existing:
             existing_issue = existing[todo['id']]
-            update_issue(existing_issue['number'], todo, phase_label)
+            
+            # If all acceptance criteria are completed and issue is open, close it
+            if todo['all_completed'] and existing_issue['state'] == 'open':
+                print(f"Closing issue {existing_issue['number']} for completed task {todo['id']}")
+                close_issue(existing_issue['number'])
+            # If not all completed and issue is closed, reopen it
+            elif not todo['all_completed'] and existing_issue['state'] == 'closed':
+                print(f"Reopening issue {existing_issue['number']} for incomplete task {todo['id']}")
+                update_issue(existing_issue['number'], todo, phase_label)
+            # Otherwise just update the issue
+            else:
+                update_issue(existing_issue['number'], todo, phase_label)
         else:
-            create_issue(todo, phase_label)
+            # Only create new issue if not all criteria are completed
+            if not todo['all_completed']:
+                create_issue(todo, phase_label)
+            else:
+                print(f"Skipping creation of issue for already completed task {todo['id']}")
 
     # Close removed tasks
     for task_id, issue in existing.items():
