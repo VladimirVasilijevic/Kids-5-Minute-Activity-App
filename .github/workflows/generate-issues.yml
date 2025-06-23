@@ -20,8 +20,12 @@ jobs:
           python-version: '3.x'
 
       - name: Install dependencies
-        run: pip install pyyaml
-
-      - name: Generate Issues from TODO.md
         run: |
-          python .github/scripts/todo_parser.py
+          python -m pip install --upgrade pip
+          pip install -r .github/scripts/requirements.txt
+
+
+      - name: Run TODO parser script
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python .github/scripts/todo_parser.py
