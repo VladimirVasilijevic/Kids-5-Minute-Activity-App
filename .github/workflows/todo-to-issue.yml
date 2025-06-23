@@ -21,6 +21,9 @@ jobs:
       - name: Show TODO tasks grep
         run: grep '^TODO:' TODO.md || echo "No TODO lines found"
 
+      - name: Show TODO tasks grep
+        run: grep '^TODO:' TODO.md || echo "No TODO lines found"
+
       - name: Create/update issues from TODO.md
         uses: juulsn/todo-issue@v1.1.4
         with:
