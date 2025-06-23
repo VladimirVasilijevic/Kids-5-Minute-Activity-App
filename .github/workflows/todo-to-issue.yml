@@ -19,11 +19,8 @@ jobs:
             docs/TODO.md
           sparse-checkout-cone-mode: false
 
-      - name: Show TODO.md content
-        run: cat docs/TODO.md
-
       - name: Create/update issues from TODO.md
-        uses: alstr/todo-to-issue-action@v4
+        uses: meienberger/todo-to-issue@v1.2.2
         with:
-          FILE_PATTERN: 'docs/TODO.md'
-          ID_PATTERN: '<!-- id: ([^ ]*) -->'
+          todo-file: 'docs/TODO.md'
+          id-pattern: '<!-- id: ([^ ]*) -->'
