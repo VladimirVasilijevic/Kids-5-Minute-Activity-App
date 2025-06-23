@@ -17,7 +17,7 @@ jobs:
       - name: Create/update issues from TODO.md
         uses: juulsn/todo-issue@v1.1.4
         with:
-          excludePattern: '^(?!TODO\\.md$).*'
+          excludePattern: '^(?!((docs/)?TODO\.md)$).*'
           label: 'todo-automation'
           autoAssign: false
           reopenClosed: false
