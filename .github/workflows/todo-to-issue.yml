@@ -20,7 +20,7 @@ jobs:
           sparse-checkout-cone-mode: false
 
       - name: Create/update issues from TODO.md
-        uses: meienberger/todo-to-issue@v1.2.2
+        uses: meienberger/todo-to-issue@main
         with:
           todo-file: 'docs/TODO.md'
           id-pattern: '<!-- id: ([^ ]*) -->'
