@@ -17,7 +17,7 @@ jobs:
         with:
           python-version: '3.x'
 
-      - name: Install dependencies
+      - name: Install dependencies 
         run: pip install pyyaml
 
       - name: Generate Issues from TODO.md
