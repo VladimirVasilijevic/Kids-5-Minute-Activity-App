@@ -1,0 +1,25 @@
+name: Manual TODO.md Issues Sync
+
+# This workflow can be triggered manually from GitHub UI
+on:
+  workflow_dispatch:
+
+jobs:
+  generate-issues:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: pip install pyyaml
+
+      - name: Generate Issues from TODO.md
+        run: |
+          python .github/scripts/todo_parser.py
