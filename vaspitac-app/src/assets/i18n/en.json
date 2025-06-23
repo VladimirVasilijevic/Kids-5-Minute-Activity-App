@@ -1,0 +1,26 @@
+{
+  "APP": {
+    "TITLE": "Vaspitac App"
+  },
+  "NAV": {
+    "HOME": "Home",
+    "ACTIVITIES": "Activities"
+  },
+  "HOME": {
+    "WELCOME_TITLE": "Welcome to Vaspitac App",
+    "WELCOME_SUBTITLE": "5-minute activities for kids",
+    "DESCRIPTION": "Find simple and fun activities for children up to 7 years old. Each activity takes only 5 minutes and requires no special equipment.",
+    "START_ACTIVITIES": "Start Activities"
+  },
+  "ACTIVITIES": {
+    "TITLE": "Activities"
+  },
+  "ACTIVITY": {
+    "VIDEO_NOT_AVAILABLE": "Video not available"
+  },
+  "SETTINGS": {
+    "TITLE": "Settings",
+    "LANGUAGE": "Language",
+    "SELECT_LANGUAGE": "Select language"
+  }
+} 

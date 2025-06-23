@@ -1,0 +1,14 @@
+<div class="activity-list-container">
+  <h2>{{ 'ACTIVITIES.TITLE' | translate }}</h2>
+  
+  <div class="activities-grid">
+    <mat-card *ngFor="let activity of activities" class="activity-card" [routerLink]="['/activity', activity.id]">
+      <mat-card-header>
+        <mat-card-title>{{ activity.title.sr }}</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <p>{{ activity.description.sr }}</p>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div> 

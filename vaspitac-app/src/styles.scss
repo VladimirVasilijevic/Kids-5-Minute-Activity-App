@@ -1,0 +1,44 @@
+/* You can add global styles to this file, and also import other style files */
+@use '@angular/material' as mat;
+
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+/* Custom theme colors based on specification */
+:root {
+  --primary-green: #4CAF50;
+  --dark-green: #2E7D32;
+  --medium-green: #66BB6A;
+  --light-green: #A5D6A7;
+  --watermelon-pink: #FF6B9D;
+  --light-pink: #FFB3D1;
+  --white: #FFFFFF;
+}
+
+/* Material Design theme customization */
+.mat-mdc-raised-button.mat-primary {
+  background-color: var(--watermelon-pink) !important;
+}
+
+.mat-mdc-raised-button.mat-primary:hover {
+  background-color: #e55a8a !important;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .container {
+    padding: 0 16px;
+  }
+}
+
+/* Accessibility improvements */
+.mat-mdc-button, .mat-mdc-raised-button {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+/* Focus indicators */
+.mat-mdc-button:focus, .mat-mdc-raised-button:focus {
+  outline: 2px solid var(--primary-green);
+  outline-offset: 2px;
+} 

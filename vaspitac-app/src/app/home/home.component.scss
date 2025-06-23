@@ -1,0 +1,39 @@
+.home-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 60vh;
+  padding: 20px;
+}
+
+.welcome-card {
+  max-width: 500px;
+  width: 100%;
+  text-align: center;
+  
+  mat-card-header {
+    justify-content: center;
+    margin-bottom: 20px;
+  }
+  
+  mat-card-content {
+    margin-bottom: 20px;
+    
+    p {
+      font-size: 16px;
+      line-height: 1.6;
+      color: #666;
+    }
+  }
+  
+  mat-card-actions {
+    display: flex;
+    justify-content: center;
+    
+    button {
+      min-width: 200px;
+      height: 48px;
+      font-size: 16px;
+    }
+  }
+} 

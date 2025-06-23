@@ -1,0 +1,26 @@
+{
+  "APP": {
+    "TITLE": "Vaspitac App"
+  },
+  "NAV": {
+    "HOME": "Početna",
+    "ACTIVITIES": "Aktivnosti"
+  },
+  "HOME": {
+    "WELCOME_TITLE": "Dobrodošli u Vaspitac App",
+    "WELCOME_SUBTITLE": "5-minutne aktivnosti za decu",
+    "DESCRIPTION": "Pronađite jednostavne i zabavne aktivnosti za decu do 7 godina. Svaka aktivnost traje samo 5 minuta i ne zahteva posebnu opremu.",
+    "START_ACTIVITIES": "Započnite aktivnosti"
+  },
+  "ACTIVITIES": {
+    "TITLE": "Aktivnosti"
+  },
+  "ACTIVITY": {
+    "VIDEO_NOT_AVAILABLE": "Video nije dostupan"
+  },
+  "SETTINGS": {
+    "TITLE": "Podešavanja",
+    "LANGUAGE": "Jezik",
+    "SELECT_LANGUAGE": "Izaberite jezik"
+  }
+} 

@@ -1,0 +1,33 @@
+.activity-list-container {
+  h2 {
+    margin-bottom: 20px;
+    color: var(--dark-green);
+  }
+}
+
+.activities-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.activity-card {
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  mat-card-header {
+    margin-bottom: 10px;
+  }
+  
+  mat-card-content {
+    p {
+      color: #666;
+      line-height: 1.5;
+    }
+  }
+} 

@@ -4,31 +4,31 @@
 
 TODO: Phase 1: Initialize Angular project with Capacitor and setup Angular Material <!-- id: task-001 -->
 **Acceptance Criteria**  
-- [ ] Angular project created via `ng new` with routing  
-- [ ] Capacitor installed and linked with `npx cap init`  
-- [ ] Angular Material added and a basic theme applied (`ng add @angular/material`)  
-- [ ] App runs on `localhost` and Android simulator
+- [x] Angular project created via `ng new` with routing  
+- [x] Capacitor installed and linked with `npx cap init`  
+- [x] Angular Material added and a basic theme applied (`ng add @angular/material`)  
+- [x] App runs on `localhost` and Android simulator
 
 TODO: Phase 1: Create app shell with routing and basic layout <!-- id: task-002 -->
 **Acceptance Criteria**  
-- [ ] Routes set up for Home, Activity List, Activity Detail, and Settings  
-- [ ] Basic layout with Angular Material toolbar and bottom nav  
-- [ ] Dummy content shown for each screen  
-- [ ] Navigation works between views without reloads
+- [x] Routes set up for Home, Activity List, Activity Detail, and Settings  
+- [x] Basic layout with Angular Material toolbar and bottom nav  
+- [x] Dummy content shown for each screen  
+- [x] Navigation works between views without reloads
 
 TODO: Phase 1: Implement global language support with ngx-translate <!-- id: task-003 -->
 **Acceptance Criteria**  
-- [ ] `ngx-translate` and `@ngx-translate/http-loader` installed  
-- [ ] `assets/i18n/sr.json` and `en.json` created with test keys  
-- [ ] Language switcher toggle or dropdown works from Settings  
-- [ ] Translations reflect instantly across the app
+- [x] `ngx-translate` and `@ngx-translate/http-loader` installed  
+- [x] `assets/i18n/sr.json` and `en.json` created with test keys  
+- [x] Language switcher toggle or dropdown works from Settings  
+- [x] Translations reflect instantly across the app
 
 TODO: Phase 1: Set up unit testing environment with Jasmine + Karma <!-- id: task-004 -->
 **Acceptance Criteria**  
-- [ ] Jasmine/Karma configured to run via `ng test`  
-- [ ] At least one simple passing test added for `AppComponent`  
-- [ ] Code coverage available in test report  
-- [ ] Project uses clear structure for placing test files
+- [x] Jasmine/Karma configured to run via `ng test`  
+- [x] At least one simple passing test added for `AppComponent`  
+- [x] Code coverage available in test report  
+- [x] Project uses clear structure for placing test files
 
 ## 📄 Phase 2: Content Integration & Rendering
 
@@ -142,7 +142,7 @@ TODO: Phase 6: Setup GitHub Actions for CI/CD <!-- id: task-018 -->
 
 TODO: Optional: Mark activity as completed (toggle or visual cue) <!-- id: task-019 -->
 **Acceptance Criteria**  
-- [ ] UI toggle or button to mark activity as “done”  
+- [ ] UI toggle or button to mark activity as "done"  
 - [ ] State stored in LocalStorage/IndexedDB  
 - [ ] Visual cue (checkmark, strikethrough)  
 - [ ] Clear/Reset option in Settings

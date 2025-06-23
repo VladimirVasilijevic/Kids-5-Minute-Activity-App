@@ -1,0 +1,22 @@
+<mat-toolbar color="primary">
+  <span>{{ 'APP.TITLE' | translate }}</span>
+  <span class="spacer"></span>
+  <button mat-icon-button [routerLink]="['/settings']" aria-label="Settings">
+    <mat-icon>settings</mat-icon>
+  </button>
+</mat-toolbar>
+
+<main class="main-content">
+  <router-outlet></router-outlet>
+</main>
+
+<nav class="bottom-nav">
+  <button mat-button [routerLink]="['/']" routerLinkActive="active">
+    <mat-icon>home</mat-icon>
+    <span>{{ 'NAV.HOME' | translate }}</span>
+  </button>
+  <button mat-button [routerLink]="['/activities']" routerLinkActive="active">
+    <mat-icon>list</mat-icon>
+    <span>{{ 'NAV.ACTIVITIES' | translate }}</span>
+  </button>
+</nav> 

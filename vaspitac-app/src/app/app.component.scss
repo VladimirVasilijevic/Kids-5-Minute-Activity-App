@@ -1,0 +1,47 @@
+.spacer {
+  flex: 1 1 auto;
+}
+
+.main-content {
+  padding: 20px;
+  min-height: calc(100vh - 128px); // Account for toolbar and bottom nav
+}
+
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: white;
+  border-top: 1px solid #e0e0e0;
+  display: flex;
+  justify-content: space-around;
+  padding: 8px 0;
+  z-index: 1000;
+
+  button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 80px;
+    
+    mat-icon {
+      margin-bottom: 4px;
+    }
+    
+    span {
+      font-size: 12px;
+    }
+    
+    &.active {
+      color: var(--watermelon-pink);
+    }
+  }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .main-content {
+    padding: 16px;
+  }
+} 

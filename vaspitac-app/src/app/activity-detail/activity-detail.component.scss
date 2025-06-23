@@ -1,0 +1,26 @@
+.activity-detail-container {
+  max-width: 800px;
+  margin: 0 auto;
+  
+  mat-card {
+    margin-bottom: 20px;
+  }
+  
+  mat-card-content {
+    p {
+      font-size: 16px;
+      line-height: 1.6;
+      color: #666;
+      margin-bottom: 20px;
+    }
+  }
+}
+
+.video-container {
+  margin-top: 20px;
+  
+  video {
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+} 
