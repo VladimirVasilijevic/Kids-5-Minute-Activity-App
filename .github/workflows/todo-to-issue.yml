@@ -8,10 +8,13 @@ on:
 jobs:
   todo:
     runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      contents: read
     steps:
       - uses: actions/checkout@v3
-      - name: Create issues from TODOs
-        uses: meienberger/todo-to-issue@v1.7.1
+      - name: Create/update issues from TODO.md
+        uses: juulsn/todo-issue@latest
         with:
           file: TODO.md
-          deduplicationMode: 'idTag'
+          deduplicate: 'idTag'
