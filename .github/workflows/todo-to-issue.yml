@@ -17,5 +17,7 @@ jobs:
       - name: Create/update issues from TODO.md
         uses: juulsn/todo-issue@v1.1.4
         with:
-          file: TODO.md
-          idTag: 'id'        # instruct the action to use <!-- id: ... --> tags for deduplication
+          excludePattern: '^(?!TODO\\.md$).*'
+          label: 'todo-automation'
+          autoAssign: false
+          reopenClosed: false
