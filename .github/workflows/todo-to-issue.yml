@@ -5,16 +5,17 @@ on:
     branches:
       - main
 
+permissions:
+  issues: write
+  contents: read
+
 jobs:
   todo:
     runs-on: ubuntu-latest
-    permissions:
-      issues: write
-      contents: read
     steps:
       - uses: actions/checkout@v3
       - name: Create/update issues from TODO.md
-        uses: juulsn/todo-issue@latest
+        uses: juulsn/todo-issue@v1.1.4
         with:
           file: TODO.md
-          deduplicate: 'idTag'
+          idTag: 'id'        # instruct the action to use <!-- id: ... --> tags for deduplication
