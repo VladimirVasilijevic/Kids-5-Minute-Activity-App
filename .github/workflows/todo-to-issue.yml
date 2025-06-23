@@ -15,7 +15,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-            - name: Show TODO.md content
+      - name: Show TODO.md content
         run: cat docs/TODO.md
 
       - name: Show TODO tasks grep
