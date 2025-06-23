@@ -1,4 +1,4 @@
-name: TODO to GitHub Issues
+name: TODO to Issue Automation
 
 on:
   push:
@@ -11,6 +11,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Create issues from TODOs
-        uses: JasonEtco/todo@v1
+        uses: meienberger/todo-to-issue@v1.7.1
         with:
           file: TODO.md
+          deduplicationMode: 'idTag'
