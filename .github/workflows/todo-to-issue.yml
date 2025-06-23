@@ -1,4 +1,4 @@
-name: TODO to Issue Automation
+name: Test TODO to Issues
 
 on:
   push:
@@ -18,16 +18,9 @@ jobs:
       - name: Show TODO.md content
         run: cat TODO.md
 
-      - name: Show TODO tasks grep
-        run: grep '^TODO:' TODO.md || echo "No TODO lines found"
-
-      - name: Show TODO tasks grep
-        run: grep '^TODO:' TODO.md || echo "No TODO lines found"
-
       - name: Create/update issues from TODO.md
         uses: juulsn/todo-issue@v1.1.4
         with:
-          excludePattern: '^(?!TODO\.md$).*'
           label: 'todo-automation'
           autoAssign: false
           reopenClosed: false
