@@ -71,16 +71,16 @@ TODO: Phase 3: Store JSON in IndexedDB and implement offline fallback <!-- id: t
 
 TODO: Phase 3: Set up GitHub Action for automated unit testing on all branches <!-- id: task-020 -->
 **Acceptance Criteria**  
-- [ ] Workflow YAML file exists in `.github/workflows/` (e.g., `unit-tests.yml`)  
-- [ ] Workflow triggers on push and pull request events for all branches  
-- [ ] Node.js environment is set up (recommended LTS version)  
-- [ ] All dependencies are installed using `npm ci`  
-- [ ] Angular app builds successfully (`npm run build`)  
-- [ ] All unit tests are executed (`npm test` or `ng test --watch=false`)  
-- [ ] Workflow fails if any test fails  
-- [ ] Contributors can see test results in the GitHub Actions tab  
-- [ ] Code coverage results are uploaded or visible in PR summary  
-- [ ] Status badge for the workflow is visible in the README  
+- [x] Workflow YAML file exists in `.github/workflows/` (e.g., `unit-tests.yml`)  
+- [x] Workflow triggers on push and pull request events for all branches  
+- [x] Node.js environment is set up (recommended LTS version)  
+- [x] All dependencies are installed using `npm ci`  
+- [x] Angular app builds successfully (`npm run build`)  
+- [x] All unit tests are executed (`npm test` or `ng test --watch=false`)  
+- [x] Workflow fails if any test fails  
+- [x] Contributors can see test results in the GitHub Actions tab  
+- [x] Code coverage results are uploaded or visible in PR summary  
+- [x] Status badge for the workflow is visible in the README  
 
 **Description**  
 Set up a GitHub Actions workflow to automatically run all unit tests for the Angular app on every push and pull request to any branch. This ensures code quality, prevents regressions, and enforces a stable mainline.
