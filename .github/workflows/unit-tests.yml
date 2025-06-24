@@ -1,0 +1,41 @@
+name: Unit Tests
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: ["**"]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Use Node.js LTS
+        uses: actions/setup-node@v4
+        with:
+          node-version: 'lts/*'
+
+      - name: Install dependencies
+        run: npm ci
+        working-directory: vaspitac-app
+
+      - name: Build Angular app
+        run: npm run build --if-present
+        working-directory: vaspitac-app
+
+      - name: Run unit tests with coverage
+        run: npx ng test --watch=false --code-coverage
+        working-directory: vaspitac-app
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: vaspitac-app/coverage/
+
+      - name: Fail if tests failed
+        if: failure()
+        run: exit 1 
