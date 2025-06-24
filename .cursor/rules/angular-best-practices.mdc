@@ -1,0 +1,59 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Angular Best Practices – Vaspitac Project
+
+## File & Directory Structure
+- Use feature-based folders: `components/`, `services/`, `models/`, `test-utils/`
+- Each component, service, and model in its own file
+# Angular Best Practices – Vaspitac Project
+
+## File & Directory Structure
+- Use feature-based folders: `components/`, `services/`, `models/`, `test-utils/`
+- Each component, service, and model in its own file
+- Co-locate `.scss` and `.html` with their `.ts` component
+- Use lowercase, dash-separated directory names
+
+## Naming Conventions
+- Components: `PascalCase` (e.g. `ActivityListComponent`)
+- Services: `PascalCase` + `Service` (e.g. `ActivityService`)
+- Interfaces/Types: `PascalCase` (e.g. `Activity`, `ActivitiesData`)
+- Files: `kebab-case` (e.g. `activity-list.component.ts`)
+
+## Type & Interface Organization
+- All shared types/interfaces go in `models/` (one file per domain)
+- Never import a service just for a type
+- Use explicit types for all public APIs and function signatures
+
+## Component & Service Patterns
+- Use Angular's dependency injection for all services
+- Use `@Injectable({ providedIn: 'root' })` for singleton services
+- Use `@Component` with clear selector, template, and styleUrls
+- Prefer `OnPush` change detection for performance (unless you need default)
+
+## Testing
+- Use `TestBed` for all Angular component/service tests
+- Use `provideHttpClientTesting()` and `provideRouter([])` for mocks
+- Place all mocks in `test-utils/` and import from there
+- Use Jasmine for unit tests, keep >80% coverage
+
+## Code Style
+- 2-space indentation, single quotes, no semicolons (unless required)
+- Use `===`/`!==` for comparisons
+- Use guard clauses for input validation
+- Use named exports, avoid default exports
+- Use RxJS best practices: pipeable operators, avoid nested subscriptions
+- Use Angular Material for UI components
+
+## General
+- Keep files <1600 lines
+- Document all public methods with JSDoc
+- Prefer functional, declarative code over imperative
+- Avoid logic in templates; keep logic in components/services
+- Use environment files for config, never hardcode secrets
+
+---
+
+**Follow these rules for all new code. Refactor legacy code to comply when possible.** 
