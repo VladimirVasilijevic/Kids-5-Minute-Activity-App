@@ -27,7 +27,7 @@ jobs:
         working-directory: vaspitac-app
 
       - name: Run unit tests with coverage
-        run: npx ng test --browsers=ChromeHeadlessCI --watch=false --code-coverage
+        run: npx ng test --browsers=ChromeHeadless --watch=false --code-coverage
         working-directory: vaspitac-app
 
       - name: Upload coverage report
