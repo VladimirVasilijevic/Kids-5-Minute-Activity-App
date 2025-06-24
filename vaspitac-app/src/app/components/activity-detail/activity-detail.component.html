@@ -1,0 +1,30 @@
+<div class="activity-detail-container">
+  <ng-container *ngIf="activity$ | async as activity; else notFound">
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title>{{ activity.title[lang] }}</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <p>{{ activity.description[lang] }}</p>
+        <div class="video-container">
+          <ng-container *ngIf="activity.videoUrl[lang]; else noVideo">
+            <video controls width="100%">
+              <source [src]="activity.videoUrl[lang]" type="video/mp4">
+              {{ 'ACTIVITY.VIDEO_NOT_AVAILABLE' | translate }}
+            </video>
+          </ng-container>
+          <ng-template #noVideo>
+            <div class="video-fallback">{{ 'ACTIVITY.VIDEO_NOT_AVAILABLE' | translate }}</div>
+          </ng-template>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </ng-container>
+  <ng-template #notFound>
+    <mat-card>
+      <mat-card-content>
+        <p>{{ 'ACTIVITY.NOT_FOUND' | translate }}</p>
+      </mat-card-content>
+    </mat-card>
+  </ng-template>
+</div> 

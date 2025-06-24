@@ -1,0 +1,17 @@
+<div class="activity-list-container">
+  <h2>{{ 'ACTIVITIES.TITLE' | translate }}</h2>
+  
+  <div class="activities-grid">
+    <mat-card *ngFor="let activity of activities$ | async" class="activity-card" [routerLink]="['/activity', activity.id]">
+      <mat-card-header>
+        <mat-card-title>{{ activity.title[lang] }}</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <p>{{ activity.description[lang] }}</p>
+      </mat-card-content>
+    </mat-card>
+    <div *ngIf="(activities$ | async)?.length === 0" class="empty-message">
+      {{ 'ACTIVITIES.EMPTY' | translate }}
+    </div>
+  </div>
+</div> 

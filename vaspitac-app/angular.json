@@ -67,10 +67,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "browserTarget": "vaspitac-app:build:production"
+              "buildTarget": "vaspitac-app:build:production"
             },
             "development": {
-              "browserTarget": "vaspitac-app:build:development"
+              "buildTarget": "vaspitac-app:build:development"
             }
           },
           "defaultConfiguration": "development"

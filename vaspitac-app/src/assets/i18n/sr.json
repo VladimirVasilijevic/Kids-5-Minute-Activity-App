@@ -13,14 +13,17 @@
     "START_ACTIVITIES": "Započnite aktivnosti"
   },
   "ACTIVITIES": {
-    "TITLE": "Aktivnosti"
+    "TITLE": "Aktivnosti",
+    "EMPTY": "Nema dostupnih aktivnosti."
   },
   "ACTIVITY": {
-    "VIDEO_NOT_AVAILABLE": "Video nije dostupan"
+    "VIDEO_NOT_AVAILABLE": "Video nije dostupan",
+    "NOT_FOUND": "Aktivnost nije pronađena."
   },
   "SETTINGS": {
     "TITLE": "Podešavanja",
     "LANGUAGE": "Jezik",
-    "SELECT_LANGUAGE": "Izaberite jezik"
+    "SELECT_LANGUAGE": "Izaberite jezik",
+    "CONTENT_VERSION": "Verzija sadržaja"
   }
 } 

@@ -1,8 +1,9 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { RouterTestingModule } from '@angular/router/testing';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { provideRouter } from '@angular/router';
+import { RouterModule } from '@angular/router';
 
 // Angular Material imports for testing
 import { MatToolbarModule } from '@angular/material/toolbar';
@@ -19,16 +20,19 @@ describe('AppComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [
-        RouterTestingModule,
         TranslateModule.forRoot(),
-        HttpClientTestingModule,
         BrowserAnimationsModule,
+        RouterModule,
         // Angular Material modules
         MatToolbarModule,
         MatButtonModule,
         MatIconModule
       ],
-      declarations: [ AppComponent ]
+      declarations: [ AppComponent ],
+      providers: [
+        provideHttpClientTesting(),
+        provideRouter([])
+      ]
     })
     .compileComponents();
   });

@@ -1,8 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { RouterTestingModule } from '@angular/router/testing';
 import { TranslateModule } from '@ngx-translate/core';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { provideRouter } from '@angular/router';
 
 // Angular Material imports
 import { MatCardModule } from '@angular/material/card';
@@ -17,14 +17,16 @@ describe('HomeComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [
-        RouterTestingModule,
         TranslateModule.forRoot(),
-        HttpClientTestingModule,
         BrowserAnimationsModule,
         MatCardModule,
         MatButtonModule
       ],
-      declarations: [ HomeComponent ]
+      declarations: [ HomeComponent ],
+      providers: [
+        provideHttpClientTesting(),
+        provideRouter([])
+      ]
     })
     .compileComponents();
   });

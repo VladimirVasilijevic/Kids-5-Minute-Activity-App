@@ -5,7 +5,11 @@
     "types": [
       "jasmine",
       "node"
-    ]
+    ],
+    "baseUrl": "./",
+    "paths": {
+      "@test-utils/*": ["src/test-utils/*"]
+    }
   },
   "include": [
     "src/**/*.spec.ts",

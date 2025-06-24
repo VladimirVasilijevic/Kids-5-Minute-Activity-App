@@ -20,10 +20,10 @@ import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 
 // Components
 import { AppComponent } from './app.component';
-import { HomeComponent } from './home/home.component';
-import { ActivityListComponent } from './activity-list/activity-list.component';
-import { ActivityDetailComponent } from './activity-detail/activity-detail.component';
-import { SettingsComponent } from './settings/settings.component';
+import { HomeComponent } from './components/home/home.component';
+import { ActivityListComponent } from './components/activity-list/activity-list.component';
+import { ActivityDetailComponent } from './components/activity-detail/activity-detail.component';
+import { SettingsComponent } from './components/settings/settings.component';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient) {

@@ -1,8 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { RouterTestingModule } from '@angular/router/testing';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { provideRouter } from '@angular/router';
+import { of } from 'rxjs';
 
 // Angular Material imports
 import { MatCardModule } from '@angular/material/card';
@@ -10,6 +10,12 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 
 import { SettingsComponent } from './settings.component';
+import { ActivityService } from '../../services/activity.service';
+
+// Proper mock for ActivityService
+class MockActivityService {
+  getVersion() { return of('1.0.2') }
+}
 
 describe('SettingsComponent', () => {
   let component: SettingsComponent;
@@ -19,15 +25,17 @@ describe('SettingsComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [
-        RouterTestingModule,
         TranslateModule.forRoot(),
-        HttpClientTestingModule,
         BrowserAnimationsModule,
         MatCardModule,
         MatFormFieldModule,
         MatSelectModule
       ],
-      declarations: [ SettingsComponent ]
+      declarations: [ SettingsComponent ],
+      providers: [
+        provideRouter([]),
+        { provide: ActivityService, useClass: MockActivityService }
+      ]
     })
     .compileComponents();
   });

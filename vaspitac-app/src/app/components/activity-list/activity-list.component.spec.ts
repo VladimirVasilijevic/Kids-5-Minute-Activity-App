@@ -1,31 +1,45 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { RouterTestingModule } from '@angular/router/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { TranslateModule } from '@ngx-translate/core';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { of } from 'rxjs';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { provideRouter } from '@angular/router';
+import { RouterModule } from '@angular/router';
 
 // Angular Material imports
 import { MatCardModule } from '@angular/material/card';
 
 import { ActivityListComponent } from './activity-list.component';
+import { ActivityService } from '../../services/activity.service';
+import { mockActivitiesData } from '../../../test-utils/mock-activities';
 
 describe('ActivityListComponent', () => {
   let component: ActivityListComponent;
   let fixture: ComponentFixture<ActivityListComponent>;
+  const mockActivities = mockActivitiesData.activities;
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
       imports: [
-        RouterTestingModule,
         TranslateModule.forRoot(),
-        HttpClientTestingModule,
         BrowserAnimationsModule,
-        MatCardModule
+        MatCardModule,
+        RouterModule
       ],
-      declarations: [ ActivityListComponent ]
+      declarations: [ ActivityListComponent ],
+      providers: [
+        {
+          provide: ActivityService,
+          useValue: {
+            getActivities: () => of(mockActivities)
+          }
+        },
+        provideHttpClientTesting(),
+        provideRouter([])
+      ]
     })
     .compileComponents();
-  });
+  }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(ActivityListComponent);
@@ -37,30 +51,35 @@ describe('ActivityListComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should have activities array', () => {
-    expect(component.activities).toBeDefined();
-    expect(Array.isArray(component.activities)).toBeTruthy();
+  it('should have activities$ observable', (done) => {
+    component.activities$.subscribe(activities => {
+      expect(Array.isArray(activities)).toBeTruthy();
+      expect(activities.length).toBe(mockActivities.length);
+      done();
+    });
   });
 
   it('should display activity cards', () => {
+    fixture.detectChanges();
     const compiled = fixture.nativeElement;
     const activityCards = compiled.querySelectorAll('.activity-card');
-    expect(activityCards.length).toBe(component.activities.length);
+    expect(activityCards.length).toBe(mockActivities.length);
   });
 
   it('should display activity titles', () => {
+    fixture.detectChanges();
     const compiled = fixture.nativeElement;
-    const firstActivity = component.activities[0];
-    expect(compiled.textContent).toContain(firstActivity.title.sr);
+    expect(compiled.textContent).toContain(mockActivities[0].title['sr']);
   });
 
   it('should have router links for activities', () => {
+    fixture.detectChanges();
     const compiled = fixture.nativeElement;
     const activityCards = compiled.querySelectorAll('.activity-card');
     activityCards.forEach((card: any, index: number) => {
       const routerLink = card.getAttribute('ng-reflect-router-link');
       expect(routerLink).toContain('/activity');
-      expect(routerLink).toContain(component.activities[index].id);
+      expect(routerLink).toContain(mockActivities[index].id);
     });
   });
 }); 

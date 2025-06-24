@@ -13,14 +13,17 @@
     "START_ACTIVITIES": "Start Activities"
   },
   "ACTIVITIES": {
-    "TITLE": "Activities"
+    "TITLE": "Activities",
+    "EMPTY": "No activities available."
   },
   "ACTIVITY": {
-    "VIDEO_NOT_AVAILABLE": "Video not available"
+    "VIDEO_NOT_AVAILABLE": "Video not available",
+    "NOT_FOUND": "Activity not found."
   },
   "SETTINGS": {
     "TITLE": "Settings",
     "LANGUAGE": "Language",
-    "SELECT_LANGUAGE": "Select language"
+    "SELECT_LANGUAGE": "Select language",
+    "CONTENT_VERSION": "Content version"
   }
 } 
