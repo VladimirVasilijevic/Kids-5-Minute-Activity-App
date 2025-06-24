@@ -183,11 +183,11 @@ The Kids 5-Minute Activity App is a friendly and professional guide designed to 
 
 The Kids 5-Minute Activity App is a carefully designed resource to support parents, future parents, and educators in fostering the physical and mental development of children up to 7 years old. The app provides a variety of short, engaging activities that can be completed in just five minutes, making it easy to incorporate educational play into any daily routine.
 
-Each activity comes with clear text instructions and accompanying videos to guide users through fun and effective exercises aimed at enhancing children’s cognitive skills, motor abilities, and emotional well-being. The content focuses on quality time and meaningful interaction, emphasizing simple, no-equipment-needed ideas that can be done anywhere.
+Each activity comes with clear text instructions and accompanying videos to guide users through fun and effective exercises aimed at enhancing children's cognitive skills, motor abilities, and emotional well-being. The content focuses on quality time and meaningful interaction, emphasizing simple, no-equipment-needed ideas that can be done anywhere.
 
 The app supports multiple languages and offers offline access to downloaded content, ensuring usability regardless of network conditions. Its user interface is designed to be clean, minimalistic, and accessible for parents and educators alike.
 
-Privacy and security are central to the app’s design. No personal data is collected, and the app complies with privacy standards relevant to children’s products, giving families peace of mind.
+Privacy and security are central to the app's design. No personal data is collected, and the app complies with privacy standards relevant to children's products, giving families peace of mind.
 
 ---
 

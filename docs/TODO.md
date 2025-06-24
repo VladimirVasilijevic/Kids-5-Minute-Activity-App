@@ -34,24 +34,24 @@ TODO: Phase 1: Set up unit testing environment with Jasmine + Karma <!-- id: tas
 
 TODO: Phase 2: Design and implement Activity List screen <!-- id: task-005 -->
 **Acceptance Criteria**  
-- [ ] Screen displays all activities from static JSON  
-- [ ] Shows localized title and description  
-- [ ] Activity cards use Angular Material  
-- [ ] Each card links to Activity Detail screen
+- [x] Screen displays all activities from static JSON  
+- [x] Shows localized title and description  
+- [x] Activity cards use Angular Material  
+- [x] Each card links to Activity Detail screen
 
 TODO: Phase 2: Design and implement Activity Detail screen <!-- id: task-006 -->
 **Acceptance Criteria**  
-- [ ] Shows localized title and description from JSON  
-- [ ] Video displayed inline with `<video>` or embedded YouTube player  
-- [ ] Layout follows UX spec with clear sectioning  
-- [ ] Fallback message for missing video
+- [x] Shows localized title and description from JSON  
+- [x] Video displayed inline with `<video>` or embedded YouTube player  
+- [x] Layout follows UX spec with clear sectioning  
+- [x] Fallback message for missing video
 
 TODO: Phase 2: Integrate JSON content loading and version tracking <!-- id: task-007 -->
 **Acceptance Criteria**  
-- [ ] Static JSON file loaded on app start from `/assets/`  
-- [ ] JSON structure matches app schema  
-- [ ] Version number displayed in Settings  
-- [ ] JSON service covered by unit tests
+- [x] Static JSON file loaded on app start from `/assets/`  
+- [x] JSON structure matches app schema  
+- [x] Version number displayed in Settings  
+- [x] JSON service covered by unit tests
 
 ## 🌐 Phase 3: Content Update & Storage
 
