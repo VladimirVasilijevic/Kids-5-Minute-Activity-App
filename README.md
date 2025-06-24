@@ -15,204 +15,139 @@ Vaspitac App is designed to help parents, future parents, and educators engage c
 - **Privacy-First**: No personal data collected
 - **Cross-Platform**: Web (PWA) and Android support
 
+---
+
+## 🏗️ Project Structure (Technical)
+
+```
+vaspitac/
+├── docs/                  # Project documentation
+│   ├── specification.md   # Software requirements/spec
+│   ├── TODO.md            # Development tasks & acceptance criteria
+│   └── UX/                # UX design assets
+├── vaspitac-app/          # Angular application
+│   ├── src/
+│   │   ├── app/
+│   │   │   ├── components/
+│   │   │   │   ├── home/              # Home screen (list of categories)
+│   │   │   │   ├── activity-list/     # Activity list screen
+│   │   │   │   ├── activity-detail/   # Activity detail (text + video)
+│   │   │   │   └── settings/          # Settings (language, version)
+│   │   │   ├── models/                # Shared TypeScript interfaces/types
+│   │   │   ├── services/              # Angular services (e.g., ActivityService)
+│   │   ├── assets/
+│   │   │   ├── activities.json        # Static content (activities)
+│   │   │   └── i18n/                  # Translation files (sr.json, en.json)
+│   │   ├── test-utils/                # Shared test mocks/utilities
+│   │   └── styles.scss                # Global styles
+│   ├── angular.json, ...              # Angular/Capacitor config
+├── .cursor/
+│   └── rules/                         # Project coding/documentation rules
+│       ├── angular-best-practices.mdc # Angular/TS best practices
+│       └── ...                        # Other rules (naming, style, etc.)
+├── .github/                           # GitHub workflows/scripts
+│   └── scripts/
+│       └── todo_parser.py             # GitHub issues automation
+└── README.md                          # Project overview (this file)
+```
+
+---
+
+## 📦 Key Directories & Files
+
+- **components/**: All UI screens, each in its own folder (with `.ts`, `.html`, `.scss`, `.spec.ts`)
+- **models/**: All shared TypeScript interfaces/types (e.g., `Activity`, `ActivitiesData`)
+- **services/**: Angular services (e.g., `ActivityService` for loading activities)
+- **test-utils/**: Shared mocks for tests (e.g., `mock-activities.ts`)
+- **assets/i18n/**: Translation files for ngx-translate
+- **assets/activities.json**: Static content, versioned and localized
+- **.cursor/rules/**: Project coding standards and best practices (see below)
+
+---
+
+## 🧑‍💻 Development & Best Practices
+
+- **Modern Angular**: Standalone components, RxJS, Angular Material
+- **TypeScript**: All types/interfaces in `models/`, never import a service just for a type
+- **Testing**: Jasmine + Karma, >80% coverage, all mocks in `test-utils/`
+- **Best Practices**: See `.cursor/rules/angular-best-practices.mdc` for enforced standards (structure, naming, code style, testing, etc.)
+- **Internationalization**: ngx-translate, language switcher in Settings
+- **PWA**: Service worker, offline support, installable
+
+---
+
 ## 🚀 Getting Started
 
 ### Prerequisites
-
-- Node.js (v16 or higher)
+- Node.js (v16+)
 - npm or yarn
 - Angular CLI
 - Android Studio (for mobile builds)
 
-### Installation
-
-1. **Clone the repository**
-   ```bash
-   git clone <repository-url>
-   cd vaspitac
-   ```
-
-2. **Install dependencies**
-   ```bash
-   cd vaspitac-app
-   npm install
-   ```
-
-3. **Run the development server**
-   ```bash
-   npm start
-   ```
-
-4. **Open your browser**
-   Navigate to `http://localhost:4200`
-
-### Mobile Development
-
-1. **Add Android platform**
-   ```bash
-   npx cap add android
-   ```
-
-2. **Build and sync**
-   ```bash
-   npm run build
-   npx cap sync
-   ```
-
-3. **Open in Android Studio**
-   ```bash
-   npx cap open android
-   ```
-
-## 🏗️ Project Structure
-
-```
-vaspitac/
-├── docs/                          # Project documentation
-│   ├── specification.md           # Software requirements
-│   ├── TODO.md                    # Development tasks
-│   └── UX/                        # UX design assets
-├── vaspitac-app/                  # Angular application
-│   ├── src/
-│   │   ├── app/                   # Application components
-│   │   │   ├── home/              # Home screen
-│   │   │   ├── activity-list/     # Activity list screen
-│   │   │   ├── activity-detail/   # Activity detail screen
-│   │   │   └── settings/          # Settings screen
-│   │   ├── assets/
-│   │   │   └── i18n/              # Translation files
-│   │   └── styles.scss            # Global styles
-│   ├── angular.json               # Angular configuration
-│   ├── capacitor.config.ts        # Capacitor configuration
-│   └── package.json               # Dependencies
-└── .github/                       # GitHub workflows and scripts
-    └── scripts/
-        └── todo_parser.py         # GitHub issues automation
-```
-
-## 🧪 Testing
-
-### Run Unit Tests
+### Installation & Running
 ```bash
-npm test
+# Clone and install
+$ git clone <repository-url>
+$ cd vaspitac/vaspitac-app
+$ npm install
+
+# Run web app
+$ npm start
+# Open http://localhost:4200
+
+# Run tests
+$ npm test
+# Run with coverage
+$ npm run test:coverage
 ```
 
-### Run Tests with Coverage
+### Mobile (Android)
 ```bash
-npm run test:coverage
+$ npx cap add android
+$ npm run build
+$ npx cap sync
+$ npx cap open android
 ```
 
-### Run E2E Tests (when implemented)
-```bash
-npm run e2e
-```
+---
 
-## 🌐 Internationalization
+## 🧪 Testing & Utilities
+- **Unit tests**: All components/services have `.spec.ts` files
+- **Test utilities**: Shared mocks in `test-utils/` (import in all specs)
+- **Coverage**: Run `npm run test:coverage` (see `/coverage`)
+- **E2E**: (Planned) Cypress/Playwright for user flows
 
-The app supports multiple languages through ngx-translate:
+---
 
-- **Serbian (sr)**: Primary language
-- **English (en)**: Secondary language
+## 🛠️ Project Rules & Best Practices
+- **Rules location**: `.cursor/rules/`
+- **Angular/TS best practices**: `.cursor/rules/angular-best-practices.mdc`
+- **Other rules**: Naming, code style, SCSS, error handling, architecture
+- **How to use**: All contributors should read and follow these rules. Refactor legacy code to comply when possible.
 
-Translation files are located in `src/assets/i18n/`:
-- `sr.json` - Serbian translations
-- `en.json` - English translations
-
-## 🎨 Design System
-
-### Colors
-- **Primary Green**: #4CAF50
-- **Dark Green**: #2E7D32
-- **Medium Green**: #66BB6A
-- **Light Green**: #A5D6A7
-- **Watermelon Pink**: #FF6B9D (CTA buttons)
-- **Light Pink**: #FFB3D1
-
-### Typography
-- **Primary Font**: Roboto
-- **Material Icons**: For UI elements
+---
 
 ## 📱 Build & Deployment
+- **Web**: `npm run build` (output in `dist/`)
+- **Android**: `npx cap build android`
+- **PWA**: Service worker, offline, installable
+- **CI/CD**: GitHub Actions (see `.github/`)
 
-### Web Build
-```bash
-npm run build
-```
-
-### Android Build
-```bash
-npm run build
-npx cap build android
-```
-
-### PWA Features
-- Offline support
-- Installable on mobile devices
-- Service worker for caching
-
-## 🔧 Development Workflow
-
-### Phase-based Development
-The project follows a structured phase-based approach:
-
-1. **Phase 1**: ✅ Project initialization & structure
-2. **Phase 2**: ✅ Content integration & rendering
-3. **Phase 3**: Content update & storage
-4. **Phase 4**: Video integration
-5. **Phase 5**: Testing & deployment
-6. **Phase 6**: Build & publish
-
-### GitHub Issues Automation
-The project includes automated GitHub issue management:
-- Issues are created from TODO.md tasks
-- Issues are automatically closed when all acceptance criteria are met
-- Phase labels are automatically applied
-
-## 📋 Content Management
-
-### JSON Schema
-Activities are stored in JSON format:
-```json
-{
-  "version": "1.0.2",
-  "languages": ["sr", "en"],
-  "activities": [
-    {
-      "id": "001",
-      "title": { "sr": "Joga za decu", "en": "Yoga for Kids" },
-      "description": { "sr": "Jednostavna petominutna joga", "en": "Simple 5 minute yoga session" },
-      "videoUrl": {
-        "sr": "https://storage.googleapis.com/myapp/yoga_sr.mp4",
-        "en": "https://storage.googleapis.com/myapp/yoga_en.mp4"
-      }
-    }
-  ]
-}
-```
-
-## 🔒 Privacy & Security
-
-- **No Personal Data**: The app collects no personal information
-- **COPPA Compliant**: Designed for children's privacy
-- **GDPR Ready**: European privacy regulation compliant
-- **Offline First**: Works without internet connection
+---
 
 ## 🤝 Contributing
-
 1. Fork the repository
 2. Create a feature branch
 3. Make your changes
-4. Add tests for new functionality
+4. Add/maintain tests
 5. Ensure all tests pass
-6. Submit a pull request
+6. Follow project rules in `.cursor/rules/`
+7. Submit a pull request
+
+---
 
 ## 📄 License
-
 This project is proprietary. All rights reserved.
-
-## 📞 Support
-
-For questions or support, please contact the development team.
 
 ---
 
