@@ -1,22 +1,55 @@
-<mat-toolbar color="primary">
-  <span>{{ 'APP.TITLE' | translate }}</span>
-  <span class="spacer"></span>
-  <button mat-icon-button [routerLink]="['/settings']" aria-label="Settings">
-    <mat-icon>settings</mat-icon>
-  </button>
-</mat-toolbar>
+<header class="bg-white shadow-sm border-b border-green-100 sticky top-0 z-50">
+  <div class="px-4 py-3">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="w-12 h-12 rounded-full bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center shadow-lg">
+          <span class="text-white font-bold text-xl">V</span>
+        </div>
+        <div>
+          <h1 class="text-xl font-bold text-green-800">{{ 'APP.TITLE' | translate }}</h1>
+          <div class="text-sm text-green-600 font-normal italic mt-1">{{ 'APP.TAGLINE' | translate }}</div>
+        </div>
+      </div>
+      <div class="flex items-center space-x-2">
+        <!-- Language Switcher -->
+        <button class="p-2 flex items-center gap-2 rounded hover:bg-green-50 transition" (click)="switchLanguage()">
+          <span class="text-lg">{{ currentLang === 'sr' ? '🇷🇸' : '🇺🇸' }}</span>
+          <svg class="h-4 w-4 text-green-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 20v-6m0 0V4m0 10l-4-4m4 4l4-4"/></svg>
+        </button>
+        <!-- Search Icon -->
+        <button class="p-2 rounded hover:bg-green-50 transition">
+          <svg class="h-5 w-5 text-green-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</header>
 
-<main class="main-content">
+<nav *ngIf="!isActive('/')" class="px-4 py-3 bg-white border-b border-green-100">
+  <div class="flex space-x-2 overflow-x-auto scrollbar-hide">
+    <a routerLink="/activities" routerLinkActive="active" class="whitespace-nowrap flex items-center gap-2 min-w-fit px-3 py-2 rounded transition-all duration-300 text-green-700 hover:bg-green-100" [ngClass]="{'bg-green-600 text-white hover:bg-green-700': isActive('/activities')}">
+      <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0h6"/></svg>
+      {{ 'NAV.ACTIVITIES' | translate }}
+    </a>
+    <a routerLink="/blog" routerLinkActive="active" class="whitespace-nowrap flex items-center gap-2 min-w-fit px-3 py-2 rounded transition-all duration-300 text-green-700 hover:bg-green-100" [ngClass]="{'bg-green-600 text-white hover:bg-green-700': isActive('/blog')}">
+      <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 19h16M4 15h16M4 11h16M4 7h16"/></svg>
+      {{ 'NAV.BLOG' | translate }}
+    </a>
+    <a routerLink="/tips" routerLinkActive="active" class="whitespace-nowrap flex items-center gap-2 min-w-fit px-3 py-2 rounded transition-all duration-300 text-green-700 hover:bg-green-100" [ngClass]="{'bg-green-600 text-white hover:bg-green-700': isActive('/tips')}">
+      <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M13 16h-1v-4h-1m1-4h.01M12 20a8 8 0 100-16 8 8 0 000 16z"/></svg>
+      {{ 'NAV.TIPS' | translate }}
+    </a>
+    <a routerLink="/games" routerLinkActive="active" class="whitespace-nowrap flex items-center gap-2 min-w-fit px-3 py-2 rounded transition-all duration-300 text-green-700 hover:bg-green-100" [ngClass]="{'bg-green-600 text-white hover:bg-green-700': isActive('/games')}">
+      <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8 12h8M12 8v8"/></svg>
+      {{ 'NAV.GAMES' | translate }}
+    </a>
+    <a routerLink="/resources" routerLinkActive="active" class="whitespace-nowrap flex items-center gap-2 min-w-fit px-3 py-2 rounded transition-all duration-300 text-green-700 hover:bg-green-100" [ngClass]="{'bg-green-600 text-white hover:bg-green-700': isActive('/resources')}">
+      <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 4v16M16 4v16"/></svg>
+      {{ 'NAV.RESOURCES' | translate }}
+    </a>
+  </div>
+</nav>
+
+<main class="main-content px-4 py-6">
   <router-outlet></router-outlet>
-</main>
-
-<nav class="bottom-nav">
-  <button mat-button [routerLink]="['/']" routerLinkActive="active">
-    <mat-icon>home</mat-icon>
-    <span>{{ 'NAV.HOME' | translate }}</span>
-  </button>
-  <button mat-button [routerLink]="['/activities']" routerLinkActive="active">
-    <mat-icon>list</mat-icon>
-    <span>{{ 'NAV.ACTIVITIES' | translate }}</span>
-  </button>
-</nav> 
+</main> 

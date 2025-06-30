@@ -18,9 +18,7 @@ describe('HomeComponent', () => {
     await TestBed.configureTestingModule({
       imports: [
         TranslateModule.forRoot(),
-        BrowserAnimationsModule,
-        MatCardModule,
-        MatButtonModule
+        BrowserAnimationsModule
       ],
       declarations: [ HomeComponent ],
       providers: [
@@ -41,14 +39,20 @@ describe('HomeComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should display welcome card', () => {
+  it('should display welcome section with translation keys', () => {
     const compiled = fixture.nativeElement;
-    expect(compiled.querySelector('.welcome-card')).toBeTruthy();
+    const title = compiled.querySelector('h2');
+    const subtitle = compiled.querySelector('p.text-lg');
+    const desc = compiled.querySelector('p.text-gray-600');
+    expect(title.textContent).toContain('HOME.WELCOME_TITLE');
+    expect(subtitle.textContent).toContain('HOME.WELCOME_SUBTITLE');
+    expect(desc.textContent).toContain('HOME.DESCRIPTION');
   });
 
-  it('should have start activities button', () => {
+  it('should have start activities button with routerLink', () => {
     const compiled = fixture.nativeElement;
     const button = compiled.querySelector('button[routerLink="/activities"]');
     expect(button).toBeTruthy();
+    expect(button.textContent).toContain('HOME.START_ACTIVITIES');
   });
 }); 

@@ -32,6 +32,14 @@ TODO: Phase 1: Set up unit testing environment with Jasmine + Karma <!-- id: tas
 
 ## 📄 Phase 2: Content Integration & Rendering
 
+TODO: Phase 2: Redesign UX <!-- id: task-UX-2024 -->
+**Acceptance Criteria**  
+- [x] Angular Material removed, Tailwind CSS and new color palette applied  
+- [x] Navigation, layout, and all main pages (Home, Activities, Activity Detail, Shop, Blog, Tips, About) rebuilt for consistency and accessibility  
+- [x] All activity images use Unsplash 
+- [x] All navigation/back buttons are visually and functionally consistent  
+- [x] i18n, accessibility, and responsiveness improved throughout 
+
 TODO: Phase 2: Design and implement Activity List screen <!-- id: task-005 -->
 **Acceptance Criteria**  
 - [x] Screen displays all activities from static JSON  

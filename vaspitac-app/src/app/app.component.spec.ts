@@ -48,10 +48,6 @@ describe('AppComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it(`should have as title 'Vaspitac App'`, () => {
-    expect(component.title).toEqual('Vaspitac App');
-  });
-
   it('should set default language to Serbian', () => {
     expect(translateService.getDefaultLang()).toBe('sr');
   });
@@ -60,34 +56,32 @@ describe('AppComponent', () => {
     expect(translateService.currentLang).toBe('sr');
   });
 
-  it('should have toolbar with app title', () => {
+  it('should render the app title and tagline using translation keys', () => {
     const compiled = fixture.nativeElement;
-    const toolbar = compiled.querySelector('mat-toolbar');
-    expect(toolbar).toBeTruthy();
+    const title = compiled.querySelector('h1');
+    const tagline = compiled.querySelector('p.text-xs');
+    expect(title.textContent).toContain('APP.TITLE');
+    expect(tagline.textContent).toContain('APP.TAGLINE');
   });
 
-  it('should have settings button in toolbar', () => {
+  it('should have navigation links for all main sections', () => {
     const compiled = fixture.nativeElement;
-    const settingsButton = compiled.querySelector('button[ng-reflect-router-link="/settings"]');
-    expect(settingsButton).toBeTruthy();
+    const navLinks = compiled.querySelectorAll('nav a');
+    const expectedRoutes = ['/activities', '/blog', '/tips', '/games', '/resources'];
+    expect(navLinks.length).toBe(expectedRoutes.length);
+    expectedRoutes.forEach((route, i) => {
+      expect(navLinks[i].getAttribute('ng-reflect-router-link')).toBe(route);
+    });
   });
 
-  it('should have bottom navigation', () => {
+  it('should have a language switcher button', () => {
     const compiled = fixture.nativeElement;
-    const bottomNav = compiled.querySelector('.bottom-nav');
-    expect(bottomNav).toBeTruthy();
+    const langBtn = compiled.querySelector('button');
+    expect(langBtn).toBeTruthy();
+    expect(langBtn.textContent).toMatch(/🇷🇸|🇺🇸/);
   });
 
-  it('should have home and activities navigation buttons', () => {
-    const compiled = fixture.nativeElement;
-    const homeButton = compiled.querySelector('button[ng-reflect-router-link="/"]');
-    const activitiesButton = compiled.querySelector('button[ng-reflect-router-link="/activities"]');
-    
-    expect(homeButton).toBeTruthy();
-    expect(activitiesButton).toBeTruthy();
-  });
-
-  it('should have router outlet for main content', () => {
+  it('should have a router outlet for main content', () => {
     const compiled = fixture.nativeElement;
     const routerOutlet = compiled.querySelector('router-outlet');
     expect(routerOutlet).toBeTruthy();

@@ -1,0 +1,71 @@
+<div class="min-h-screen bg-green-50/30">
+  <div class="px-4 py-6 max-w-4xl mx-auto">
+    <!-- Back Button -->
+    <div class="mb-6">
+      <button (click)="goBack()" class="text-green-600 hover:text-green-700 p-0 h-auto font-medium flex items-center gap-1">
+        <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7"/></svg>
+        {{ 'ABOUT.BACK' | translate }}
+      </button>
+    </div>
+
+    <div class="space-y-8">
+      <!-- Header Section -->
+      <div class="text-center">
+        <div class="w-32 h-32 rounded-full bg-gradient-to-br from-green-400 to-green-600 mx-auto mb-4 flex items-center justify-center shadow-lg">
+          <span class="text-white font-bold text-4xl">A</span>
+        </div>
+        <h1 class="text-3xl font-semibold text-gray-900 mb-2">{{ 'ABOUT.NAME' | translate }}</h1>
+        <p class="text-lg text-green-600 font-medium">{{ 'ABOUT.ROLE' | translate }}</p>
+      </div>
+
+      <!-- Biography Card -->
+      <div class="bg-white shadow-lg border border-green-100 rounded-xl p-8">
+        <h2 class="text-2xl font-semibold text-gray-900 mb-4">{{ 'ABOUT.BIO_TITLE' | translate }}</h2>
+        <div class="prose prose-green max-w-none text-gray-700 leading-relaxed">
+          <p class="mb-4">{{ 'ABOUT.BIO_1' | translate }}</p>
+          <p class="mb-4">{{ 'ABOUT.BIO_2' | translate }}</p>
+          <p>{{ 'ABOUT.BIO_3' | translate }}</p>
+        </div>
+      </div>
+
+      <!-- Experience Card -->
+      <div class="bg-white shadow-lg border border-green-100 rounded-xl p-8">
+        <h2 class="text-2xl font-semibold text-gray-900 mb-6">{{ 'ABOUT.EXPERIENCE_TITLE' | translate }}</h2>
+        <div class="space-y-6">
+          <div class="border-l-4 border-green-500 pl-4">
+            <h3 class="font-semibold text-lg text-gray-900">{{ 'ABOUT.EXP1_TITLE' | translate }}</h3>
+            <p class="text-green-600 font-medium">2018 - {{ 'ABOUT.PRESENT' | translate }}</p>
+            <p class="text-gray-700 mt-2">{{ 'ABOUT.EXP1_DESC' | translate }}</p>
+          </div>
+          <div class="border-l-4 border-green-500 pl-4">
+            <h3 class="font-semibold text-lg text-gray-900">{{ 'ABOUT.EXP2_TITLE' | translate }}</h3>
+            <p class="text-green-600 font-medium">2014 - 2018</p>
+            <p class="text-gray-700 mt-2">{{ 'ABOUT.EXP2_DESC' | translate }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Contact Card -->
+      <div class="bg-white shadow-lg border border-green-100 rounded-xl p-8">
+        <h2 class="text-2xl font-semibold text-gray-900 mb-6">{{ 'ABOUT.CONTACT_TITLE' | translate }}</h2>
+        <div class="space-y-4">
+          <div class="flex items-center space-x-3">
+            <!-- Lucide Mail Icon for email -->
+            <svg class="h-5 w-5 text-green-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 6-10 7L2 6"/></svg>
+            <span class="text-gray-700">ana.petrovic&#64;vaspitac.rs</span>
+          </div>
+          <div class="flex items-center space-x-3">
+            <!-- Lucide Phone Icon for phone -->
+            <svg class="h-5 w-5 text-green-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 16.92V19a2 2 0 0 1-2 2A18 18 0 0 1 3 5a2 2 0 0 1 2-2h2.09a2 2 0 0 1 2 1.72c.13.81.36 1.6.7 2.34a2 2 0 0 1-.45 2.11L7.91 10.09a16 16 0 0 0 6 6l1.92-1.92a2 2 0 0 1 2.11-.45c.74.34 1.53.57 2.34.7A2 2 0 0 1 22 16.92z"/></svg>
+            <span class="text-gray-700">+381 61 123 4567</span>
+          </div>
+          <div class="flex items-center space-x-3">
+            <!-- Lucide MapPin Icon for location -->
+            <svg class="h-5 w-5 text-green-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 21c-4.418 0-8-4.03-8-9a8 8 0 1 1 16 0c0 4.97-3.582 9-8 9z"/><circle cx="12" cy="12" r="3"/></svg>
+            <span class="text-gray-700">{{ 'ABOUT.LOCATION' | translate }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div> 

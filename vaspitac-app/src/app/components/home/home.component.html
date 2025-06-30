@@ -1,16 +1,34 @@
-<div class="home-container">
-  <mat-card class="welcome-card">
-    <mat-card-header>
-      <mat-card-title>{{ 'HOME.WELCOME_TITLE' | translate }}</mat-card-title>
-      <mat-card-subtitle>{{ 'HOME.WELCOME_SUBTITLE' | translate }}</mat-card-subtitle>
-    </mat-card-header>
-    <mat-card-content>
-      <p>{{ 'HOME.DESCRIPTION' | translate }}</p>
-    </mat-card-content>
-    <mat-card-actions>
-      <button mat-raised-button color="primary" routerLink="/activities">
-        {{ 'HOME.START_ACTIVITIES' | translate }}
-      </button>
-    </mat-card-actions>
-  </mat-card>
+<div class="max-w-3xl mx-auto text-center my-8">
+  <h2 class="text-3xl font-semibold text-green-800 mb-2">{{ 'HOME.WELCOME_TITLE' | translate }}</h2>
+  <p class="text-lg text-green-700 mb-4">{{ 'HOME.WELCOME_SUBTITLE' | translate }}</p>
+  <p class="text-gray-600 mb-6">{{ 'HOME.DESCRIPTION' | translate }}</p>
+</div>
+
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto mb-12">
+  <div *ngFor="let cat of categories" (click)="goToCategory(cat.id)" class="cursor-pointer transform hover:scale-105 transition-all duration-300 bg-white rounded-xl shadow hover:shadow-lg border border-green-100 p-6 flex flex-col items-center text-center">
+    <div class="w-16 h-16 rounded-full flex items-center justify-center shadow-lg mb-4" [ngClass]="cat.color">
+      <ng-container [ngSwitch]="cat.icon">
+        <!-- Lucide User -->
+        <svg *ngSwitchCase="'user'" class="h-8 w-8 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <!-- Lucide ShoppingCart -->
+        <svg *ngSwitchCase="'shopping-cart'" class="h-8 w-8 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2 6h2l.34 2m0 0L6 17a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2l1.24-7.45A2 2 0 0 0 18.26 8H6.34z"/></svg>
+        <!-- Lucide BookOpen -->
+        <svg *ngSwitchCase="'book-open'" class="h-8 w-8 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M2 7v13a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V7"/><path d="M16 3v4M8 3v4"/></svg>
+        <!-- Lucide Lightbulb -->
+        <svg *ngSwitchCase="'lightbulb'" class="h-8 w-8 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 0-7 7c0 3.87 3.13 7 7 7s7-3.13 7-7a7 7 0 0 0-7-7z"/></svg>
+        <!-- Lucide Dumbbell -->
+        <svg *ngSwitchCase="'dumbbell'" class="h-8 w-8 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6.5 6.5l11 11"/><path d="M21 21l-1.5-1.5"/><path d="M3 3l1.5 1.5"/><path d="M18 22v-4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v4"/></svg>
+        <!-- Lucide Palette -->
+        <svg *ngSwitchCase="'palette'" class="h-8 w-8 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="7.5" cy="10.5" r="1.5"/><circle cx="16.5" cy="10.5" r="1.5"/><circle cx="12" cy="16.5" r="1.5"/><path d="M12 2v2"/></svg>
+        <!-- Lucide GraduationCap -->
+        <svg *ngSwitchCase="'graduation-cap'" class="h-8 w-8 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 12l-10-7-10 7 10 7 10-7z"/><path d="M2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6"/></svg>
+        <!-- Lucide Music -->
+        <svg *ngSwitchCase="'music'" class="h-8 w-8 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9 17V9l8-2v8"/></svg>
+        <!-- Lucide TreePine -->
+        <svg *ngSwitchCase="'tree'" class="h-8 w-8 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2l-7 12h14L12 2z"/><path d="M12 22v-4"/></svg>
+      </ng-container>
+    </div>
+    <h3 class="text-lg font-semibold text-green-800 mb-2">{{ cat.title | translate }}</h3>
+    <p class="text-sm text-gray-600 line-clamp-2">{{ cat.description | translate }}</p>
+  </div>
 </div> 

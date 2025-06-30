@@ -1,8 +1,11 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 /* You can add global styles to this file, and also import other style files */
-@use '@angular/material' as mat;
 
 html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+body { margin: 0; }
 
 /* Custom theme colors based on specification */
 :root {
@@ -41,4 +44,77 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 .mat-mdc-button:focus, .mat-mdc-raised-button:focus {
   outline: 2px solid var(--primary-green);
   outline-offset: 2px;
+}
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 120 43% 42%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 120 25% 85%;
+    --secondary-foreground: 120 43% 25%;
+    --muted: 120 15% 95%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 120 35% 75%;
+    --accent-foreground: 120 43% 25%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 120 15% 90%;
+    --input: 120 15% 90%;
+    --ring: 120 43% 42%;
+    --radius: 1rem;
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+    --green-primary: 120 43% 42%;
+    --green-light: 120 35% 75%;
+    --green-pale: 120 25% 85%;
+    --green-mint: 120 15% 95%;
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 120 35% 75%;
+    --primary-foreground: 120 43% 15%;
+    --secondary: 120 20% 25%;
+    --secondary-foreground: 120 35% 85%;
+    --muted: 120 10% 15%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 120 25% 35%;
+    --accent-foreground: 120 35% 85%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 120 15% 25%;
+    --input: 120 15% 25%;
+    --ring: 120 35% 75%;
+  }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  }
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+/* Hide scrollbar for IE, Edge and Firefox */
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;     /* Firefox */
 } 

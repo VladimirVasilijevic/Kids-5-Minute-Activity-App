@@ -64,9 +64,29 @@ describe('ActivityDetailComponent', () => {
   });
 
   // UI test: should render the activity title in the DOM
-  it('should render the activity title', () => {
-    fixture.detectChanges();
-    const compiled = fixture.nativeElement;
-    expect(compiled.textContent).toContain(mockActivity.title['sr']);
-  });
+  it('should render the activity title in the current language', () => {
+    component.lang = 'sr'
+    fixture.detectChanges()
+    const compiled = fixture.nativeElement
+    const title = compiled.querySelector('h1')
+    expect(title).toBeTruthy()
+    expect(title && title.textContent).toContain(mockActivity.title['sr'])
+    component.lang = 'en'
+    fixture.detectChanges()
+    const titleEn = compiled.querySelector('h1')
+    expect(titleEn).toBeTruthy()
+    expect(titleEn && titleEn.textContent).toContain(mockActivity.title['en'])
+  })
+
+  it('should show not found message if activity is missing', () => {
+    // Simulate no activity found
+    const testBed = TestBed.inject(ActivityService) as any
+    spyOn(testBed, 'getActivityById').and.returnValue(of(undefined))
+    fixture = TestBed.createComponent(ActivityDetailComponent)
+    component = fixture.componentInstance
+    fixture.detectChanges()
+    const compiled = fixture.nativeElement
+    const notFound = compiled.querySelector('ng-template') || compiled.textContent
+    expect(compiled.textContent).toContain('ACTIVITY.NOT_FOUND')
+  })
 }); 

@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ActivityService } from '../../services/activity.service';
 import { Activity } from '../../models/activity.model';
 import { TranslateService } from '@ngx-translate/core';
@@ -18,7 +18,8 @@ export class ActivityDetailComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private activityService: ActivityService,
-    private translate: TranslateService
+    private translate: TranslateService,
+    private router: Router
   ) {}
 
   ngOnInit() {
@@ -36,5 +37,9 @@ export class ActivityDetailComponent implements OnInit {
         return this.activityService.getActivityById(id);
       })
     );
+  }
+
+  goBack() {
+    this.router.navigate(['/activities']);
   }
 } 

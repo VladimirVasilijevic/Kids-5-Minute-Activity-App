@@ -9,7 +9,13 @@
       "videoUrl": {
         "sr": "https://storage.googleapis.com/myapp/yoga_sr.mp4",
         "en": "https://storage.googleapis.com/myapp/yoga_en.mp4"
-      }
+      },
+      "category": "physical",
+      "duration": "5 min",
+      "imageUrl": "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=400&h=300&fit=crop",
+      "ageGroup": "3-7",
+      "materials": ["Paper", "Crayons"],
+      "instructions": ["Prepare the materials.", "Follow the activity steps.", "Have fun!"]
     },
     {
       "id": "002",
@@ -18,7 +24,13 @@
       "videoUrl": {
         "sr": "https://storage.googleapis.com/myapp/dance_sr.mp4",
         "en": "https://storage.googleapis.com/myapp/dance_en.mp4"
-      }
+      },
+      "category": "physical",
+      "duration": "5 min",
+      "imageUrl": "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=400&h=300&fit=crop",
+      "ageGroup": "3-7",
+      "materials": ["Paper", "Crayons"],
+      "instructions": ["Prepare the materials.", "Follow the activity steps.", "Have fun!"]
     },
     {
       "id": "003",
@@ -27,109 +39,217 @@
       "videoUrl": {
         "sr": "",
         "en": ""
-      }
+      },
+      "category": "educational",
+      "duration": "5 min",
+      "imageUrl": "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=400&h=300&fit=crop",
+      "ageGroup": "3-7",
+      "materials": ["Paper", "Crayons"],
+      "instructions": ["Prepare the materials.", "Follow the activity steps.", "Have fun!"]
     },
     {
       "id": "004",
       "title": { "sr": "Skakanje", "en": "Jumping" },
       "description": { "sr": "Skačite na jednoj nozi 1 minut", "en": "Jump on one leg for 1 minute" },
-      "videoUrl": { "sr": "", "en": "" }
+      "videoUrl": { "sr": "", "en": "" },
+      "category": "physical",
+      "duration": "5 min",
+      "imageUrl": "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=400&h=300&fit=crop",
+      "ageGroup": "3-7",
+      "materials": ["Paper", "Crayons"],
+      "instructions": ["Prepare the materials.", "Follow the activity steps.", "Have fun!"]
     },
     {
       "id": "005",
       "title": { "sr": "Brojanje igračaka", "en": "Counting Toys" },
       "description": { "sr": "Prebrojite sve igračke u sobi", "en": "Count all the toys in the room" },
-      "videoUrl": { "sr": "", "en": "" }
+      "videoUrl": { "sr": "", "en": "" },
+      "category": "educational",
+      "duration": "5 min",
+      "imageUrl": "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=400&h=300&fit=crop",
+      "ageGroup": "3-7",
+      "materials": ["Paper", "Crayons"],
+      "instructions": ["Prepare the materials.", "Follow the activity steps.", "Have fun!"]
     },
     {
       "id": "006",
       "title": { "sr": "Crtanje kruga", "en": "Draw a Circle" },
       "description": { "sr": "Nacrtajte veliki krug na papiru", "en": "Draw a big circle on paper" },
-      "videoUrl": { "sr": "", "en": "" }
+      "videoUrl": { "sr": "", "en": "" },
+      "category": "creative",
+      "duration": "5 min",
+      "imageUrl": "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=400&h=300&fit=crop",
+      "ageGroup": "3-7",
+      "materials": ["Paper", "Crayons"],
+      "instructions": ["Prepare the materials.", "Follow the activity steps.", "Have fun!"]
     },
     {
       "id": "007",
       "title": { "sr": "Sastavi slagalicu", "en": "Do a Puzzle" },
       "description": { "sr": "Sastavite slagalicu od 10 delova", "en": "Complete a 10-piece puzzle" },
-      "videoUrl": { "sr": "", "en": "" }
+      "videoUrl": { "sr": "", "en": "" },
+      "category": "educational",
+      "duration": "5 min",
+      "imageUrl": "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=400&h=300&fit=crop",
+      "ageGroup": "3-7",
+      "materials": ["Paper", "Crayons"],
+      "instructions": ["Prepare the materials.", "Follow the activity steps.", "Have fun!"]
     },
     {
       "id": "008",
       "title": { "sr": "Pevačka pauza", "en": "Singing Break" },
       "description": { "sr": "Opevajte omiljenu pesmu", "en": "Sing your favorite song" },
-      "videoUrl": { "sr": "", "en": "" }
+      "videoUrl": { "sr": "", "en": "" },
+      "category": "musical",
+      "duration": "5 min",
+      "imageUrl": "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=400&h=300&fit=crop",
+      "ageGroup": "3-7",
+      "materials": ["Paper", "Crayons"],
+      "instructions": ["Prepare the materials.", "Follow the activity steps.", "Have fun!"]
     },
     {
       "id": "009",
       "title": { "sr": "Igra senki", "en": "Shadow Game" },
       "description": { "sr": "Pravite oblike rukama na zidu", "en": "Make shapes with your hands on the wall" },
-      "videoUrl": { "sr": "", "en": "" }
+      "videoUrl": { "sr": "", "en": "" },
+      "category": "creative",
+      "duration": "5 min",
+      "imageUrl": "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=400&h=300&fit=crop",
+      "ageGroup": "3-7",
+      "materials": ["Paper", "Crayons"],
+      "instructions": ["Prepare the materials.", "Follow the activity steps.", "Have fun!"]
     },
     {
       "id": "010",
       "title": { "sr": "Brzo trčanje", "en": "Quick Run" },
       "description": { "sr": "Trčite u mestu 1 minut", "en": "Run in place for 1 minute" },
-      "videoUrl": { "sr": "", "en": "" }
+      "videoUrl": { "sr": "", "en": "" },
+      "category": "physical",
+      "duration": "5 min",
+      "imageUrl": "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=400&h=300&fit=crop",
+      "ageGroup": "3-7",
+      "materials": ["Paper", "Crayons"],
+      "instructions": ["Prepare the materials.", "Follow the activity steps.", "Have fun!"]
     },
     {
       "id": "011",
       "title": { "sr": "Igra boja", "en": "Color Game" },
       "description": { "sr": "Pronađi 3 crvene stvari u sobi", "en": "Find 3 red things in the room" },
-      "videoUrl": { "sr": "", "en": "" }
+      "videoUrl": { "sr": "", "en": "" },
+      "category": "educational",
+      "duration": "5 min",
+      "imageUrl": "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=400&h=300&fit=crop",
+      "ageGroup": "3-7",
+      "materials": ["Paper", "Crayons"],
+      "instructions": ["Prepare the materials.", "Follow the activity steps.", "Have fun!"]
     },
     {
       "id": "012",
       "title": { "sr": "Pravljenje tornja", "en": "Build a Tower" },
       "description": { "sr": "Napravite toranj od kockica", "en": "Build a tower with blocks" },
-      "videoUrl": { "sr": "", "en": "" }
+      "videoUrl": { "sr": "", "en": "" },
+      "category": "creative",
+      "duration": "5 min",
+      "imageUrl": "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=400&h=300&fit=crop",
+      "ageGroup": "3-7",
+      "materials": ["Paper", "Crayons"],
+      "instructions": ["Prepare the materials.", "Follow the activity steps.", "Have fun!"]
     },
     {
       "id": "013",
       "title": { "sr": "Igra ogledala", "en": "Mirror Game" },
       "description": { "sr": "Ponovi pokrete odrasle osobe", "en": "Copy the adult's movements" },
-      "videoUrl": { "sr": "", "en": "" }
+      "videoUrl": { "sr": "", "en": "" },
+      "category": "physical",
+      "duration": "5 min",
+      "imageUrl": "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=400&h=300&fit=crop",
+      "ageGroup": "3-7",
+      "materials": ["Paper", "Crayons"],
+      "instructions": ["Prepare the materials.", "Follow the activity steps.", "Have fun!"]
     },
     {
       "id": "014",
       "title": { "sr": "Skrivanje igračaka", "en": "Hide the Toy" },
       "description": { "sr": "Sakrij igračku i neka je dete pronađe", "en": "Hide a toy and let the child find it" },
-      "videoUrl": { "sr": "", "en": "" }
+      "videoUrl": { "sr": "", "en": "" },
+      "category": "creative",
+      "duration": "5 min",
+      "imageUrl": "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=400&h=300&fit=crop",
+      "ageGroup": "3-7",
+      "materials": ["Paper", "Crayons"],
+      "instructions": ["Prepare the materials.", "Follow the activity steps.", "Have fun!"]
     },
     {
       "id": "015",
       "title": { "sr": "Igra brojeva", "en": "Number Game" },
       "description": { "sr": "Izbroj do 10 naglas", "en": "Count to 10 out loud" },
-      "videoUrl": { "sr": "", "en": "" }
+      "videoUrl": { "sr": "", "en": "" },
+      "category": "educational",
+      "duration": "5 min",
+      "imageUrl": "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=400&h=300&fit=crop",
+      "ageGroup": "3-7",
+      "materials": ["Paper", "Crayons"],
+      "instructions": ["Prepare the materials.", "Follow the activity steps.", "Have fun!"]
     },
     {
       "id": "016",
       "title": { "sr": "Sklekovi", "en": "Push-ups" },
       "description": { "sr": "Uradi 5 sklekova", "en": "Do 5 push-ups" },
-      "videoUrl": { "sr": "", "en": "" }
+      "videoUrl": { "sr": "", "en": "" },
+      "category": "physical",
+      "duration": "5 min",
+      "imageUrl": "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=400&h=300&fit=crop",
+      "ageGroup": "3-7",
+      "materials": ["Paper", "Crayons"],
+      "instructions": ["Prepare the materials.", "Follow the activity steps.", "Have fun!"]
     },
     {
       "id": "017",
       "title": { "sr": "Igra životinja", "en": "Animal Game" },
       "description": { "sr": "Oponašaj omiljenu životinju", "en": "Imitate your favorite animal" },
-      "videoUrl": { "sr": "", "en": "" }
+      "videoUrl": { "sr": "", "en": "" },
+      "category": "nature",
+      "duration": "5 min",
+      "imageUrl": "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=400&h=300&fit=crop",
+      "ageGroup": "3-7",
+      "materials": ["Paper", "Crayons"],
+      "instructions": ["Prepare the materials.", "Follow the activity steps.", "Have fun!"]
     },
     {
       "id": "018",
       "title": { "sr": "Pravljenje loptice", "en": "Make a Ball" },
       "description": { "sr": "Napravi lopticu od papira", "en": "Make a paper ball" },
-      "videoUrl": { "sr": "", "en": "" }
+      "videoUrl": { "sr": "", "en": "" },
+      "category": "creative",
+      "duration": "5 min",
+      "imageUrl": "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=400&h=300&fit=crop",
+      "ageGroup": "3-7",
+      "materials": ["Paper", "Crayons"],
+      "instructions": ["Prepare the materials.", "Follow the activity steps.", "Have fun!"]
     },
     {
       "id": "019",
       "title": { "sr": "Igra pamćenja 2", "en": "Memory Game 2" },
       "description": { "sr": "Zapamti 3 predmeta i ponovi", "en": "Remember 3 objects and repeat" },
-      "videoUrl": { "sr": "", "en": "" }
+      "videoUrl": { "sr": "", "en": "" },
+      "category": "educational",
+      "duration": "5 min",
+      "imageUrl": "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=400&h=300&fit=crop",
+      "ageGroup": "3-7",
+      "materials": ["Paper", "Crayons"],
+      "instructions": ["Prepare the materials.", "Follow the activity steps.", "Have fun!"]
     },
     {
       "id": "020",
       "title": { "sr": "Igra balansa", "en": "Balance Game" },
       "description": { "sr": "Hodaj po liniji na podu", "en": "Walk along a line on the floor" },
-      "videoUrl": { "sr": "", "en": "" }
+      "videoUrl": { "sr": "", "en": "" },
+      "category": "physical",
+      "duration": "5 min",
+      "imageUrl": "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=400&h=300&fit=crop",
+      "ageGroup": "3-7",
+      "materials": ["Paper", "Crayons"],
+      "instructions": ["Prepare the materials.", "Follow the activity steps.", "Have fun!"]
     }
   ]
 } 

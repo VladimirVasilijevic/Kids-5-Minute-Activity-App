@@ -24,6 +24,10 @@ import { HomeComponent } from './components/home/home.component';
 import { ActivityListComponent } from './components/activity-list/activity-list.component';
 import { ActivityDetailComponent } from './components/activity-detail/activity-detail.component';
 import { SettingsComponent } from './components/settings/settings.component';
+import { ShopComponent } from './components/shop/shop.component';
+import { AboutComponent } from './components/about/about.component';
+import { BlogComponent } from './components/blog/blog.component';
+import { TipsComponent } from './components/tips/tips.component';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient) {
@@ -36,7 +40,11 @@ export function HttpLoaderFactory(http: HttpClient) {
     HomeComponent,
     ActivityListComponent,
     ActivityDetailComponent,
-    SettingsComponent
+    SettingsComponent,
+    ShopComponent,
+    AboutComponent,
+    BlogComponent,
+    TipsComponent
   ],
   imports: [
     BrowserModule,
@@ -47,6 +55,10 @@ export function HttpLoaderFactory(http: HttpClient) {
       { path: 'activities', component: ActivityListComponent },
       { path: 'activity/:id', component: ActivityDetailComponent },
       { path: 'settings', component: SettingsComponent },
+      { path: 'shop', component: ShopComponent },
+      { path: 'about', component: AboutComponent },
+      { path: 'blog', component: BlogComponent },
+      { path: 'tips', component: TipsComponent },
       { path: '**', redirectTo: '' }
     ]),
     TranslateModule.forRoot({

@@ -15,6 +15,18 @@ Vaspitac App is designed to help parents, future parents, and educators engage c
 - **Privacy-First**: No personal data collected
 - **Cross-Platform**: Web (PWA) and Android support
 
+## UX Redesign
+- The app was fully redesigned.
+- Now uses Tailwind CSS, Unsplash images for activities, and a new color palette.
+- Navigation, layout, and all main pages were rebuilt for consistency and accessibility.
+- Angular Material was removed in favor of Tailwind.
+- All navigation/back buttons are visually and functionally consistent.
+- i18n, accessibility, and responsiveness improved throughout.
+
+## Updating Activity Images
+- Activity images are now set via Unsplash URLs in `src/assets/activities.json`.
+- To update, edit the `imageUrl` field for each activity.
+
 ---
 
 ## 🏗️ Project Structure (Technical)
