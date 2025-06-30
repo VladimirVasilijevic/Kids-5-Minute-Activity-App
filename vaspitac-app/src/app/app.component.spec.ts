@@ -59,9 +59,9 @@ describe('AppComponent', () => {
   it('should render the app title and tagline using translation keys', () => {
     const compiled = fixture.nativeElement;
     const title = compiled.querySelector('h1');
-    const tagline = compiled.querySelector('p.text-xs');
-    expect(title.textContent).toContain('APP.TITLE');
-    expect(tagline.textContent).toContain('APP.TAGLINE');
+    const tagline = compiled.querySelector('div.text-sm');
+    expect(title.textContent).toContain(translateService.instant('APP.TITLE'));
+    expect(tagline.textContent).toContain(translateService.instant('APP.TAGLINE'));
   });
 
   it('should have navigation links for all main sections', () => {

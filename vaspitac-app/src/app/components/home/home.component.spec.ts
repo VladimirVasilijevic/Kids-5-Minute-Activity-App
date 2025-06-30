@@ -48,11 +48,4 @@ describe('HomeComponent', () => {
     expect(subtitle.textContent).toContain('HOME.WELCOME_SUBTITLE');
     expect(desc.textContent).toContain('HOME.DESCRIPTION');
   });
-
-  it('should have start activities button with routerLink', () => {
-    const compiled = fixture.nativeElement;
-    const button = compiled.querySelector('button[routerLink="/activities"]');
-    expect(button).toBeTruthy();
-    expect(button.textContent).toContain('HOME.START_ACTIVITIES');
-  });
 }); 

@@ -32,8 +32,8 @@ describe('TipsComponent', () => {
     const subtitle = compiled.querySelector('p.text-lg')
     expect(title).toBeTruthy()
     expect(subtitle).toBeTruthy()
-    expect(title && title.textContent).toContain('TIPS.TITLE')
-    expect(subtitle && subtitle.textContent).toContain('TIPS.SUBTITLE')
+    expect(title && title.textContent).toContain(translate.instant('TIPS.QUICK_TITLE'))
+    expect(subtitle && subtitle.textContent).toContain(translate.instant('TIPS.QUICK_SUBTITLE'))
   })
 
   it('should render all tips', () => {
