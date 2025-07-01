@@ -173,24 +173,24 @@ TODO: Phase 6: Configure Firebase Hosting for web/PWA <!-- id: task-016 -->
 
 TODO: Phase 6: Build Android APK using Capacitor and test on real devices <!-- id: task-017 -->
 **Acceptance Criteria**  
-- [ ] `npx cap build android` creates functional APK  
-- [ ] App works on Android 8+ devices  
-- [ ] Offline playback verified  
-- [ ] Firebase storage access secure via rules
-- [ ] All android/ files (including gradlew) are committed and gradlew is executable in CI
-- [ ] CI/CD pipeline uses only allowlisted GitHub Actions
-- [ ] gradlew permission errors are handled with chmod +x step in workflow
+- [x] `npx cap build android` creates functional APK  
+- [x] App works on Android 8+ devices  
+- [x] Offline playback verified  
+- [x] Firebase storage access secure via rules
+- [x] All android/ files (including gradlew) are committed and gradlew is executable in CI
+- [x] CI/CD pipeline uses only allowlisted GitHub Actions
+- [x] gradlew permission errors are handled with chmod +x step in workflow
 
 TODO: Phase 6: Setup GitHub Actions for CI/CD <!-- id: task-018 -->
 **Acceptance Criteria**  
-- [ ] Pipeline runs on push to main  
-- [ ] Unit and e2e tests executed in pipeline  
+- [x] Pipeline runs on push to main  
+- [x] Unit and e2e tests executed in pipeline  
 - [ ] Web build deployed to Firebase automatically  
-- [ ] Clear logs and notifications on failures
-- [ ] Web build and Android APK are built and uploaded as artifacts in CI
-- [ ] Deployment to GitHub Pages uses allowlisted actions only
-- [ ] gh-pages branch appears after first successful deploy
-- [ ] .gitignore only ignores build/local files, not android/ directory
+- [x] Clear logs and notifications on failures
+- [x] Web build and Android APK are built and uploaded as artifacts in CI
+- [x] Deployment to GitHub Pages uses allowlisted actions only
+- [x] gh-pages branch appears after first successful deploy
+- [x] .gitignore only ignores build/local files, not android/ directory
 
 ## 🌿 Optional MVP Enhancement
 
