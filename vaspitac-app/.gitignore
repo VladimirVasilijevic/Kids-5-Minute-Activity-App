@@ -11,6 +11,17 @@
 **/android/app/build/
 **/ios/build/
 
+# Android/Gradle
+**/android/.gradle/
+**/android/local.properties
+**/android/.idea/
+**/android/.cxx/
+**/android/.DS_Store
+**/android/.settings/
+**/android/.externalNativeBuild/
+**/android/captures/
+**/android/build/
+
 # Environment files
 /src/environments/*.ts
 !.src/environments/environment*.ts
