@@ -16,6 +16,7 @@ Vaspitac App is designed to help parents, future parents, and educators engage c
 - **Cross-Platform**: Web (PWA) and Android support
 - **Mobile-First Design**: Optimized for Android portrait mode with responsive layouts
 - **Smooth Navigation**: Automatic scroll-to-top on all navigation actions
+- **CI/CD Ready**: Automated builds and tests for web and Android via GitHub Actions
 
 ## UX Redesign & Mobile Optimization
 - The app was fully redesigned with mobile-first approach
@@ -28,9 +29,10 @@ Vaspitac App is designed to help parents, future parents, and educators engage c
   - Responsive grid layouts that adapt to screen size
   - Touch-friendly buttons and navigation elements
   - Optimized typography and spacing for mobile screens
-  - PayPal section text overflow fixed for mobile
-  - Smooth scroll-to-top functionality on all navigation
+  - **PayPal section text overflow fixed for mobile**
+  - **Smooth scroll-to-top functionality on all navigation**
   - Category filtering with query parameters support
+  - **All navigation and category selection now scroll to top automatically**
 
 ## Updating Activity Images
 - Activity images are now set via Unsplash URLs in `src/assets/activities.json`.
@@ -60,12 +62,12 @@ vaspitac/
 │   │   │   │   └── settings/          # Settings (language, version)
 │   │   │   ├── models/                # Shared TypeScript interfaces/types
 │   │   │   ├── services/              # Angular services (e.g., ActivityService)
-│   │   ├── assets/
-│   │   │   ├── activities.json        # Static content (activities)
-│   │   │   └── i18n/                  # Translation files (sr.json, en.json)
-│   │   ├── test-utils/                # Shared test mocks/utilities
-│   │   └── styles.scss                # Global styles
-│   ├── angular.json, ...              # Angular/Capacitor config
+│   │   │   ├── assets/
+│   │   │   │   ├── activities.json        # Static content (activities)
+│   │   │   │   └── i18n/                  # Translation files (sr.json, en.json)
+│   │   │   ├── test-utils/                # Shared test mocks/utilities
+│   │   │   └── styles.scss                # Global styles
+│   │   ├── angular.json, ...              # Angular/Capacitor config
 ├── .cursor/
 │   └── rules/                         # Project coding/documentation rules
 │       ├── angular-best-practices.mdc # Angular/TS best practices
@@ -109,6 +111,7 @@ vaspitac/
 - npm or yarn
 - Angular CLI
 - Android Studio (for mobile builds)
+- **For CI/CD:** GitHub repository with Actions enabled, allowlisted actions (see below)
 
 ### Installation & Running
 ```bash
@@ -135,6 +138,12 @@ $ npx cap sync
 $ npx cap open android
 ```
 
+#### Building Android APK (Local)
+```bash
+# After syncing, open Android Studio and build APK as usual
+# Or use CLI:
+$ npx cap build android
+```
 ---
 
 ## 🧪 Testing & Utilities
