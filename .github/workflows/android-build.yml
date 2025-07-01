@@ -42,6 +42,10 @@ jobs:
     - name: Sync Capacitor
       working-directory: vaspitac-app
       run: npx cap sync
+
+    - name: Make gradlew executable
+      working-directory: vaspitac-app/android
+      run: chmod +x gradlew
       
     - name: Clean previous Android build
       working-directory: vaspitac-app/android
