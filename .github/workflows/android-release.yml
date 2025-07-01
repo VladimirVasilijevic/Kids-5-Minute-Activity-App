@@ -1,0 +1,77 @@
+name: Build Android Release APK
+
+on:
+  push:
+    tags:
+      - 'v*' # Trigger on version tags
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  build-android-release:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: 'vaspitac-app/package-lock.json'
+        
+    - name: Setup Java
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'zulu'
+        java-version: '17'
+        
+    - name: Setup Android SDK
+      uses: android-actions/setup-android@v3
+      
+    - name: Install dependencies
+      working-directory: vaspitac-app
+      run: npm ci
+      
+    - name: Build Angular app
+      working-directory: vaspitac-app
+      run: npm run build
+      
+    - name: Add Android platform
+      working-directory: vaspitac-app
+      run: npx cap add android --force
+      
+    - name: Sync Capacitor
+      working-directory: vaspitac-app
+      run: npx cap sync
+      
+    - name: Create keystore
+      run: |
+        keytool -genkey -v -keystore vaspitac-app/android/app/release-key.keystore -alias vaspitac-key -keyalg RSA -keysize 2048 -validity 10000 -storepass ${{ secrets.KEYSTORE_PASSWORD }} -keypass ${{ secrets.KEY_PASSWORD }} -dname "CN=Vaspitac App, OU=Development, O=Vaspitac, L=Belgrade, S=Serbia, C=RS"
+      
+    - name: Build Release APK
+      working-directory: vaspitac-app
+      run: |
+        cd android
+        ./gradlew assembleRelease
+      env:
+        ANDROID_HOME: ${{ env.ANDROID_SDK_ROOT }}
+        KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+        KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        
+    - name: Upload Release APK
+      uses: actions/upload-artifact@v4
+      with:
+        name: vaspitac-app-release
+        path: vaspitac-app/android/app/build/outputs/apk/release/app-release.apk
+        retention-days: 90
+        
+    - name: Create Release
+      uses: softprops/action-gh-release@v2
+      if: startsWith(github.ref, 'refs/tags/')
+      with:
+        files: vaspitac-app/android/app/build/outputs/apk/release/app-release.apk
+        generate_release_notes: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 

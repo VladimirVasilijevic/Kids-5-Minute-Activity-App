@@ -8,8 +8,8 @@
 /node_modules
 
 # Capacitor build output
-/android
-/ios
+**/android/app/build/
+**/ios/build/
 
 # Environment files
 /src/environments/*.ts
