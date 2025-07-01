@@ -61,6 +61,28 @@ TODO: Phase 2: Integrate JSON content loading and version tracking <!-- id: task
 - [x] Version number displayed in Settings  
 - [x] JSON service covered by unit tests
 
+## 📱 Phase 2.5: Mobile Optimization & Bug Fixes
+
+TODO: Phase 2.5: Implement mobile-first responsive design <!-- id: task-MOBILE-001 -->
+**Acceptance Criteria**  
+- [x] All pages optimized for mobile screens (portrait orientation)
+- [x] Responsive grid layouts that adapt to different screen sizes
+- [x] Touch-friendly buttons and navigation elements
+- [x] Optimized typography and spacing for mobile screens
+- [x] PayPal section text overflow fixed for mobile displays
+- [x] Smooth scroll-to-top functionality on all navigation actions
+- [x] Category filtering with query parameters support
+- [x] All unit tests updated to match new responsive design
+
+TODO: Phase 2.5: Fix navigation and user experience issues <!-- id: task-MOBILE-002 -->
+**Acceptance Criteria**  
+- [x] Home page category navigation scrolls to top after selection
+- [x] All back buttons scroll to top when returning to previous pages
+- [x] Activity list properly handles category query parameters
+- [x] Shop page PayPal section text properly contained on mobile
+- [x] All navigation actions provide consistent user experience
+- [x] Language switcher remains visible and accessible on all screen sizes
+
 ## 🌐 Phase 3: Content Update & Storage
 
 TODO: Phase 3: Implement remote content fetch and version check on app start <!-- id: task-008 -->

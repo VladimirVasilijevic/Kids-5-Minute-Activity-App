@@ -25,12 +25,12 @@ export class AppComponent {
     })
   }
 
-  switchLanguage () {
+  switchLanguage() {
     this.currentLang = this.currentLang === 'sr' ? 'en' : 'sr'
     this.translate.use(this.currentLang)
   }
 
-  isActive (route: string): boolean {
+  isActive(route: string): boolean {
     return this.activeRoute.startsWith(route)
   }
 } 

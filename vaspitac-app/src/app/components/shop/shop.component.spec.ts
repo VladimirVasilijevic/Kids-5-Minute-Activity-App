@@ -39,7 +39,7 @@ describe('ShopComponent', () => {
   it('should render the shop title and description', () => {
     const compiled = fixture.nativeElement as HTMLElement
     const title = compiled.querySelector('h1')
-    const desc = compiled.querySelector('p.text-lg')
+    const desc = compiled.querySelector('p.text-base.md\\:text-lg')
     expect(title).toBeTruthy()
     expect(desc).toBeTruthy()
     expect(title && title.textContent).toContain('SHOP.TITLE')

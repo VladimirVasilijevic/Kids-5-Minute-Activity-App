@@ -1,56 +1,56 @@
-<div class="max-w-5xl mx-auto">
+<div class="max-w-5xl mx-auto px-4">
   <!-- Title and Description -->
-  <div class="mb-6 text-center">
-    <button (click)="goBack()" class="text-green-600 hover:text-green-700 p-0 h-auto font-medium flex items-center gap-1 mb-4" [attr.aria-label]="'ACTIVITIES.BACK' | translate">
+  <div class="mb-4 md:mb-6 text-center">
+    <button (click)="goBack()" class="text-green-600 hover:text-green-700 p-0 h-auto font-medium flex items-center gap-1 mb-3 md:mb-4" [attr.aria-label]="'ACTIVITIES.BACK' | translate">
       <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7"/></svg>
       {{ 'ACTIVITIES.BACK' | translate }}
     </button>
-    <h2 class="text-3xl font-semibold text-green-800 mb-2">{{ 'HOME.CAT_PHYSICAL_TITLE' | translate }}</h2>
-    <p class="text-lg text-green-700 mb-4">{{ 'HOME.CAT_PHYSICAL_DESC' | translate }}</p>
+    <h2 class="text-2xl md:text-3xl font-semibold text-green-800 mb-2">{{ 'HOME.CAT_PHYSICAL_TITLE' | translate }}</h2>
+    <p class="text-base md:text-lg text-green-700 mb-3 md:mb-4">{{ 'HOME.CAT_PHYSICAL_DESC' | translate }}</p>
   </div>
 
   <!-- Category Filter -->
-  <div class="py-3 bg-green-50/50 border-b border-green-100 mb-6">
-    <div class="flex space-x-2 overflow-x-auto scrollbar-hide">
-      <button (click)="selectCategory('')" [ngClass]="selectedCategory === '' ? 'bg-green-600 text-white shadow-lg scale-105' : 'border-green-200 text-green-700 hover:bg-green-100 hover:border-green-300 hover:scale-105'" class="whitespace-nowrap rounded-full min-w-fit transition-all duration-300 px-4 py-1 border font-medium text-sm focus:outline-none">
+  <div class="py-3 bg-green-50/50 border-b border-green-100 mb-4 md:mb-6">
+    <div class="flex space-x-2 overflow-x-auto scrollbar-hide px-2">
+      <button (click)="selectCategory('')" [ngClass]="selectedCategory === '' ? 'bg-green-600 text-white shadow-lg scale-105' : 'border-green-200 text-green-700 hover:bg-green-100 hover:border-green-300 hover:scale-105'" class="whitespace-nowrap rounded-full min-w-fit transition-all duration-300 px-3 md:px-4 py-1 border font-medium text-xs md:text-sm focus:outline-none">
         {{ 'ACTIVITIES.ALL' | translate }}
       </button>
-      <button *ngFor="let cat of categories" (click)="selectCategory(cat)" [ngClass]="selectedCategory === cat ? 'bg-green-600 text-white shadow-lg scale-105' : 'border-green-200 text-green-700 hover:bg-green-100 hover:border-green-300 hover:scale-105'" class="whitespace-nowrap rounded-full min-w-fit transition-all duration-300 px-4 py-1 border font-medium text-sm focus:outline-none">
+      <button *ngFor="let cat of categories" (click)="selectCategory(cat)" [ngClass]="selectedCategory === cat ? 'bg-green-600 text-white shadow-lg scale-105' : 'border-green-200 text-green-700 hover:bg-green-100 hover:border-green-300 hover:scale-105'" class="whitespace-nowrap rounded-full min-w-fit transition-all duration-300 px-3 md:px-4 py-1 border font-medium text-xs md:text-sm focus:outline-none">
         {{ ('HOME.CAT_' + cat.toUpperCase() + '_TITLE') | translate }}
       </button>
     </div>
   </div>
 
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
     <div *ngFor="let activity of activities$ | async" (click)="goToActivity(activity.id)" class="group overflow-hidden bg-white rounded-xl shadow hover:shadow-xl transition-all duration-500 hover:scale-[1.03] transform-gpu cursor-pointer">
-      <div class="relative h-40 bg-gradient-card overflow-hidden">
+      <div class="relative h-32 md:h-40 bg-gradient-card overflow-hidden">
         <img [src]="activity.imageUrl" [alt]="activity.title[lang]" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
         <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent group-hover:from-black/30 transition-all duration-300"></div>
-        <div class="absolute top-3 left-3">
-          <span class="bg-green-600 text-white text-xs px-3 py-1 rounded-full font-medium shadow-lg backdrop-blur-sm">
+        <div class="absolute top-2 md:top-3 left-2 md:left-3">
+          <span class="bg-green-600 text-white text-xs px-2 md:px-3 py-1 rounded-full font-medium shadow-lg backdrop-blur-sm">
             {{ ('HOME.CAT_' + activity.category.toUpperCase() + '_TITLE') | translate }}
           </span>
         </div>
-        <div class="absolute top-3 right-3 flex items-center bg-white/95 backdrop-blur-sm rounded-full px-3 py-1 shadow-md">
-          <svg class="h-4 w-4 text-green-600 mr-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        <div class="absolute top-2 md:top-3 right-2 md:right-3 flex items-center bg-white/95 backdrop-blur-sm rounded-full px-2 md:px-3 py-1 shadow-md">
+          <svg class="h-3 w-3 md:h-4 md:w-4 text-green-600 mr-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
           <span class="text-xs font-medium text-green-800">{{ activity.duration }}</span>
         </div>
         <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-          <div class="w-12 h-12 bg-white/90 rounded-full flex items-center justify-center shadow-lg backdrop-blur-sm">
-            <svg class="h-6 w-6 text-green-600 ml-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="6 3 20 12 6 21 6 3"/></svg>
+          <div class="w-10 h-10 md:w-12 md:h-12 bg-white/90 rounded-full flex items-center justify-center shadow-lg backdrop-blur-sm">
+            <svg class="h-5 w-5 md:h-6 md:w-6 text-green-600 ml-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="6 3 20 12 6 21 6 3"/></svg>
           </div>
         </div>
       </div>
-      <div class="p-4">
-        <h3 class="font-semibold text-gray-900 mb-2 line-clamp-2 group-hover:text-green-800 transition-colors duration-300">{{ activity.title[lang] }}</h3>
-        <p class="text-sm text-gray-600 mb-4 line-clamp-2">{{ activity.description[lang] }}</p>
-        <button (click)="goToActivity(activity.id); $event.stopPropagation()" class="w-full bg-green-600 hover:bg-green-700 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02] flex items-center justify-center py-2 mt-2">
-          <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="6 3 20 12 6 21 6 3"/></svg>
+      <div class="p-3 md:p-4">
+        <h3 class="font-semibold text-gray-900 mb-1 md:mb-2 line-clamp-2 group-hover:text-green-800 transition-colors duration-300 text-sm md:text-base">{{ activity.title[lang] }}</h3>
+        <p class="text-xs md:text-sm text-gray-600 mb-3 md:mb-4 line-clamp-2">{{ activity.description[lang] }}</p>
+        <button (click)="goToActivity(activity.id); $event.stopPropagation()" class="w-full bg-green-600 hover:bg-green-700 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02] flex items-center justify-center py-2 md:py-2 mt-2 text-sm md:text-base">
+          <svg class="h-3 w-3 md:h-4 md:w-4 mr-1 md:mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="6 3 20 12 6 21 6 3"/></svg>
           {{ 'ACTIVITIES.START' | translate }}
         </button>
       </div>
     </div>
-    <div *ngIf="(activities$ | async)?.length === 0" class="col-span-full text-center text-gray-500 py-12">
+    <div *ngIf="(activities$ | async)?.length === 0" class="col-span-full text-center text-gray-500 py-8 md:py-12">
       {{ 'ACTIVITIES.EMPTY' | translate }}
     </div>
   </div>

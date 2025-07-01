@@ -5,7 +5,11 @@
   },
   "NAV": {
     "HOME": "Home",
-    "ACTIVITIES": "Activities"
+    "ACTIVITIES": "Activities",
+    "BLOG": "Blog",
+    "TIPS": "Tips",
+    "SHOP": "Shop",
+    "ABOUT": "About"
   },
   "HOME": {
     "WELCOME_TITLE": "Welcome to Vaspitac App",

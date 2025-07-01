@@ -14,14 +14,23 @@ Vaspitac App is designed to help parents, future parents, and educators engage c
 - **No Special Equipment**: Activities require no special materials
 - **Privacy-First**: No personal data collected
 - **Cross-Platform**: Web (PWA) and Android support
+- **Mobile-First Design**: Optimized for Android portrait mode with responsive layouts
+- **Smooth Navigation**: Automatic scroll-to-top on all navigation actions
 
-## UX Redesign
-- The app was fully redesigned.
-- Now uses Tailwind CSS, Unsplash images for activities, and a new color palette.
-- Navigation, layout, and all main pages were rebuilt for consistency and accessibility.
-- Angular Material was removed in favor of Tailwind.
-- All navigation/back buttons are visually and functionally consistent.
-- i18n, accessibility, and responsiveness improved throughout.
+## UX Redesign & Mobile Optimization
+- The app was fully redesigned with mobile-first approach
+- Now uses Tailwind CSS, Unsplash images for activities, and a new color palette
+- Navigation, layout, and all main pages were rebuilt for consistency and accessibility
+- Angular Material was removed in favor of Tailwind CSS
+- All navigation/back buttons are visually and functionally consistent
+- i18n, accessibility, and responsiveness improved throughout
+- **Mobile Optimizations**:
+  - Responsive grid layouts that adapt to screen size
+  - Touch-friendly buttons and navigation elements
+  - Optimized typography and spacing for mobile screens
+  - PayPal section text overflow fixed for mobile
+  - Smooth scroll-to-top functionality on all navigation
+  - Category filtering with query parameters support
 
 ## Updating Activity Images
 - Activity images are now set via Unsplash URLs in `src/assets/activities.json`.
@@ -44,6 +53,10 @@ vaspitac/
 │   │   │   │   ├── home/              # Home screen (list of categories)
 │   │   │   │   ├── activity-list/     # Activity list screen
 │   │   │   │   ├── activity-detail/   # Activity detail (text + video)
+│   │   │   │   ├── blog/              # Blog articles
+│   │   │   │   ├── tips/              # Parenting tips
+│   │   │   │   ├── shop/              # Educational materials shop
+│   │   │   │   ├── about/             # About the author
 │   │   │   │   └── settings/          # Settings (language, version)
 │   │   │   ├── models/                # Shared TypeScript interfaces/types
 │   │   │   ├── services/              # Angular services (e.g., ActivityService)
@@ -79,12 +92,13 @@ vaspitac/
 
 ## 🧑‍💻 Development & Best Practices
 
-- **Modern Angular**: Standalone components, RxJS, Angular Material
+- **Modern Angular**: Standalone components, RxJS, Tailwind CSS
 - **TypeScript**: All types/interfaces in `models/`, never import a service just for a type
 - **Testing**: Jasmine + Karma, >80% coverage, all mocks in `test-utils/`
 - **Best Practices**: See `.cursor/rules/angular-best-practices.mdc` for enforced standards (structure, naming, code style, testing, etc.)
-- **Internationalization**: ngx-translate, language switcher in Settings
+- **Internationalization**: ngx-translate, language switcher in header
 - **PWA**: Service worker, offline support, installable
+- **Mobile-First**: Responsive design optimized for Android portrait mode
 
 ---
 
@@ -128,6 +142,7 @@ $ npx cap open android
 - **Test utilities**: Shared mocks in `test-utils/` (import in all specs)
 - **Coverage**: Run `npm run test:coverage` (see `/coverage`)
 - **E2E**: (Planned) Cypress/Playwright for user flows
+- **Mobile Testing**: Responsive design tested across different screen sizes
 
 ---
 

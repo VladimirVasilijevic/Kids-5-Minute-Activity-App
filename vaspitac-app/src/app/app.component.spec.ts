@@ -59,7 +59,9 @@ describe('AppComponent', () => {
   it('should render the app title and tagline using translation keys', () => {
     const compiled = fixture.nativeElement;
     const title = compiled.querySelector('h1');
-    const tagline = compiled.querySelector('div.text-sm');
+    const tagline = compiled.querySelector('div.text-xs.md\\:text-sm');
+    expect(title).toBeTruthy();
+    expect(tagline).toBeTruthy();
     expect(title.textContent).toContain(translateService.instant('APP.TITLE'));
     expect(tagline.textContent).toContain(translateService.instant('APP.TAGLINE'));
   });
@@ -67,7 +69,7 @@ describe('AppComponent', () => {
   it('should have navigation links for all main sections', () => {
     const compiled = fixture.nativeElement;
     const navLinks = compiled.querySelectorAll('nav a');
-    const expectedRoutes = ['/activities', '/blog', '/tips', '/games', '/resources'];
+    const expectedRoutes = ['/activities', '/blog', '/tips', '/shop', '/about'];
     expect(navLinks.length).toBe(expectedRoutes.length);
     expectedRoutes.forEach((route, i) => {
       expect(navLinks[i].getAttribute('ng-reflect-router-link')).toBe(route);

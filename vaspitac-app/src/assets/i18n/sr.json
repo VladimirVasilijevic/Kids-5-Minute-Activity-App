@@ -5,7 +5,11 @@
   },
   "NAV": {
     "HOME": "Početna",
-    "ACTIVITIES": "Aktivnosti"
+    "ACTIVITIES": "Aktivnosti",
+    "BLOG": "Blog",
+    "TIPS": "Saveti",
+    "SHOP": "Prodavnica",
+    "ABOUT": "O meni"
   },
   "HOME": {
     "WELCOME_TITLE": "Dobrodošli u Vaspitac App",

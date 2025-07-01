@@ -40,6 +40,8 @@ export class ActivityDetailComponent implements OnInit {
   }
 
   goBack() {
-    this.router.navigate(['/activities']);
+    this.router.navigate(['/activities']).then(() => {
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    })
   }
 } 

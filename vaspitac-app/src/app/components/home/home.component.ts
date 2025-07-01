@@ -86,26 +86,30 @@ export class HomeComponent {
   goToCategory(categoryId: string): void {
     switch (categoryId) {
       case 'about':
-        this.router.navigate(['/about']);
+        this.router.navigate(['/about']).then(() => this.scrollToTop());
         break;
       case 'shop':
-        this.router.navigate(['/shop']);
+        this.router.navigate(['/shop']).then(() => this.scrollToTop());
         break;
       case 'blog':
-        this.router.navigate(['/blog']);
+        this.router.navigate(['/blog']).then(() => this.scrollToTop());
         break;
       case 'tips':
-        this.router.navigate(['/tips']);
+        this.router.navigate(['/tips']).then(() => this.scrollToTop());
         break;
       case 'physical':
       case 'creative':
       case 'educational':
       case 'musical':
       case 'nature':
-        this.router.navigate(['/activities'], { queryParams: { category: categoryId } });
+        this.router.navigate(['/activities'], { queryParams: { category: categoryId } }).then(() => this.scrollToTop());
         break;
       default:
-        this.router.navigate(['/activities']);
+        this.router.navigate(['/activities']).then(() => this.scrollToTop());
     }
+  }
+
+  private scrollToTop(): void {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 } 

@@ -39,7 +39,9 @@ export class BlogComponent {
 
   constructor(private router: Router) {}
 
-  goBack () {
-    this.router.navigate(['/'])
+  goBack() {
+    this.router.navigate(['/']).then(() => {
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    })
   }
 } 

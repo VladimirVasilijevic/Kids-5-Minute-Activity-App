@@ -4,7 +4,7 @@ import { Activity } from '../../models/activity.model'
 import { TranslateService } from '@ngx-translate/core'
 import { Observable, combineLatest, BehaviorSubject } from 'rxjs'
 import { map, startWith } from 'rxjs/operators'
-import { Router } from '@angular/router'
+import { Router, ActivatedRoute } from '@angular/router'
 
 @Component({
   selector: 'app-activity-list',
@@ -23,15 +23,27 @@ export class ActivityListComponent implements OnInit {
   constructor(
     private activityService: ActivityService,
     private translate: TranslateService,
-    private router: Router
+    private router: Router,
+    private route: ActivatedRoute
   ) {}
 
   ngOnInit() {
     this.lang = this.translate.currentLang || this.translate.getDefaultLang() || 'sr'
+    
+    // Handle query parameters for category filtering
+    this.route.queryParams.subscribe(params => {
+      const category = params['category']
+      if (category) {
+        this.selectedCategory = category
+        this.categoryFilter$.next(category)
+      }
+    })
+
     this.activityService.getActivities().subscribe(activities => {
       this.allActivities = activities
       this.categories = Array.from(new Set(activities.map(a => a.category)))
     })
+    
     this.activities$ = combineLatest([
       this.activityService.getActivities(),
       this.translate.onLangChange.pipe(
@@ -57,6 +69,8 @@ export class ActivityListComponent implements OnInit {
   }
 
   goBack() {
-    this.router.navigate(['/'])
+    this.router.navigate(['/']).then(() => {
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    })
   }
 } 

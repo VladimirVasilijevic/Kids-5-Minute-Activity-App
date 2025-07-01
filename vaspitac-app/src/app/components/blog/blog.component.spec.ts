@@ -29,7 +29,7 @@ describe('BlogComponent', () => {
   it('should render the blog title and subtitle', () => {
     const compiled = fixture.nativeElement as HTMLElement
     const title = compiled.querySelector('h2')
-    const subtitle = compiled.querySelector('p.text-lg')
+    const subtitle = compiled.querySelector('p.text-base.md\\:text-lg')
     expect(title).toBeTruthy()
     expect(subtitle).toBeTruthy()
     expect(title && title.textContent).toContain('BLOG.TITLE')
