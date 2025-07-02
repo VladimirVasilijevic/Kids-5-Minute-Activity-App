@@ -1,44 +1,22 @@
-import { Component } from '@angular/core'
+import { Component, OnInit } from '@angular/core'
 import { Router } from '@angular/router'
+import { HttpClient } from '@angular/common/http'
+import { Observable } from 'rxjs'
+import { Tip } from '../../models/tip.model'
 
 @Component({
   selector: 'app-tips',
   templateUrl: './tips.component.html',
   styleUrls: ['./tips.component.scss']
 })
-export class TipsComponent {
-  tips = [
-    {
-      id: 1,
-      title: 'TIPS.TIP1_TITLE',
-      description: 'TIPS.TIP1_DESC',
-      icon: 'heart',
-      color: 'bg-pink-100 text-pink-600'
-    },
-    {
-      id: 2,
-      title: 'TIPS.TIP2_TITLE',
-      description: 'TIPS.TIP2_DESC',
-      icon: 'brain',
-      color: 'bg-blue-100 text-blue-600'
-    },
-    {
-      id: 3,
-      title: 'TIPS.TIP3_TITLE',
-      description: 'TIPS.TIP3_DESC',
-      icon: 'smile',
-      color: 'bg-yellow-100 text-yellow-600'
-    },
-    {
-      id: 4,
-      title: 'TIPS.TIP4_TITLE',
-      description: 'TIPS.TIP4_DESC',
-      icon: 'lightbulb',
-      color: 'bg-green-100 text-green-600'
-    }
-  ]
+export class TipsComponent implements OnInit {
+  tips$!: Observable<Tip[]>
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, private http: HttpClient) {}
+
+  ngOnInit(): void {
+    this.tips$ = this.http.get<Tip[]>('assets/tips.json')
+  }
 
   goBack() {
     this.router.navigate(['/']).then(() => {

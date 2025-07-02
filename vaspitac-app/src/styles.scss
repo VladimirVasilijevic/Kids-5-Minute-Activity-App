@@ -117,4 +117,6 @@ body { margin: 0; }
 .scrollbar-hide {
   -ms-overflow-style: none;  /* IE and Edge */
   scrollbar-width: none;     /* Firefox */
-} 
+}
+
+@import 'flag-icons/css/flag-icons.min.css'; 

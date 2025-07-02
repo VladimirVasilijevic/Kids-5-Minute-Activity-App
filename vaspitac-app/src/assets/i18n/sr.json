@@ -91,7 +91,9 @@
     "BANK_HOWTO_ACCOUNT": "3. Broj računa: ",
     "BANK_HOWTO_ACCOUNT_DESC": "160-123456789-12",
     "BANK_HOWTO_REFERENCE": "4. Model i poziv na broj: ",
-    "BANK_HOWTO_REFERENCE_DESC": "97 123-456789"
+    "BANK_HOWTO_REFERENCE_DESC": "97 123-456789",
+    "BANK_NOTE_TITLE": "Napomena",
+    "BANK_NOTE_DESC": "Molimo vas da nakon uplate pošaljete potvrdu na email ili Viber radi brže obrade porudžbine."
   },
   "ABOUT": {
     "BACK": "Nazad na početnu",

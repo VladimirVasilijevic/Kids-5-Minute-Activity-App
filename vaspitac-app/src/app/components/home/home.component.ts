@@ -1,107 +1,43 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-
-interface Category {
-  id: string;
-  title: string;
-  description: string;
-  color: string;
-  icon: string;
-}
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { Category } from '../../models/category.model';
+import { CATEGORY_KEYS } from '../../models/category-keys';
 
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss']
 })
-export class HomeComponent {
-  categories: Category[] = [
-    {
-      id: 'about',
-      title: 'HOME.CAT_ABOUT_TITLE',
-      description: 'HOME.CAT_ABOUT_DESC',
-      color: 'bg-blue-500',
-      icon: 'user'
-    },
-    {
-      id: 'shop',
-      title: 'HOME.CAT_SHOP_TITLE',
-      description: 'HOME.CAT_SHOP_DESC',
-      color: 'bg-green-500',
-      icon: 'shopping-cart'
-    },
-    {
-      id: 'blog',
-      title: 'HOME.CAT_BLOG_TITLE',
-      description: 'HOME.CAT_BLOG_DESC',
-      color: 'bg-purple-500',
-      icon: 'book-open'
-    },
-    {
-      id: 'tips',
-      title: 'HOME.CAT_TIPS_TITLE',
-      description: 'HOME.CAT_TIPS_DESC',
-      color: 'bg-yellow-500',
-      icon: 'lightbulb'
-    },
-    {
-      id: 'physical',
-      title: 'HOME.CAT_PHYSICAL_TITLE',
-      description: 'HOME.CAT_PHYSICAL_DESC',
-      color: 'bg-red-500',
-      icon: 'dumbbell'
-    },
-    {
-      id: 'creative',
-      title: 'HOME.CAT_CREATIVE_TITLE',
-      description: 'HOME.CAT_CREATIVE_DESC',
-      color: 'bg-pink-500',
-      icon: 'palette'
-    },
-    {
-      id: 'educational',
-      title: 'HOME.CAT_EDUCATIONAL_TITLE',
-      description: 'HOME.CAT_EDUCATIONAL_DESC',
-      color: 'bg-indigo-500',
-      icon: 'graduation-cap'
-    },
-    {
-      id: 'musical',
-      title: 'HOME.CAT_MUSICAL_TITLE',
-      description: 'HOME.CAT_MUSICAL_DESC',
-      color: 'bg-orange-500',
-      icon: 'music'
-    },
-    {
-      id: 'nature',
-      title: 'HOME.CAT_NATURE_TITLE',
-      description: 'HOME.CAT_NATURE_DESC',
-      color: 'bg-emerald-500',
-      icon: 'tree'
-    }
-  ];
+export class HomeComponent implements OnInit {
+  categories$!: Observable<Category[]>;
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, private http: HttpClient) {}
+
+  ngOnInit(): void {
+    this.categories$ = this.http.get<Category[]>('assets/categories.json');
+  }
 
   goToCategory(categoryId: string): void {
     switch (categoryId) {
-      case 'about':
+      case CATEGORY_KEYS.ABOUT:
         this.router.navigate(['/about']).then(() => this.scrollToTop());
         break;
-      case 'shop':
+      case CATEGORY_KEYS.SHOP:
         this.router.navigate(['/shop']).then(() => this.scrollToTop());
         break;
-      case 'blog':
+      case CATEGORY_KEYS.BLOG:
         this.router.navigate(['/blog']).then(() => this.scrollToTop());
         break;
-      case 'tips':
+      case CATEGORY_KEYS.TIPS:
         this.router.navigate(['/tips']).then(() => this.scrollToTop());
         break;
-      case 'physical':
-      case 'creative':
-      case 'educational':
-      case 'musical':
-      case 'nature':
+      case CATEGORY_KEYS.PHYSICAL:
+      case CATEGORY_KEYS.CREATIVE:
+      case CATEGORY_KEYS.EDUCATIONAL:
+      case CATEGORY_KEYS.MUSICAL:
+      case CATEGORY_KEYS.NATURE:
         this.router.navigate(['/activities'], { queryParams: { category: categoryId } }).then(() => this.scrollToTop());
         break;
       default:

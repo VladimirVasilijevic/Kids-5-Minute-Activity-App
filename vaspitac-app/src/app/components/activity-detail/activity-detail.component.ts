@@ -40,7 +40,10 @@ export class ActivityDetailComponent implements OnInit {
   }
 
   goBack() {
-    this.router.navigate(['/activities']).then(() => {
+    const category = this.route.snapshot.queryParamMap.get('category')
+    this.router.navigate(['/activities'], {
+      queryParams: { category: category || null }
+    }).then(() => {
       window.scrollTo({ top: 0, behavior: 'smooth' })
     })
   }

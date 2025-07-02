@@ -5,7 +5,7 @@
 </div>
 
 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 max-w-5xl mx-auto mb-8 md:mb-12 px-4">
-  <div *ngFor="let cat of categories" (click)="goToCategory(cat.id)" class="cursor-pointer transform hover:scale-105 transition-all duration-300 bg-white rounded-xl shadow hover:shadow-lg border border-green-100 p-4 md:p-6 flex flex-col items-center text-center min-h-[140px] md:min-h-[160px]">
+  <div *ngFor="let cat of categories$ | async" (click)="goToCategory(cat.id)" class="cursor-pointer transform hover:scale-105 transition-all duration-300 bg-white rounded-xl shadow hover:shadow-lg border border-green-100 p-4 md:p-6 flex flex-col items-center text-center min-h-[140px] md:min-h-[160px]">
     <div class="w-12 h-12 md:w-16 md:h-16 rounded-full flex items-center justify-center shadow-lg mb-3 md:mb-4" [ngClass]="cat.color">
       <ng-container [ngSwitch]="cat.icon">
         <!-- Lucide User -->

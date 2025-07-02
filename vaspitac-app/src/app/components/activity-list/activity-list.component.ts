@@ -62,10 +62,17 @@ export class ActivityListComponent implements OnInit {
   selectCategory(category: string) {
     this.selectedCategory = category
     this.categoryFilter$.next(category)
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { category: category || null },
+      queryParamsHandling: 'merge'
+    })
   }
 
   goToActivity(id: string | number) {
-    this.router.navigate(['/activity', id])
+    this.router.navigate(['/activity', id], {
+      queryParams: { category: this.selectedCategory || null }
+    })
   }
 
   goBack() {

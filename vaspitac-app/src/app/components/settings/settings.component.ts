@@ -11,8 +11,8 @@ import { Observable } from 'rxjs';
 export class SettingsComponent {
   currentLanguage = 'sr';
   languages = [
-    { code: 'sr', name: 'Српски' },
-    { code: 'en', name: 'English' }
+    { code: 'sr', name: 'Српски', flag: 'rs' },
+    { code: 'en', name: 'English', flag: 'gb' }
   ];
   version$!: Observable<string>;
 
