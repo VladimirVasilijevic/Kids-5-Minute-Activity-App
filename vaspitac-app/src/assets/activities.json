@@ -1,7 +1,7 @@
 {
-  "version": "1.0.2",
+  "version": "1.0.0",
   "languages": ["sr", "en"],
-  "activities": [
+  "data": [
     {
       "id": "001",
       "title": { "sr": "Joga za decu", "en": "Yoga for Kids" },

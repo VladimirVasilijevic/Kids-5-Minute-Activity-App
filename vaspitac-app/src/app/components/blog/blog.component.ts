@@ -3,6 +3,7 @@ import { Router } from '@angular/router'
 import { HttpClient } from '@angular/common/http'
 import { Observable } from 'rxjs'
 import { BlogPost } from '../../models/blog-post.model'
+import { map } from 'rxjs/operators'
 
 @Component({
   selector: 'app-blog',
@@ -15,7 +16,8 @@ export class BlogComponent implements OnInit {
   constructor(private router: Router, private http: HttpClient) {}
 
   ngOnInit(): void {
-    this.blogPosts$ = this.http.get<BlogPost[]>('assets/blog-posts.json')
+    this.blogPosts$ = this.http.get<{ version: string, data: BlogPost[] }>('assets/blog-posts.json')
+      .pipe(map(res => res.data))
   }
 
   goBack() {

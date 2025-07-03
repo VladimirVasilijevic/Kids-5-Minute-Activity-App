@@ -4,6 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Category } from '../../models/category.model';
 import { CATEGORY_KEYS } from '../../models/category-keys';
+import { map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-home',
@@ -16,7 +17,8 @@ export class HomeComponent implements OnInit {
   constructor(private router: Router, private http: HttpClient) {}
 
   ngOnInit(): void {
-    this.categories$ = this.http.get<Category[]>('assets/categories.json');
+    this.categories$ = this.http.get<{ version: string, data: Category[] }>('assets/categories.json')
+      .pipe(map(res => res.data));
   }
 
   goToCategory(categoryId: string): void {

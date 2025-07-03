@@ -3,6 +3,7 @@ import { Router } from '@angular/router'
 import { HttpClient } from '@angular/common/http'
 import { Observable } from 'rxjs'
 import { Tip } from '../../models/tip.model'
+import { map } from 'rxjs/operators'
 
 @Component({
   selector: 'app-tips',
@@ -15,7 +16,8 @@ export class TipsComponent implements OnInit {
   constructor(private router: Router, private http: HttpClient) {}
 
   ngOnInit(): void {
-    this.tips$ = this.http.get<Tip[]>('assets/tips.json')
+    this.tips$ = this.http.get<{ version: string, data: Tip[] }>('assets/tips.json')
+      .pipe(map(res => res.data))
   }
 
   goBack() {

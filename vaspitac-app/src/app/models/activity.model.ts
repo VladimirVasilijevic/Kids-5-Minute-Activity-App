@@ -14,5 +14,5 @@ export interface Activity {
 export interface ActivitiesData {
   version: string
   languages: string[]
-  activities: Activity[]
+  data: Activity[]
 } 

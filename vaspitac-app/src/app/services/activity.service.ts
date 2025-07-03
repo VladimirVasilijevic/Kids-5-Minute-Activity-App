@@ -24,7 +24,7 @@ export class ActivityService {
   }
 
   getActivities(): Observable<Activity[]> {
-    return this.data$.pipe(map(data => data.activities))
+    return this.data$.pipe(map(data => data.data))
   }
 
   getActivityById(id: string): Observable<Activity | undefined> {
