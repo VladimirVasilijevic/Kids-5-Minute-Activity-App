@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core'
 import { Router } from '@angular/router'
 import { HttpClient } from '@angular/common/http'
-import { Observable } from 'rxjs'
+import { Observable, switchMap } from 'rxjs'
 import { BlogPost } from '../../models/blog-post.model'
-import { map } from 'rxjs/operators'
+import { LanguageService } from '../../services/language.service'
 
 @Component({
   selector: 'app-blog',
@@ -13,11 +13,12 @@ import { map } from 'rxjs/operators'
 export class BlogComponent implements OnInit {
   blogPosts$!: Observable<BlogPost[]>
 
-  constructor(private router: Router, private http: HttpClient) {}
+  constructor(private router: Router, private http: HttpClient, private languageService: LanguageService) {}
 
   ngOnInit(): void {
-    this.blogPosts$ = this.http.get<{ version: string, data: BlogPost[] }>('assets/blog-posts.json')
-      .pipe(map(res => res.data))
+    this.blogPosts$ = this.languageService.getLanguage().pipe(
+      switchMap(lang => this.http.get<BlogPost[]>(`assets/blog-posts_${lang}.json`))
+    )
   }
 
   goBack() {

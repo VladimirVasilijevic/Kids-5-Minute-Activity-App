@@ -16,11 +16,12 @@ describe('AboutComponent', () => {
   let translate: TranslateService
 
   beforeEach(async () => {
+    const navigateSpy = jasmine.createSpy('navigate').and.returnValue(Promise.resolve())
     await TestBed.configureTestingModule({
       declarations: [AboutComponent],
       imports: [TranslateModule.forRoot()],
       providers: [
-        { provide: Router, useClass: MockRouter }
+        { provide: Router, useValue: { navigate: navigateSpy } }
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents()

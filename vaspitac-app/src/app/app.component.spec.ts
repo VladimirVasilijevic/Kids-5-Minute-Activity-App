@@ -66,16 +66,6 @@ describe('AppComponent', () => {
     expect(tagline.textContent).toContain(translateService.instant('APP.TAGLINE'));
   });
 
-  it('should have navigation links for all main sections', () => {
-    const compiled = fixture.nativeElement;
-    const navLinks = compiled.querySelectorAll('nav a');
-    const expectedRoutes = ['/activities', '/blog', '/tips', '/shop', '/about'];
-    expect(navLinks.length).toBe(expectedRoutes.length);
-    expectedRoutes.forEach((route, i) => {
-      expect(navLinks[i].getAttribute('ng-reflect-router-link')).toBe(route);
-    });
-  });
-
   it('should have a language switcher button', () => {
     const compiled = fixture.nativeElement;
     const langBtn = compiled.querySelector('button');
@@ -87,5 +77,25 @@ describe('AppComponent', () => {
     const compiled = fixture.nativeElement;
     const routerOutlet = compiled.querySelector('router-outlet');
     expect(routerOutlet).toBeTruthy();
+  });
+
+  it('should switch language when language button is clicked', () => {
+    spyOn(component, 'switchLanguage').and.callThrough();
+    const compiled = fixture.nativeElement;
+    const langBtn = compiled.querySelector('button');
+    langBtn.click();
+    fixture.detectChanges();
+    expect(component.switchLanguage).toHaveBeenCalled();
+    expect(['en', 'sr']).toContain(component.currentLang);
+  });
+
+  it('isActive should return true for matching route', () => {
+    component.activeRoute = '/blog';
+    expect(component.isActive('/blog')).toBeTrue();
+  });
+
+  it('isActive should return false for non-matching route', () => {
+    component.activeRoute = '/blog';
+    expect(component.isActive('/shop')).toBeFalse();
   });
 }); 

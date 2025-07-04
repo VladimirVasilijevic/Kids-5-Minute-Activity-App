@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing'
 import { HttpTestingController, HttpClientTestingModule } from '@angular/common/http/testing'
 import { ActivityService } from './activity.service'
-import { mockActivitiesData } from '../../test-utils/mock-activities'
+import { mockActivities } from '../../test-utils/mock-activities'
 
 describe('ActivityService', () => {
   let service: ActivityService
@@ -22,29 +22,21 @@ describe('ActivityService', () => {
 
   it('should load activities from JSON', done => {
     service.getActivities().subscribe(acts => {
-      expect(acts.length).toBe(mockActivitiesData.activities.length)
-      expect(acts[0].id).toBe(mockActivitiesData.activities[0].id)
+      expect(acts.length).toBe(mockActivities.length)
+      expect(acts[0].id).toBe(mockActivities[0].id)
       done()
     })
-    httpMock.expectOne('assets/activities.json').flush(mockActivitiesData)
-  })
-
-  it('should get version from JSON', done => {
-    service.getVersion().subscribe(version => {
-      expect(version).toBe(mockActivitiesData.version)
-      done()
-    })
-    httpMock.expectOne('assets/activities.json').flush(mockActivitiesData)
+    httpMock.expectOne('assets/activities_sr.json').flush(mockActivities)
   })
 
   it('should get activity by ID', done => {
-    const targetId = mockActivitiesData.activities[1].id
+    const targetId = mockActivities[1].id
     service.getActivityById(targetId).subscribe(act => {
       expect(act).toBeTruthy()
       expect(act?.id).toBe(targetId)
       done()
     })
-    httpMock.expectOne('assets/activities.json').flush(mockActivitiesData)
+    httpMock.expectOne('assets/activities_sr.json').flush(mockActivities)
   })
 
   it('should return undefined for missing ID', done => {
@@ -52,6 +44,6 @@ describe('ActivityService', () => {
       expect(act).toBeUndefined()
       done()
     })
-    httpMock.expectOne('assets/activities.json').flush(mockActivitiesData)
+    httpMock.expectOne('assets/activities_sr.json').flush(mockActivities)
   })
 }) 

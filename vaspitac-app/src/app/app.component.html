@@ -35,44 +35,6 @@
   </div>
 </header>
 
-<nav *ngIf="!isActive('/')" class="px-4 py-3 bg-white border-b border-green-100">
-  <div class="flex space-x-2 overflow-x-auto scrollbar-hide">
-    <a routerLink="/activities" routerLinkActive="active" class="whitespace-nowrap flex items-center gap-2 min-w-fit px-3 py-2 rounded transition-all duration-300 text-green-700 hover:bg-green-100" [ngClass]="{'bg-green-600 text-white hover:bg-green-700': isActive('/activities')}">
-      <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-        <path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0h6"/>
-      </svg>
-      {{ 'NAV.ACTIVITIES' | translate }}
-    </a>
-    <a routerLink="/blog" routerLinkActive="active" class="whitespace-nowrap flex items-center gap-2 min-w-fit px-3 py-2 rounded transition-all duration-300 text-green-700 hover:bg-green-100" [ngClass]="{'bg-green-600 text-white hover:bg-green-700': isActive('/blog')}">
-      <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-        <path d="M4 19h16M4 15h16M4 11h16M4 7h16"/>
-      </svg>
-      {{ 'NAV.BLOG' | translate }}
-    </a>
-    <a routerLink="/tips" routerLinkActive="active" class="whitespace-nowrap flex items-center gap-2 min-w-fit px-3 py-2 rounded transition-all duration-300 text-green-700 hover:bg-green-100" [ngClass]="{'bg-green-600 text-white hover:bg-green-700': isActive('/tips')}">
-      <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-        <path d="M13 16h-1v-4h-1m1-4h.01M12 20a8 8 0 100-16 8 8 0 000 16z"/>
-      </svg>
-      {{ 'NAV.TIPS' | translate }}
-    </a>
-    <a routerLink="/shop" routerLinkActive="active" class="whitespace-nowrap flex items-center gap-2 min-w-fit px-3 py-2 rounded transition-all duration-300 text-green-700 hover:bg-green-100" [ngClass]="{'bg-green-600 text-white hover:bg-green-700': isActive('/shop')}">
-      <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-        <circle cx="8" cy="21" r="1"/>
-        <circle cx="19" cy="21" r="1"/>
-        <path d="M2 6h2l.34 2m0 0L6 17a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2l1.24-7.45A2 2 0 0 0 18.26 8H6.34z"/>
-      </svg>
-      {{ 'NAV.SHOP' | translate }}
-    </a>
-    <a routerLink="/about" routerLinkActive="active" class="whitespace-nowrap flex items-center gap-2 min-w-fit px-3 py-2 rounded transition-all duration-300 text-green-700 hover:bg-green-100" [ngClass]="{'bg-green-600 text-white hover:bg-green-700': isActive('/about')}">
-      <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-        <path d="M16 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-        <circle cx="12" cy="7" r="4"/>
-      </svg>
-      {{ 'NAV.ABOUT' | translate }}
-    </a>
-  </div>
-</nav>
-
 <main class="main-content px-4 py-4 md:py-6">
   <router-outlet></router-outlet>
 </main> 

@@ -1,14 +1,14 @@
 export interface Activity {
   id: string
-  title: { [lang: string]: string }
-  description: { [lang: string]: string }
+  title: string
+  description: string
   imageUrl: string
   category: string
   duration: string
   ageGroup?: string
   materials?: string[]
   instructions?: string[]
-  videoUrl?: { [lang: string]: string }
+  videoUrl?: string
 }
 
 export interface ActivitiesData {

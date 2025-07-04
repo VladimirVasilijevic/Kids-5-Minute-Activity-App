@@ -93,7 +93,8 @@
     "BANK_HOWTO_REFERENCE": "4. Model i poziv na broj: ",
     "BANK_HOWTO_REFERENCE_DESC": "97 123-456789",
     "BANK_NOTE_TITLE": "Napomena",
-    "BANK_NOTE_DESC": "Molimo vas da nakon uplate pošaljete potvrdu na email ili Viber radi brže obrade porudžbine."
+    "BANK_NOTE_DESC": "Molimo vas da nakon uplate pošaljete potvrdu na email ili Viber radi brže obrade porudžbine.",
+    "COPY_PAYPAL": "Kopiraj"
   },
   "ABOUT": {
     "BACK": "Nazad na početnu",

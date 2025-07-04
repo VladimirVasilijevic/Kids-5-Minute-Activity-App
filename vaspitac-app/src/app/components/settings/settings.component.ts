@@ -1,7 +1,6 @@
 import { Component } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { ActivityService } from '../../services/activity.service';
-import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-settings',
@@ -14,11 +13,9 @@ export class SettingsComponent {
     { code: 'sr', name: 'Српски', flag: 'rs' },
     { code: 'en', name: 'English', flag: 'gb' }
   ];
-  version$!: Observable<string>;
 
   constructor(private translate: TranslateService, private activityService: ActivityService) {
     this.currentLanguage = this.translate.currentLang;
-    this.version$ = this.activityService.getVersion();
   }
 
   changeLanguage(lang: string) {

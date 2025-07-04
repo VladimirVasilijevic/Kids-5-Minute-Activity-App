@@ -1,10 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, switchMap } from 'rxjs';
 import { Category } from '../../models/category.model';
 import { CATEGORY_KEYS } from '../../models/category-keys';
-import { map } from 'rxjs/operators';
+import { LanguageService } from '../../services/language.service';
 
 @Component({
   selector: 'app-home',
@@ -14,11 +14,12 @@ import { map } from 'rxjs/operators';
 export class HomeComponent implements OnInit {
   categories$!: Observable<Category[]>;
 
-  constructor(private router: Router, private http: HttpClient) {}
+  constructor(private router: Router, private http: HttpClient, private languageService: LanguageService) {}
 
   ngOnInit(): void {
-    this.categories$ = this.http.get<{ version: string, data: Category[] }>('assets/categories.json')
-      .pipe(map(res => res.data));
+    this.categories$ = this.languageService.getLanguage().pipe(
+      switchMap(lang => this.http.get<Category[]>(`assets/categories_${lang}.json`))
+    );
   }
 
   goToCategory(categoryId: string): void {

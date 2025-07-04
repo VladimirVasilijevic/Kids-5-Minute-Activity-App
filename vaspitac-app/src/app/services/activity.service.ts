@@ -1,30 +1,17 @@
 import { Injectable } from '@angular/core'
 import { HttpClient } from '@angular/common/http'
-import { Observable, BehaviorSubject } from 'rxjs'
-import { map, shareReplay } from 'rxjs/operators'
-import { Activity, ActivitiesData } from '../models/activity.model'
+import { Observable, switchMap, map } from 'rxjs'
+import { Activity } from '../models/activity.model'
+import { LanguageService } from './language.service'
 
 @Injectable({ providedIn: 'root' })
 export class ActivityService {
-  private data$ = this.http.get<ActivitiesData>('assets/activities.json').pipe(shareReplay(1))
-  private lang$ = new BehaviorSubject<string>('sr')
-
-  constructor(private http: HttpClient) {}
-
-  setLanguage(lang: string) {
-    this.lang$.next(lang)
-  }
-
-  getLanguage(): Observable<string> {
-    return this.lang$.asObservable()
-  }
-
-  getVersion(): Observable<string> {
-    return this.data$.pipe(map(data => data.version))
-  }
+  constructor(private http: HttpClient, private languageService: LanguageService) {}
 
   getActivities(): Observable<Activity[]> {
-    return this.data$.pipe(map(data => data.data))
+    return this.languageService.getLanguage().pipe(
+      switchMap(lang => this.http.get<Activity[]>(`assets/activities_${lang}.json`))
+    )
   }
 
   getActivityById(id: string): Observable<Activity | undefined> {

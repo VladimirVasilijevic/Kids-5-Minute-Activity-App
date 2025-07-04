@@ -4,9 +4,15 @@ import { Router } from '@angular/router'
 import { TranslateModule, TranslateService } from '@ngx-translate/core'
 import { By } from '@angular/platform-browser'
 import { NO_ERRORS_SCHEMA } from '@angular/core'
+import { Pipe, PipeTransform } from '@angular/core'
 
 class MockRouter {
   navigate = jasmine.createSpy('navigate')
+}
+
+@Pipe({ name: 'translate' })
+class MockTranslatePipe implements PipeTransform {
+  transform(value: string) { return value }
 }
 
 describe('ShopComponent', () => {
@@ -16,11 +22,12 @@ describe('ShopComponent', () => {
   let translate: TranslateService
 
   beforeEach(async () => {
+    const navigateSpy = jasmine.createSpy('navigate').and.returnValue(Promise.resolve())
     await TestBed.configureTestingModule({
-      declarations: [ShopComponent],
+      declarations: [ShopComponent, MockTranslatePipe],
       imports: [TranslateModule.forRoot()],
       providers: [
-        { provide: Router, useClass: MockRouter }
+        { provide: Router, useValue: { navigate: navigateSpy } }
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents()
@@ -65,5 +72,38 @@ describe('ShopComponent', () => {
     const compiled = fixture.nativeElement as HTMLElement
     expect(compiled.textContent).toContain('ana.petrovic.vaspitac@g') // partial check for obfuscated email
     expect(compiled.textContent).toContain('SHOP.PAYPAL_EMAIL_LABEL')
+  })
+
+  it('should use fallback copy method if navigator.clipboard is not available', fakeAsync(() => {
+    const originalClipboard = navigator.clipboard
+    Object.defineProperty(navigator, 'clipboard', { value: undefined, configurable: true })
+    const textarea = document.createElement('textarea')
+    spyOn(document, 'createElement').and.returnValue(textarea)
+    spyOn(document.body, 'appendChild').and.callThrough()
+    spyOn(document.body, 'removeChild').and.callThrough()
+    spyOn(textarea, 'select').and.callThrough()
+    spyOn(document, 'execCommand').and.returnValue(true)
+    component.copyPayPalEmail()
+    tick(2000) // flush all timers
+    expect(document.createElement).toHaveBeenCalledWith('textarea')
+    expect(document.body.appendChild).toHaveBeenCalledWith(textarea)
+    expect(textarea.select).toHaveBeenCalled()
+    expect(document.execCommand).toHaveBeenCalledWith('copy')
+    expect(document.body.removeChild).toHaveBeenCalledWith(textarea)
+    Object.defineProperty(navigator, 'clipboard', { value: originalClipboard, configurable: true })
+  }))
+
+  it('should handle error in copyPayPalEmail gracefully', fakeAsync(() => {
+    spyOn(navigator.clipboard, 'writeText').and.returnValue(Promise.reject('fail'))
+    component.copyPayPalEmail()
+    tick()
+    expect(component.copiedPayPal).toBeFalse()
+  }))
+
+  it('should show feedback UI when copiedPayPal is true', () => {
+    component.copiedPayPal = true
+    fixture.detectChanges()
+    const compiled = fixture.nativeElement as HTMLElement
+    expect(compiled.textContent).toContain('SHOP.COPIED')
   })
 }) 

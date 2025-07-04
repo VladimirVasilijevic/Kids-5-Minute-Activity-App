@@ -93,7 +93,8 @@
     "BANK_HOWTO_REFERENCE": "4. Reference Number: ",
     "BANK_HOWTO_REFERENCE_DESC": "97 123-456789",
     "BANK_NOTE_TITLE": "Important Note",
-    "BANK_NOTE_DESC": "Please send confirmation after payment via email or Viber for faster order processing."
+    "BANK_NOTE_DESC": "Please send confirmation after payment via email or Viber for faster order processing.",
+    "COPY_PAYPAL": "Copy"
   },
   "ABOUT": {
     "BACK": "Back to home",
