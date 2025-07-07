@@ -10,13 +10,21 @@ Vaspitac App is designed to help parents, future parents, and educators engage c
 
 - **5-Minute Activities**: Quick, accessible ideas that fit into busy schedules
 - **Multi-language Support**: Serbian (primary) and English
-- **Offline Access**: Download content for offline use
+- **Dynamic Content**: Activities, blog posts, tips, and categories are loaded from Firestore (Firebase) for real-time updates
+- **Offline Access & Fallback**: If Firestore is unavailable (offline or permission error), the app automatically falls back to static JSON files
 - **No Special Equipment**: Activities require no special materials
 - **Privacy-First**: No personal data collected
 - **Cross-Platform**: Web (PWA) and Android support
 - **Mobile-First Design**: Optimized for Android portrait mode with responsive layouts
 - **Smooth Navigation**: Automatic scroll-to-top on all navigation actions
 - **CI/CD Ready**: Automated builds and tests for web and Android via GitHub Actions
+
+## Firestore Integration & Content Fallback
+- The app uses Firestore collections for all dynamic content: `activities_{lang}`, `categories_{lang}`, `blog_{lang}`, `tips_{lang}` (e.g., `blog_sr`, `categories_en`)
+- If Firestore is unreachable or access is denied, the app logs a fallback message and loads the corresponding static JSON from `/assets/`
+- **Firestore Security Rules:** During development, set rules to `allow read, write: if true;` for testing. For production, restrict as needed.
+- **Collection Naming:** Ensure your Firestore collections are named exactly as expected (e.g., `blog_sr`, not just `blog`)
+- **Import Script:** Use `scripts/import-to-firestore.js` to migrate local JSON to Firestore collections. See `scripts/README.md` for usage.
 
 ## UX Redesign & Mobile Optimization
 - The app was fully redesigned with mobile-first approach
@@ -25,7 +33,7 @@ Vaspitac App is designed to help parents, future parents, and educators engage c
 - Angular Material was removed in favor of Tailwind CSS
 - All navigation/back buttons are visually and functionally consistent
 - i18n, accessibility, and responsiveness improved throughout
-- **Mobile Optimizations**:
+- **Mobile Optimizations:**
   - Responsive grid layouts that adapt to screen size
   - Touch-friendly buttons and navigation elements
   - Optimized typography and spacing for mobile screens
@@ -61,11 +69,11 @@ vaspitac/
 │   │   │   │   ├── about/             # About the author
 │   │   │   │   └── settings/          # Settings (language, version)
 │   │   │   ├── models/                # Shared TypeScript interfaces/types
-│   │   │   ├── services/              # Angular services (e.g., ActivityService)
+│   │   │   ├── services/              # Angular services (e.g., ActivityService, FirestoreService)
+│   │   │   ├── test-utils/            # Shared test mocks/utilities (mock-activities, mock-blog-posts, etc.)
 │   │   │   ├── assets/
 │   │   │   │   ├── activities.json        # Static content (activities)
 │   │   │   │   └── i18n/                  # Translation files (sr.json, en.json)
-│   │   │   ├── test-utils/                # Shared test mocks/utilities
 │   │   │   └── styles.scss                # Global styles
 │   │   ├── angular.json, ...              # Angular/Capacitor config
 ├── .cursor/
@@ -84,23 +92,36 @@ vaspitac/
 
 - **components/**: All UI screens, each in its own folder (with `.ts`, `.html`, `.scss`, `.spec.ts`)
 - **models/**: All shared TypeScript interfaces/types (e.g., `Activity`, `ActivitiesData`)
-- **services/**: Angular services (e.g., `ActivityService` for loading activities)
-- **test-utils/**: Shared mocks for tests (e.g., `mock-activities.ts`)
+- **services/**: Angular services (e.g., `ActivityService`, `FirestoreService` for loading activities, blog, tips, categories)
+- **test-utils/**: Shared mocks for tests (e.g., `mock-activities.ts`, `mock-blog-posts.ts`, `mock-categories.ts`, `mock-tips.ts`)
 - **assets/i18n/**: Translation files for ngx-translate
 - **assets/activities.json**: Static content, versioned and localized
 - **.cursor/rules/**: Project coding standards and best practices (see below)
+- **scripts/import-to-firestore.js**: Script to import local JSON to Firestore collections
 
 ---
+
+## 🛣️ Roadmap & Future Enhancements
+
+- **Dynamic Blog Pages**: Blog list links to individual article pages with full content and SEO-friendly URLs
+- **User Profile**: Editable user profile page (display name, avatar, local storage)
+- **Admin Authentication**: Google/email login for admin users, role-based access to content editing
+- **Admin Content Editor**: Admin-only UI for adding/editing activities, blog posts, and tips (syncs to Firestore)
+- **Backend Logic**: Cloud Functions or backend for moderation, analytics, notifications, and secure admin endpoints
+- **E2E Tests**: Cypress/Playwright tests for admin/content flows, run in CI
+- **Error Monitoring**: Sentry or similar integration for error tracking and alerts
+- **Code Documentation & Style**: JSDoc comments, ESLint/TSLint, Prettier, and documented code style for all contributors
 
 ## 🧑‍💻 Development & Best Practices
 
 - **Modern Angular**: Standalone components, RxJS, Tailwind CSS
 - **TypeScript**: All types/interfaces in `models/`, never import a service just for a type
-- **Testing**: Jasmine + Karma, >80% coverage, all mocks in `test-utils/`
+- **Testing**: Jasmine + Karma, >80% coverage, all mocks in `test-utils/` for all domains
 - **Best Practices**: See `.cursor/rules/angular-best-practices.mdc` for enforced standards (structure, naming, code style, testing, etc.)
 - **Internationalization**: ngx-translate, language switcher in header
 - **PWA**: Service worker, offline support, installable
 - **Mobile-First**: Responsive design optimized for Android portrait mode
+- **Planned**: Admin authentication, content editor, user profile, backend logic, E2E tests, error monitoring, and code style enforcement (see Roadmap)
 
 ---
 
@@ -148,10 +169,11 @@ $ npx cap build android
 
 ## 🧪 Testing & Utilities
 - **Unit tests**: All components/services have `.spec.ts` files
-- **Test utilities**: Shared mocks in `test-utils/` (import in all specs)
+- **Test utilities**: Shared mocks in `test-utils/` (import in all specs, e.g., `mock-activities`, `mock-blog-posts`, `mock-categories`, `mock-tips`)
 - **Coverage**: Run `npm run test:coverage` (see `/coverage`)
 - **E2E**: (Planned) Cypress/Playwright for user flows
 - **Mobile Testing**: Responsive design tested across different screen sizes
+- **Planned**: E2E tests for admin/content flows, error monitoring integration, and code style checks (see Roadmap)
 
 ---
 
@@ -168,6 +190,14 @@ $ npx cap build android
 - **Android**: `npx cap build android`
 - **PWA**: Service worker, offline, installable
 - **CI/CD**: GitHub Actions (see `.github/`)
+
+---
+
+## 🔧 Firestore & Firebase Setup
+- **Firestore collections must be named**: `activities_{lang}`, `categories_{lang}`, `blog_{lang}`, `tips_{lang}` (e.g., `blog_sr`)
+- **Security rules**: For development, use `allow read, write: if true;` in `firestore.rules`. For production, restrict as needed.
+- **Import script**: Use `scripts/import-to-firestore.js` to migrate JSON to Firestore.
+- **Troubleshooting**: If you see fallback logs, check rules, config, and collection names.
 
 ---
 
