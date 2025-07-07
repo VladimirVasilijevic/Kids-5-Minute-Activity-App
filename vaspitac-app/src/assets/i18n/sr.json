@@ -1,6 +1,6 @@
 {
   "APP": {
-    "TITLE": "Vaspitac App",
+    "TITLE": "Ana Vaspitac",
     "TAGLINE": "Zabavne, brze aktivnosti za decu i roditelje."
   },
   "NAV": {
@@ -12,7 +12,7 @@
     "ABOUT": "O meni"
   },
   "HOME": {
-    "WELCOME_TITLE": "Dobrodošli u Vaspitac App",
+    "WELCOME_TITLE": "Dobrodošli u Ana Vaspitac",
     "WELCOME_SUBTITLE": "5-minutne aktivnosti za decu",
     "DESCRIPTION": "Pronađite jednostavne i zabavne aktivnosti za decu do 7 godina. Svaka aktivnost traje samo 5 minuta i ne zahteva posebnu opremu.",
     "START_ACTIVITIES": "Započnite aktivnosti",

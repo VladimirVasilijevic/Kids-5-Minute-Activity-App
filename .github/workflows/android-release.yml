@@ -73,7 +73,7 @@ jobs:
       
     - name: Create keystore
       run: |
-        keytool -genkey -v -keystore vaspitac-app/android/app/release-key.keystore -alias vaspitac-key -keyalg RSA -keysize 2048 -validity 10000 -storepass ${{ secrets.KEYSTORE_PASSWORD }} -keypass ${{ secrets.KEY_PASSWORD }} -dname "CN=Vaspitac App, OU=Development, O=Vaspitac, L=Belgrade, S=Serbia, C=RS"
+        keytool -genkey -v -keystore vaspitac-app/android/app/release-key.keystore -alias vaspitac-key -keyalg RSA -keysize 2048 -validity 10000 -storepass ${{ secrets.KEYSTORE_PASSWORD }} -keypass ${{ secrets.KEY_PASSWORD }} -dname "CN=Ana Vaspitac, OU=Development, O=Vaspitac, L=Belgrade, S=Serbia, C=RS"
       
     - name: Build Release APK
       working-directory: vaspitac-app

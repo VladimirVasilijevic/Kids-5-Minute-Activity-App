@@ -1,10 +1,10 @@
-# Vaspitac App - Kids 5-Minute Activity App
+# Ana Vaspitac - Kids 5-Minute Activity App
 
 A cross-platform mobile and web application that delivers simple 5-minute educational and physical activities for kids. The app displays text instructions and associated videos for each activity, with primary language support for Serbian and English.
 
 ## 🎯 Project Overview
 
-Vaspitac App is designed to help parents, future parents, and educators engage children up to 7 years old in simple, fun, and educational activities. Each activity encourages both physical and mental development through easy-to-follow instructions and video demonstrations.
+Ana Vaspitac is designed to help parents, future parents, and educators engage children up to 7 years old in simple, fun, and educational activities. Each activity encourages both physical and mental development through easy-to-follow instructions and video demonstrations.
 
 ### Key Features
 

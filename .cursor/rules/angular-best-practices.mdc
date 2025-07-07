@@ -3,12 +3,12 @@ description:
 globs: 
 alwaysApply: false
 ---
-# Angular Best Practices – Vaspitac Project
+# Angular Best Practices – Ana Vaspitac Project
 
 ## File & Directory Structure
 - Use feature-based folders: `components/`, `services/`, `models/`, `test-utils/`
 - Each component, service, and model in its own file
-# Angular Best Practices – Vaspitac Project
+# Angular Best Practices – Ana Vaspitac Project
 
 ## File & Directory Structure
 - Use feature-based folders: `components/`, `services/`, `models/`, `test-utils/`
