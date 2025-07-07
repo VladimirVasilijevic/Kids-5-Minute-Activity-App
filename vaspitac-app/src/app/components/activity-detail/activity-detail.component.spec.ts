@@ -16,6 +16,7 @@ import { FirestoreService } from '../../services/firestore.service';
 import { mockFirestoreService } from '../../../test-utils/mock-firestore-service';
 
 import { ActivityDetailComponent } from './activity-detail.component';
+import { ScrollToTopComponent } from '../scroll-to-top/scroll-to-top.component';
 
 describe('ActivityDetailComponent', () => {
   let component: ActivityDetailComponent;
@@ -25,7 +26,7 @@ describe('ActivityDetailComponent', () => {
   beforeEach(waitForAsync(async (): Promise<void> => {
     await TestBed.configureTestingModule({
       imports: [TranslateModule.forRoot(), BrowserAnimationsModule, MatCardModule],
-      declarations: [ActivityDetailComponent],
+      declarations: [ActivityDetailComponent, ScrollToTopComponent],
       providers: [
         provideHttpClientTesting(),
         provideRouter([]),

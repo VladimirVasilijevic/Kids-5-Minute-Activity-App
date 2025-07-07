@@ -34,6 +34,7 @@ import { ShopComponent } from './components/shop/shop.component';
 import { AboutComponent } from './components/about/about.component';
 import { BlogComponent } from './components/blog/blog.component';
 import { TipsComponent } from './components/tips/tips.component';
+import { ScrollToTopComponent } from './components/scroll-to-top/scroll-to-top.component';
 
 // AoT requires an exported function for factories
 /**
@@ -59,6 +60,7 @@ export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
     AboutComponent,
     BlogComponent,
     TipsComponent,
+    ScrollToTopComponent,
   ],
   imports: [
     BrowserModule,

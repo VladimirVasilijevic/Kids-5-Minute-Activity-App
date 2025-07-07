@@ -11,6 +11,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 
 import { AppComponent } from './app.component';
+import { ScrollToTopComponent } from './components/scroll-to-top/scroll-to-top.component';
 
 describe('AppComponent', () => {
   let component: AppComponent;
@@ -28,7 +29,7 @@ describe('AppComponent', () => {
         MatButtonModule,
         MatIconModule,
       ],
-      declarations: [AppComponent],
+      declarations: [AppComponent, ScrollToTopComponent],
       providers: [provideHttpClientTesting(), provideRouter([])],
     }).compileComponents();
   });

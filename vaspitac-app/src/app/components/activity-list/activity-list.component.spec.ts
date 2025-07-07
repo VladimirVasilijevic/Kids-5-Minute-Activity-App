@@ -13,6 +13,7 @@ import { ActivityService } from '../../services/activity.service';
 import { mockActivities } from '../../../test-utils/mock-activities';
 
 import { ActivityListComponent } from './activity-list.component';
+import { ScrollToTopComponent } from '../scroll-to-top/scroll-to-top.component';
 
 describe('ActivityListComponent', (): void => {
   let component: ActivityListComponent;
@@ -26,7 +27,7 @@ describe('ActivityListComponent', (): void => {
     activitiesSubject = new Subject<any[]>();
     await TestBed.configureTestingModule({
       imports: [TranslateModule.forRoot(), BrowserAnimationsModule],
-      declarations: [ActivityListComponent],
+      declarations: [ActivityListComponent, ScrollToTopComponent],
       providers: [
         {
           provide: ActivityService,

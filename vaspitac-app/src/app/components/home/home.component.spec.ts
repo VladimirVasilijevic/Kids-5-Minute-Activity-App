@@ -9,6 +9,7 @@ import { FirestoreService } from '../../services/firestore.service';
 import { mockFirestoreService } from '../../../test-utils/mock-firestore-service';
 
 import { HomeComponent } from './home.component';
+import { ScrollToTopComponent } from '../scroll-to-top/scroll-to-top.component';
 
 describe('HomeComponent', () => {
   let component: HomeComponent;
@@ -20,7 +21,7 @@ describe('HomeComponent', () => {
     routerSpy.navigate.and.returnValue(Promise.resolve(true));
     await TestBed.configureTestingModule({
       imports: [TranslateModule.forRoot(), BrowserAnimationsModule, HttpClientTestingModule],
-      declarations: [HomeComponent],
+      declarations: [HomeComponent, ScrollToTopComponent],
       providers: [
         { provide: Router, useValue: routerSpy },
         { provide: FirestoreService, useValue: mockFirestoreService },

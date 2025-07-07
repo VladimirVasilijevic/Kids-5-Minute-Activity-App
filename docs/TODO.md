@@ -83,6 +83,11 @@ TODO: Fix navigation and user experience issues <!-- id: task-010 -->
 - [x] All navigation actions provide consistent user experience
 - [x] Language switcher remains visible and accessible on all screen sizes
 - [x] All navigation and category selection now scroll to top automatically
+- [x] ScrollToTop component implemented and integrated across all pages
+- [x] ScrollToTop component appears after scrolling down >300px
+- [x] ScrollToTop component provides smooth scroll-to-top functionality
+- [x] Comprehensive unit tests written for ScrollToTop component
+- [x] All component tests updated to include ScrollToTop component declarations
 
 ## 🌐 Phase 3: Content Update & Storage
 
