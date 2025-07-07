@@ -91,7 +91,10 @@
     "BANK_HOWTO_ACCOUNT": "3. Account Number: ",
     "BANK_HOWTO_ACCOUNT_DESC": "160-123456789-12",
     "BANK_HOWTO_REFERENCE": "4. Reference Number: ",
-    "BANK_HOWTO_REFERENCE_DESC": "97 123-456789"
+    "BANK_HOWTO_REFERENCE_DESC": "97 123-456789",
+    "BANK_NOTE_TITLE": "Important Note",
+    "BANK_NOTE_DESC": "Please send confirmation after payment via email or Viber for faster order processing.",
+    "COPY_PAYPAL": "Copy"
   },
   "ABOUT": {
     "BACK": "Back to home",
@@ -141,4 +144,4 @@
     "QUICK_TITLE": "Quick Tips",
     "QUICK_SUBTITLE": "Simple tips for every day"
   }
-} 
+}
