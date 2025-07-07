@@ -1,20 +1,17 @@
 import { Injectable } from '@angular/core'
-import { HttpClient } from '@angular/common/http'
-import { Observable, switchMap, map } from 'rxjs'
+import { Observable } from 'rxjs'
 import { Activity } from '../models/activity.model'
-import { LanguageService } from './language.service'
+import { FirestoreService } from './firestore.service'
 
 @Injectable({ providedIn: 'root' })
 export class ActivityService {
-  constructor(private http: HttpClient, private languageService: LanguageService) {}
+  constructor(private firestoreService: FirestoreService) {}
 
   getActivities(): Observable<Activity[]> {
-    return this.languageService.getLanguage().pipe(
-      switchMap(lang => this.http.get<Activity[]>(`assets/activities_${lang}.json`))
-    )
+    return this.firestoreService.getActivities()
   }
 
   getActivityById(id: string): Observable<Activity | undefined> {
-    return this.getActivities().pipe(map(acts => acts.find(a => a.id === id)))
+    return this.firestoreService.getActivityById(id)
   }
 } 

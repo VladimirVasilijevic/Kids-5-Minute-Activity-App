@@ -1,49 +1,49 @@
 import { TestBed } from '@angular/core/testing'
-import { HttpTestingController, HttpClientTestingModule } from '@angular/common/http/testing'
 import { ActivityService } from './activity.service'
 import { mockActivities } from '../../test-utils/mock-activities'
+import { FirestoreService } from './firestore.service'
+import { mockFirestoreService } from '../../test-utils/mock-firestore-service'
+import { of } from 'rxjs'
 
 describe('ActivityService', () => {
   let service: ActivityService
-  let httpMock: HttpTestingController
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
-      providers: [ActivityService]
+      providers: [
+        ActivityService,
+        { provide: FirestoreService, useValue: mockFirestoreService }
+      ]
     })
     service = TestBed.inject(ActivityService)
-    httpMock = TestBed.inject(HttpTestingController)
+    mockFirestoreService.getActivities.calls.reset()
+    mockFirestoreService.getActivityById.calls.reset()
   })
 
-  afterEach(() => {
-    httpMock.verify()
-  })
-
-  it('should load activities from JSON', done => {
+  it('should load activities from FirestoreService', done => {
+    mockFirestoreService.getActivities.and.returnValue(of(mockActivities))
     service.getActivities().subscribe(acts => {
       expect(acts.length).toBe(mockActivities.length)
       expect(acts[0].id).toBe(mockActivities[0].id)
       done()
     })
-    httpMock.expectOne('assets/activities_sr.json').flush(mockActivities)
   })
 
   it('should get activity by ID', done => {
     const targetId = mockActivities[1].id
+    mockFirestoreService.getActivityById.and.returnValue(of(mockActivities[1]))
     service.getActivityById(targetId).subscribe(act => {
       expect(act).toBeTruthy()
       expect(act?.id).toBe(targetId)
       done()
     })
-    httpMock.expectOne('assets/activities_sr.json').flush(mockActivities)
   })
 
   it('should return undefined for missing ID', done => {
+    mockFirestoreService.getActivityById.and.returnValue(of(undefined))
     service.getActivityById('999').subscribe(act => {
       expect(act).toBeUndefined()
       done()
     })
-    httpMock.expectOne('assets/activities_sr.json').flush(mockActivities)
   })
 }) 

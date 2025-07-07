@@ -7,6 +7,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { HomeComponent } from './home.component';
 import { Router } from '@angular/router';
 import { CATEGORY_KEYS } from '../../models/category-keys';
+import { FirestoreService } from '../../services/firestore.service';
+import { mockFirestoreService } from '../../../test-utils/mock-firestore-service';
 
 describe('HomeComponent', () => {
   let component: HomeComponent;
@@ -24,7 +26,8 @@ describe('HomeComponent', () => {
       ],
       declarations: [ HomeComponent ],
       providers: [
-        { provide: Router, useValue: routerSpy }
+        { provide: Router, useValue: routerSpy },
+        { provide: FirestoreService, useValue: mockFirestoreService }
       ]
     })
     .compileComponents();

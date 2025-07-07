@@ -4,6 +4,7 @@ import { HttpClient } from '@angular/common/http'
 import { Observable, switchMap } from 'rxjs'
 import { BlogPost } from '../../models/blog-post.model'
 import { LanguageService } from '../../services/language.service'
+import { BlogService } from '../../services/blog.service'
 
 @Component({
   selector: 'app-blog',
@@ -13,12 +14,10 @@ import { LanguageService } from '../../services/language.service'
 export class BlogComponent implements OnInit {
   blogPosts$!: Observable<BlogPost[]>
 
-  constructor(private router: Router, private http: HttpClient, private languageService: LanguageService) {}
+  constructor(private router: Router, private http: HttpClient, private languageService: LanguageService, private blogService: BlogService) {}
 
   ngOnInit(): void {
-    this.blogPosts$ = this.languageService.getLanguage().pipe(
-      switchMap(lang => this.http.get<BlogPost[]>(`assets/blog-posts_${lang}.json`))
-    )
+    this.blogPosts$ = this.blogService.getBlogPosts();
   }
 
   goBack() {

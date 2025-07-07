@@ -5,6 +5,7 @@ import { Observable, switchMap } from 'rxjs';
 import { Category } from '../../models/category.model';
 import { CATEGORY_KEYS } from '../../models/category-keys';
 import { LanguageService } from '../../services/language.service';
+import { CategoryService } from '../../services/category.service'
 
 @Component({
   selector: 'app-home',
@@ -14,12 +15,15 @@ import { LanguageService } from '../../services/language.service';
 export class HomeComponent implements OnInit {
   categories$!: Observable<Category[]>;
 
-  constructor(private router: Router, private http: HttpClient, private languageService: LanguageService) {}
+  constructor(
+    private router: Router,
+    private http: HttpClient,
+    private languageService: LanguageService,
+    private categoryService: CategoryService,
+  ) {}
 
   ngOnInit(): void {
-    this.categories$ = this.languageService.getLanguage().pipe(
-      switchMap(lang => this.http.get<Category[]>(`assets/categories_${lang}.json`))
-    );
+    this.categories$ = this.categoryService.getCategories();
   }
 
   goToCategory(categoryId: string): void {

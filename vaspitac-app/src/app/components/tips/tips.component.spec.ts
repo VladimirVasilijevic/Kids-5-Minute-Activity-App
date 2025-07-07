@@ -6,6 +6,9 @@ import { NO_ERRORS_SCHEMA } from '@angular/core'
 import { HttpClientTestingModule } from '@angular/common/http/testing'
 import { Router } from '@angular/router'
 import { of } from 'rxjs'
+import { FirestoreService } from '../../services/firestore.service'
+import { mockFirestoreService } from '../../../test-utils/mock-firestore-service'
+import { mockTips } from '../../../test-utils/mock-tips'
 
 describe('TipsComponent', () => {
   let component: TipsComponent
@@ -16,12 +19,16 @@ describe('TipsComponent', () => {
     await TestBed.configureTestingModule({
       declarations: [TipsComponent],
       imports: [TranslateModule.forRoot(), HttpClientTestingModule],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
+      providers: [
+        { provide: FirestoreService, useValue: mockFirestoreService }
+      ]
     }).compileComponents()
 
     fixture = TestBed.createComponent(TipsComponent)
     component = fixture.componentInstance
     translate = TestBed.inject(TranslateService)
+    mockFirestoreService.getTips.calls.reset()
     fixture.detectChanges()
   })
 
@@ -40,6 +47,7 @@ describe('TipsComponent', () => {
   })
 
   it('should render all tips', async () => {
+    mockFirestoreService.getTips.and.returnValue(of(mockTips))
     await fixture.whenStable()
     fixture.detectChanges()
     const compiled = fixture.nativeElement as HTMLElement
@@ -67,6 +75,7 @@ describe('TipsComponent', () => {
   })
 
   it('should render tip content (description)', async () => {
+    mockFirestoreService.getTips.and.returnValue(of(mockTips))
     await fixture.whenStable()
     fixture.detectChanges()
     const compiled = fixture.nativeElement as HTMLElement
@@ -81,6 +90,7 @@ describe('TipsComponent', () => {
   })
 
   it('should show empty state if no tips', () => {
+    mockFirestoreService.getTips.and.returnValue(of([]))
     component.tips$ = of([])
     fixture.detectChanges()
     const compiled = fixture.nativeElement as HTMLElement

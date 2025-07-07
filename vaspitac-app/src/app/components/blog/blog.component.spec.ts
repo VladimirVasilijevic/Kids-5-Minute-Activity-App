@@ -6,6 +6,9 @@ import { NO_ERRORS_SCHEMA } from '@angular/core'
 import { HttpClientTestingModule } from '@angular/common/http/testing'
 import { Router } from '@angular/router'
 import { of } from 'rxjs'
+import { FirestoreService } from '../../services/firestore.service'
+import { mockFirestoreService } from '../../../test-utils/mock-firestore-service'
+import { mockBlogPosts } from '../../../test-utils/mock-blog-posts'
 
 describe('BlogComponent', () => {
   let component: BlogComponent
@@ -16,12 +19,16 @@ describe('BlogComponent', () => {
     await TestBed.configureTestingModule({
       declarations: [BlogComponent],
       imports: [TranslateModule.forRoot(), HttpClientTestingModule],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
+      providers: [
+        { provide: FirestoreService, useValue: mockFirestoreService }
+      ]
     }).compileComponents()
 
     fixture = TestBed.createComponent(BlogComponent)
     component = fixture.componentInstance
     translate = TestBed.inject(TranslateService)
+    mockFirestoreService.getBlogPosts.calls.reset()
     fixture.detectChanges()
   })
 
@@ -40,6 +47,7 @@ describe('BlogComponent', () => {
   })
 
   it('should render all blog posts', async () => {
+    mockFirestoreService.getBlogPosts.and.returnValue(of(mockBlogPosts))
     await fixture.whenStable()
     fixture.detectChanges()
     const compiled = fixture.nativeElement as HTMLElement
@@ -67,6 +75,7 @@ describe('BlogComponent', () => {
   })
 
   it('should render blog post content (excerpt, image)', async () => {
+    mockFirestoreService.getBlogPosts.and.returnValue(of(mockBlogPosts))
     await fixture.whenStable()
     fixture.detectChanges()
     const compiled = fixture.nativeElement as HTMLElement
@@ -86,6 +95,7 @@ describe('BlogComponent', () => {
   })
 
   it('should show empty state if no blog posts', () => {
+    mockFirestoreService.getBlogPosts.and.returnValue(of([]))
     component.blogPosts$ = of([])
     fixture.detectChanges()
     const compiled = fixture.nativeElement as HTMLElement
@@ -93,6 +103,7 @@ describe('BlogComponent', () => {
   })
 
   it('should update posts on language change', () => {
+    mockFirestoreService.getBlogPosts.and.returnValue(of(mockBlogPosts))
     const languageService = TestBed.inject<any>(TranslateService)
     spyOn(languageService, 'use').and.callThrough()
     // Simulate language change

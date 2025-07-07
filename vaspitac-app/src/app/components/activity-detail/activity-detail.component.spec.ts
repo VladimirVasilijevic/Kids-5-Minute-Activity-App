@@ -12,6 +12,8 @@ import { ActivatedRoute } from '@angular/router';
 import { mockActivities } from '../../../test-utils/mock-activities';
 import { of } from 'rxjs';
 import { Router } from '@angular/router';
+import { FirestoreService } from '../../services/firestore.service';
+import { mockFirestoreService } from '../../../test-utils/mock-firestore-service';
 
 describe('ActivityDetailComponent', () => {
   let component: ActivityDetailComponent;
@@ -35,6 +37,7 @@ describe('ActivityDetailComponent', () => {
             getActivityById: () => of(mockActivity)
           }
         },
+        { provide: FirestoreService, useValue: mockFirestoreService },
         {
           provide: ActivatedRoute,
           useValue: {

@@ -4,6 +4,7 @@ import { HttpClient } from '@angular/common/http'
 import { Observable, switchMap } from 'rxjs'
 import { Tip } from '../../models/tip.model'
 import { LanguageService } from '../../services/language.service'
+import { TipsService } from '../../services/tips.service'
 
 @Component({
   selector: 'app-tips',
@@ -13,12 +14,10 @@ import { LanguageService } from '../../services/language.service'
 export class TipsComponent implements OnInit {
   tips$!: Observable<Tip[]>
 
-  constructor(private router: Router, private http: HttpClient, private languageService: LanguageService) {}
+  constructor(private router: Router, private http: HttpClient, private languageService: LanguageService, private tipsService: TipsService) {}
 
   ngOnInit(): void {
-    this.tips$ = this.languageService.getLanguage().pipe(
-      switchMap(lang => this.http.get<Tip[]>(`assets/tips_${lang}.json`))
-    )
+    this.tips$ = this.tipsService.getTips();
   }
 
   goBack() {

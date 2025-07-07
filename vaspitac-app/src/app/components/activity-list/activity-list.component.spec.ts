@@ -5,6 +5,8 @@ import { of, Subject } from 'rxjs';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideRouter } from '@angular/router';
 import { Router } from '@angular/router';
+import { FirestoreService } from '../../services/firestore.service';
+import { mockFirestoreService } from '../../../test-utils/mock-firestore-service';
 
 import { ActivityListComponent } from './activity-list.component';
 import { ActivityService } from '../../services/activity.service';
@@ -33,6 +35,7 @@ describe('ActivityListComponent', () => {
             getActivities: () => activitiesSubject.asObservable()
           }
         },
+        { provide: FirestoreService, useValue: mockFirestoreService },
         provideHttpClientTesting(),
         provideRouter([])
       ]

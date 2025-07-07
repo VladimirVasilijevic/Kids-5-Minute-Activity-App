@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "536360476476",
+    "project_id": "ana-vaspitac",
+    "storage_bucket": "ana-vaspitac.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:536360476476:android:db66a743887fed405e8839",
+        "android_client_info": {
+          "package_name": "com.vaspitac.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAqKkqT3zBGuuQpA0BRNslz0gWTiVX-yPI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
