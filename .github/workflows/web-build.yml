@@ -29,6 +29,10 @@ jobs:
     - name: Create environment.ts
       working-directory: vaspitac-app
       run: |
+        # ⚠️ SECURITY: The API key will be visible in the compiled JS files
+        # Ensure the FIREBASE_API_KEY secret has proper restrictions configured:
+        # - HTTP referrers: your-domain.com, *.your-domain.com
+        # - App package names: com.vaspitac.app (for Android)
         cat <<EOF > src/environments/environment.ts
         export const environment = {
           production: true,

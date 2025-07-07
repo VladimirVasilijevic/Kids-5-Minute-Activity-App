@@ -1,6 +1,11 @@
 export const environment = {
   production: true,
   firebase: {
+    // ⚠️ SECURITY: This API key will be visible in the browser
+    // Configure restrictions in Google Cloud Console:
+    // - HTTP referrers (web sites)
+    // - App package names (Android)
+    // - IP addresses
     apiKey: 'YOUR_FIREBASE_API_KEY',
     authDomain: 'your-project.firebaseapp.com',
     projectId: 'your-project-id',

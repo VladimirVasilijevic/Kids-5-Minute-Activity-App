@@ -272,10 +272,15 @@ For automated builds and deployments, add these secrets to your GitHub repositor
 - **Never commit `google-services.json`, `environment.ts`, or `environment.prod.ts` to version control**
 - These files contain sensitive API keys and are automatically ignored by `.gitignore`
 - **Use GitHub Secrets for CI/CD builds** - the workflows will create these files from secrets
+- **API Key Security**: Firebase API keys in frontend apps are inherently public. Configure restrictions in Google Cloud Console:
+  - HTTP referrers for web apps
+  - App package names for Android
+  - IP address restrictions
 - If you accidentally commit these files, immediately:
   1. Rotate the API keys in Firebase Console
   2. Remove the files from git tracking: `git rm --cached android/app/google-services.json src/environments/environment.ts src/environments/environment.prod.ts`
   3. Commit the removal
+- **See [SECURITY.md](SECURITY.md) for detailed security guidelines**
 # Run with coverage
 $ npm run test:coverage
 ```

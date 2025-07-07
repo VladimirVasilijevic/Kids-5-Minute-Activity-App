@@ -216,14 +216,31 @@ TODO: Configure app icons for web and Android platforms <!-- id: task-034 -->
 - [x] Icons tested on web browsers and Android devices
 - [x] Documentation created for icon setup and troubleshooting
 
-## 🔒 Phase 7: Secure Firestore Rules
+## 🔒 Phase 7: Security & API Key Management
 
-TODO: Harden Firestore security rules for production <!-- id: task-024 -->
+TODO: Implement comprehensive API key security and monitoring <!-- id: task-024 -->
 **Acceptance Criteria**  
+- [x] SECURITY.md documentation created with API key best practices
+- [x] Environment templates updated with security warnings
+- [x] GitHub Actions workflows include security comments
+- [x] README updated with security guidelines
+- [ ] API key restrictions configured in Google Cloud Console (HTTP referrers, app package names)
 - [ ] Firestore rules restrict write access in production
 - [ ] Only allow reads for public content collections
-- [ ] Document security policy in README
+- [ ] API key rotation process documented and tested
+- [ ] Monitoring alerts set up for unusual API key usage
 - [ ] All contributors understand and follow security best practices
+
+TODO: Remediate exposed API key and secure build artifacts <!-- id: task-035 -->
+**Acceptance Criteria**  
+- [ ] Compromised API key revoked in Google Cloud Console
+- [ ] New API key created with proper restrictions
+- [ ] GitHub Secrets updated with new API key
+- [ ] Sensitive files removed from git tracking (environment.ts, environment.prod.ts, google-services.json)
+- [ ] Git history cleaned of sensitive data (if necessary)
+- [ ] Build artifacts scanned for remaining secrets
+- [ ] GitHub security alert closed
+- [ ] Post-incident review completed and lessons learned documented
 
 ## 🌿 Optional MVP Enhancement
 
