@@ -188,6 +188,10 @@ $ git clone <repository-url>
 $ cd vaspitac/vaspitac-app
 $ npm install
 
+# Set up environment (see Environment Setup below)
+$ cp src/environments/environment.template.ts src/environments/environment.ts
+# Edit src/environments/environment.ts with your Firebase credentials
+
 # Run web app
 $ npm start
 # Open http://localhost:4200
@@ -197,6 +201,45 @@ $ npm test
 # Run with coverage
 $ npm run test:coverage
 ```
+
+### Environment Setup
+
+The app requires Firebase configuration for full functionality. Follow these steps to set up your local environment:
+
+1. **Get Firebase Credentials**
+   - Go to [Firebase Console](https://console.firebase.google.com/)
+   - Create a new project or use an existing one
+   - Go to Project Settings > General
+   - Scroll down to "Your apps" section
+   - Click "Add app" > Web app
+   - Copy the configuration object
+
+2. **Create Your Environment File**
+   - Copy the template file: `cp src/environments/environment.template.ts src/environments/environment.ts`
+   - Open `src/environments/environment.ts`
+   - Replace the placeholder values with your Firebase credentials:
+   ```typescript
+   export const environment = {
+     production: false,
+     firebase: {
+       apiKey: "your-actual-api-key",
+       authDomain: "your-project.firebaseapp.com",
+       projectId: "your-project-id",
+       storageBucket: "your-project.appspot.com",
+       messagingSenderId: "123456789012",
+       appId: "1:123456789012:web:abcdef123456",
+       measurementId: "G-XXXXXXXXXX"
+     }
+   }
+   ```
+
+3. **Firestore Setup (Optional)**
+   - If you want to use Firestore for dynamic content:
+     - Enable Firestore in your Firebase project
+     - Set up collections: `activities_sr`, `activities_en`, `categories_sr`, `categories_en`, `blog_sr`, `blog_en`, `tips_sr`, `tips_en`
+     - Use the import script: `npm run import-to-firestore`
+
+**Note:** The `environment.ts` file is gitignored for security. Use `environment.template.ts` as a starting point. Never commit real Firebase credentials to the repository.
 
 ### Mobile (Android)
 ```bash
