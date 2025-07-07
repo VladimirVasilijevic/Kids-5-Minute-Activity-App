@@ -1,3 +1,6 @@
+/**
+ * Constant object containing all category key values
+ */
 export const CATEGORY_KEYS = {
   ABOUT: 'about',
   SHOP: 'shop',
@@ -10,4 +13,7 @@ export const CATEGORY_KEYS = {
   NATURE: 'nature',
 } as const;
 
+/**
+ * Type representing all possible category key values
+ */
 export type CategoryKey = (typeof CATEGORY_KEYS)[keyof typeof CATEGORY_KEYS];

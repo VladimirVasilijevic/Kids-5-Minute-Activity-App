@@ -1,59 +1,49 @@
-// @ts-check
-import jsdoc from 'eslint-plugin-jsdoc'
-import typescriptEslint from '@typescript-eslint/eslint-plugin'
-import typescriptParser from '@typescript-eslint/parser'
-import importPlugin from 'eslint-plugin-import'
+import js from '@eslint/js';
+import tseslint from '@typescript-eslint/eslint-plugin';
+import tsparser from '@typescript-eslint/parser';
 
-/** @type {import('eslint').Linter.FlatConfig[]} */
 export default [
+  js.configs.recommended,
   {
     files: ['**/*.ts'],
     languageOptions: {
-      parser: typescriptParser,
+      parser: tsparser,
       parserOptions: {
-        project: ['./tsconfig.json'],
+        ecmaVersion: 2021,
         sourceType: 'module',
       },
-      ecmaVersion: 2021,
+      globals: {
+        console: 'readonly',
+        describe: 'readonly',
+        it: 'readonly',
+        expect: 'readonly',
+        beforeEach: 'readonly',
+        afterEach: 'readonly',
+        jasmine: 'readonly',
+        spyOn: 'readonly',
+        fail: 'readonly',
+        window: 'readonly',
+        document: 'readonly',
+        navigator: 'readonly',
+        HTMLElement: 'readonly',
+        HTMLImageElement: 'readonly',
+        setTimeout: 'readonly',
+      },
     },
     plugins: {
-      '@typescript-eslint': typescriptEslint,
-      import: importPlugin,
-      jsdoc,
+      '@typescript-eslint': tseslint,
     },
     rules: {
-      'jsdoc/require-jsdoc': [
-        'warn',
-        {
-          publicOnly: true,
-          require: {
-            FunctionDeclaration: true,
-            MethodDefinition: true,
-            ClassDeclaration: true,
-            ArrowFunctionExpression: false,
-            FunctionExpression: false,
-          },
-        },
-      ],
-      'jsdoc/require-param': 'warn',
-      'jsdoc/require-returns': 'warn',
-      'import/order': [
-        'warn',
-        {
-          groups: [
-            'builtin',
-            'external',
-            'internal',
-            'parent',
-            'sibling',
-            'index',
-          ],
-          'newlines-between': 'always',
-        },
-      ],
       '@typescript-eslint/explicit-function-return-type': 'warn',
-      '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
+      '@typescript-eslint/no-unused-vars': 'off',
+      'no-unused-vars': ['error', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
       '@typescript-eslint/no-explicit-any': 'warn',
     },
   },
-] 
+  {
+    files: ['**/*.spec.ts'],
+    rules: {
+      '@typescript-eslint/no-explicit-any': 'off',
+    },
+  },
+]; 

@@ -1,6 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { By } from '@angular/platform-browser';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { Router } from '@angular/router';
@@ -15,9 +14,9 @@ import { TipsComponent } from './tips.component';
 describe('TipsComponent', () => {
   let component: TipsComponent;
   let fixture: ComponentFixture<TipsComponent>;
-  let translate: TranslateService;
+  let _translate: TranslateService;
 
-  beforeEach(async () => {
+  beforeEach(async (): Promise<void> => {
     await TestBed.configureTestingModule({
       declarations: [TipsComponent],
       imports: [TranslateModule.forRoot(), HttpClientTestingModule],
@@ -27,26 +26,26 @@ describe('TipsComponent', () => {
 
     fixture = TestBed.createComponent(TipsComponent);
     component = fixture.componentInstance;
-    translate = TestBed.inject(TranslateService);
+    _translate = TestBed.inject(TranslateService);
     mockFirestoreService.getTips.calls.reset();
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it('should create', (): void => {
     expect(component).toBeTruthy();
   });
 
-  it('should render the tips title and subtitle', () => {
+  it('should render the tips title and subtitle', (): void => {
     const compiled = fixture.nativeElement as HTMLElement;
     const title = compiled.querySelector('h2');
     const subtitle = compiled.querySelector('p.text-base.md\\:text-lg');
     expect(title).toBeTruthy();
     expect(subtitle).toBeTruthy();
-    expect(title && title.textContent).toContain(translate.instant('TIPS.QUICK_TITLE'));
-    expect(subtitle && subtitle.textContent).toContain(translate.instant('TIPS.QUICK_SUBTITLE'));
+    expect(title && title.textContent).toContain(_translate.instant('TIPS.QUICK_TITLE'));
+    expect(subtitle && subtitle.textContent).toContain(_translate.instant('TIPS.QUICK_SUBTITLE'));
   });
 
-  it('should render all tips', async () => {
+  it('should render all tips', async (): Promise<void> => {
     mockFirestoreService.getTips.and.returnValue(of(mockTips));
     await fixture.whenStable();
     fixture.detectChanges();
@@ -61,7 +60,7 @@ describe('TipsComponent', () => {
     expect(cards.length).toBeGreaterThanOrEqual(0);
   });
 
-  it('should navigate back to home on back button click', () => {
+  it('should navigate back to home on back button click', (): void => {
     const router = TestBed.inject(Router);
     spyOn(router, 'navigate').and.returnValue(Promise.resolve(true));
     const compiled = fixture.nativeElement as HTMLElement;
@@ -74,7 +73,7 @@ describe('TipsComponent', () => {
     }
   });
 
-  it('should render tip content (description)', async () => {
+  it('should render tip content (description)', async (): Promise<void> => {
     mockFirestoreService.getTips.and.returnValue(of(mockTips));
     await fixture.whenStable();
     fixture.detectChanges();
@@ -89,7 +88,7 @@ describe('TipsComponent', () => {
     expect(cards.length).toBeGreaterThanOrEqual(0);
   });
 
-  it('should show empty state if no tips', () => {
+  it('should show empty state if no tips', (): void => {
     mockFirestoreService.getTips.and.returnValue(of([]));
     component.tips$ = of([]);
     fixture.detectChanges();
@@ -97,7 +96,7 @@ describe('TipsComponent', () => {
     expect(compiled.textContent).toContain('TIPS.EMPTY');
   });
 
-  it('should update tips on language change', () => {
+  it('should update tips on language change', (): void => {
     const languageService = TestBed.inject<any>(TranslateService);
     spyOn(languageService, 'use').and.callThrough();
     // Simulate language change

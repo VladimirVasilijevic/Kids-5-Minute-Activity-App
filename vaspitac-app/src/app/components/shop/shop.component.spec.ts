@@ -7,13 +7,9 @@ import { Pipe, PipeTransform } from '@angular/core';
 
 import { ShopComponent } from './shop.component';
 
-class MockRouter {
-  navigate = jasmine.createSpy('navigate');
-}
-
 @Pipe({ name: 'translate' })
 class MockTranslatePipe implements PipeTransform {
-  transform(value: string) {
+  transform(value: string): string {
     return value;
   }
 }
@@ -21,10 +17,10 @@ class MockTranslatePipe implements PipeTransform {
 describe('ShopComponent', () => {
   let component: ShopComponent;
   let fixture: ComponentFixture<ShopComponent>;
-  let router: MockRouter;
-  let translate: TranslateService;
+  let router: Router;
+  let _translate: TranslateService;
 
-  beforeEach(async () => {
+  beforeEach(async (): Promise<void> => {
     const navigateSpy = jasmine.createSpy('navigate').and.returnValue(Promise.resolve());
     await TestBed.configureTestingModule({
       declarations: [ShopComponent, MockTranslatePipe],
@@ -35,16 +31,16 @@ describe('ShopComponent', () => {
 
     fixture = TestBed.createComponent(ShopComponent);
     component = fixture.componentInstance;
-    router = TestBed.inject(Router) as any;
-    translate = TestBed.inject(TranslateService);
+    router = TestBed.inject(Router);
+    _translate = TestBed.inject(TranslateService);
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it('should create', (): void => {
     expect(component).toBeTruthy();
   });
 
-  it('should render the shop title and description', () => {
+  it('should render the shop title and description', (): void => {
     const compiled = fixture.nativeElement as HTMLElement;
     const title = compiled.querySelector('h1');
     const desc = compiled.querySelector('p.text-base.md\\:text-lg');
@@ -54,13 +50,13 @@ describe('ShopComponent', () => {
     expect(desc && desc.textContent).toContain('SHOP.DESCRIPTION');
   });
 
-  it('should navigate back to home on back button click', () => {
+  it('should navigate back to home on back button click', (): void => {
     const backBtn = fixture.debugElement.query(By.css('button'));
     backBtn.triggerEventHandler('click', null);
     expect(router.navigate).toHaveBeenCalledWith(['/']);
   });
 
-  it('should copy PayPal email and show feedback', fakeAsync(() => {
+  it('should copy PayPal email and show feedback', fakeAsync((): void => {
     spyOn(navigator.clipboard, 'writeText').and.returnValue(Promise.resolve());
     component.copyPayPalEmail();
     tick();
@@ -69,13 +65,13 @@ describe('ShopComponent', () => {
     expect(component.copiedPayPal).toBeFalse();
   }));
 
-  it('should render PayPal email', () => {
+  it('should render PayPal email', (): void => {
     const compiled = fixture.nativeElement as HTMLElement;
     expect(compiled.textContent).toContain('ana.petrovic.vaspitac@g'); // partial check for obfuscated email
     expect(compiled.textContent).toContain('SHOP.PAYPAL_EMAIL_LABEL');
   });
 
-  it('should use fallback copy method if navigator.clipboard is not available', fakeAsync(() => {
+  it('should use fallback copy method if navigator.clipboard is not available', fakeAsync((): void => {
     const originalClipboard = navigator.clipboard;
     Object.defineProperty(navigator, 'clipboard', { value: undefined, configurable: true });
     const textarea = document.createElement('textarea');
@@ -94,14 +90,14 @@ describe('ShopComponent', () => {
     Object.defineProperty(navigator, 'clipboard', { value: originalClipboard, configurable: true });
   }));
 
-  it('should handle error in copyPayPalEmail gracefully', fakeAsync(() => {
+  it('should handle error in copyPayPalEmail gracefully', fakeAsync((): void => {
     spyOn(navigator.clipboard, 'writeText').and.returnValue(Promise.reject('fail'));
     component.copyPayPalEmail();
     tick();
     expect(component.copiedPayPal).toBeFalse();
   }));
 
-  it('should show feedback UI when copiedPayPal is true', () => {
+  it('should show feedback UI when copiedPayPal is true', (): void => {
     component.copiedPayPal = true;
     fixture.detectChanges();
     const compiled = fixture.nativeElement as HTMLElement;

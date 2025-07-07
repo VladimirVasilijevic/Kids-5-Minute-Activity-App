@@ -1,11 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
-import { Observable, switchMap } from 'rxjs';
+import { Observable } from 'rxjs';
 
 import { Category } from '../../models/category.model';
 import { CATEGORY_KEYS } from '../../models/category-keys';
-import { LanguageService } from '../../services/language.service';
 import { CategoryService } from '../../services/category.service';
 
 /**
@@ -23,21 +22,19 @@ export class HomeComponent implements OnInit {
    *
    * @param router
    * @param http
-   * @param languageService
    * @param categoryService
    */
   constructor(
-    private router: Router,
-    private http: HttpClient,
-    private languageService: LanguageService,
-    private categoryService: CategoryService
+    private _router: Router,
+    private _http: HttpClient,
+    private _categoryService: CategoryService
   ) {}
 
   /**
    *
    */
   ngOnInit(): void {
-    this.categories$ = this.categoryService.getCategories();
+    this.categories$ = this._categoryService.getCategories();
   }
 
   /**
@@ -47,28 +44,28 @@ export class HomeComponent implements OnInit {
   goToCategory(categoryId: string): void {
     switch (categoryId) {
       case CATEGORY_KEYS.ABOUT:
-        this.router.navigate(['/about']).then(() => this.scrollToTop());
+        this._router.navigate(['/about']).then((): void => this.scrollToTop());
         break;
       case CATEGORY_KEYS.SHOP:
-        this.router.navigate(['/shop']).then(() => this.scrollToTop());
+        this._router.navigate(['/shop']).then((): void => this.scrollToTop());
         break;
       case CATEGORY_KEYS.BLOG:
-        this.router.navigate(['/blog']).then(() => this.scrollToTop());
+        this._router.navigate(['/blog']).then((): void => this.scrollToTop());
         break;
       case CATEGORY_KEYS.TIPS:
-        this.router.navigate(['/tips']).then(() => this.scrollToTop());
+        this._router.navigate(['/tips']).then((): void => this.scrollToTop());
         break;
       case CATEGORY_KEYS.PHYSICAL:
       case CATEGORY_KEYS.CREATIVE:
       case CATEGORY_KEYS.EDUCATIONAL:
       case CATEGORY_KEYS.MUSICAL:
       case CATEGORY_KEYS.NATURE:
-        this.router
+        this._router
           .navigate(['/activities'], { queryParams: { category: categoryId } })
-          .then(() => this.scrollToTop());
+          .then((): void => this.scrollToTop());
         break;
       default:
-        this.router.navigate(['/activities']).then(() => this.scrollToTop());
+        this._router.navigate(['/activities']).then((): void => this.scrollToTop());
     }
   }
 

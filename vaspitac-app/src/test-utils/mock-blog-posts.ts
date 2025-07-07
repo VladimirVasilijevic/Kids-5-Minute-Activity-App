@@ -1,3 +1,7 @@
+/**
+ * Mock blog posts data for testing purposes
+ * Contains sample blog posts with various topics and authors
+ */
 export const mockBlogPosts = [
   {
     id: 1,

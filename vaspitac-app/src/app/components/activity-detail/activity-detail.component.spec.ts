@@ -6,7 +6,7 @@ import { provideRouter } from '@angular/router';
 // Angular Material imports
 import { MatCardModule } from '@angular/material/card';
 import { ActivatedRoute } from '@angular/router';
-import { of } from 'rxjs';
+import { of, Observable } from 'rxjs';
 import { Router } from '@angular/router';
 
 import { ActivityService } from '../../services/activity.service';
@@ -22,8 +22,8 @@ describe('ActivityDetailComponent', () => {
   let fixture: ComponentFixture<ActivityDetailComponent>;
   const mockActivity: Activity = mockActivities[0];
 
-  beforeEach(waitForAsync(() => {
-    TestBed.configureTestingModule({
+  beforeEach(waitForAsync(async (): Promise<void> => {
+    await TestBed.configureTestingModule({
       imports: [TranslateModule.forRoot(), BrowserAnimationsModule, MatCardModule],
       declarations: [ActivityDetailComponent],
       providers: [
@@ -32,17 +32,17 @@ describe('ActivityDetailComponent', () => {
         {
           provide: ActivityService,
           useValue: {
-            getActivityById: () => of(mockActivity),
+            getActivityById: (): Observable<Activity | undefined> => of(mockActivity),
           },
         },
         { provide: FirestoreService, useValue: mockFirestoreService },
         {
           provide: ActivatedRoute,
           useValue: {
-            paramMap: of({ get: () => '001' }),
+            paramMap: of({ get: (): string => '001' }),
             snapshot: {
               queryParamMap: {
-                get: () => null,
+                get: (): null => null,
               },
             },
           },
@@ -54,17 +54,17 @@ describe('ActivityDetailComponent', () => {
     }).compileComponents();
   }));
 
-  beforeEach(() => {
+  beforeEach((): void => {
     fixture = TestBed.createComponent(ActivityDetailComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it('should create', (): void => {
     expect(component).toBeTruthy();
   });
 
-  it('should have activity$ observable', (done) => {
+  it('should have activity$ observable', (done: Function): void => {
     component.activity$.subscribe((activity) => {
       expect(activity).toBeTruthy();
       expect(activity?.id).toBe('001');
@@ -73,7 +73,7 @@ describe('ActivityDetailComponent', () => {
   });
 
   // UI test: should render the activity title in the DOM
-  it('should render the activity title in the current language', () => {
+  it('should render the activity title in the current language', (): void => {
     component.lang = 'sr';
     fixture.detectChanges();
     const compiled = fixture.nativeElement;
@@ -87,19 +87,19 @@ describe('ActivityDetailComponent', () => {
     expect(titleEn && titleEn.textContent).toContain(mockActivity.title);
   });
 
-  it('should show not found message if activity is missing', () => {
+  it('should show not found message if activity is missing', (): void => {
     // Simulate no activity found
-    const testBed = TestBed.inject(ActivityService) as any;
-    spyOn(testBed, 'getActivityById').and.returnValue(of(undefined));
+    const activityService = TestBed.inject(ActivityService);
+    spyOn(activityService, 'getActivityById').and.returnValue(of(undefined));
     fixture = TestBed.createComponent(ActivityDetailComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
     const compiled = fixture.nativeElement;
-    const notFound = compiled.querySelector('ng-template') || compiled.textContent;
+    const _notFound = compiled.querySelector('ng-template') || compiled.textContent;
     expect(compiled.textContent).toContain('ACTIVITY.NOT_FOUND');
   });
 
-  it('should call goBack and navigate to /activities when back button is clicked', () => {
+  it('should call goBack and navigate to /activities when back button is clicked', (): void => {
     spyOn(component, 'goBack').and.callThrough();
     const router = TestBed.inject(Router);
     spyOn(router, 'navigate').and.returnValue(Promise.resolve(true));
@@ -112,7 +112,7 @@ describe('ActivityDetailComponent', () => {
     });
   });
 
-  it('should render video link if videoUrl is present', () => {
+  it('should render video link if videoUrl is present', (): void => {
     const compiled = fixture.nativeElement;
     const videoLink = compiled.querySelector('a[href="' + mockActivity.videoUrl + '"]');
     if (mockActivity.videoUrl) {
@@ -123,7 +123,7 @@ describe('ActivityDetailComponent', () => {
     }
   });
 
-  it('should render image with correct src and alt', () => {
+  it('should render image with correct src and alt', (): void => {
     const compiled = fixture.nativeElement;
     const img = compiled.querySelector('img');
     expect(img).toBeTruthy();
@@ -131,7 +131,7 @@ describe('ActivityDetailComponent', () => {
     expect(img.getAttribute('alt')).toBe(mockActivity.title);
   });
 
-  it('should render materials if present', () => {
+  it('should render materials if present', (): void => {
     const compiled = fixture.nativeElement;
     if (mockActivity.materials && mockActivity.materials.length) {
       const materials = compiled.querySelectorAll(
@@ -147,7 +147,7 @@ describe('ActivityDetailComponent', () => {
     }
   });
 
-  it('should render instructions if present', () => {
+  it('should render instructions if present', (): void => {
     const compiled = fixture.nativeElement;
     if (mockActivity.instructions && mockActivity.instructions.length) {
       const instructions = compiled.querySelectorAll(
@@ -163,7 +163,7 @@ describe('ActivityDetailComponent', () => {
     }
   });
 
-  it('should render category badge with correct translation key', () => {
+  it('should render category badge with correct translation key', (): void => {
     const compiled = fixture.nativeElement;
     const badge = compiled.querySelector('span.bg-green-100.text-green-700');
     expect(badge).toBeTruthy();

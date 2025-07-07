@@ -1,10 +1,11 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { of, Subject } from 'rxjs';
+import { Subject } from 'rxjs';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideRouter } from '@angular/router';
 import { Router } from '@angular/router';
+import { Observable } from 'rxjs';
 
 import { FirestoreService } from '../../services/firestore.service';
 import { mockFirestoreService } from '../../../test-utils/mock-firestore-service';
@@ -13,7 +14,7 @@ import { mockActivities } from '../../../test-utils/mock-activities';
 
 import { ActivityListComponent } from './activity-list.component';
 
-describe('ActivityListComponent', () => {
+describe('ActivityListComponent', (): void => {
   let component: ActivityListComponent;
   let fixture: ComponentFixture<ActivityListComponent>;
   let router: Router;
@@ -21,16 +22,16 @@ describe('ActivityListComponent', () => {
   const mockActivitiesList = mockActivities;
   let activitiesSubject: Subject<any[]>;
 
-  beforeEach(waitForAsync(() => {
+  beforeEach(waitForAsync(async (): Promise<void> => {
     activitiesSubject = new Subject<any[]>();
-    TestBed.configureTestingModule({
+    await TestBed.configureTestingModule({
       imports: [TranslateModule.forRoot(), BrowserAnimationsModule],
       declarations: [ActivityListComponent],
       providers: [
         {
           provide: ActivityService,
           useValue: {
-            getActivities: () => activitiesSubject.asObservable(),
+            getActivities: (): Observable<any[]> => activitiesSubject.asObservable(),
           },
         },
         { provide: FirestoreService, useValue: mockFirestoreService },
@@ -40,7 +41,7 @@ describe('ActivityListComponent', () => {
     }).compileComponents();
   }));
 
-  beforeEach(() => {
+  beforeEach((): void => {
     fixture = TestBed.createComponent(ActivityListComponent);
     component = fixture.componentInstance;
     router = TestBed.inject(Router);
@@ -48,11 +49,11 @@ describe('ActivityListComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it('should create', (): void => {
     expect(component).toBeTruthy();
   });
 
-  it('should render the activities title using translation key', () => {
+  it('should render the activities title using translation key', (): void => {
     activitiesSubject.next(mockActivitiesList);
     fixture.detectChanges();
     const compiled = fixture.nativeElement;
@@ -61,7 +62,7 @@ describe('ActivityListComponent', () => {
     expect(title && title.textContent).toContain(translate.instant('HOME.CAT_PHYSICAL_TITLE'));
   });
 
-  it('should show a message if no activities are available', () => {
+  it('should show a message if no activities are available', (): void => {
     activitiesSubject.next([]);
     fixture.detectChanges();
     const compiled = fixture.nativeElement;
@@ -70,13 +71,13 @@ describe('ActivityListComponent', () => {
     expect(emptyMsg && emptyMsg.textContent).toContain('ACTIVITIES.EMPTY');
   });
 
-  it('should show a loading spinner while loading', () => {
+  it('should show a loading spinner while loading', (): void => {
     // No spinner in new template, so skip or update this test if needed
     // expect(compiled.querySelector('[data-testid="loading-spinner"]')).toBeTruthy()
     expect(true).toBeTrue(); // placeholder
   });
 
-  it('should render activity cards with Tailwind classes', () => {
+  it('should render activity cards with Tailwind classes', (): void => {
     activitiesSubject.next(mockActivitiesList);
     fixture.detectChanges();
     const compiled = fixture.nativeElement;
@@ -85,7 +86,7 @@ describe('ActivityListComponent', () => {
     expect(cards[0].className).toMatch(/rounded-xl/);
   });
 
-  it('should apply responsive Tailwind classes', () => {
+  it('should apply responsive Tailwind classes', (): void => {
     activitiesSubject.next(mockActivitiesList);
     fixture.detectChanges();
     const compiled = fixture.nativeElement;
@@ -94,7 +95,7 @@ describe('ActivityListComponent', () => {
     expect(grid.className).toMatch(/lg:grid-cols-3/);
   });
 
-  it('should have accessible alt text for images in the current language', () => {
+  it('should have accessible alt text for images in the current language', (): void => {
     activitiesSubject.next(mockActivitiesList);
     component.lang = 'sr';
     fixture.detectChanges();
@@ -111,10 +112,17 @@ describe('ActivityListComponent', () => {
     });
   });
 
-  it('should call goBack and navigate to / when back button is clicked', () => {
-    spyOn(component, 'goBack').and.callThrough();
+  it('should call goBack and navigate to / when back button is clicked', (): void => {
+    // Set up spies before component creation
     const router = TestBed.inject(Router);
     spyOn(router, 'navigate').and.returnValue(Promise.resolve(true));
+    
+    // Create component and set up goBack spy
+    fixture = TestBed.createComponent(ActivityListComponent);
+    component = fixture.componentInstance;
+    spyOn(component, 'goBack').and.callThrough();
+    
+    fixture.detectChanges();
     const compiled = fixture.nativeElement;
     const backBtn = compiled.querySelector('button');
     backBtn.click();
@@ -122,7 +130,7 @@ describe('ActivityListComponent', () => {
     expect(router.navigate).toHaveBeenCalledWith(['/']);
   });
 
-  it('should render category filter buttons for all categories', () => {
+  it('should render category filter buttons for all categories', (): void => {
     activitiesSubject.next(mockActivitiesList);
     fixture.detectChanges();
     const compiled = fixture.nativeElement;
@@ -132,7 +140,7 @@ describe('ActivityListComponent', () => {
     expect(filterBtns[0].textContent).toContain('ACTIVITIES.ALL');
   });
 
-  it('should highlight the selected category', () => {
+  it('should highlight the selected category', (): void => {
     activitiesSubject.next(mockActivitiesList);
     component.selectedCategory = component.categories[0];
     fixture.detectChanges();
@@ -141,18 +149,24 @@ describe('ActivityListComponent', () => {
     expect(filterBtns[1].className).toContain('bg-green-600');
   });
 
-  it('should call selectCategory and update filter when a category is clicked', () => {
+  it('should call selectCategory and update filter when a category is clicked', async (): Promise<void> => {
     activitiesSubject.next(mockActivitiesList);
     fixture.detectChanges();
+    await fixture.whenStable();
+    
+    // Spy on the selectCategory method to track calls
     spyOn(component, 'selectCategory').and.callThrough();
     const compiled = fixture.nativeElement;
     const filterBtns = compiled.querySelectorAll('div.flex button');
+    
+    // Click the first category button (index 1, since index 0 is "ALL")
     filterBtns[1].click();
+    
     expect(component.selectCategory).toHaveBeenCalled();
     expect(component.selectedCategory).toBe(component.categories[0]);
   });
 
-  it('should render a card for each activity with correct content', () => {
+  it('should render a card for each activity with correct content', (): void => {
     activitiesSubject.next(mockActivitiesList);
     fixture.detectChanges();
     const compiled = fixture.nativeElement;
@@ -169,7 +183,7 @@ describe('ActivityListComponent', () => {
     });
   });
 
-  it('should navigate to activity detail on card click', () => {
+  it('should navigate to activity detail on card click', (): void => {
     activitiesSubject.next(mockActivitiesList);
     fixture.detectChanges();
     spyOn(router, 'navigate');
@@ -182,13 +196,25 @@ describe('ActivityListComponent', () => {
     );
   });
 
-  it('should call goToActivity and navigate to detail when start button is clicked', () => {
+  it('should call goToActivity and navigate to detail when start button is clicked', async (): Promise<void> => {
+    // Set up router spy before component initialization
+    const router = TestBed.inject(Router);
+    spyOn(router, 'navigate');
+    
+    // Provide mock data and wait for component to be stable
     activitiesSubject.next(mockActivitiesList);
     fixture.detectChanges();
+    await fixture.whenStable();
+    
+    // Set up goToActivity spy after component is initialized
     spyOn(component, 'goToActivity').and.callThrough();
-    spyOn(router, 'navigate');
+    
     const compiled = fixture.nativeElement;
     const startBtn = compiled.querySelector('.group.overflow-hidden.bg-white button');
+    if (!startBtn) {
+      fail('Start button not found');
+      return;
+    }
     startBtn.click();
     expect(component.goToActivity).toHaveBeenCalledWith(mockActivitiesList[0].id);
     expect(router.navigate).toHaveBeenCalledWith(
@@ -197,11 +223,12 @@ describe('ActivityListComponent', () => {
     );
   });
 
-  it('should apply responsive Tailwind classes to the grid', () => {
+  it('should apply responsive Tailwind classes to the grid', (): void => {
     activitiesSubject.next(mockActivitiesList);
     fixture.detectChanges();
     const compiled = fixture.nativeElement;
     const grid = compiled.querySelector('.grid');
+    expect(grid.className).toMatch(/grid-cols-1/);
     expect(grid.className).toMatch(/sm:grid-cols-2/);
     expect(grid.className).toMatch(/lg:grid-cols-3/);
   });

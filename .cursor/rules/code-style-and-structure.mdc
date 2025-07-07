@@ -1,15 +1,33 @@
----
-description: 
-globs: 
-alwaysApply: true
----
-Write concise, technical TypeScript. Follow Standard.js rules.
+# Code Style and Structure Guidelines
 
-Use functional, declarative patterns; avoid classes.
+## General Principles
+- Write concise, technical TypeScript following Standard.js rules
+- Use functional, declarative patterns; prefer functions over classes
+- Favor loops and small helper modules over duplicate code
+- Use descriptive names with auxiliary verbs (e.g. `isLoading`, `hasError`)
 
-Favor loops and small helper modules over duplicate code.
+## File Organization
+- **Exported component** → **subcomponents** → **hooks/helpers** → **static content**
+- Keep files focused and under 1600 lines
+- Use meaningful file names that describe their purpose
+- Group related functionality together
 
-Use descriptive names with auxiliary verbs (e.g. isLoading, hasError).
+## Naming Conventions
+- **Variables**: camelCase (`userName`, `isLoading`)
+- **Functions**: camelCase with verbs (`getUserData`, `handleClick`)
+- **Classes**: PascalCase (`UserService`, `HomeComponent`)
+- **Interfaces**: PascalCase with descriptive names (`UserProfile`, `ApiResponse`)
+- **Constants**: UPPER_SNAKE_CASE (`MAX_RETRY_ATTEMPTS`, `DEFAULT_TIMEOUT`)
 
+## Code Structure
+- **Single responsibility** - Each function/class should do one thing well
+- **Early returns** - Use guard clauses to reduce nesting
+- **Consistent formatting** - Follow established indentation and spacing
+- **Clear separation** - Separate concerns between UI, business logic, and data access
 
-File layout: exported component → subcomponents → hooks/helpers → static content.
+## Best Practices
+- **Avoid magic numbers** - Use named constants
+- **Minimize side effects** - Make functions pure when possible
+- **Handle errors gracefully** - Provide meaningful error messages
+- **Document complex logic** - Add comments for non-obvious code
+- **Test coverage** - Write tests for critical functionality

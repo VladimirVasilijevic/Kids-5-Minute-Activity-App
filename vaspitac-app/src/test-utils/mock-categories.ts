@@ -1,3 +1,7 @@
+/**
+ * Mock categories data for testing purposes
+ * Contains all available categories with their styling and translation keys
+ */
 export const mockCategories = [
   {
     id: 'about',

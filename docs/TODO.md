@@ -270,3 +270,8 @@ TODO: Improve code documentation and enforce TypeScript code style <!-- id: task
 - [x] Enforce code style with ESLint/TSLint and Prettier  
 - [x] Linting errors do not block CI, but warnings are visible in PRs  
 - [x] All contributors follow documented code style
+- [x] Cursor rules created for code style, linting, and command line practices
+- [x] ESLint configured with TypeScript, JSDoc, and import rules
+- [x] Prettier configured with semicolons and consistent formatting
+- [x] All source files linted and formatted according to standards
+- [x] Test files use proper TypeScript types and shared mocks

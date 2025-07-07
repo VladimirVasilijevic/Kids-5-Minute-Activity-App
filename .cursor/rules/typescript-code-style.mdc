@@ -1,0 +1,155 @@
+# TypeScript Code Style Standards
+
+## Type Safety
+- **Strict typing** - Use explicit types for all variables, parameters, and return values
+- **No `any` types** - Replace with proper TypeScript interfaces or types
+- **Generic types** - Use generics for reusable components and functions
+- **Union types** - Use union types instead of `any` for multiple possible types
+
+## Function and Method Standards
+```typescript
+// ✅ Good - explicit return type
+function getData(): Observable<Data[]> {
+  return this.http.get<Data[]>('/api/data');
+}
+
+// ✅ Good - async function with return type
+async loadData(): Promise<void> {
+  await this.dataService.load();
+}
+
+// ❌ Bad - missing return type
+function getData() {
+  return this.http.get('/api/data');
+}
+```
+
+## Interface and Type Definitions
+```typescript
+// ✅ Good - proper interface
+interface User {
+  id: string;
+  name: string;
+  email: string;
+  isActive: boolean;
+}
+
+// ✅ Good - type union
+type Status = 'loading' | 'success' | 'error';
+
+// ✅ Good - generic interface
+interface ApiResponse<T> {
+  data: T;
+  status: number;
+  message: string;
+}
+```
+
+## Component Standards
+```typescript
+// ✅ Good - proper component typing
+@Component({
+  selector: 'app-user-list',
+  templateUrl: './user-list.component.html',
+  styleUrls: ['./user-list.component.scss']
+})
+export class UserListComponent implements OnInit {
+  users$!: Observable<User[]>;
+  loading$!: Observable<boolean>;
+  
+  constructor(private userService: UserService) {}
+  
+  ngOnInit(): void {
+    this.users$ = this.userService.getUsers();
+  }
+  
+  onUserSelect(user: User): void {
+    // Handle user selection
+  }
+}
+```
+
+## Service Standards
+```typescript
+// ✅ Good - proper service typing
+@Injectable({
+  providedIn: 'root'
+})
+export class DataService {
+  constructor(private http: HttpClient) {}
+  
+  getData(): Observable<Data[]> {
+    return this.http.get<Data[]>('/api/data').pipe(
+      catchError((error: HttpErrorResponse) => {
+        console.error('Error fetching data:', error);
+        return throwError(() => new Error('Failed to fetch data'));
+      })
+    );
+  }
+  
+  createData(data: CreateDataRequest): Observable<Data> {
+    return this.http.post<Data>('/api/data', data);
+  }
+}
+```
+
+## Testing Standards
+```typescript
+// ✅ Good - proper test typing
+describe('UserService', (): void => {
+  let service: UserService;
+  let httpMock: HttpTestingController;
+  
+  beforeEach((): void => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      providers: [UserService]
+    });
+    service = TestBed.inject(UserService);
+    httpMock = TestBed.inject(HttpTestingController);
+  });
+  
+  it('should get users', (done: Function): void => {
+    const mockUsers: User[] = [
+      { id: '1', name: 'John', email: 'john@example.com', isActive: true }
+    ];
+    
+    service.getUsers().subscribe((users: User[]): void => {
+      expect(users).toEqual(mockUsers);
+      done();
+    });
+    
+    const req = httpMock.expectOne('/api/users');
+    req.flush(mockUsers);
+  });
+});
+```
+
+## Import Standards
+```typescript
+// ✅ Good - organized imports
+import { Component, OnInit } from '@angular/core';
+import { Observable } from 'rxjs';
+import { map, catchError } from 'rxjs/operators';
+
+import { User } from '../models/user.model';
+import { UserService } from '../services/user.service';
+```
+
+## Error Handling
+```typescript
+// ✅ Good - proper error handling
+try {
+  const result = await this.riskyOperation();
+  return result;
+} catch (error: unknown) {
+  if (error instanceof Error) {
+    console.error('Operation failed:', error.message);
+  }
+  throw new Error('Operation failed');
+}
+```
+description:
+globs:
+alwaysApply: false
+---

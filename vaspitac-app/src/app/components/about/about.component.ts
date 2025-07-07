@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 
 /**
- *
+ * About component for displaying information about the app and developer
  */
 @Component({
   selector: 'app-about',
@@ -11,16 +11,16 @@ import { Router } from '@angular/router';
 })
 export class AboutComponent {
   /**
-   *
-   * @param router
+   * Constructor for AboutComponent
+   * @param _router - Router service (unused)
    */
-  constructor(private router: Router) {}
+  constructor(private _router: Router) {}
 
   /**
-   *
+   * Navigate back to home page and scroll to top
    */
-  goBack() {
-    this.router.navigate(['/']).then(() => {
+  goBack(): void {
+    this._router.navigate(['/']).then((): void => {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     });
   }

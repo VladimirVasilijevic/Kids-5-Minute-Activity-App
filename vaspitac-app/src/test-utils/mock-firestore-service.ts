@@ -1,5 +1,9 @@
 import { of } from 'rxjs';
 
+/**
+ * Mock FirestoreService for testing purposes
+ * Provides spy objects for all FirestoreService methods with default return values
+ */
 export const mockFirestoreService = jasmine.createSpyObj('FirestoreService', [
   'getCategories',
   'getBlogPosts',

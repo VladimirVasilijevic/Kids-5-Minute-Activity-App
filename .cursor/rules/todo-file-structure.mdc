@@ -1,0 +1,44 @@
+# TODO.md File Structure and Format Rules
+
+## File Structure
+- Use phases to group related TODO tasks (e.g., "Phase 1: Project Initialization & Structure")
+- Phases should be ordered logically and numbered sequentially
+- Each phase contains related TODO tasks
+- New phases should be added at the bottom of the file
+
+## TODO Task Format
+```
+TODO: [Task Title] <!-- id: task-[number] -->
+**Acceptance Criteria**  
+- [ ] [Criteria 1]
+- [ ] [Criteria 2]
+- [x] [Completed criteria]
+```
+
+## Task ID Rules
+- **NEVER** change existing `<!-- id: task-[number] -->` comments
+- New tasks must get the next sequential number
+- Task IDs are immutable once created
+- Use format: `<!-- id: task-001 -->`, `<!-- id: task-002 -->`, etc.
+
+## Task Modification Rules
+- **TODO title is CONSTANT** - never change the task title after creation
+- Only the "Acceptance Criteria" section can be modified
+- Checkboxes can be updated to reflect completion status
+- Criteria items can be added, removed, or modified as needed
+
+## New Task Addition
+- New tasks must be added at the bottom of the file
+- Assign the next sequential task ID
+- Follow the exact format shown above
+- Group under appropriate phase or create new phase if needed
+
+## File Organization
+- Keep phases in logical order
+- Maintain consistent markdown formatting
+- Use checkboxes for tracking completion
+- Preserve all existing task IDs and titles
+description:
+globs:
+alwaysApply: false
+---

@@ -6,17 +6,13 @@ import { NO_ERRORS_SCHEMA } from '@angular/core';
 
 import { AboutComponent } from './about.component';
 
-class MockRouter {
-  navigate = jasmine.createSpy('navigate');
-}
-
 describe('AboutComponent', () => {
   let component: AboutComponent;
   let fixture: ComponentFixture<AboutComponent>;
-  let router: MockRouter;
-  let translate: TranslateService;
+  let router: Router;
+  let _translate: TranslateService;
 
-  beforeEach(async () => {
+  beforeEach(async (): Promise<void> => {
     const navigateSpy = jasmine.createSpy('navigate').and.returnValue(Promise.resolve());
     await TestBed.configureTestingModule({
       declarations: [AboutComponent],
@@ -27,23 +23,23 @@ describe('AboutComponent', () => {
 
     fixture = TestBed.createComponent(AboutComponent);
     component = fixture.componentInstance;
-    router = TestBed.inject(Router) as any;
-    translate = TestBed.inject(TranslateService);
+    router = TestBed.inject(Router);
+    _translate = TestBed.inject(TranslateService);
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it('should create', (): void => {
     expect(component).toBeTruthy();
   });
 
-  it('should render the about title and name', () => {
+  it('should render the about title and name', (): void => {
     const compiled = fixture.nativeElement as HTMLElement;
     const title = compiled.querySelector('h1');
     expect(title).toBeTruthy();
     expect(title && title.textContent).toContain('ABOUT.NAME');
   });
 
-  it('should navigate back to home on back button click', () => {
+  it('should navigate back to home on back button click', (): void => {
     const backBtn = fixture.debugElement.query(By.css('button'));
     backBtn.triggerEventHandler('click', null);
     expect(router.navigate).toHaveBeenCalledWith(['/']);

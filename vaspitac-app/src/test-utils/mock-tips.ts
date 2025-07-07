@@ -1,3 +1,7 @@
+/**
+ * Mock tips data for testing purposes
+ * Contains sample parenting tips with various themes and styling
+ */
 export const mockTips = [
   {
     id: 1,

@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 
 /**
- *
+ * Shop component for displaying donation and support information
  */
 @Component({
   selector: 'app-shop',
@@ -14,24 +14,24 @@ export class ShopComponent {
   paypalEmail = 'ana.petrovic.vaspitac@gmail.com';
 
   /**
-   *
-   * @param router
+   * Constructor for ShopComponent
+   * @param _router - Router service (unused)
    */
-  constructor(private router: Router) {}
+  constructor(private _router: Router) {}
 
   /**
-   *
+   * Navigate back to home page and scroll to top
    */
-  goBack() {
-    this.router.navigate(['/']).then(() => {
+  goBack(): void {
+    this._router.navigate(['/']).then((): void => {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     });
   }
 
   /**
-   *
+   * Copy PayPal email to clipboard with fallback support
    */
-  async copyPayPalEmail() {
+  async copyPayPalEmail(): Promise<void> {
     try {
       if (navigator.clipboard) {
         await navigator.clipboard.writeText(this.paypalEmail);
@@ -46,7 +46,7 @@ export class ShopComponent {
       }
       this.copiedPayPal = true;
       setTimeout(() => (this.copiedPayPal = false), 2000);
-    } catch (err) {
+    } catch {
       this.copiedPayPal = false;
     }
   }

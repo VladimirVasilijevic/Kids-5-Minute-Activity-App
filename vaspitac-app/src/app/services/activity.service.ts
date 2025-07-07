@@ -14,13 +14,13 @@ export class ActivityService {
    *
    * @param firestoreService
    */
-  constructor(private firestoreService: FirestoreService) {}
+  constructor(private _firestoreService: FirestoreService) {}
 
   /**
    *
    */
   getActivities(): Observable<Activity[]> {
-    return this.firestoreService.getActivities();
+    return this._firestoreService.getActivities();
   }
 
   /**
@@ -28,6 +28,6 @@ export class ActivityService {
    * @param id
    */
   getActivityById(id: string): Observable<Activity | undefined> {
-    return this.firestoreService.getActivityById(id);
+    return this._firestoreService.getActivityById(id);
   }
 }

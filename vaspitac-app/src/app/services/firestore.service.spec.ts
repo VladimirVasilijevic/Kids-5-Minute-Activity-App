@@ -4,9 +4,15 @@ import { HttpClient } from '@angular/common/http';
 import { of, throwError } from 'rxjs';
 
 import { mockActivities } from '../../test-utils/mock-activities';
+import { mockCategories } from '../../test-utils/mock-categories';
+import { mockBlogPosts } from '../../test-utils/mock-blog-posts';
+import { mockTips } from '../../test-utils/mock-tips';
 
 import { LanguageService } from './language.service';
 import { FirestoreService } from './firestore.service';
+import { Category } from '../models/category.model';
+import { BlogPost } from '../models/blog-post.model';
+import { Tip } from '../models/tip.model';
 
 describe('FirestoreService', () => {
   let service: FirestoreService;
@@ -35,10 +41,10 @@ describe('FirestoreService', () => {
 
   it('should get categories from Firestore', (done) => {
     langSpy.getLanguage.and.returnValue(of('en'));
-    const valueChangesSpy = jasmine.createSpy().and.returnValue(of([{ id: '1', title: 'cat' }]));
-    afsSpy.collection.and.returnValue({ valueChanges: valueChangesSpy } as any);
+    const valueChangesSpy = jasmine.createSpy().and.returnValue(of([mockCategories[0]]));
+    afsSpy.collection.and.returnValue({ valueChanges: valueChangesSpy } as unknown as any);
     service.getCategories().subscribe((categories) => {
-      expect(categories).toEqual([{ id: '1', title: 'cat' }]);
+      expect(categories).toEqual([mockCategories[0] as Category]);
       done();
     });
   });
@@ -48,20 +54,20 @@ describe('FirestoreService', () => {
     const valueChangesSpy = jasmine
       .createSpy()
       .and.returnValue(throwError(() => new Error('fail')));
-    afsSpy.collection.and.returnValue({ valueChanges: valueChangesSpy } as any);
-    httpSpy.get.and.returnValue(of([{ id: '2', title: 'json' }]));
+    afsSpy.collection.and.returnValue({ valueChanges: valueChangesSpy } as unknown as any);
+    httpSpy.get.and.returnValue(of([mockCategories[1]]));
     service.getCategories().subscribe((categories) => {
-      expect(categories).toEqual([{ id: '2', title: 'json' }]);
+      expect(categories).toEqual([mockCategories[1] as Category]);
       done();
     });
   });
 
   it('should get blog posts from Firestore', (done) => {
     langSpy.getLanguage.and.returnValue(of('en'));
-    const valueChangesSpy = jasmine.createSpy().and.returnValue(of([{ id: '1', title: 'blog' }]));
-    afsSpy.collection.and.returnValue({ valueChanges: valueChangesSpy } as any);
+    const valueChangesSpy = jasmine.createSpy().and.returnValue(of([mockBlogPosts[0]]));
+    afsSpy.collection.and.returnValue({ valueChanges: valueChangesSpy } as unknown as any);
     service.getBlogPosts().subscribe((posts) => {
-      expect(posts).toEqual([{ id: '1', title: 'blog' }]);
+      expect(posts).toEqual([mockBlogPosts[0] as BlogPost]);
       done();
     });
   });
@@ -71,20 +77,20 @@ describe('FirestoreService', () => {
     const valueChangesSpy = jasmine
       .createSpy()
       .and.returnValue(throwError(() => new Error('fail')));
-    afsSpy.collection.and.returnValue({ valueChanges: valueChangesSpy } as any);
-    httpSpy.get.and.returnValue(of([{ id: '2', title: 'json' }]));
+    afsSpy.collection.and.returnValue({ valueChanges: valueChangesSpy } as unknown as any);
+    httpSpy.get.and.returnValue(of([mockBlogPosts[1]]));
     service.getBlogPosts().subscribe((posts) => {
-      expect(posts).toEqual([{ id: '2', title: 'json' }]);
+      expect(posts).toEqual([mockBlogPosts[1] as BlogPost]);
       done();
     });
   });
 
   it('should get tips from Firestore', (done) => {
     langSpy.getLanguage.and.returnValue(of('en'));
-    const valueChangesSpy = jasmine.createSpy().and.returnValue(of([{ id: '1', title: 'tip' }]));
-    afsSpy.collection.and.returnValue({ valueChanges: valueChangesSpy } as any);
+    const valueChangesSpy = jasmine.createSpy().and.returnValue(of([mockTips[0]]));
+    afsSpy.collection.and.returnValue({ valueChanges: valueChangesSpy } as unknown as any);
     service.getTips().subscribe((tips) => {
-      expect(tips).toEqual([{ id: '1', title: 'tip' }]);
+      expect(tips).toEqual([mockTips[0] as Tip]);
       done();
     });
   });
@@ -94,10 +100,10 @@ describe('FirestoreService', () => {
     const valueChangesSpy = jasmine
       .createSpy()
       .and.returnValue(throwError(() => new Error('fail')));
-    afsSpy.collection.and.returnValue({ valueChanges: valueChangesSpy } as any);
-    httpSpy.get.and.returnValue(of([{ id: '2', title: 'json' }]));
+    afsSpy.collection.and.returnValue({ valueChanges: valueChangesSpy } as unknown as any);
+    httpSpy.get.and.returnValue(of([mockTips[1]]));
     service.getTips().subscribe((tips) => {
-      expect(tips).toEqual([{ id: '2', title: 'json' }]);
+      expect(tips).toEqual([mockTips[1] as Tip]);
       done();
     });
   });
@@ -105,7 +111,7 @@ describe('FirestoreService', () => {
   it('should get activities from Firestore', (done) => {
     langSpy.getLanguage.and.returnValue(of('en'));
     const valueChangesSpy = jasmine.createSpy().and.returnValue(of([mockActivities[0]]));
-    afsSpy.collection.and.returnValue({ valueChanges: valueChangesSpy } as any);
+    afsSpy.collection.and.returnValue({ valueChanges: valueChangesSpy } as unknown as any);
     service.getActivities().subscribe((acts) => {
       expect(acts).toEqual([mockActivities[0]]);
       done();
@@ -117,7 +123,7 @@ describe('FirestoreService', () => {
     const valueChangesSpy = jasmine
       .createSpy()
       .and.returnValue(throwError(() => new Error('fail')));
-    afsSpy.collection.and.returnValue({ valueChanges: valueChangesSpy } as any);
+    afsSpy.collection.and.returnValue({ valueChanges: valueChangesSpy } as unknown as any);
     httpSpy.get.and.returnValue(of([mockActivities[1]]));
     service.getActivities().subscribe((acts) => {
       expect(acts).toEqual([mockActivities[1]]);
@@ -128,7 +134,7 @@ describe('FirestoreService', () => {
   it('should get activity by id from Firestore', (done) => {
     langSpy.getLanguage.and.returnValue(of('en'));
     const valueChangesSpy = jasmine.createSpy().and.returnValue(of(mockActivities[0]));
-    afsSpy.doc.and.returnValue({ valueChanges: valueChangesSpy } as any);
+    afsSpy.doc.and.returnValue({ valueChanges: valueChangesSpy } as unknown as any);
     service.getActivityById('001').subscribe((act) => {
       expect(act).toEqual(mockActivities[0]);
       done();
@@ -140,7 +146,7 @@ describe('FirestoreService', () => {
     const valueChangesSpy = jasmine
       .createSpy()
       .and.returnValue(throwError(() => new Error('fail')));
-    afsSpy.doc.and.returnValue({ valueChanges: valueChangesSpy } as any);
+    afsSpy.doc.and.returnValue({ valueChanges: valueChangesSpy } as unknown as any);
     httpSpy.get.and.returnValue(of([mockActivities[1]]));
     service.getActivityById('002').subscribe((act) => {
       expect(act).toEqual(mockActivities[1]);

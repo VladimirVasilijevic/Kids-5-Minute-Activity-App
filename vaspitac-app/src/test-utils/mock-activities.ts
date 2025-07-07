@@ -1,5 +1,9 @@
 import { Activity } from '../app/models/activity.model';
 
+/**
+ * Mock activities data for testing purposes
+ * Contains sample activities across different categories
+ */
 export const mockActivities: Activity[] = [
   {
     id: '001',

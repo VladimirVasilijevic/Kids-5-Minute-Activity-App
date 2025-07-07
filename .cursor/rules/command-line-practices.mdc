@@ -1,0 +1,46 @@
+# Command Line Best Practices
+
+## Terminal Commands
+- **NO `&&` in commands** - Use separate commands instead of chaining with `&&`
+- **Clear directory navigation** - Use `cd` commands explicitly
+- **Proper error handling** - Check command outputs and handle errors
+- **Descriptive explanations** - Always explain what commands do
+
+## Command Structure
+```bash
+# ❌ DON'T use && chaining
+cd path && npm run lint && npm test
+
+# ✅ DO use separate commands
+cd path
+npm run lint
+npm test
+```
+
+## Common Commands
+- **Navigation**: `cd directory-name`
+- **Linting**: `npm run lint`
+- **Testing**: `npm test`
+- **Type checking**: `npx tsc --noEmit --strict`
+- **Build**: `npm run build`
+
+## Best Practices
+- **One command per line** - Keep commands simple and readable
+- **Check working directory** - Always verify current directory before running commands
+- **Use proper paths** - Use relative paths when possible
+- **Handle errors gracefully** - Provide clear error messages and solutions
+
+## Project-Specific Commands
+- **Angular CLI**: `ng generate component name`
+- **Firebase**: `firebase deploy`
+- **Capacitor**: `npx cap sync`
+- **Testing**: `npm run test:watch` for development
+
+## Documentation
+- **Update README** - Document any new commands or scripts
+- **Comment complex commands** - Explain what complex commands do
+- **Version control** - Commit command changes to package.json scripts
+description:
+globs:
+alwaysApply: false
+---

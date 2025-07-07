@@ -1,0 +1,36 @@
+# Linting and Code Quality Rules
+
+## ESLint and TypeScript Standards
+- **NO `any` types** - Use proper TypeScript types instead
+- **Explicit return types** - All functions must have explicit return types
+- **No unused variables** - Prefix with underscore if intentionally unused
+- **No unused imports** - Remove all unused imports
+- **Proper type assertions** - Use proper types instead of `as any`
+
+## Code Quality Standards
+- **JSDoc comments** - Document all public methods and classes
+- **Consistent naming** - Follow established naming conventions
+- **Error handling** - Use proper error handling patterns
+- **Null checks** - Always check for null/undefined before accessing properties
+
+## Testing Standards
+- **Mock data** - Use comprehensive mock data from test-utils
+- **Proper spies** - Use `spyOn()` instead of manual spy creation
+- **Type safety** - Avoid `any` types in tests, use proper types
+- **Async testing** - Use `async/await` for asynchronous tests
+
+## File Organization
+- **Single responsibility** - Each file should have one clear purpose
+- **Import order** - Group imports: Angular, third-party, local
+- **Export consistency** - Use named exports, avoid default exports
+- **File size** - Keep files under 1600 lines
+
+## Before Committing
+- **Run lint** - Always run `npm run lint` before committing
+- **Fix warnings** - Address all linting warnings, not just errors
+- **Type check** - Run `npx tsc --noEmit` to check types
+- **Test coverage** - Ensure tests pass and maintain coverage
+description:
+globs:
+alwaysApply: false
+---

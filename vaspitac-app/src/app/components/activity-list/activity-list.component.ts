@@ -8,7 +8,7 @@ import { Activity } from '../../models/activity.model';
 import { ActivityService } from '../../services/activity.service';
 
 /**
- *
+ * Component for displaying and filtering a list of activities
  */
 @Component({
   selector: 'app-activity-list',
@@ -25,27 +25,27 @@ export class ActivityListComponent implements OnInit {
   private categoryFilter$ = new BehaviorSubject<string>('');
 
   /**
-   *
-   * @param activityService
-   * @param translate
-   * @param router
-   * @param route
+   * Initializes the activity list component with required services
+   * @param _activityService - Service for activity data operations
+   * @param _translate - Service for internationalization
+   * @param _router - Service for navigation
+   * @param _route - Service for route parameters
    */
   constructor(
-    private activityService: ActivityService,
-    private translate: TranslateService,
-    private router: Router,
-    private route: ActivatedRoute
+    private _activityService: ActivityService,
+    private _translate: TranslateService,
+    private _router: Router,
+    private _route: ActivatedRoute
   ) {}
 
   /**
-   *
+   * Initializes the component by setting up language, loading activities, and configuring filters
    */
-  ngOnInit() {
-    this.lang = this.translate.currentLang || this.translate.getDefaultLang() || 'sr';
+  ngOnInit(): void {
+    this.lang = this._translate.currentLang || this._translate.getDefaultLang() || 'sr';
 
     // Handle query parameters for category filtering
-    this.route.queryParams.subscribe((params) => {
+    this._route.queryParams.subscribe((params) => {
       const category = params['category'];
       if (category) {
         this.selectedCategory = category;
@@ -53,14 +53,14 @@ export class ActivityListComponent implements OnInit {
       }
     });
 
-    this.activityService.getActivities().subscribe((activities) => {
+    this._activityService.getActivities().subscribe((activities) => {
       this.allActivities = activities;
       this.categories = Array.from(new Set(activities.map((a) => a.category)));
     });
 
     this.activities$ = combineLatest([
-      this.activityService.getActivities(),
-      this.translate.onLangChange.pipe(
+      this._activityService.getActivities(),
+      this._translate.onLangChange.pipe(
         map((e) => e.lang as string),
         startWith(this.lang)
       ),
@@ -74,35 +74,39 @@ export class ActivityListComponent implements OnInit {
   }
 
   /**
-   *
-   * @param category
+   * Selects a category filter and updates the URL
+   * @param category - The category to filter by
    */
-  selectCategory(category: string) {
+  selectCategory(category: string): void {
     this.selectedCategory = category;
     this.categoryFilter$.next(category);
-    this.router.navigate([], {
-      relativeTo: this.route,
+    this._router.navigate([], {
+      relativeTo: this._route,
       queryParams: { category: category || null },
       queryParamsHandling: 'merge',
     });
   }
 
   /**
-   *
-   * @param id
+   * Navigates to the activity detail page
+   * @param id - The activity ID to navigate to
    */
-  goToActivity(id: string | number) {
-    this.router.navigate(['/activity', id], {
+  goToActivity(id: string | number): void {
+    this._router.navigate(['/activity', id], {
       queryParams: { category: this.selectedCategory || null },
     });
   }
 
   /**
-   *
+   * Navigates back to the home page and scrolls to top
    */
-  goBack() {
-    this.router.navigate(['/']).then(() => {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+  goBack(): void {
+    this._router.navigate(['/']).then(() => {
+       
+      if (typeof window !== 'undefined' && window) {
+         
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
     });
   }
 }

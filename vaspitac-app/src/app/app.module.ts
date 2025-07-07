@@ -37,15 +37,16 @@ import { TipsComponent } from './components/tips/tips.component';
 
 // AoT requires an exported function for factories
 /**
- *
- * @param http
+ * Factory function for creating the HTTP loader for translations
+ * @param http - HTTP client for loading translation files
+ * @returns TranslateHttpLoader instance
  */
-export function HttpLoaderFactory(http: HttpClient) {
+export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
   return new TranslateHttpLoader(http, './assets/i18n/', '.json');
 }
 
 /**
- *
+ * Main application module
  */
 @NgModule({
   declarations: [

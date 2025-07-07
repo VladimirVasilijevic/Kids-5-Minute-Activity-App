@@ -24,8 +24,8 @@ export class AppComponent {
    */
   constructor(
     private translate: TranslateService,
-    private router: Router,
-    private languageService: LanguageService
+    private _router: Router,
+    private _languageService: LanguageService
   ) {
     // Set default language
     translate.setDefaultLang('sr');
@@ -33,7 +33,7 @@ export class AppComponent {
     this.currentLang = 'sr';
 
     // Listen for route changes
-    this.router.events.subscribe((event) => {
+    this._router.events.subscribe((event) => {
       if (event instanceof NavigationEnd) {
         this.activeRoute = event.urlAfterRedirects;
       }
@@ -47,7 +47,7 @@ export class AppComponent {
   switchLanguage(): void {
     this.currentLang = this.currentLang === 'sr' ? 'en' : 'sr';
     this.translate.use(this.currentLang);
-    this.languageService.setLanguage(this.currentLang);
+    this._languageService.setLanguage(this.currentLang);
   }
 
   /**

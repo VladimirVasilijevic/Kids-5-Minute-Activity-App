@@ -4,7 +4,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { ActivityService } from '../../services/activity.service';
 
 /**
- *
+ * Settings component for managing app preferences
  */
 @Component({
   selector: 'app-settings',
@@ -19,23 +19,23 @@ export class SettingsComponent {
   ];
 
   /**
-   *
-   * @param translate
-   * @param activityService
+   * Constructor for SettingsComponent
+   * @param _translate - Translation service
+   * @param _activityService - Activity service (unused)
    */
   constructor(
-    private translate: TranslateService,
-    private activityService: ActivityService
+    private _translate: TranslateService,
+    private _activityService: ActivityService
   ) {
-    this.currentLanguage = this.translate.currentLang;
+    this.currentLanguage = this._translate.currentLang;
   }
 
   /**
-   *
-   * @param lang
+   * Change the current language
+   * @param lang - Language code to switch to
    */
-  changeLanguage(lang: string) {
+  changeLanguage(lang: string): void {
     this.currentLanguage = lang;
-    this.translate.use(lang);
+    this._translate.use(lang);
   }
 }

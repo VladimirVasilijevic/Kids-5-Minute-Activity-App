@@ -1,6 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { By } from '@angular/platform-browser';
+import { TranslateModule } from '@ngx-translate/core';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { Router } from '@angular/router';
@@ -9,15 +8,15 @@ import { of } from 'rxjs';
 import { FirestoreService } from '../../services/firestore.service';
 import { mockFirestoreService } from '../../../test-utils/mock-firestore-service';
 import { mockBlogPosts } from '../../../test-utils/mock-blog-posts';
+import { TranslateService } from '@ngx-translate/core';
 
 import { BlogComponent } from './blog.component';
 
-describe('BlogComponent', () => {
+describe('BlogComponent', (): void => {
   let component: BlogComponent;
   let fixture: ComponentFixture<BlogComponent>;
-  let translate: TranslateService;
 
-  beforeEach(async () => {
+  beforeEach(async (): Promise<void> => {
     await TestBed.configureTestingModule({
       declarations: [BlogComponent],
       imports: [TranslateModule.forRoot(), HttpClientTestingModule],
@@ -27,16 +26,15 @@ describe('BlogComponent', () => {
 
     fixture = TestBed.createComponent(BlogComponent);
     component = fixture.componentInstance;
-    translate = TestBed.inject(TranslateService);
     mockFirestoreService.getBlogPosts.calls.reset();
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it('should create', (): void => {
     expect(component).toBeTruthy();
   });
 
-  it('should render the blog title and subtitle', () => {
+  it('should render the blog title and subtitle', (): void => {
     const compiled = fixture.nativeElement as HTMLElement;
     const title = compiled.querySelector('h2');
     const subtitle = compiled.querySelector('p.text-base.md\\:text-lg');
@@ -46,7 +44,7 @@ describe('BlogComponent', () => {
     expect(subtitle && subtitle.textContent).toContain('BLOG.SUBTITLE');
   });
 
-  it('should render all blog posts', async () => {
+  it('should render all blog posts', async (): Promise<void> => {
     mockFirestoreService.getBlogPosts.and.returnValue(of(mockBlogPosts));
     await fixture.whenStable();
     fixture.detectChanges();
@@ -61,7 +59,7 @@ describe('BlogComponent', () => {
     expect(cards.length).toBeGreaterThanOrEqual(0);
   });
 
-  it('should navigate back to home on back button click', () => {
+  it('should navigate back to home on back button click', (): void => {
     const router = TestBed.inject(Router);
     spyOn(router, 'navigate').and.returnValue(Promise.resolve(true));
     const compiled = fixture.nativeElement as HTMLElement;
@@ -74,7 +72,7 @@ describe('BlogComponent', () => {
     }
   });
 
-  it('should render blog post content (excerpt, image)', async () => {
+  it('should render blog post content (excerpt, image)', async (): Promise<void> => {
     mockFirestoreService.getBlogPosts.and.returnValue(of(mockBlogPosts));
     await fixture.whenStable();
     fixture.detectChanges();
@@ -94,7 +92,7 @@ describe('BlogComponent', () => {
     expect(cards.length).toBeGreaterThanOrEqual(0);
   });
 
-  it('should show empty state if no blog posts', () => {
+  it('should show empty state if no blog posts', (): void => {
     mockFirestoreService.getBlogPosts.and.returnValue(of([]));
     component.blogPosts$ = of([]);
     fixture.detectChanges();
@@ -102,11 +100,11 @@ describe('BlogComponent', () => {
     expect(compiled.textContent).toContain('BLOG.EMPTY');
   });
 
-  it('should update posts on language change', () => {
+  it('should update posts on language change', (): void => {
     mockFirestoreService.getBlogPosts.and.returnValue(of(mockBlogPosts));
-    const languageService = TestBed.inject<any>(TranslateService);
-    spyOn(languageService, 'use').and.callThrough();
     // Simulate language change
+    const languageService = TestBed.inject(TranslateService);
+    spyOn(languageService, 'use').and.callThrough();
     languageService.use('en');
     fixture.detectChanges();
     expect(languageService.use).toHaveBeenCalledWith('en');

@@ -1,18 +1,37 @@
+/**
+ * Represents a single activity for children
+ */
 export interface Activity {
+  /** Unique identifier for the activity */
   id: string;
+  /** Title of the activity */
   title: string;
+  /** Description of the activity */
   description: string;
+  /** URL to the activity's image */
   imageUrl: string;
+  /** Category the activity belongs to */
   category: string;
+  /** Duration of the activity */
   duration: string;
+  /** Target age group (optional) */
   ageGroup?: string;
+  /** List of materials needed (optional) */
   materials?: string[];
+  /** Step-by-step instructions (optional) */
   instructions?: string[];
+  /** URL to video demonstration (optional) */
   videoUrl?: string;
 }
 
+/**
+ * Represents the complete activities data structure
+ */
 export interface ActivitiesData {
+  /** Version of the data */
   version: string;
+  /** Supported languages */
   languages: string[];
+  /** Array of activities */
   data: Activity[];
 }

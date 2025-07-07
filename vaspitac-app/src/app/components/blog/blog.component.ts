@@ -1,14 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { HttpClient } from '@angular/common/http';
-import { Observable, switchMap } from 'rxjs';
+import { Observable } from 'rxjs';
 
 import { BlogPost } from '../../models/blog-post.model';
-import { LanguageService } from '../../services/language.service';
 import { BlogService } from '../../services/blog.service';
 
 /**
- *
+ * BlogComponent displays a list of blog posts with navigation and i18n support.
  */
 @Component({
   selector: 'app-blog',
@@ -19,32 +17,30 @@ export class BlogComponent implements OnInit {
   blogPosts$!: Observable<BlogPost[]>;
 
   /**
-   *
-   * @param router
-   * @param http
-   * @param languageService
-   * @param blogService
+   * Initializes the blog component with required services
+   * @param _router - Angular router for navigation
+   * @param _blogService - Service for blog post data
    */
   constructor(
-    private router: Router,
-    private http: HttpClient,
-    private languageService: LanguageService,
-    private blogService: BlogService
+    private _router: Router,
+    private _blogService: BlogService
   ) {}
 
   /**
-   *
+   * Loads blog posts on init
    */
   ngOnInit(): void {
-    this.blogPosts$ = this.blogService.getBlogPosts();
+    this.blogPosts$ = this._blogService.getBlogPosts();
   }
 
   /**
-   *
+   * Navigates back to the home page and scrolls to top
    */
-  goBack() {
-    this.router.navigate(['/']).then(() => {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+  goBack(): void {
+    this._router.navigate(['/']).then(() => {
+      if (typeof window !== 'undefined' && window) {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
     });
   }
 }
