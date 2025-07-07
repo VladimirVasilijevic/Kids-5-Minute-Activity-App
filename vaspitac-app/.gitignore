@@ -22,9 +22,14 @@
 **/android/captures/
 **/android/build/
 
+# Firebase configuration files (contain sensitive API keys)
+**/android/app/google-services.json
+**/ios/GoogleService-Info.plist
+
 # Environment files
 /src/environments/*.ts
 !src/environments/environment.template.ts
+!src/environments/environment.prod.template.ts
 
 # IDEs and editors
 /.idea

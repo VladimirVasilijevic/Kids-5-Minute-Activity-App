@@ -46,6 +46,13 @@ jobs:
       working-directory: vaspitac-app
       run: npx cap sync
       
+    - name: Create google-services.json from secret
+      working-directory: vaspitac-app/android/app
+      run: |
+        echo '${{ secrets.GOOGLE_SERVICES_JSON }}' > google-services.json
+      env:
+        GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
+      
     - name: Create keystore
       run: |
         keytool -genkey -v -keystore vaspitac-app/android/app/release-key.keystore -alias vaspitac-key -keyalg RSA -keysize 2048 -validity 10000 -storepass ${{ secrets.KEYSTORE_PASSWORD }} -keypass ${{ secrets.KEY_PASSWORD }} -dname "CN=Vaspitac App, OU=Development, O=Vaspitac, L=Belgrade, S=Serbia, C=RS"

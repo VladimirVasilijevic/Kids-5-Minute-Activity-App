@@ -192,12 +192,90 @@ $ npm install
 $ cp src/environments/environment.template.ts src/environments/environment.ts
 # Edit src/environments/environment.ts with your Firebase credentials
 
+# Set up Firebase for Android (see Firebase Setup below)
+$ cp android/app/google-services.template.json android/app/google-services.json
+# Edit android/app/google-services.json with your Firebase project credentials
+
 # Run web app
 $ npm start
 # Open http://localhost:4200
 
 # Run tests
 $ npm test
+
+## 🔥 Firebase Setup
+
+### Web Configuration (Development)
+1. Copy the environment template:
+   ```bash
+   cp src/environments/environment.template.ts src/environments/environment.ts
+   ```
+2. Edit `src/environments/environment.ts` with your Firebase project credentials:
+   - Replace `YOUR_FIREBASE_API_KEY` with your actual API key
+   - Update other Firebase config values as needed
+
+### Web Configuration (Production)
+1. Copy the production environment template:
+   ```bash
+   cp src/environments/environment.prod.template.ts src/environments/environment.prod.ts
+   ```
+2. Edit `src/environments/environment.prod.ts` with your production Firebase credentials
+
+### Android Configuration
+1. Copy the Firebase configuration template:
+   ```bash
+   cp android/app/google-services.template.json android/app/google-services.json
+   ```
+2. Download your `google-services.json` from the Firebase Console:
+   - Go to [Firebase Console](https://console.firebase.google.com/)
+   - Select your project
+   - Go to Project Settings > General
+   - Scroll down to "Your apps" section
+   - Click on your Android app or create a new one
+   - Download the `google-services.json` file
+3. Replace the template file with your downloaded `google-services.json`
+
+### Firebase Project Setup
+1. **Create Firebase Project**: If you haven't already, create a project at [Firebase Console](https://console.firebase.google.com/)
+2. **Enable Firestore**: Go to Firestore Database and create a database
+3. **Set Security Rules**: For development, use `allow read, write: if true;` (restrict for production)
+4. **Import Data**: Use the import script to populate Firestore:
+   ```bash
+   cd scripts
+   npm install
+   node import-to-firestore.js
+   ```
+
+### GitHub Actions Setup (CI/CD)
+For automated builds and deployments, add these secrets to your GitHub repository:
+
+1. **Go to your repository Settings > Secrets and variables > Actions**
+2. **Add the following secrets:**
+
+#### For Web/Production Builds:
+- `FIREBASE_API_KEY`: Your Firebase API key
+- `FIREBASE_AUTH_DOMAIN`: Your Firebase auth domain (e.g., `ana-vaspitac.firebaseapp.com`)
+- `FIREBASE_PROJECT_ID`: Your Firebase project ID (e.g., `ana-vaspitac`)
+- `FIREBASE_STORAGE_BUCKET`: Your Firebase storage bucket (e.g., `ana-vaspitac.firebasestorage.app`)
+- `FIREBASE_MESSAGING_SENDER_ID`: Your Firebase messaging sender ID (e.g., `536360476476`)
+- `FIREBASE_APP_ID`: Your Firebase app ID (e.g., `1:536360476476:web:fdbed45ad8a9c91f5e8839`)
+- `FIREBASE_MEASUREMENT_ID`: Your Firebase measurement ID (e.g., `G-0EG5E3Q69H`)
+
+#### For Android Builds:
+- `GOOGLE_SERVICES_JSON`: The entire content of your `google-services.json` file
+
+#### For Android Release Builds (Optional):
+- `KEYSTORE_PASSWORD`: Password for the release keystore
+- `KEY_PASSWORD`: Password for the release key
+
+### Security Notice
+- **Never commit `google-services.json`, `environment.ts`, or `environment.prod.ts` to version control**
+- These files contain sensitive API keys and are automatically ignored by `.gitignore`
+- **Use GitHub Secrets for CI/CD builds** - the workflows will create these files from secrets
+- If you accidentally commit these files, immediately:
+  1. Rotate the API keys in Firebase Console
+  2. Remove the files from git tracking: `git rm --cached android/app/google-services.json src/environments/environment.ts src/environments/environment.prod.ts`
+  3. Commit the removal
 # Run with coverage
 $ npm run test:coverage
 ```
