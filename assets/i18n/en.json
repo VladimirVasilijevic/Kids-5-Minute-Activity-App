@@ -1,6 +1,6 @@
 {
   "APP": {
-    "TITLE": "Vaspitac App",
+    "TITLE": "Ana Vaspitac",
     "TAGLINE": "Fun, fast activities for kids and parents."
   },
   "NAV": {
@@ -12,7 +12,7 @@
     "ABOUT": "About"
   },
   "HOME": {
-    "WELCOME_TITLE": "Welcome to Vaspitac App",
+    "WELCOME_TITLE": "Welcome to Ana Vaspitac",
     "WELCOME_SUBTITLE": "5-minute activities for kids",
     "DESCRIPTION": "Find simple and fun activities for children up to 7 years old. Each activity takes only 5 minutes and requires no special equipment.",
     "START_ACTIVITIES": "Start Activities",
