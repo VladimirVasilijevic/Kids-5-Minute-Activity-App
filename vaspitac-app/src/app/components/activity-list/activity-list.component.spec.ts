@@ -11,6 +11,7 @@ import { FirestoreService } from '../../services/firestore.service';
 import { mockFirestoreService } from '../../../test-utils/mock-firestore-service';
 import { ActivityService } from '../../services/activity.service';
 import { mockActivities } from '../../../test-utils/mock-activities';
+import { Activity } from '../../models/activity.model';
 
 import { ActivityListComponent } from './activity-list.component';
 import { ScrollToTopComponent } from '../scroll-to-top/scroll-to-top.component';
@@ -21,10 +22,10 @@ describe('ActivityListComponent', (): void => {
   let router: Router;
   let translate: TranslateService;
   const mockActivitiesList = mockActivities;
-  let activitiesSubject: Subject<any[]>;
+  let activitiesSubject: Subject<Activity[]>;
 
   beforeEach(waitForAsync(async (): Promise<void> => {
-    activitiesSubject = new Subject<any[]>();
+    activitiesSubject = new Subject<Activity[]>();
     await TestBed.configureTestingModule({
       imports: [TranslateModule.forRoot(), BrowserAnimationsModule],
       declarations: [ActivityListComponent, ScrollToTopComponent],
@@ -32,7 +33,7 @@ describe('ActivityListComponent', (): void => {
         {
           provide: ActivityService,
           useValue: {
-            getActivities: (): Observable<any[]> => activitiesSubject.asObservable(),
+            getActivities: (): Observable<Activity[]> => activitiesSubject.asObservable(),
           },
         },
         { provide: FirestoreService, useValue: mockFirestoreService },

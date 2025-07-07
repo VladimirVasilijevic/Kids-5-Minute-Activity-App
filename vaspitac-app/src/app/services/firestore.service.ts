@@ -145,7 +145,10 @@ export class FirestoreService {
       .doc<{ version: string; lastUpdated: Date }>('metadata/version')
       .valueChanges()
       .pipe(
-        map((data) => data || { version: '1.0.0', lastUpdated: new Date() }),
+        map((data) => ({
+          version: data?.version ?? '1.0.0',
+          lastUpdated: data?.lastUpdated ? new Date(data.lastUpdated) : new Date()
+        })),
         catchError(() => {
           console.log('Falling back to default version');
           return of<{ version: string; lastUpdated: Date }>({ 

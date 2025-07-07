@@ -41,7 +41,10 @@
           </svg>
         </button>
         <!-- Search Icon -->
-        <button class="p-2 rounded hover:bg-green-50 transition">
+        <button 
+          class="p-2 rounded hover:bg-green-50 transition"
+          (click)="openSearch()"
+        >
           <svg
             class="h-4 w-4 md:h-5 md:w-5 text-green-600"
             fill="none"
@@ -64,3 +67,11 @@
 
 <!-- Test ScrollToTop component -->
 <app-scroll-to-top></app-scroll-to-top>
+
+<!-- Search Overlay -->
+<app-search-overlay
+  [isOpen]="isSearchOpen"
+  [activities]="activities"
+  [blogPosts]="blogPosts"
+  (close)="closeSearch()"
+></app-search-overlay>

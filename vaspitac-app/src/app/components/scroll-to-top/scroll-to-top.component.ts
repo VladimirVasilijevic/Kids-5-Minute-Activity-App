@@ -8,15 +8,26 @@ import { Component, OnInit, OnDestroy, HostListener } from '@angular/core';
 export class ScrollToTopComponent implements OnInit, OnDestroy {
   isVisible = false;
 
+  /**
+   * Host listener for window scroll events
+   * Triggers visibility toggle when user scrolls
+   */
   @HostListener('window:scroll', [])
   onWindowScroll(): void {
     this.toggleVisibility();
   }
 
+  /**
+   * Lifecycle hook that is called after data-bound properties are initialized
+   */
   ngOnInit(): void {
     // Component initialization
   }
 
+  /**
+   * Lifecycle hook that is called before the component is destroyed
+   * Performs cleanup operations if needed
+   */
   ngOnDestroy(): void {
     // Cleanup if needed
   }
@@ -29,6 +40,9 @@ export class ScrollToTopComponent implements OnInit, OnDestroy {
     }
   }
 
+  /**
+   * Scrolls the page to the top with smooth animation
+   */
   scrollToTop(): void {
     window.scrollTo({
       top: 0,

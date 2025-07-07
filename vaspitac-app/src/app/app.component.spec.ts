@@ -4,6 +4,12 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideRouter } from '@angular/router';
 import { RouterModule } from '@angular/router';
+import { Activity } from './models/activity.model';
+import { BlogPost } from './models/blog-post.model';
+import { Observable, of } from 'rxjs';
+import { ActivityService } from './services/activity.service';
+import { BlogService } from './services/blog.service';
+import { LanguageService } from './services/language.service';
 
 // Angular Material imports for testing
 import { MatToolbarModule } from '@angular/material/toolbar';
@@ -12,6 +18,17 @@ import { MatIconModule } from '@angular/material/icon';
 
 import { AppComponent } from './app.component';
 import { ScrollToTopComponent } from './components/scroll-to-top/scroll-to-top.component';
+import { SearchOverlayComponent } from './components/search-overlay/search-overlay.component';
+
+class MockActivityService {
+  getActivities = (): Observable<Activity[]> => of([]);
+}
+class MockBlogService {
+  getBlogPosts = (): Observable<BlogPost[]> => of([]);
+}
+class MockLanguageService {
+  setLanguage = (): void => {};
+}
 
 describe('AppComponent', () => {
   let component: AppComponent;
@@ -29,8 +46,14 @@ describe('AppComponent', () => {
         MatButtonModule,
         MatIconModule,
       ],
-      declarations: [AppComponent, ScrollToTopComponent],
-      providers: [provideHttpClientTesting(), provideRouter([])],
+      declarations: [AppComponent, ScrollToTopComponent, SearchOverlayComponent],
+      providers: [
+        provideHttpClientTesting(),
+        provideRouter([]),
+        { provide: ActivityService, useClass: MockActivityService },
+        { provide: BlogService, useClass: MockBlogService },
+        { provide: LanguageService, useClass: MockLanguageService },
+      ],
     }).compileComponents();
   });
 

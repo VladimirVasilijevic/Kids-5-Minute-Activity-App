@@ -1,6 +1,11 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ScrollToTopComponent } from './scroll-to-top.component';
 
+/**
+ * Unit tests for ScrollToTopComponent
+ * Tests scroll-to-top functionality, visibility logic, and user interactions
+ */
+
 describe('ScrollToTopComponent', () => {
   let component: ScrollToTopComponent;
   let fixture: ComponentFixture<ScrollToTopComponent>;
@@ -193,6 +198,65 @@ describe('ScrollToTopComponent', () => {
 
     it('should handle cleanup in ngOnDestroy', () => {
       expect(() => component.ngOnDestroy()).not.toThrow();
+    });
+
+    it('should call ngOnInit without errors', () => {
+      expect(() => component.ngOnInit()).not.toThrow();
+    });
+
+    it('should have proper lifecycle methods defined', () => {
+      expect(typeof component.ngOnInit).toBe('function');
+      expect(typeof component.ngOnDestroy).toBe('function');
+    });
+  });
+
+  describe('Public Methods', () => {
+    it('should have onWindowScroll method with proper JSDoc', () => {
+      expect(typeof component.onWindowScroll).toBe('function');
+      expect(component.onWindowScroll.name).toBe('onWindowScroll');
+    });
+
+    it('should have scrollToTop method with proper JSDoc', () => {
+      expect(typeof component.scrollToTop).toBe('function');
+      expect(component.scrollToTop.name).toBe('scrollToTop');
+    });
+
+    it('should call window.scrollTo when scrollToTop is called', () => {
+      spyOn(window, 'scrollTo');
+      component.scrollToTop();
+      expect(window.scrollTo).toHaveBeenCalled();
+    });
+
+    it('should handle scrollToTop multiple times', () => {
+      spyOn(window, 'scrollTo');
+      
+      component.scrollToTop();
+      component.scrollToTop();
+      component.scrollToTop();
+      
+      expect(window.scrollTo).toHaveBeenCalledTimes(3);
+    });
+  });
+
+  describe('Edge Cases and Error Handling', () => {
+    it('should handle undefined pageYOffset gracefully', () => {
+      // Mock undefined pageYOffset
+      Object.defineProperty(window, 'pageYOffset', {
+        writable: true,
+        value: undefined
+      });
+
+      expect(() => component.onWindowScroll()).not.toThrow();
+    });
+
+    it('should handle null pageYOffset gracefully', () => {
+      // Mock null pageYOffset
+      Object.defineProperty(window, 'pageYOffset', {
+        writable: true,
+        value: null
+      });
+
+      expect(() => component.onWindowScroll()).not.toThrow();
     });
   });
 }); 

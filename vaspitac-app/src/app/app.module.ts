@@ -3,6 +3,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 
 // Firebase imports
 import { AngularFireModule } from '@angular/fire/compat';
@@ -17,6 +18,7 @@ import { MatListModule } from '@angular/material/list';
 import { MatBottomSheetModule } from '@angular/material/bottom-sheet';
 import { MatSelectModule } from '@angular/material/select';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
 
 // Translation imports
 import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
@@ -35,6 +37,7 @@ import { AboutComponent } from './components/about/about.component';
 import { BlogComponent } from './components/blog/blog.component';
 import { TipsComponent } from './components/tips/tips.component';
 import { ScrollToTopComponent } from './components/scroll-to-top/scroll-to-top.component';
+import { SearchOverlayComponent } from './components/search-overlay/search-overlay.component';
 
 // AoT requires an exported function for factories
 /**
@@ -61,11 +64,13 @@ export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
     BlogComponent,
     TipsComponent,
     ScrollToTopComponent,
+    SearchOverlayComponent,
   ],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
     HttpClientModule,
+    FormsModule,
     RouterModule.forRoot([
       { path: '', component: HomeComponent },
       { path: 'activities', component: ActivityListComponent },
@@ -97,6 +102,7 @@ export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
     MatBottomSheetModule,
     MatSelectModule,
     MatFormFieldModule,
+    MatInputModule,
   ],
   providers: [],
   bootstrap: [AppComponent],

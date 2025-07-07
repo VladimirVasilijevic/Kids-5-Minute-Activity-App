@@ -1,0 +1,96 @@
+<div 
+  *ngIf="isOpen" 
+  class="search-overlay-backdrop"
+  (click)="onBackdropClick($event)"
+>
+  <div class="search-overlay-container">
+    <!-- Header with search input -->
+    <div class="search-header">
+      <div class="search-input-container">
+        <mat-icon class="search-icon">search</mat-icon>
+        <input
+          type="text"
+          [placeholder]="'SEARCH.PLACEHOLDER' | translate"
+          [(ngModel)]="searchTerm"
+          (ngModelChange)="onSearchChange()"
+          class="search-input"
+          autofocus
+        />
+        <button 
+          mat-icon-button 
+          (click)="closeOverlay()"
+          class="close-button"
+        >
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+    </div>
+
+    <!-- Search results -->
+    <div class="search-results">
+      <div *ngIf="searchTerm.length > 0">
+        <!-- Activities section -->
+        <div *ngIf="filteredActivities.length > 0" class="results-section">
+          <h3 class="section-title">
+            {{ 'SEARCH.ACTIVITIES' | translate }} ({{ filteredActivities.length }})
+          </h3>
+          <div class="results-grid">
+            <mat-card 
+              *ngFor="let activity of filteredActivities" 
+              class="activity-card"
+              (click)="onActivityClick(activity.id)"
+            >
+              <mat-card-header>
+                <mat-card-title>{{ activity.title }}</mat-card-title>
+                <mat-card-subtitle>{{ activity.category }}</mat-card-subtitle>
+              </mat-card-header>
+              <mat-card-content>
+                <p>{{ activity.description }}</p>
+                <div class="activity-meta">
+                  <span class="duration">{{ activity.duration }}</span>
+                </div>
+              </mat-card-content>
+            </mat-card>
+          </div>
+        </div>
+
+        <!-- Blog posts section -->
+        <div *ngIf="filteredBlogs.length > 0" class="results-section">
+          <h3 class="section-title">
+            {{ 'SEARCH.BLOG_POSTS' | translate }} ({{ filteredBlogs.length }})
+          </h3>
+          <div class="results-grid">
+            <mat-card 
+              *ngFor="let blog of filteredBlogs" 
+              class="blog-card"
+              (click)="onBlogClick(blog.id)"
+            >
+              <mat-card-header>
+                <mat-card-title>{{ blog.title }}</mat-card-title>
+                <mat-card-subtitle>{{ blog.author }} • {{ blog.readTime }}</mat-card-subtitle>
+              </mat-card-header>
+              <mat-card-content>
+                <p>{{ blog.excerpt }}</p>
+              </mat-card-content>
+            </mat-card>
+          </div>
+        </div>
+
+        <!-- No results message -->
+        <div 
+          *ngIf="filteredActivities.length === 0 && filteredBlogs.length === 0" 
+          class="no-results"
+        >
+          <mat-icon class="no-results-icon">search_off</mat-icon>
+          <p>{{ 'SEARCH.NO_RESULTS' | translate: { term: searchTerm } }}</p>
+        </div>
+      </div>
+
+      <!-- Empty state -->
+      <div *ngIf="searchTerm.length === 0" class="empty-state">
+        <mat-icon class="empty-state-icon">search</mat-icon>
+        <p>{{ 'SEARCH.START_TYPING' | translate }}</p>
+      </div>
+    </div>
+  </div>
+</div> 
