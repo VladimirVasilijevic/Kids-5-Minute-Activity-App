@@ -1,4 +1,4 @@
-import { Activity } from '../app/models/activity.model'
+import { Activity } from '../app/models/activity.model';
 
 export const mockActivities: Activity[] = [
   {
@@ -8,7 +8,7 @@ export const mockActivities: Activity[] = [
     videoUrl: 'url2',
     imageUrl: 'mock-image-1.jpg',
     category: 'physical',
-    duration: '5 min'
+    duration: '5 min',
   },
   {
     id: '002',
@@ -17,7 +17,7 @@ export const mockActivities: Activity[] = [
     videoUrl: '',
     imageUrl: 'mock-image-2.jpg',
     category: 'creative',
-    duration: '5 min'
+    duration: '5 min',
   },
   {
     id: '003',
@@ -26,6 +26,6 @@ export const mockActivities: Activity[] = [
     videoUrl: '',
     imageUrl: 'mock-image-3.jpg',
     category: 'educational',
-    duration: '5 min'
-  }
-] 
+    duration: '5 min',
+  },
+];

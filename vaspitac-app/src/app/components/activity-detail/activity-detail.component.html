@@ -3,11 +3,25 @@
     <!-- Back Button and Header -->
     <div class="sticky top-0 z-50 bg-white shadow-sm border-b border-green-100">
       <div class="px-4 py-3 flex items-center space-x-3">
-        <button (click)="goBack()" class="text-green-600 hover:text-green-700 p-0 h-auto font-medium flex items-center gap-1" [attr.aria-label]="'ACTIVITY.BACK' | translate">
-          <svg class="h-4 w-4 text-green-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7"/></svg>
+        <button
+          (click)="goBack()"
+          class="text-green-600 hover:text-green-700 p-0 h-auto font-medium flex items-center gap-1"
+          [attr.aria-label]="'ACTIVITY.BACK' | translate"
+        >
+          <svg
+            class="h-4 w-4 text-green-600"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+          >
+            <path d="M15 19l-7-7 7-7" />
+          </svg>
           {{ 'ACTIVITY.BACK' | translate }}
         </button>
-        <h1 class="font-semibold text-gray-900 flex-1 text-sm md:text-base truncate">{{ activity.title }}</h1>
+        <h1 class="font-semibold text-gray-900 flex-1 text-sm md:text-base truncate">
+          {{ activity.title }}
+        </h1>
       </div>
     </div>
 
@@ -15,11 +29,27 @@
       <!-- Video/Image Section -->
       <div class="overflow-hidden bg-white shadow-sm border border-green-100 rounded-xl">
         <div class="relative h-40 md:h-48 bg-gray-100">
-          <img [src]="activity.imageUrl" [alt]="activity.title" class="w-full h-full object-cover" />
+          <img
+            [src]="activity.imageUrl"
+            [alt]="activity.title"
+            class="w-full h-full object-cover"
+          />
           <ng-container *ngIf="activity.videoUrl">
             <div class="absolute inset-0 bg-black/20 flex items-center justify-center">
-              <a [href]="activity.videoUrl" target="_blank" class="bg-white/90 text-green-600 hover:bg-white rounded-full px-4 md:px-6 py-2 flex items-center gap-2 shadow-lg text-sm md:text-base">
-                <svg class="h-4 w-4 md:h-5 md:w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="6 3 20 12 6 21 6 3"/></svg>
+              <a
+                [href]="activity.videoUrl"
+                target="_blank"
+                class="bg-white/90 text-green-600 hover:bg-white rounded-full px-4 md:px-6 py-2 flex items-center gap-2 shadow-lg text-sm md:text-base"
+              >
+                <svg
+                  class="h-4 w-4 md:h-5 md:w-5"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                >
+                  <polygon points="6 3 20 12 6 21 6 3" />
+                </svg>
                 {{ 'ACTIVITY.PLAY_VIDEO' | translate }}
               </a>
             </div>
@@ -29,27 +59,56 @@
 
       <!-- Activity Info Card -->
       <div class="bg-white shadow-sm border border-green-100 rounded-xl p-3 md:p-4">
-        <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-3 md:mb-4 space-y-2 md:space-y-0">
+        <div
+          class="flex flex-col md:flex-row md:items-center md:justify-between mb-3 md:mb-4 space-y-2 md:space-y-0"
+        >
           <div class="flex flex-wrap items-center space-x-3 md:space-x-4">
             <div class="flex items-center text-green-600">
-              <svg class="h-3 w-3 md:h-4 md:w-4 mr-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              <svg
+                class="h-3 w-3 md:h-4 md:w-4 mr-1"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+              >
+                <circle cx="12" cy="12" r="10" />
+                <polyline points="12 6 12 12 16 14" />
+              </svg>
               <span class="text-xs md:text-sm font-medium">{{ activity.duration }}</span>
             </div>
             <div class="flex items-center text-green-600">
-              <svg class="h-3 w-3 md:h-4 md:w-4 mr-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              <svg
+                class="h-3 w-3 md:h-4 md:w-4 mr-1"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+              >
+                <path d="M17 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2" />
+                <circle cx="9" cy="7" r="4" />
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+              </svg>
               <span class="text-xs md:text-sm font-medium">{{ activity.ageGroup }}</span>
             </div>
           </div>
-          <span class="bg-green-100 text-green-700 text-xs px-2 md:px-3 py-1 rounded-full font-medium self-start md:self-auto">
-            {{ ('HOME.CAT_' + activity.category.toUpperCase() + '_TITLE') | translate }}
+          <span
+            class="bg-green-100 text-green-700 text-xs px-2 md:px-3 py-1 rounded-full font-medium self-start md:self-auto"
+          >
+            {{ 'HOME.CAT_' + activity.category.toUpperCase() + '_TITLE' | translate }}
           </span>
         </div>
         <p class="text-gray-700 mb-3 md:mb-4 text-sm md:text-base">{{ activity.description }}</p>
       </div>
 
       <!-- Materials Card -->
-      <div class="bg-white shadow-sm border border-green-100 rounded-xl p-3 md:p-4" *ngIf="activity.materials && activity.materials.length">
-        <h3 class="font-semibold text-gray-900 mb-2 md:mb-3 text-sm md:text-base">{{ 'ACTIVITY.MATERIALS_TITLE' | translate }}</h3>
+      <div
+        class="bg-white shadow-sm border border-green-100 rounded-xl p-3 md:p-4"
+        *ngIf="activity.materials && activity.materials.length"
+      >
+        <h3 class="font-semibold text-gray-900 mb-2 md:mb-3 text-sm md:text-base">
+          {{ 'ACTIVITY.MATERIALS_TITLE' | translate }}
+        </h3>
         <div class="space-y-1 md:space-y-2">
           <div *ngFor="let material of activity.materials" class="flex items-center space-x-2">
             <div class="w-1.5 h-1.5 md:w-2 md:h-2 bg-green-500 rounded-full flex-shrink-0"></div>
@@ -59,11 +118,21 @@
       </div>
 
       <!-- Instructions Card -->
-      <div class="bg-white shadow-sm border border-green-100 rounded-xl p-3 md:p-4" *ngIf="activity.instructions && activity.instructions.length">
-        <h3 class="font-semibold text-gray-900 mb-2 md:mb-3 text-sm md:text-base">{{ 'ACTIVITY.INSTRUCTIONS_TITLE' | translate }}</h3>
+      <div
+        class="bg-white shadow-sm border border-green-100 rounded-xl p-3 md:p-4"
+        *ngIf="activity.instructions && activity.instructions.length"
+      >
+        <h3 class="font-semibold text-gray-900 mb-2 md:mb-3 text-sm md:text-base">
+          {{ 'ACTIVITY.INSTRUCTIONS_TITLE' | translate }}
+        </h3>
         <div class="space-y-3 md:space-y-4">
-          <div *ngFor="let instruction of activity.instructions; let i = index" class="flex space-x-2 md:space-x-3">
-            <div class="flex-shrink-0 w-5 h-5 md:w-6 md:h-6 bg-green-600 text-white rounded-full flex items-center justify-center text-xs md:text-sm font-medium">
+          <div
+            *ngFor="let instruction of activity.instructions; let i = index"
+            class="flex space-x-2 md:space-x-3"
+          >
+            <div
+              class="flex-shrink-0 w-5 h-5 md:w-6 md:h-6 bg-green-600 text-white rounded-full flex items-center justify-center text-xs md:text-sm font-medium"
+            >
               {{ i + 1 }}
             </div>
             <p class="text-gray-700 pt-0.5 text-sm md:text-base">{{ instruction }}</p>
@@ -73,8 +142,10 @@
     </div>
   </ng-container>
   <ng-template #notFound>
-    <div class="max-w-xl mx-auto bg-white shadow-sm border-green-100 rounded-xl p-6 md:p-8 mt-8 md:mt-12 text-center mx-4">
+    <div
+      class="max-w-xl mx-auto bg-white shadow-sm border-green-100 rounded-xl p-6 md:p-8 mt-8 md:mt-12 text-center mx-4"
+    >
       <p class="text-gray-600 text-sm md:text-base">{{ 'ACTIVITY.NOT_FOUND' | translate }}</p>
     </div>
   </ng-template>
-</div> 
+</div>

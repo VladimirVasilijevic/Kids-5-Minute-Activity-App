@@ -4,62 +4,62 @@ export const mockCategories = [
     title: 'HOME.CAT_ABOUT_TITLE',
     description: 'HOME.CAT_ABOUT_DESC',
     color: 'bg-blue-500',
-    icon: 'user'
+    icon: 'user',
   },
   {
     id: 'shop',
     title: 'HOME.CAT_SHOP_TITLE',
     description: 'HOME.CAT_SHOP_DESC',
     color: 'bg-green-500',
-    icon: 'shopping-cart'
+    icon: 'shopping-cart',
   },
   {
     id: 'blog',
     title: 'HOME.CAT_BLOG_TITLE',
     description: 'HOME.CAT_BLOG_DESC',
     color: 'bg-purple-500',
-    icon: 'book-open'
+    icon: 'book-open',
   },
   {
     id: 'tips',
     title: 'HOME.CAT_TIPS_TITLE',
     description: 'HOME.CAT_TIPS_DESC',
     color: 'bg-yellow-500',
-    icon: 'lightbulb'
+    icon: 'lightbulb',
   },
   {
     id: 'physical',
     title: 'HOME.CAT_PHYSICAL_TITLE',
     description: 'HOME.CAT_PHYSICAL_DESC',
     color: 'bg-red-500',
-    icon: 'dumbbell'
+    icon: 'dumbbell',
   },
   {
     id: 'creative',
     title: 'HOME.CAT_CREATIVE_TITLE',
     description: 'HOME.CAT_CREATIVE_DESC',
     color: 'bg-pink-500',
-    icon: 'palette'
+    icon: 'palette',
   },
   {
     id: 'educational',
     title: 'HOME.CAT_EDUCATIONAL_TITLE',
     description: 'HOME.CAT_EDUCATIONAL_DESC',
     color: 'bg-indigo-500',
-    icon: 'graduation-cap'
+    icon: 'graduation-cap',
   },
   {
     id: 'musical',
     title: 'HOME.CAT_MUSICAL_TITLE',
     description: 'HOME.CAT_MUSICAL_DESC',
     color: 'bg-orange-500',
-    icon: 'music'
+    icon: 'music',
   },
   {
     id: 'nature',
     title: 'HOME.CAT_NATURE_TITLE',
     description: 'HOME.CAT_NATURE_DESC',
     color: 'bg-emerald-500',
-    icon: 'tree'
-  }
-] 
+    icon: 'tree',
+  },
+];

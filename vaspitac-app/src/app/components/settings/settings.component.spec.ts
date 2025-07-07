@@ -9,12 +9,15 @@ import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 
-import { SettingsComponent } from './settings.component';
 import { ActivityService } from '../../services/activity.service';
+
+import { SettingsComponent } from './settings.component';
 
 // Proper mock for ActivityService
 class MockActivityService {
-  getVersion() { return of('1.0.2') }
+  getVersion() {
+    return of('1.0.2');
+  }
 }
 
 describe('SettingsComponent', () => {
@@ -29,15 +32,11 @@ describe('SettingsComponent', () => {
         BrowserAnimationsModule,
         MatCardModule,
         MatFormFieldModule,
-        MatSelectModule
+        MatSelectModule,
       ],
-      declarations: [ SettingsComponent ],
-      providers: [
-        provideRouter([]),
-        { provide: ActivityService, useClass: MockActivityService }
-      ]
-    })
-    .compileComponents();
+      declarations: [SettingsComponent],
+      providers: [provideRouter([]), { provide: ActivityService, useClass: MockActivityService }],
+    }).compileComponents();
   });
 
   beforeEach(() => {
@@ -58,7 +57,7 @@ describe('SettingsComponent', () => {
   });
 
   it('should have Serbian and English languages', () => {
-    const languageCodes = component.languages.map(lang => lang.code);
+    const languageCodes = component.languages.map((lang) => lang.code);
     expect(languageCodes).toContain('sr');
     expect(languageCodes).toContain('en');
   });
@@ -74,9 +73,9 @@ describe('SettingsComponent', () => {
   it('should call translate service when language changes', () => {
     spyOn(translateService, 'use');
     const newLanguage = 'en';
-    
+
     component.changeLanguage(newLanguage);
-    
+
     expect(component.currentLanguage).toBe(newLanguage);
     expect(translateService.use).toHaveBeenCalledWith(newLanguage);
   });
@@ -85,4 +84,4 @@ describe('SettingsComponent', () => {
     const compiled = fixture.nativeElement;
     expect(compiled.querySelector('mat-card')).toBeTruthy();
   });
-}); 
+});

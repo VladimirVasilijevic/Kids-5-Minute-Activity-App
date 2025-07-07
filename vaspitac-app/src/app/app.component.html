@@ -2,32 +2,51 @@
   <div class="px-4 py-3">
     <div class="flex items-center justify-between">
       <div class="flex items-center space-x-3">
-        <div class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center shadow-lg">
+        <div
+          class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center shadow-lg"
+        >
           <span class="text-white font-bold text-lg md:text-xl">V</span>
         </div>
         <div class="hidden sm:block">
           <h1 class="text-lg md:text-xl font-bold text-green-800">{{ 'APP.TITLE' | translate }}</h1>
-          <div class="text-xs md:text-sm text-green-600 font-normal italic mt-1">{{ 'APP.TAGLINE' | translate }}</div>
+          <div class="text-xs md:text-sm text-green-600 font-normal italic mt-1">
+            {{ 'APP.TAGLINE' | translate }}
+          </div>
         </div>
         <!-- Mobile title only -->
         <div class="sm:hidden">
           <h1 class="text-lg font-bold text-green-800">{{ 'APP.TITLE' | translate }}</h1>
         </div>
       </div>
-      
+
       <div class="flex items-center space-x-2">
         <!-- Language Switcher -->
-        <button class="p-2 flex items-center gap-1 md:gap-2 rounded hover:bg-green-50 transition" (click)="switchLanguage()">
+        <button
+          class="p-2 flex items-center gap-1 md:gap-2 rounded hover:bg-green-50 transition"
+          (click)="switchLanguage()"
+        >
           <span class="text-base md:text-lg">{{ currentLang === 'sr' ? '🇷🇸' : '🇺🇸' }}</span>
-          <svg class="h-3 w-3 md:h-4 md:w-4 text-green-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path d="M12 20v-6m0 0V4m0 10l-4-4m4 4l4-4"/>
+          <svg
+            class="h-3 w-3 md:h-4 md:w-4 text-green-600"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+          >
+            <path d="M12 20v-6m0 0V4m0 10l-4-4m4 4l4-4" />
           </svg>
         </button>
         <!-- Search Icon -->
         <button class="p-2 rounded hover:bg-green-50 transition">
-          <svg class="h-4 w-4 md:h-5 md:w-5 text-green-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <circle cx="11" cy="11" r="8"/>
-            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          <svg
+            class="h-4 w-4 md:h-5 md:w-5 text-green-600"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+          >
+            <circle cx="11" cy="11" r="8" />
+            <line x1="21" y1="21" x2="16.65" y2="16.65" />
           </svg>
         </button>
       </div>
@@ -37,4 +56,4 @@
 
 <main class="main-content px-4 py-4 md:py-6">
   <router-outlet></router-outlet>
-</main> 
+</main>

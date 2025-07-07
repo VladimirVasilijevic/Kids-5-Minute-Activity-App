@@ -4,11 +4,13 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
-import { HomeComponent } from './home.component';
 import { Router } from '@angular/router';
+
 import { CATEGORY_KEYS } from '../../models/category-keys';
 import { FirestoreService } from '../../services/firestore.service';
 import { mockFirestoreService } from '../../../test-utils/mock-firestore-service';
+
+import { HomeComponent } from './home.component';
 
 describe('HomeComponent', () => {
   let component: HomeComponent;
@@ -19,18 +21,13 @@ describe('HomeComponent', () => {
     routerSpy = jasmine.createSpyObj('Router', ['navigate']);
     routerSpy.navigate.and.returnValue(Promise.resolve(true));
     await TestBed.configureTestingModule({
-      imports: [
-        TranslateModule.forRoot(),
-        BrowserAnimationsModule,
-        HttpClientTestingModule
-      ],
-      declarations: [ HomeComponent ],
+      imports: [TranslateModule.forRoot(), BrowserAnimationsModule, HttpClientTestingModule],
+      declarations: [HomeComponent],
       providers: [
         { provide: Router, useValue: routerSpy },
-        { provide: FirestoreService, useValue: mockFirestoreService }
-      ]
-    })
-    .compileComponents();
+        { provide: FirestoreService, useValue: mockFirestoreService },
+      ],
+    }).compileComponents();
   });
 
   beforeEach(() => {
@@ -48,10 +45,14 @@ describe('HomeComponent', () => {
     const title = compiled.querySelector('h2');
     const ps = compiled.querySelectorAll('p');
     const subtitle = Array.from(ps).find(
-      el => (el as HTMLElement).className.includes('text-base') && (el as HTMLElement).className.includes('md:text-lg')
+      (el) =>
+        (el as HTMLElement).className.includes('text-base') &&
+        (el as HTMLElement).className.includes('md:text-lg')
     ) as HTMLElement | undefined;
     const desc = Array.from(ps).find(
-      el => (el as HTMLElement).className.includes('text-sm') && (el as HTMLElement).className.includes('md:text-base')
+      (el) =>
+        (el as HTMLElement).className.includes('text-sm') &&
+        (el as HTMLElement).className.includes('md:text-base')
     ) as HTMLElement | undefined;
     expect(title).toBeTruthy();
     expect(subtitle).toBeTruthy();
@@ -92,35 +93,45 @@ describe('HomeComponent', () => {
   it('should navigate to /activities with category for PHYSICAL', async () => {
     spyOn(component as any, 'scrollToTop');
     await component.goToCategory(CATEGORY_KEYS.PHYSICAL);
-    expect(routerSpy.navigate).toHaveBeenCalledWith(['/activities'], { queryParams: { category: CATEGORY_KEYS.PHYSICAL } });
+    expect(routerSpy.navigate).toHaveBeenCalledWith(['/activities'], {
+      queryParams: { category: CATEGORY_KEYS.PHYSICAL },
+    });
     expect((component as any).scrollToTop).toHaveBeenCalled();
   });
 
   it('should navigate to /activities with category for CREATIVE', async () => {
     spyOn(component as any, 'scrollToTop');
     await component.goToCategory(CATEGORY_KEYS.CREATIVE);
-    expect(routerSpy.navigate).toHaveBeenCalledWith(['/activities'], { queryParams: { category: CATEGORY_KEYS.CREATIVE } });
+    expect(routerSpy.navigate).toHaveBeenCalledWith(['/activities'], {
+      queryParams: { category: CATEGORY_KEYS.CREATIVE },
+    });
     expect((component as any).scrollToTop).toHaveBeenCalled();
   });
 
   it('should navigate to /activities with category for EDUCATIONAL', async () => {
     spyOn(component as any, 'scrollToTop');
     await component.goToCategory(CATEGORY_KEYS.EDUCATIONAL);
-    expect(routerSpy.navigate).toHaveBeenCalledWith(['/activities'], { queryParams: { category: CATEGORY_KEYS.EDUCATIONAL } });
+    expect(routerSpy.navigate).toHaveBeenCalledWith(['/activities'], {
+      queryParams: { category: CATEGORY_KEYS.EDUCATIONAL },
+    });
     expect((component as any).scrollToTop).toHaveBeenCalled();
   });
 
   it('should navigate to /activities with category for MUSICAL', async () => {
     spyOn(component as any, 'scrollToTop');
     await component.goToCategory(CATEGORY_KEYS.MUSICAL);
-    expect(routerSpy.navigate).toHaveBeenCalledWith(['/activities'], { queryParams: { category: CATEGORY_KEYS.MUSICAL } });
+    expect(routerSpy.navigate).toHaveBeenCalledWith(['/activities'], {
+      queryParams: { category: CATEGORY_KEYS.MUSICAL },
+    });
     expect((component as any).scrollToTop).toHaveBeenCalled();
   });
 
   it('should navigate to /activities with category for NATURE', async () => {
     spyOn(component as any, 'scrollToTop');
     await component.goToCategory(CATEGORY_KEYS.NATURE);
-    expect(routerSpy.navigate).toHaveBeenCalledWith(['/activities'], { queryParams: { category: CATEGORY_KEYS.NATURE } });
+    expect(routerSpy.navigate).toHaveBeenCalledWith(['/activities'], {
+      queryParams: { category: CATEGORY_KEYS.NATURE },
+    });
     expect((component as any).scrollToTop).toHaveBeenCalled();
   });
 
@@ -130,4 +141,4 @@ describe('HomeComponent', () => {
     expect(routerSpy.navigate).toHaveBeenCalledWith(['/activities']);
     expect((component as any).scrollToTop).toHaveBeenCalled();
   });
-}); 
+});

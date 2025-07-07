@@ -7,7 +7,7 @@ export const CATEGORY_KEYS = {
   CREATIVE: 'creative',
   EDUCATIONAL: 'educational',
   MUSICAL: 'musical',
-  NATURE: 'nature'
+  NATURE: 'nature',
 } as const;
 
-export type CategoryKey = typeof CATEGORY_KEYS[keyof typeof CATEGORY_KEYS]; 
+export type CategoryKey = (typeof CATEGORY_KEYS)[keyof typeof CATEGORY_KEYS];

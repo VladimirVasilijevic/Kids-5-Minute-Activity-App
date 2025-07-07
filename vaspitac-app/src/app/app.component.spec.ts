@@ -26,15 +26,11 @@ describe('AppComponent', () => {
         // Angular Material modules
         MatToolbarModule,
         MatButtonModule,
-        MatIconModule
+        MatIconModule,
       ],
-      declarations: [ AppComponent ],
-      providers: [
-        provideHttpClientTesting(),
-        provideRouter([])
-      ]
-    })
-    .compileComponents();
+      declarations: [AppComponent],
+      providers: [provideHttpClientTesting(), provideRouter([])],
+    }).compileComponents();
   });
 
   beforeEach(() => {
@@ -98,4 +94,4 @@ describe('AppComponent', () => {
     component.activeRoute = '/blog';
     expect(component.isActive('/shop')).toBeFalse();
   });
-}); 
+});

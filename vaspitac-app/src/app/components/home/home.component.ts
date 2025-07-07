@@ -2,30 +2,48 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { Observable, switchMap } from 'rxjs';
+
 import { Category } from '../../models/category.model';
 import { CATEGORY_KEYS } from '../../models/category-keys';
 import { LanguageService } from '../../services/language.service';
-import { CategoryService } from '../../services/category.service'
+import { CategoryService } from '../../services/category.service';
 
+/**
+ *
+ */
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
-  styleUrls: ['./home.component.scss']
+  styleUrls: ['./home.component.scss'],
 })
 export class HomeComponent implements OnInit {
   categories$!: Observable<Category[]>;
 
+  /**
+   *
+   * @param router
+   * @param http
+   * @param languageService
+   * @param categoryService
+   */
   constructor(
     private router: Router,
     private http: HttpClient,
     private languageService: LanguageService,
-    private categoryService: CategoryService,
+    private categoryService: CategoryService
   ) {}
 
+  /**
+   *
+   */
   ngOnInit(): void {
     this.categories$ = this.categoryService.getCategories();
   }
 
+  /**
+   *
+   * @param categoryId
+   */
   goToCategory(categoryId: string): void {
     switch (categoryId) {
       case CATEGORY_KEYS.ABOUT:
@@ -45,7 +63,9 @@ export class HomeComponent implements OnInit {
       case CATEGORY_KEYS.EDUCATIONAL:
       case CATEGORY_KEYS.MUSICAL:
       case CATEGORY_KEYS.NATURE:
-        this.router.navigate(['/activities'], { queryParams: { category: categoryId } }).then(() => this.scrollToTop());
+        this.router
+          .navigate(['/activities'], { queryParams: { category: categoryId } })
+          .then(() => this.scrollToTop());
         break;
       default:
         this.router.navigate(['/activities']).then(() => this.scrollToTop());
@@ -55,4 +75,4 @@ export class HomeComponent implements OnInit {
   private scrollToTop(): void {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
-} 
+}

@@ -123,6 +123,53 @@ vaspitac/
 - **Mobile-First**: Responsive design optimized for Android portrait mode
 - **Planned**: Admin authentication, content editor, user profile, backend logic, E2E tests, error monitoring, and code style enforcement (see Roadmap)
 
+## 📝 Code Style & Linting
+
+### ESLint Configuration
+- **TypeScript Rules**: Enforced with `@typescript-eslint/recommended`
+- **Import Order**: Automatic grouping and sorting with `eslint-plugin-import`
+- **JSDoc Requirements**: All public functions and classes must have JSDoc comments with `@returns` declarations
+- **No `any` Types**: Explicit typing required, use proper interfaces instead
+
+### Prettier Configuration
+- **Formatting**: Single quotes, 2-space indentation, semicolons required
+- **Line Length**: 100 characters max
+- **Trailing Commas**: ES5 compatible
+
+### Available Commands
+```bash
+# Lint TypeScript files
+npm run lint
+
+# Auto-fix linting issues
+npm run lint:fix
+
+# Format all files (TypeScript, HTML, SCSS, JSON)
+npm run format
+
+# Check formatting without changes
+npm run format:check
+```
+
+### JSDoc Requirements
+All public functions and classes must include:
+- Description of what the function/class does
+- `@param` tags for all parameters with descriptions
+- `@returns` tag with return type and description
+- `@example` for complex functions (optional)
+
+Example:
+```typescript
+/**
+ * Retrieves activities from Firestore with JSON fallback
+ * @param category - Optional category filter
+ * @returns Observable of activities array
+ */
+getActivities(category?: string): Observable<Activity[]> {
+  // implementation
+}
+```
+
 ---
 
 ## 🚀 Getting Started

@@ -1,19 +1,32 @@
-import { Injectable } from '@angular/core'
-import { BehaviorSubject, Observable } from 'rxjs'
+import { Injectable } from '@angular/core';
+import { BehaviorSubject, Observable } from 'rxjs';
 
+/**
+ *
+ */
 @Injectable({ providedIn: 'root' })
 export class LanguageService {
-  private lang$ = new BehaviorSubject<string>('sr')
+  private lang$ = new BehaviorSubject<string>('sr');
 
+  /**
+   *
+   * @param lang
+   */
   setLanguage(lang: string) {
-    this.lang$.next(lang)
+    this.lang$.next(lang);
   }
 
+  /**
+   *
+   */
   getLanguage(): Observable<string> {
-    return this.lang$.asObservable()
+    return this.lang$.asObservable();
   }
 
+  /**
+   *
+   */
   getCurrentLanguage(): string {
-    return this.lang$.getValue()
+    return this.lang$.getValue();
   }
-} 
+}

@@ -1,12 +1,26 @@
-import { Injectable } from '@angular/core'
-import { AngularFirestore } from '@angular/fire/compat/firestore'
-import { HttpClient } from '@angular/common/http'
-import { Observable, of, catchError, switchMap } from 'rxjs'
-import { Activity } from '../models/activity.model'
-import { LanguageService } from './language.service'
+import { Injectable } from '@angular/core';
+import { AngularFirestore } from '@angular/fire/compat/firestore';
+import { HttpClient } from '@angular/common/http';
+import { Observable, of, catchError, switchMap } from 'rxjs';
 
+import { Activity } from '../models/activity.model';
+import { Category } from '../models/category.model';
+import { BlogPost } from '../models/blog-post.model';
+import { Tip } from '../models/tip.model';
+
+import { LanguageService } from './language.service';
+
+/**
+ * Service for managing Firestore operations with JSON fallback
+ */
 @Injectable({ providedIn: 'root' })
 export class FirestoreService {
+  /**
+   * Initializes the Firestore service with required dependencies
+   * @param firestore - Angular Firestore service
+   * @param http - HTTP client for JSON fallback
+   * @param languageService - Service for language management
+   */
   constructor(
     private firestore: AngularFirestore,
     private http: HttpClient,
@@ -15,10 +29,11 @@ export class FirestoreService {
 
   /**
    * Get activities from Firestore with JSON fallback
+   * @returns {Observable<Activity[]>} Observable of activities array
    */
   getActivities(): Observable<Activity[]> {
     return this.languageService.getLanguage().pipe(
-      switchMap(lang => {
+      switchMap((lang) => {
         // Try Firestore first
         return this.firestore
           .collection<Activity>(`activities_${lang}`)
@@ -26,20 +41,22 @@ export class FirestoreService {
           .pipe(
             catchError(() => {
               // Fallback to JSON if Firestore fails
-              console.log(`Falling back to JSON for activities_${lang}`)
-              return this.http.get<Activity[]>(`assets/activities_${lang}.json`)
+              console.log(`Falling back to JSON for activities_${lang}`);
+              return this.http.get<Activity[]>(`assets/activities_${lang}.json`);
             })
-          )
+          );
       })
-    )
+    );
   }
 
   /**
    * Get activity by ID from Firestore with JSON fallback
+   * @param id - The activity ID to retrieve
+   * @returns {Observable<Activity | undefined>} Observable of activity or undefined
    */
   getActivityById(id: string): Observable<Activity | undefined> {
     return this.languageService.getLanguage().pipe(
-      switchMap(lang => {
+      switchMap((lang) => {
         // Try Firestore first
         return this.firestore
           .doc<Activity>(`activities_${lang}/${id}`)
@@ -47,89 +64,94 @@ export class FirestoreService {
           .pipe(
             catchError(() => {
               // Fallback to JSON if Firestore fails
-              console.log(`Falling back to JSON for activity ${id}`)
+              console.log(`Falling back to JSON for activity ${id}`);
               return this.http
                 .get<Activity[]>(`assets/activities_${lang}.json`)
                 .pipe(
-                  switchMap(activities => 
-                    of(activities.find(activity => activity.id === id))
-                  )
-                )
+                  switchMap((activities) => of(activities.find((activity) => activity.id === id)))
+                );
             })
-          )
+          );
       })
-    )
+    );
   }
 
   /**
    * Get categories from Firestore with JSON fallback
+   * @returns {Observable<Category[]>} Observable of categories array
    */
-  getCategories(): Observable<any[]> {
+  getCategories(): Observable<Category[]> {
     return this.languageService.getLanguage().pipe(
-      switchMap(lang => {
+      switchMap((lang) => {
         return this.firestore
-          .collection(`categories_${lang}`)
+          .collection<Category>(`categories_${lang}`)
           .valueChanges()
           .pipe(
             catchError(() => {
-              console.log(`Falling back to JSON for categories_${lang}`)
-              return this.http.get<any[]>(`assets/categories_${lang}.json`)
+              console.log(`Falling back to JSON for categories_${lang}`);
+              return this.http.get<Category[]>(`assets/categories_${lang}.json`);
             })
-          )
+          );
       })
-    )
+    );
   }
 
   /**
    * Get blog posts from Firestore with JSON fallback
+   * @returns {Observable<BlogPost[]>} Observable of blog posts array
    */
-  getBlogPosts(): Observable<any[]> {
+  getBlogPosts(): Observable<BlogPost[]> {
     return this.languageService.getLanguage().pipe(
-      switchMap(lang => {
+      switchMap((lang) => {
         return this.firestore
-          .collection(`blog_${lang}`)
+          .collection<BlogPost>(`blog_${lang}`)
           .valueChanges()
           .pipe(
-            catchError((error) => {
-              console.log(`Falling back to JSON for blog_${lang}`, error)
-              return this.http.get<any[]>(`assets/blog-posts_${lang}.json`)
+            catchError((error: unknown) => {
+              console.log(`Falling back to JSON for blog_${lang}`, error);
+              return this.http.get<BlogPost[]>(`assets/blog-posts_${lang}.json`);
             })
-          )
+          );
       })
-    )
+    );
   }
 
   /**
    * Get tips from Firestore with JSON fallback
+   * @returns {Observable<Tip[]>} Observable of tips array
    */
-  getTips(): Observable<any[]> {
+  getTips(): Observable<Tip[]> {
     return this.languageService.getLanguage().pipe(
-      switchMap(lang => {
+      switchMap((lang) => {
         return this.firestore
-          .collection(`tips_${lang}`)
+          .collection<Tip>(`tips_${lang}`)
           .valueChanges()
           .pipe(
             catchError(() => {
-              console.log(`Falling back to JSON for tips_${lang}`)
-              return this.http.get<any[]>(`assets/tips_${lang}.json`)
+              console.log(`Falling back to JSON for tips_${lang}`);
+              return this.http.get<Tip[]>(`assets/tips_${lang}.json`);
             })
-          )
+          );
       })
-    )
+    );
   }
 
   /**
    * Get version metadata from Firestore
+   * @returns {Observable<{version: string, lastUpdated: Date}>} Observable of version metadata
    */
-  getVersion(): Observable<any> {
+  getVersion(): Observable<{ version: string; lastUpdated: Date }> {
     return this.firestore
-      .doc('metadata/version')
+      .doc<{ version: string; lastUpdated: Date }>('metadata/version')
       .valueChanges()
       .pipe(
         catchError(() => {
-          console.log('Falling back to default version')
-          return of({ version: '1.0.0', lastUpdated: new Date() })
+          console.log('Falling back to default version');
+          return of<{ version: string; lastUpdated: Date }>({
+            version: '1.0.0',
+            lastUpdated: new Date(),
+          });
         })
-      )
+      );
   }
-} 
+}

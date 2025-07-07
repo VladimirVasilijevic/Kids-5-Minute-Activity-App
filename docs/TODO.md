@@ -266,7 +266,7 @@ TODO: Integrate error monitoring and reporting <!-- id: task-032 -->
 
 TODO: Improve code documentation and enforce TypeScript code style <!-- id: task-033 -->
 **Acceptance Criteria**  
-- [ ] Add JSDoc comments to all public functions/classes  
-- [ ] Enforce code style with ESLint/TSLint and Prettier  
-- [ ] Linting errors do not block CI, but warnings are visible in PRs  
-- [ ] All contributors follow documented code style
+- [x] Add JSDoc comments to all public functions/classes  
+- [x] Enforce code style with ESLint/TSLint and Prettier  
+- [x] Linting errors do not block CI, but warnings are visible in PRs  
+- [x] All contributors follow documented code style

@@ -1,20 +1,31 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ActivityService } from '../../services/activity.service';
-import { Activity } from '../../models/activity.model';
 import { TranslateService } from '@ngx-translate/core';
 import { Observable, combineLatest, of } from 'rxjs';
 import { switchMap, map, startWith } from 'rxjs/operators';
 
+import { Activity } from '../../models/activity.model';
+import { ActivityService } from '../../services/activity.service';
+
+/**
+ *
+ */
 @Component({
   selector: 'app-activity-detail',
   templateUrl: './activity-detail.component.html',
-  styleUrls: ['./activity-detail.component.scss']
+  styleUrls: ['./activity-detail.component.scss'],
 })
 export class ActivityDetailComponent implements OnInit {
   activity$!: Observable<Activity | undefined>;
   lang!: string;
 
+  /**
+   *
+   * @param route
+   * @param activityService
+   * @param translate
+   * @param router
+   */
   constructor(
     private route: ActivatedRoute,
     private activityService: ActivityService,
@@ -22,14 +33,17 @@ export class ActivityDetailComponent implements OnInit {
     private router: Router
   ) {}
 
+  /**
+   *
+   */
   ngOnInit() {
     this.lang = this.translate.currentLang || this.translate.getDefaultLang() || 'sr';
     this.activity$ = combineLatest([
-      this.route.paramMap.pipe(map(params => params.get('id'))),
+      this.route.paramMap.pipe(map((params) => params.get('id'))),
       this.translate.onLangChange.pipe(
-        map(e => e.lang as string),
+        map((e) => e.lang as string),
         startWith(this.lang)
-      )
+      ),
     ]).pipe(
       switchMap(([id, lang]) => {
         this.lang = lang;
@@ -39,12 +53,17 @@ export class ActivityDetailComponent implements OnInit {
     );
   }
 
+  /**
+   *
+   */
   goBack() {
-    const category = this.route.snapshot.queryParamMap.get('category')
-    this.router.navigate(['/activities'], {
-      queryParams: { category: category || null }
-    }).then(() => {
-      window.scrollTo({ top: 0, behavior: 'smooth' })
-    })
+    const category = this.route.snapshot.queryParamMap.get('category');
+    this.router
+      .navigate(['/activities'], {
+        queryParams: { category: category || null },
+      })
+      .then(() => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
   }
-} 
+}

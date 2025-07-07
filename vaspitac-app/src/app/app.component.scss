@@ -24,15 +24,15 @@
     flex-direction: column;
     align-items: center;
     min-width: 80px;
-    
+
     mat-icon {
       margin-bottom: 4px;
     }
-    
+
     span {
       font-size: 12px;
     }
-    
+
     &.active {
       color: var(--watermelon-pink);
     }
@@ -44,4 +44,4 @@
   .main-content {
     padding: 16px;
   }
-} 
+}

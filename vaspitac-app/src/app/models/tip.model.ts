@@ -4,4 +4,4 @@ export interface Tip {
   description: string;
   icon: string;
   color: string;
-} 
+}

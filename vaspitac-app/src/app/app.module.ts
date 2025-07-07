@@ -7,7 +7,6 @@ import { RouterModule } from '@angular/router';
 // Firebase imports
 import { AngularFireModule } from '@angular/fire/compat';
 import { AngularFirestoreModule } from '@angular/fire/compat/firestore';
-import { environment } from '../environments/environment';
 
 // Angular Material imports
 import { MatToolbarModule } from '@angular/material/toolbar';
@@ -23,6 +22,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 
+import { environment } from '../environments/environment';
+
 // Components
 import { AppComponent } from './app.component';
 import { HomeComponent } from './components/home/home.component';
@@ -35,10 +36,17 @@ import { BlogComponent } from './components/blog/blog.component';
 import { TipsComponent } from './components/tips/tips.component';
 
 // AoT requires an exported function for factories
+/**
+ *
+ * @param http
+ */
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http, './assets/i18n/', '.json');
 }
 
+/**
+ *
+ */
 @NgModule({
   declarations: [
     AppComponent,
@@ -49,7 +57,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     ShopComponent,
     AboutComponent,
     BlogComponent,
-    TipsComponent
+    TipsComponent,
   ],
   imports: [
     BrowserModule,
@@ -64,15 +72,15 @@ export function HttpLoaderFactory(http: HttpClient) {
       { path: 'about', component: AboutComponent },
       { path: 'blog', component: BlogComponent },
       { path: 'tips', component: TipsComponent },
-      { path: '**', redirectTo: '' }
+      { path: '**', redirectTo: '' },
     ]),
     TranslateModule.forRoot({
       defaultLanguage: 'sr',
       loader: {
         provide: TranslateLoader,
         useFactory: HttpLoaderFactory,
-        deps: [HttpClient]
-      }
+        deps: [HttpClient],
+      },
     }),
     // Firebase modules
     AngularFireModule.initializeApp(environment.firebase),
@@ -85,9 +93,9 @@ export function HttpLoaderFactory(http: HttpClient) {
     MatListModule,
     MatBottomSheetModule,
     MatSelectModule,
-    MatFormFieldModule
+    MatFormFieldModule,
   ],
   providers: [],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
 })
-export class AppModule { } 
+export class AppModule {}
