@@ -1,4 +1,8 @@
-apply plugin: 'com.android.application'
+plugins {
+  id 'com.android.application'
+  // Add the Google services Gradle plugin
+  id 'com.google.gms.google-services'
+}
 
 android {
     namespace "com.vaspitac.app"
@@ -30,13 +34,6 @@ repositories {
     }
 }
 
-plugins {
-  id 'com.android.application'
-
-  // Add the Google services Gradle plugin
-  id 'com.google.gms.google-services'
-}
-
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation "androidx.appcompat:appcompat:$androidxAppCompatVersion"
@@ -56,7 +53,7 @@ apply from: 'capacitor.build.gradle'
 try {
     def servicesJSON = file('google-services.json')
     if (servicesJSON.text) {
-        apply plugin: 'com.google.gms.google-services'
+        logger.info("google-services.json found, Google Services plugin is already applied")
     }
 } catch(Exception e) {
     logger.info("google-services.json not found, google-services plugin not applied. Push Notifications won't work")
