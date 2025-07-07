@@ -143,5 +143,12 @@
     "BACK": "Back to home",
     "QUICK_TITLE": "Quick Tips",
     "QUICK_SUBTITLE": "Simple tips for every day"
+  },
+  "SEARCH": {
+    "PLACEHOLDER": "Search activities and blogs...",
+    "ACTIVITIES": "Activities",
+    "BLOG_POSTS": "Blog Posts",
+    "NO_RESULTS": "No results for \"{{term}}\"",
+    "START_TYPING": "Start typing to search..."
   }
 }

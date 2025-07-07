@@ -143,5 +143,12 @@
     "TIP3_DESC": "Svaki napredak je važan. Pohvaljivanje motiviše dete i gradi samopoštovanje.",
     "TIP4_TITLE": "Budite kreativni",
     "TIP4_DESC": "Koristite svakodnevne situacije za učenje. Brojanje prilikom kuvanja, boje tokom šetnje..."
+  },
+  "SEARCH": {
+    "PLACEHOLDER": "Pretražite aktivnosti i blogove...",
+    "ACTIVITIES": "Aktivnosti",
+    "BLOG_POSTS": "Blog članovi",
+    "NO_RESULTS": "Nema rezultata za \"{{term}}\"",
+    "START_TYPING": "Počnite kucanje da biste pretražili..."
   }
 }
