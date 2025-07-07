@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">vaspitac-app</string>
-    <string name="title_activity_main">vaspitac-app</string>
+    <string name="app_name">Ana Vaspitac</string>
+    <string name="title_activity_main">Ana Vaspitac</string>
     <string name="package_name">com.vaspitac.app</string>
     <string name="custom_url_scheme">com.vaspitac.app</string>
 </resources>

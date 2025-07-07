@@ -197,6 +197,20 @@ TODO: Setup GitHub Actions for CI/CD <!-- id: task-023 -->
 - [x] gh-pages branch appears after first successful deploy
 - [x] .gitignore only ignores build/local files, not android/ directory
 
+TODO: Configure app icons for web and Android platforms <!-- id: task-034 -->
+**Acceptance Criteria**  
+- [x] Web favicon generated for all required sizes (16x16, 32x32, 48x48, 96x96)
+- [x] Apple Touch Icon (180x180) created for iOS Safari
+- [x] Android Chrome icons (192x192, 512x512) generated for browser
+- [x] Android app launcher icons created for all densities (mdpi, hdpi, xhdpi, xxhdpi, xxxhdpi)
+- [x] Adaptive icons configured for modern Android (API 26+)
+- [x] HTML meta tags updated with proper favicon and icon references
+- [x] Web manifest updated with app name "Ana Vaspitac" and proper icon paths
+- [x] Android strings.xml updated with app name "Ana Vaspitac"
+- [x] App title updated to "Ana Vaspitac" in index.html
+- [x] Icons tested on web browsers and Android devices
+- [x] Documentation created for icon setup and troubleshooting
+
 ## 🔒 Phase 7: Secure Firestore Rules
 
 TODO: Harden Firestore security rules for production <!-- id: task-024 -->
