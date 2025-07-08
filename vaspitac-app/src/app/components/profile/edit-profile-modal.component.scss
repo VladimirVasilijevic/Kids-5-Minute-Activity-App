@@ -1,0 +1,13 @@
+/* Most styling is handled by Tailwind classes in the template. Add any custom styles here if needed. */
+
+:host ::ng-deep .modal-overlay {
+  background: rgba(0,0,0,0.5);
+}
+
+.avatar-preview {
+  width: 80px;
+  height: 80px;
+  border-radius: 9999px;
+  object-fit: cover;
+  border: 1px solid #e5e7eb;
+} 

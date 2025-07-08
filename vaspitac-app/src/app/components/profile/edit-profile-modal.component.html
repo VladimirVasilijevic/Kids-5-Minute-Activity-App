@@ -1,0 +1,42 @@
+<div *ngIf="isOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
+  <div class="bg-white rounded-lg w-full max-w-md p-6 relative shadow-lg">
+    <!-- Close button -->
+    <button (click)="onClose()" class="absolute top-3 right-3 p-1 rounded-full hover:bg-gray-100 focus:outline-none" type="button">
+      <span aria-hidden="true">&times;</span>
+    </button>
+    <h2 class="text-xl font-bold text-gray-900 mb-6 text-center">
+      {{ 'PROFILE.EDIT_TITLE' | translate }}
+    </h2>
+    <form class="space-y-4" autocomplete="off" (ngSubmit)="onSave($event)">
+      <div class="flex flex-col items-center gap-2 mb-4">
+        <div class="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center overflow-hidden border border-gray-300">
+          <img *ngIf="avatarUrl; else defaultAvatar" [src]="avatarUrl" alt="avatar" class="w-full h-full object-cover" />
+          <ng-template #defaultAvatar>
+            <svg class="h-10 w-10 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M16 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+              <circle cx="12" cy="7" r="4" />
+            </svg>
+          </ng-template>
+        </div>
+        <div class="flex gap-2 mt-2">
+          <label class="cursor-pointer text-green-600 hover:underline text-sm">
+            {{ 'PROFILE.CHANGE_AVATAR' | translate }}
+            <input type="file" accept="image/*" (change)="onAvatarChange($event)" class="hidden" />
+          </label>
+          <button type="button" (click)="removeAvatar()" class="text-red-500 hover:underline text-sm">
+            {{ 'PROFILE.REMOVE_AVATAR' | translate }}
+          </button>
+        </div>
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">{{ 'PROFILE.NAME' | translate }}</label>
+        <input type="text" [(ngModel)]="displayName" name="displayName" class="w-full pl-3 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" placeholder="{{ 'PROFILE.NAME_PLACEHOLDER' | translate }}" required />
+        <div *ngIf="!displayName" class="text-red-500 text-xs mt-1">{{ 'PROFILE.ERROR_NAME_REQUIRED' | translate }}</div>
+      </div>
+      <div class="flex justify-end gap-2 mt-6">
+        <button type="button" (click)="onClose()" class="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-100">{{ 'COMMON.CANCEL' | translate }}</button>
+        <button type="submit" class="px-4 py-2 rounded-lg bg-green-600 text-white font-semibold hover:bg-green-700" [disabled]="!displayName">{{ 'COMMON.SAVE' | translate }}</button>
+      </div>
+    </form>
+  </div>
+</div> 

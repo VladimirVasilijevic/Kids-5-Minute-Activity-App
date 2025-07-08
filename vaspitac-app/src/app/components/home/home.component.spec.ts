@@ -15,6 +15,7 @@ import { CategoryService } from '../../services/category.service';
 import { HomeComponent } from './home.component';
 import { ScrollToTopComponent } from '../scroll-to-top/scroll-to-top.component';
 import { AuthModalComponent } from '../auth-modal/auth-modal.component';
+import { ResetPasswordModalComponent } from '../auth-modal/reset-password-modal.component';
 
 describe('HomeComponent', () => {
   let component: HomeComponent;
@@ -39,7 +40,7 @@ describe('HomeComponent', () => {
     
     await TestBed.configureTestingModule({
       imports: [TranslateModule.forRoot(), BrowserAnimationsModule, HttpClientTestingModule],
-      declarations: [HomeComponent, ScrollToTopComponent, AuthModalComponent],
+      declarations: [HomeComponent, ScrollToTopComponent, AuthModalComponent, ResetPasswordModalComponent],
       providers: [
         { provide: Router, useValue: routerSpy },
         { provide: FirestoreService, useValue: mockFirestoreService },

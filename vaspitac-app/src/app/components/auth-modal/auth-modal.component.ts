@@ -2,14 +2,15 @@
  * AuthModalComponent provides a modal for user login and registration.
  * Supports email/password and social login, with i18n and validation.
  */
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, EventEmitter, Output, Input } from '@angular/core';
 import { AuthService } from '../../services/auth.service';
 import { UserService } from '../../services/user.service';
 import { UserProfile } from '../../models/user-profile.model';
 import { TranslateService } from '@ngx-translate/core';
 
-
-
+/**
+ * Modal component for user authentication (login/register)
+ */
 @Component({
   selector: 'app-auth-modal',
   templateUrl: './auth-modal.component.html',
@@ -21,16 +22,20 @@ export class AuthModalComponent {
   /** Emits when the modal should be closed */
   @Output() close = new EventEmitter<void>();
 
-  /** True for login, false for register */
-  isLogin = true;
-  /** Form fields */
-  name = '';
+  // Form fields
   email = '';
   password = '';
-  /** Loading state */
+  name = '';
+  isLogin = true;
   isLoading = false;
-  /** Error message */
   error = '';
+
+  // Add state for reset password modal
+  showResetPasswordModal = false;
+  resetEmail = '';
+  resetError: string | null = null;
+  resetLoading = false;
+  resetSuccess = false;
 
   constructor(
     private _auth: AuthService,
@@ -38,26 +43,22 @@ export class AuthModalComponent {
     private _translate: TranslateService
   ) {}
 
-  /** Switch between login and register mode */
+  /**
+   * Switch between login and register modes
+   */
   switchMode(): void {
     this.isLogin = !this.isLogin;
     this.error = '';
-  }
-
-  /** Close the modal */
-  onClose(): void {
-    this.close.emit();
-    this.resetForm();
-  }
-
-  /** Reset form fields and error */
-  private resetForm(): void {
-    this.name = '';
     this.email = '';
     this.password = '';
-    this.error = '';
-    this.isLoading = false;
-    this.isLogin = true;
+    this.name = '';
+  }
+
+  /**
+   * Close the modal
+   */
+  onClose(): void {
+    this.close.emit();
   }
 
   /**
@@ -89,37 +90,45 @@ export class AuthModalComponent {
         }
       }
       this.onClose();
-    } catch {
-      this.error = this._translate.instant('AUTH.ERROR_GENERIC');
+    } catch (error: unknown) {
+      this.error = (error as Error).message || this._translate.instant('AUTH.ERROR_GENERIC');
     } finally {
       this.isLoading = false;
     }
   }
 
-  /**
-   * Handle social login (Google, Facebook)
-   * @param provider - 'google' | 'facebook'
-   */
-  async onSocialLogin(provider: string): Promise<void> {
-    this.error = '';
-    this.isLoading = true;
+  /** Show the reset password modal */
+  onShowResetPassword(): void {
+    this.resetEmail = this.email;
+    this.resetError = null;
+    this.showResetPasswordModal = true;
+  }
+
+  /** Handle sending the reset password email from the modal */
+  async onSendResetPassword(email: string): Promise<void> {
+    this.resetLoading = true;
+    this.resetError = null;
     try {
-      const user = await this._auth.signInWithProvider(provider);
-      if (user) {
-        const profile: UserProfile = {
-          uid: user.uid,
-          displayName: user.displayName || '',
-          email: user.email || '',
-          avatarUrl: user.photoURL || '',
-          createdAt: new Date().toISOString()
-        };
-        await this._userService.setUserProfile(profile);
-      }
-      this.onClose();
-    } catch {
-      this.error = this._translate.instant('AUTH.ERROR_SOCIAL');
+      await this._auth.sendPasswordResetEmail(email);
+      this.resetSuccess = true;
+      // Do not close the modal immediately; show success message
+    } catch (err: unknown) {
+      this.resetError = (err as Error).message || 'Došlo je do greške pri slanju emaila za reset lozinke.';
     } finally {
-      this.isLoading = false;
+      this.resetLoading = false;
     }
+  }
+
+  /** Handle closing the reset password modal */
+  onCloseResetPassword(): void {
+    this.showResetPasswordModal = false;
+    this.resetSuccess = false;
+  }
+
+  /**
+   * Trigger password reset for the entered email or prompt for email
+   */
+  forgotPassword(): void {
+    this.onShowResetPassword();
   }
 } 

@@ -53,6 +53,12 @@
           placeholder="{{ 'AUTH.PASSWORD_PLACEHOLDER' | translate }}"
         />
       </div>
+      <!-- Forgot password link (only in login mode) -->
+      <div *ngIf="isLogin" class="text-right mb-2">
+        <button type="button" (click)="forgotPassword()" class="text-blue-600 hover:underline text-sm">
+          {{ 'AUTH.FORGOT_PASSWORD' | translate }}
+        </button>
+      </div>
       <div *ngIf="error" class="text-red-500 text-sm">{{ error }}</div>
       <button
         type="submit"
@@ -75,4 +81,13 @@
       </button>
     </div>
   </div>
-</div> 
+</div>
+<app-reset-password-modal
+  [isOpen]="showResetPasswordModal"
+  [email]="resetEmail"
+  [isLoading]="resetLoading"
+  [errorMessage]="resetError"
+  [success]="resetSuccess"
+  (close)="onCloseResetPassword()"
+  (send)="onSendResetPassword($event)"
+></app-reset-password-modal> 

@@ -44,6 +44,8 @@ import { AuthModalComponent } from './components/auth-modal/auth-modal.component
 import { ProfileCardComponent } from './components/profile-card/profile-card.component';
 import { ProfileComponent } from './components/profile/profile.component';
 import { UserCardComponent } from './components/user-card/user-card.component';
+import { EditProfileModalComponent } from './components/profile/edit-profile-modal.component';
+import { ResetPasswordModalComponent } from './components/auth-modal/reset-password-modal.component';
 
 // AoT requires an exported function for factories
 /**
@@ -76,6 +78,8 @@ export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
     ProfileCardComponent,
     ProfileComponent,
     UserCardComponent,
+    EditProfileModalComponent,
+    ResetPasswordModalComponent,
   ],
   imports: [
     BrowserModule,
