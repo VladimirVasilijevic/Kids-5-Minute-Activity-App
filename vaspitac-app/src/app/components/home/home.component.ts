@@ -8,6 +8,7 @@ import { UserProfile } from '../../models/user-profile.model';
 import { Category } from '../../models/category.model';
 import { CATEGORY_KEYS } from '../../models/category-keys';
 import { CategoryService } from '../../services/category.service';
+import { map } from 'rxjs/operators';
 
 /**
  *
@@ -40,7 +41,9 @@ export class HomeComponent implements OnInit {
    *
    */
   ngOnInit(): void {
-    this.categories$ = this._categoryService.getCategories();
+    this.categories$ = this._categoryService.getCategories().pipe(
+      map(categories => categories.slice().sort((a, b) => (a.order ?? 0) - (b.order ?? 0)))
+    );
     this.userProfile$ = this._auth.user$.pipe(
       switchMap(user => user ? this._userService.getUserProfile(user.uid) : of(null))
     );

@@ -14,4 +14,8 @@ export interface Category {
   color: string;
   /** Icon name for the category */
   icon: string;
+  /**
+   * Order of the category for display purposes (lower comes first)
+   */
+  order?: number;
 }
