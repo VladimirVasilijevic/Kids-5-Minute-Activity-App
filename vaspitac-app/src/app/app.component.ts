@@ -3,6 +3,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { Router, NavigationEnd } from '@angular/router';
 import { Location } from '@angular/common';
 import { App as CapacitorApp } from '@capacitor/app';
+import { PluginListenerHandle } from '@capacitor/core';
 
 import { LanguageService } from './services/language.service';
 import { ActivityService } from './services/activity.service';
@@ -24,7 +25,7 @@ export class AppComponent implements OnInit, OnDestroy {
   isSearchOpen = false;
   activities: Activity[] = [];
   blogPosts: BlogPost[] = [];
-  private backButtonListener: any;
+  private backButtonListener?: PluginListenerHandle;
 
   /**
    * Initializes the app component with translation and routing services
@@ -71,7 +72,7 @@ export class AppComponent implements OnInit, OnDestroy {
    * Register Android hardware back button handler using Capacitor
    */
   private registerAndroidBackButton(): void {
-    this.backButtonListener = CapacitorApp.addListener('backButton', ({ canGoBack }: any) => {
+    CapacitorApp.addListener('backButton', ({ canGoBack: _canGoBack }: { canGoBack: boolean }) => {
       // If Angular can go back, do so
       if (window.history.length > 1) {
         this._location.back();
@@ -79,6 +80,8 @@ export class AppComponent implements OnInit, OnDestroy {
         // Otherwise, exit the app
         CapacitorApp.exitApp();
       }
+    }).then(listener => {
+      this.backButtonListener = listener;
     });
   }
 

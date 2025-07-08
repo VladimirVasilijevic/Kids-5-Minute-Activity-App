@@ -43,4 +43,16 @@ export class BlogComponent implements OnInit {
       }
     });
   }
+
+  /**
+   * Navigates to the blog detail page for a specific blog post
+   * @param blogId - The ID of the blog post to view
+   */
+  viewBlogDetail(blogId: number): void {
+    this._router.navigate(['/blog', blogId]).then(() => {
+      if (typeof window !== 'undefined' && window) {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    });
+  }
 }

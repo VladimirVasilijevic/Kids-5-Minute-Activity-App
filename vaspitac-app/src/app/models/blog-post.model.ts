@@ -8,6 +8,8 @@ export interface BlogPost {
   title: string;
   /** Short excerpt/summary of the blog post */
   excerpt: string;
+  /** Full content of the blog post */
+  fullContent: string;
   /** Author of the blog post */
   author: string;
   /** Estimated reading time */

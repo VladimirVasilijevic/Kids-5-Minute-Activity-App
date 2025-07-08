@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 
 import { FirestoreService } from './firestore.service';
 import { BlogPost } from '../models/blog-post.model';
@@ -21,5 +21,22 @@ export class BlogService {
    */
   getBlogPosts(): Observable<BlogPost[]> {
     return this._firestoreService.getBlogPosts();
+  }
+
+  /**
+   * Retrieves a specific blog post by its ID
+   * @param id - The ID of the blog post to retrieve
+   * @returns {Observable<BlogPost>} Observable of the blog post
+   */
+  getBlogPostById(id: number): Observable<BlogPost> {
+    return this._firestoreService.getBlogPosts().pipe(
+      map(posts => {
+        const post = posts.find(p => p.id === id);
+        if (!post) {
+          throw new Error(`Blog post with ID ${id} not found`);
+        }
+        return post;
+      })
+    );
   }
 }

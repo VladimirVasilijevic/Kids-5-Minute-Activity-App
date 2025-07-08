@@ -1,0 +1,35 @@
+// Blog detail component styles
+:host {
+  display: block;
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  article {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  
+  h1 {
+    font-size: 1.75rem;
+  }
+  
+  .meta-info {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+}
+
+// Smooth transitions
+button {
+  transition: all 0.2s ease-in-out;
+}
+
+// Image hover effect
+img {
+  transition: transform 0.3s ease-in-out;
+  
+  &:hover {
+    transform: scale(1.02);
+  }
+} 

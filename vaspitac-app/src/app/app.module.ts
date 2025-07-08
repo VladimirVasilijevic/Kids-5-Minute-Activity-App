@@ -35,6 +35,7 @@ import { SettingsComponent } from './components/settings/settings.component';
 import { ShopComponent } from './components/shop/shop.component';
 import { AboutComponent } from './components/about/about.component';
 import { BlogComponent } from './components/blog/blog.component';
+import { BlogDetailComponent } from './components/blog-detail/blog-detail.component';
 import { TipsComponent } from './components/tips/tips.component';
 import { ScrollToTopComponent } from './components/scroll-to-top/scroll-to-top.component';
 import { SearchOverlayComponent } from './components/search-overlay/search-overlay.component';
@@ -62,6 +63,7 @@ export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
     ShopComponent,
     AboutComponent,
     BlogComponent,
+    BlogDetailComponent,
     TipsComponent,
     ScrollToTopComponent,
     SearchOverlayComponent,
@@ -79,6 +81,7 @@ export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
       { path: 'shop', component: ShopComponent },
       { path: 'about', component: AboutComponent },
       { path: 'blog', component: BlogComponent },
+      { path: 'blog/:id', component: BlogDetailComponent },
       { path: 'tips', component: TipsComponent },
       { path: '**', redirectTo: '' },
     ]),

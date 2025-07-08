@@ -54,6 +54,7 @@ describe('BlogComponent', (): void => {
       expect(posts.length).toBe(cards.length);
       for (let i = 0; i < cards.length; i++) {
         expect(cards[i].textContent).toContain(posts[i].title);
+        expect(posts[i].fullContent).toBeDefined(); // Ensure fullContent exists
       }
     });
     expect(cards.length).toBeGreaterThanOrEqual(0);
@@ -82,6 +83,7 @@ describe('BlogComponent', (): void => {
       posts.forEach((post, i) => {
         const card = cards[i];
         expect(card.textContent).toContain(post.excerpt);
+        expect(post.fullContent).toBeDefined(); // Ensure fullContent exists
         const img = card.querySelector('img');
         if (img) {
           expect(img.getAttribute('src')).toBe(post.imageUrl);

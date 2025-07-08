@@ -26,6 +26,7 @@ describe('BlogService', () => {
     mockFirestoreService.getBlogPosts.and.returnValue(of(mockBlogPosts));
     service.getBlogPosts().subscribe((posts) => {
       expect(posts).toEqual(mockBlogPosts);
+      posts.forEach(post => expect(post.fullContent).toBeDefined()); // Ensure fullContent exists
     });
     expect(mockFirestoreService.getBlogPosts).toHaveBeenCalled();
   });

@@ -1,0 +1,64 @@
+<div class="min-h-screen bg-white">
+  <!-- Sticky header with back button -->
+  <div class="sticky top-0 bg-white border-b border-gray-200 z-10">
+    <div class="px-4 py-3">
+      <button
+        (click)="goBack()"
+        class="text-green-600 hover:text-green-700 p-2 rounded-lg hover:bg-green-50 transition-colors flex items-center gap-2"
+      >
+        <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path d="M15 19l-7-7 7-7" />
+        </svg>
+        {{ 'BLOG.BACK' | translate }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Blog post content -->
+  <article class="max-w-4xl mx-auto px-4 py-6" *ngIf="blogPost$ | async as blog">
+    <div class="mb-6">
+      <!-- Featured image -->
+      <img
+        [src]="blog.imageUrl"
+        [alt]="blog.title | translate"
+        class="w-full h-64 object-cover rounded-lg mb-6"
+      />
+      
+      <!-- Title -->
+      <h1 class="text-3xl font-bold text-gray-900 mb-4">
+        {{ blog.title | translate }}
+      </h1>
+      
+      <!-- Meta information -->
+      <div class="flex items-center gap-4 text-sm text-gray-600 mb-6">
+        <div class="flex items-center gap-1">
+          <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M16 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+            <circle cx="12" cy="7" r="4" />
+          </svg>
+          <span>{{ blog.author | translate }}</span>
+        </div>
+        <div class="flex items-center gap-1">
+          <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="10" />
+            <polyline points="12 6 12 12 16 14" />
+          </svg>
+          <span>{{ blog.readTime }}</span>
+        </div>
+        <span>{{ blog.date | date:'mediumDate' }}</span>
+      </div>
+    </div>
+
+    <!-- Full content -->
+    <div class="prose max-w-none">
+      <div class="text-gray-700 leading-relaxed whitespace-pre-line text-base">
+        {{ blog.fullContent }}
+      </div>
+    </div>
+  </article>
+
+  <!-- Loading state -->
+  <div class="flex justify-center items-center min-h-screen" *ngIf="!(blogPost$ | async)">
+    <div class="text-gray-500">Loading...</div>
+  </div>
+</div> 
