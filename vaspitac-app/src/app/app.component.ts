@@ -4,7 +4,10 @@ import { Router, NavigationEnd } from '@angular/router';
 import { Location } from '@angular/common';
 import { App as CapacitorApp } from '@capacitor/app';
 import { PluginListenerHandle } from '@capacitor/core';
-
+import { Observable, of, switchMap } from 'rxjs';
+import { AuthService } from './services/auth.service';
+import { UserService } from './services/user.service';
+import { UserProfile } from './models/user-profile.model';
 import { LanguageService } from './services/language.service';
 import { ActivityService } from './services/activity.service';
 import { BlogService } from './services/blog.service';
@@ -27,6 +30,9 @@ export class AppComponent implements OnInit, OnDestroy {
   blogPosts: BlogPost[] = [];
   private backButtonListener?: PluginListenerHandle;
 
+  userProfile$: Observable<UserProfile | null> = of(null);
+  showAuthModal = false;
+
   /**
    * Initializes the app component with translation and routing services
    * @param translate - Translation service for i18n support
@@ -40,7 +46,9 @@ export class AppComponent implements OnInit, OnDestroy {
     private _location: Location,
     private _languageService: LanguageService,
     private _activityService: ActivityService,
-    private _blogService: BlogService
+    private _blogService: BlogService,
+    private _auth: AuthService,
+    private _userService: UserService
   ) {
     // Set default language
     translate.setDefaultLang('sr');
@@ -60,6 +68,9 @@ export class AppComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.loadData();
+    this.userProfile$ = this._auth.user$.pipe(
+      switchMap(user => user ? this._userService.getUserProfile(user.uid) : of(null))
+    );
   }
 
   ngOnDestroy(): void {
@@ -129,5 +140,25 @@ export class AppComponent implements OnInit, OnDestroy {
    */
   closeSearch(): void {
     this.isSearchOpen = false;
+  }
+
+  /** Open the auth modal */
+  openAuthModal(): void {
+    this.showAuthModal = true;
+  }
+
+  /** Close the auth modal */
+  closeAuthModal(): void {
+    this.showAuthModal = false;
+  }
+
+  /** Handle logout */
+  onLogout(): void {
+    this._auth.signOut();
+  }
+
+  /** Handle profile click */
+  onProfileClick(): void {
+    this._router.navigate(['/profile']);
   }
 }

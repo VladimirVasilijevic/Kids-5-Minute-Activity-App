@@ -8,6 +8,7 @@ import { FormsModule } from '@angular/forms';
 // Firebase imports
 import { AngularFireModule } from '@angular/fire/compat';
 import { AngularFirestoreModule } from '@angular/fire/compat/firestore';
+import { AngularFireAuthModule } from '@angular/fire/compat/auth';
 
 // Angular Material imports
 import { MatToolbarModule } from '@angular/material/toolbar';
@@ -39,6 +40,10 @@ import { BlogDetailComponent } from './components/blog-detail/blog-detail.compon
 import { TipsComponent } from './components/tips/tips.component';
 import { ScrollToTopComponent } from './components/scroll-to-top/scroll-to-top.component';
 import { SearchOverlayComponent } from './components/search-overlay/search-overlay.component';
+import { AuthModalComponent } from './components/auth-modal/auth-modal.component';
+import { ProfileCardComponent } from './components/profile-card/profile-card.component';
+import { ProfileComponent } from './components/profile/profile.component';
+import { UserCardComponent } from './components/user-card/user-card.component';
 
 // AoT requires an exported function for factories
 /**
@@ -67,6 +72,10 @@ export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
     TipsComponent,
     ScrollToTopComponent,
     SearchOverlayComponent,
+    AuthModalComponent,
+    ProfileCardComponent,
+    ProfileComponent,
+    UserCardComponent,
   ],
   imports: [
     BrowserModule,
@@ -83,6 +92,7 @@ export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
       { path: 'blog', component: BlogComponent },
       { path: 'blog/:id', component: BlogDetailComponent },
       { path: 'tips', component: TipsComponent },
+      { path: 'profile', component: ProfileComponent },
       { path: '**', redirectTo: '' },
     ]),
     TranslateModule.forRoot({
@@ -96,6 +106,7 @@ export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
     // Firebase modules
     AngularFireModule.initializeApp(environment.firebase),
     AngularFirestoreModule,
+    AngularFireAuthModule,
     // Angular Material modules
     MatToolbarModule,
     MatButtonModule,

@@ -1,0 +1,42 @@
+/**
+ * ProfileCardComponent styles
+ * Complements Tailwind CSS classes with custom styles
+ */
+
+.profile-card {
+  box-shadow: 0 2px 8px 0 rgba(16, 185, 129, 0.08);
+  border-radius: 1rem;
+  background: #fff;
+  transition: box-shadow 0.2s;
+  cursor: pointer;
+}
+
+.profile-card:hover {
+  box-shadow: 0 4px 16px 0 rgba(16, 185, 129, 0.16);
+}
+
+.profile-avatar {
+  border: 2px solid #10b981; // green-500
+  border-radius: 9999px;
+  width: 3.5rem;
+  height: 3.5rem;
+  object-fit: cover;
+  margin-bottom: 0.5rem;
+}
+
+.profile-name {
+  font-weight: 600;
+  color: #047857; // green-700
+  font-size: 1.1rem;
+  margin-bottom: 0.25rem;
+}
+
+@media (max-width: 640px) {
+  .profile-card {
+    padding: 1rem;
+  }
+  .profile-avatar {
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+} 

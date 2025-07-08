@@ -1,0 +1,16 @@
+<div class="hover:shadow-lg transition-all duration-300 cursor-pointer transform hover:scale-105 bg-white border-green-100 rounded-xl shadow p-6 flex flex-col items-center text-center space-y-4" (click)="onClick()">
+  <div class="w-16 h-16 rounded-full bg-white shadow-lg flex items-center justify-center">
+    <img *ngIf="avatarUrl; else defaultAvatar" [src]="avatarUrl" [alt]="name" class="w-16 h-16 rounded-full border-2 border-green-300" />
+    <ng-template #defaultAvatar>
+      <img src="/assets/placeholder.svg" alt="Profile Logo" class="w-12 h-12 object-contain" />
+    </ng-template>
+  </div>
+  <div>
+    <h3 class="text-lg font-semibold text-green-800 mb-2">
+      {{ 'PROFILECARD.TITLE' | translate }}
+    </h3>
+    <p class="text-sm text-gray-600 line-clamp-2">
+      {{ 'PROFILECARD.WELCOME' | translate:{ name: name } }}
+    </p>
+  </div>
+</div> 

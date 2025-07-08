@@ -33,7 +33,8 @@
     "CAT_MUSICAL_TITLE": "Musical Activities",
     "CAT_MUSICAL_DESC": "Music, rhythm and singing",
     "CAT_NATURE_TITLE": "Nature Activities",
-    "CAT_NATURE_DESC": "Exploring and learning about nature"
+    "CAT_NATURE_DESC": "Exploring and learning about nature",
+    "LOGIN_PROMPT": "Log in to access your profile and personalized features."
   },
   "ACTIVITIES": {
     "TITLE": "Activities",
@@ -150,5 +151,46 @@
     "BLOG_POSTS": "Blog Posts",
     "NO_RESULTS": "No results for \"{{term}}\"",
     "START_TYPING": "Start typing to search..."
+  },
+  "AUTH": {
+    "CLOSE": "Close",
+    "LOGIN_TITLE": "Sign In",
+    "REGISTER_TITLE": "Register",
+    "NAME": "Name",
+    "NAME_PLACEHOLDER": "Enter your name",
+    "EMAIL": "Email",
+    "EMAIL_PLACEHOLDER": "Enter your email",
+    "PASSWORD": "Password",
+    "PASSWORD_PLACEHOLDER": "Enter your password",
+    "LOGIN": "Sign In",
+    "REGISTER": "Register",
+    "LOADING": "Please wait...",
+    "NO_ACCOUNT": "Don't have an account? Register",
+    "HAVE_ACCOUNT": "Already have an account? Sign In",
+    "REQUIRED_FIELDS": "All fields are required.",
+    "ERROR_GENERIC": "An error occurred. Please try again.",
+    "ERROR_SOCIAL": "Social login failed. Please try again.",
+    "LOGIN_GOOGLE": "Sign in with Google",
+    "LOGIN_FACEBOOK": "Sign in with Facebook"
+  },
+  "USERCARD": {
+    "WELCOME": "Welcome, {{name}}!",
+    "LOGOUT": "Logout"
+  },
+  "PROFILECARD": {
+    "TITLE": "My Profile",
+    "WELCOME": "Welcome, {{name}}! View your profile"
+  },
+  "PROFILE": {
+    "BACK": "Back to Home",
+    "TITLE": "My Profile",
+    "PERSONAL_INFO": "Personal Information",
+    "DISPLAY_NAME": "Display Name",
+    "EMAIL": "Email Address",
+    "MEMBER_SINCE": "Member since",
+    "ACCOUNT_ACTIONS": "Account Actions",
+    "EDIT_PROFILE": "Edit Profile",
+    "CHANGE_PASSWORD": "Change Password",
+    "NO_USER": "No user profile found. Please log in."
   }
 }

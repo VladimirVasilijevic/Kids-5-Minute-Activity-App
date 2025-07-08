@@ -1,0 +1,102 @@
+<div *ngIf="isOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
+  <div class="bg-white rounded-lg w-full max-w-md p-6 relative shadow-lg">
+    <!-- Close button -->
+    <button
+      (click)="onClose()"
+      [attr.aria-label]="'AUTH.CLOSE' | translate"
+      class="absolute top-3 right-3 p-1 rounded-full hover:bg-gray-100 focus:outline-none"
+      type="button"
+    >
+      <span aria-hidden="true">&times;</span>
+    </button>
+
+    <!-- Title -->
+    <h2 class="text-xl font-bold text-gray-900 mb-6 text-center">
+      {{ isLogin ? ('AUTH.LOGIN_TITLE' | translate) : ('AUTH.REGISTER_TITLE' | translate) }}
+    </h2>
+
+    <!-- Form -->
+    <form class="space-y-4" autocomplete="off" (ngSubmit)="onSubmit($event)">
+      <div *ngIf="!isLogin">
+        <label class="block text-sm font-medium text-gray-700 mb-1">
+          {{ 'AUTH.NAME' | translate }}
+        </label>
+        <input
+          type="text"
+          [(ngModel)]="name"
+          name="name"
+          class="w-full pl-3 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+          placeholder="{{ 'AUTH.NAME_PLACEHOLDER' | translate }}"
+        />
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">
+          {{ 'AUTH.EMAIL' | translate }}
+        </label>
+        <input
+          type="email"
+          [(ngModel)]="email"
+          name="email"
+          class="w-full pl-3 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+          placeholder="{{ 'AUTH.EMAIL_PLACEHOLDER' | translate }}"
+        />
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">
+          {{ 'AUTH.PASSWORD' | translate }}
+        </label>
+        <input
+          type="password"
+          [(ngModel)]="password"
+          name="password"
+          class="w-full pl-3 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+          placeholder="{{ 'AUTH.PASSWORD_PLACEHOLDER' | translate }}"
+        />
+      </div>
+      <div *ngIf="error" class="text-red-500 text-sm">{{ error }}</div>
+      <button
+        type="submit"
+        class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2 rounded-lg transition-colors"
+        [disabled]="isLoading"
+      >
+        <span *ngIf="isLoading">{{ 'AUTH.LOADING' | translate }}</span>
+        <span *ngIf="!isLoading">{{ isLogin ? ('AUTH.LOGIN' | translate) : ('AUTH.REGISTER' | translate) }}</span>
+      </button>
+    </form>
+
+    <!-- Social login -->
+    <div class="mt-4 flex flex-col gap-2">
+      <button
+        type="button"
+        (click)="onSocialLogin('google')"
+        class="w-full flex items-center justify-center gap-2 border border-gray-300 rounded-lg py-2 hover:bg-gray-50"
+        [disabled]="isLoading"
+        [attr.aria-label]="'AUTH.LOGIN_GOOGLE' | translate"
+      >
+        <span class="i-lucide--google h-5 w-5"></span>
+        <span>{{ 'AUTH.LOGIN_GOOGLE' | translate }}</span>
+      </button>
+      <button
+        type="button"
+        (click)="onSocialLogin('facebook')"
+        class="w-full flex items-center justify-center gap-2 border border-gray-300 rounded-lg py-2 hover:bg-gray-50"
+        [disabled]="isLoading"
+        [attr.aria-label]="'AUTH.LOGIN_FACEBOOK' | translate"
+      >
+        <span class="i-lucide--facebook h-5 w-5"></span>
+        <span>{{ 'AUTH.LOGIN_FACEBOOK' | translate }}</span>
+      </button>
+    </div>
+
+    <!-- Toggle login/register -->
+    <div class="mt-4 text-center">
+      <button
+        type="button"
+        (click)="switchMode()"
+        class="text-green-600 hover:text-green-700 text-sm"
+      >
+        {{ isLogin ? ('AUTH.NO_ACCOUNT' | translate) : ('AUTH.HAVE_ACCOUNT' | translate) }}
+      </button>
+    </div>
+  </div>
+</div> 

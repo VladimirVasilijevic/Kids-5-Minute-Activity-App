@@ -9,19 +9,27 @@ import { FirestoreService } from '../../services/firestore.service';
 import { mockFirestoreService } from '../../../test-utils/mock-firestore-service';
 import { mockBlogPosts } from '../../../test-utils/mock-blog-posts';
 import { TranslateService } from '@ngx-translate/core';
+import { BlogService } from '../../services/blog.service';
 
 import { BlogComponent } from './blog.component';
 
 describe('BlogComponent', (): void => {
   let component: BlogComponent;
   let fixture: ComponentFixture<BlogComponent>;
+  let blogServiceSpy: jasmine.SpyObj<BlogService>;
 
   beforeEach(async (): Promise<void> => {
+    blogServiceSpy = jasmine.createSpyObj('BlogService', ['getBlogPosts']);
+    blogServiceSpy.getBlogPosts.and.returnValue(of(mockBlogPosts));
+
     await TestBed.configureTestingModule({
       declarations: [BlogComponent],
       imports: [TranslateModule.forRoot(), HttpClientTestingModule],
       schemas: [NO_ERRORS_SCHEMA],
-      providers: [{ provide: FirestoreService, useValue: mockFirestoreService }],
+      providers: [
+        { provide: FirestoreService, useValue: mockFirestoreService },
+        { provide: BlogService, useValue: blogServiceSpy }
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(BlogComponent);
@@ -110,5 +118,36 @@ describe('BlogComponent', (): void => {
     languageService.use('en');
     fixture.detectChanges();
     expect(languageService.use).toHaveBeenCalledWith('en');
+  });
+
+  it('should navigate to blog detail page when viewBlogDetail is called', (): void => {
+    const router = TestBed.inject(Router);
+    spyOn(router, 'navigate').and.returnValue(Promise.resolve(true));
+    const blogId = 123;
+    
+    component.viewBlogDetail(blogId);
+    
+    expect(router.navigate).toHaveBeenCalledWith(['/blog', blogId]);
+  });
+
+  it('should call viewBlogDetail when blog post card is clicked', async (): Promise<void> => {
+    const router = TestBed.inject(Router);
+    spyOn(router, 'navigate').and.returnValue(Promise.resolve(true));
+    spyOn(component, 'viewBlogDetail').and.callThrough();
+    
+    // Set up blog posts data
+    blogServiceSpy.getBlogPosts.and.returnValue(of(mockBlogPosts));
+    await fixture.whenStable();
+    fixture.detectChanges();
+    
+    const compiled = fixture.nativeElement as HTMLElement;
+    const firstBlogCard = compiled.querySelector('.overflow-hidden.bg-white') as HTMLElement;
+    
+    if (firstBlogCard) {
+      firstBlogCard.click();
+      expect(component.viewBlogDetail).toHaveBeenCalled();
+    } else {
+      fail('Blog post card not found');
+    }
   });
 });

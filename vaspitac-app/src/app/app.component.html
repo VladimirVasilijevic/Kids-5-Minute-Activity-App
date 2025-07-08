@@ -56,10 +56,35 @@
             <line x1="21" y1="21" x2="16.65" y2="16.65" />
           </svg>
         </button>
+        <!-- User Profile/Avatar or Login -->
+        <ng-container *ngIf="userProfile$ | async as user; else showLoginHeader">
+          <button class="p-1 rounded-full hover:bg-green-50 transition flex items-center" (click)="onProfileClick()">
+            <img *ngIf="user.avatarUrl; else defaultAvatarHeader" [src]="user.avatarUrl" [alt]="user.displayName" class="w-8 h-8 rounded-full border-2 border-green-300" />
+            <ng-template #defaultAvatarHeader>
+              <svg
+                class="h-7 w-7 text-green-600"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+              >
+                <path d="M16 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                <circle cx="12" cy="7" r="4" />
+              </svg>
+            </ng-template>
+          </button>
+        </ng-container>
+        <ng-template #showLoginHeader>
+          <button class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg shadow" (click)="openAuthModal()">
+            {{ 'AUTH.LOGIN' | translate }}
+          </button>
+        </ng-template>
       </div>
     </div>
   </div>
 </header>
+
+<app-auth-modal [isOpen]="showAuthModal" (close)="closeAuthModal()"></app-auth-modal>
 
 <main class="main-content px-4 py-4 md:py-6">
   <router-outlet></router-outlet>

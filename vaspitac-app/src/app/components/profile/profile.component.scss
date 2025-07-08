@@ -1,0 +1,56 @@
+/**
+ * ProfileComponent styles
+ * Complements Tailwind CSS classes with custom styles
+ */
+
+.profile-container {
+  min-height: calc(100vh - 200px);
+}
+
+.profile-header {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.profile-avatar {
+  border: 4px solid #10b981;
+  transition: transform 0.2s ease-in-out;
+}
+
+.profile-avatar:hover {
+  transform: scale(1.05);
+}
+
+.profile-actions {
+  transition: all 0.2s ease-in-out;
+}
+
+.profile-actions:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+// Responsive adjustments
+@media (max-width: 640px) {
+  .profile-container {
+    padding: 1rem;
+  }
+  
+  .profile-header {
+    padding: 1rem;
+  }
+}
+
+// Loading animation
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+} 

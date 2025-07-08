@@ -3,28 +3,49 @@ import { TranslateModule } from '@ngx-translate/core';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { Router } from '@angular/router';
+import { of } from 'rxjs';
 
 import { CATEGORY_KEYS } from '../../models/category-keys';
 import { FirestoreService } from '../../services/firestore.service';
 import { mockFirestoreService } from '../../../test-utils/mock-firestore-service';
+import { AuthService } from '../../services/auth.service';
+import { UserService } from '../../services/user.service';
+import { CategoryService } from '../../services/category.service';
 
 import { HomeComponent } from './home.component';
 import { ScrollToTopComponent } from '../scroll-to-top/scroll-to-top.component';
+import { AuthModalComponent } from '../auth-modal/auth-modal.component';
 
 describe('HomeComponent', () => {
   let component: HomeComponent;
   let fixture: ComponentFixture<HomeComponent>;
   let routerSpy: jasmine.SpyObj<Router>;
+  let authServiceSpy: jasmine.SpyObj<AuthService>;
+  let userServiceSpy: jasmine.SpyObj<UserService>;
+  let categoryServiceSpy: jasmine.SpyObj<CategoryService>;
 
   beforeEach(async (): Promise<void> => {
     routerSpy = jasmine.createSpyObj('Router', ['navigate']);
     routerSpy.navigate.and.returnValue(Promise.resolve(true));
+    
+    authServiceSpy = jasmine.createSpyObj('AuthService', ['signOut'], {
+      user$: of(null)
+    });
+    
+    userServiceSpy = jasmine.createSpyObj('UserService', ['getUserProfile']);
+    
+    categoryServiceSpy = jasmine.createSpyObj('CategoryService', ['getCategories']);
+    categoryServiceSpy.getCategories.and.returnValue(of([]));
+    
     await TestBed.configureTestingModule({
       imports: [TranslateModule.forRoot(), BrowserAnimationsModule, HttpClientTestingModule],
-      declarations: [HomeComponent, ScrollToTopComponent],
+      declarations: [HomeComponent, ScrollToTopComponent, AuthModalComponent],
       providers: [
         { provide: Router, useValue: routerSpy },
         { provide: FirestoreService, useValue: mockFirestoreService },
+        { provide: AuthService, useValue: authServiceSpy },
+        { provide: UserService, useValue: userServiceSpy },
+        { provide: CategoryService, useValue: categoryServiceSpy },
       ],
     }).compileComponents();
   });

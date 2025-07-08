@@ -1,8 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
-
+import { Observable, of, switchMap } from 'rxjs';
+import { AuthService } from '../../services/auth.service';
+import { UserService } from '../../services/user.service';
+import { UserProfile } from '../../models/user-profile.model';
 import { Category } from '../../models/category.model';
 import { CATEGORY_KEYS } from '../../models/category-keys';
 import { CategoryService } from '../../services/category.service';
@@ -17,6 +19,8 @@ import { CategoryService } from '../../services/category.service';
 })
 export class HomeComponent implements OnInit {
   categories$!: Observable<Category[]>;
+  userProfile$: Observable<UserProfile | null> = of(null);
+  showAuthModal = false;
 
   /**
    *
@@ -27,7 +31,9 @@ export class HomeComponent implements OnInit {
   constructor(
     private _router: Router,
     private _http: HttpClient,
-    private _categoryService: CategoryService
+    private _categoryService: CategoryService,
+    private _auth: AuthService,
+    private _userService: UserService
   ) {}
 
   /**
@@ -35,6 +41,9 @@ export class HomeComponent implements OnInit {
    */
   ngOnInit(): void {
     this.categories$ = this._categoryService.getCategories();
+    this.userProfile$ = this._auth.user$.pipe(
+      switchMap(user => user ? this._userService.getUserProfile(user.uid) : of(null))
+    );
   }
 
   /**
@@ -71,5 +80,25 @@ export class HomeComponent implements OnInit {
 
   private scrollToTop(): void {
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  /** Open the auth modal */
+  openAuthModal(): void {
+    this.showAuthModal = true;
+  }
+
+  /** Close the auth modal */
+  closeAuthModal(): void {
+    this.showAuthModal = false;
+  }
+
+  /** Handle profile card click */
+  onProfileClick(): void {
+    this._router.navigate(['/profile']);
+  }
+
+  /** Handle logout */
+  onLogout(): void {
+    this._auth.signOut();
   }
 }

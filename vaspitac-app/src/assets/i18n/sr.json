@@ -33,7 +33,8 @@
     "CAT_MUSICAL_TITLE": "Muzičke aktivnosti",
     "CAT_MUSICAL_DESC": "Muzika, ritam i pevanje",
     "CAT_NATURE_TITLE": "Priroda",
-    "CAT_NATURE_DESC": "Istraživanje i upoznavanje prirode"
+    "CAT_NATURE_DESC": "Istraživanje i upoznavanje prirode",
+    "LOGIN_PROMPT": "Prijavite se da biste pristupili svom profilu i personalizovanim funkcijama."
   },
   "ACTIVITIES": {
     "TITLE": "Aktivnosti",
@@ -150,5 +151,46 @@
     "BLOG_POSTS": "Blog članovi",
     "NO_RESULTS": "Nema rezultata za \"{{term}}\"",
     "START_TYPING": "Počnite kucanje da biste pretražili..."
+  },
+  "AUTH": {
+    "CLOSE": "Zatvori",
+    "LOGIN_TITLE": "Prijavite se",
+    "REGISTER_TITLE": "Registrujte se",
+    "NAME": "Ime",
+    "NAME_PLACEHOLDER": "Unesite vaše ime",
+    "EMAIL": "Email",
+    "EMAIL_PLACEHOLDER": "Unesite vaš email",
+    "PASSWORD": "Lozinka",
+    "PASSWORD_PLACEHOLDER": "Unesite vašu lozinku",
+    "LOGIN": "Prijavite se",
+    "REGISTER": "Registrujte se",
+    "LOADING": "Molimo sačekajte...",
+    "NO_ACCOUNT": "Nemate nalog? Registrujte se",
+    "HAVE_ACCOUNT": "Već imate nalog? Prijavite se",
+    "REQUIRED_FIELDS": "Sva polja su obavezna.",
+    "ERROR_GENERIC": "Došlo je do greške. Pokušajte ponovo.",
+    "ERROR_SOCIAL": "Prijava putem društvenih mreža nije uspela. Pokušajte ponovo.",
+    "LOGIN_GOOGLE": "Prijavite se putem Google-a",
+    "LOGIN_FACEBOOK": "Prijavite se putem Facebook-a"
+  },
+  "USERCARD": {
+    "WELCOME": "Dobrodošli, {{name}}!",
+    "LOGOUT": "Odjavite se"
+  },
+  "PROFILECARD": {
+    "TITLE": "Moj Profil",
+    "WELCOME": "Dobrodošli, {{name}}! Pogledajte vaš profil"
+  },
+  "PROFILE": {
+    "BACK": "Nazad na Početnu",
+    "TITLE": "Moj Profil",
+    "PERSONAL_INFO": "Lične Informacije",
+    "DISPLAY_NAME": "Ime za Prikaz",
+    "EMAIL": "Email Adresa",
+    "MEMBER_SINCE": "Član od",
+    "ACCOUNT_ACTIONS": "Akcije Naloga",
+    "EDIT_PROFILE": "Izmeni Profil",
+    "CHANGE_PASSWORD": "Promeni Lozinku",
+    "NO_USER": "Profil korisnika nije pronađen. Molimo prijavite se."
   }
 }
