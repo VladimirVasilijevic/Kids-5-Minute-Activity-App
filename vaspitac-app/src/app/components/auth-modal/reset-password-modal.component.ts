@@ -17,6 +17,8 @@ export class ResetPasswordModalComponent {
   @Input() isLoading = false;
   /** Error message */
   @Input() errorMessage: string | null = null;
+  /** Whether the email field should be disabled (when pre-filled) */
+  @Input() disableEmail = false;
   /** Emits when the modal should be closed */
   @Output() close = new EventEmitter<void>();
   /** Emits the email to send reset to */

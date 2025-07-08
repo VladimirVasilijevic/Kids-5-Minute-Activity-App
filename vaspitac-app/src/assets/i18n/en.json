@@ -176,7 +176,8 @@
     "RESET_PASSWORD_CHECK_INBOX": "Check your inbox.",
     "RESET_PASSWORD_EMAIL_PLACEHOLDER": "Enter your email",
     "RESET_PASSWORD_SEND": "Send",
-    "RESET_PASSWORD_CANCEL": "Cancel"
+    "RESET_PASSWORD_CANCEL": "Cancel",
+    "EMAIL_PREFILLED": "Email is pre-filled from your profile"
   },
   "USERCARD": {
     "WELCOME": "Welcome, {{name}}!",

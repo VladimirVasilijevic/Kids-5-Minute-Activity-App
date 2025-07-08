@@ -24,7 +24,13 @@ export class ProfileComponent implements OnInit {
   // Modal state
   showEditProfileModal = false;
   showChangePasswordModal = false;
+  showResetPasswordModal = false;
   selectedUser: UserProfile | null = null;
+  
+  // Reset password modal state
+  resetLoading = false;
+  resetError: string | null = null;
+  resetSuccess = false;
 
   constructor(
     private _router: Router,
@@ -68,21 +74,37 @@ export class ProfileComponent implements OnInit {
   }
 
   /**
-   * Trigger password reset for the logged-in user
+   * Show the reset password modal
    */
   onResetPassword(): void {
-    if (!this.selectedUser || !this.selectedUser.email) {
-      window.alert(this._translate.instant('PROFILE.ERROR_NO_EMAIL'));
-      return;
+    this.resetError = null;
+    this.resetSuccess = false;
+    this.showResetPasswordModal = true;
+  }
+
+  /**
+   * Handle sending the reset password email from the modal
+   */
+  async onSendResetPassword(email: string): Promise<void> {
+    this.resetLoading = true;
+    this.resetError = null;
+    try {
+      await this._auth.sendPasswordResetEmail(email);
+      this.resetSuccess = true;
+    } catch (error) {
+      console.error('Password reset email error:', error);
+      this.resetError = (error as Error).message || this._translate.instant('PROFILE.ERROR_RESET_PASSWORD');
+    } finally {
+      this.resetLoading = false;
     }
-    this._auth.sendPasswordResetEmail(this.selectedUser.email)
-      .then(() => {
-        window.alert(this._translate.instant('PROFILE.RESET_PASSWORD_SUCCESS'));
-      })
-      .catch((error) => {
-        console.error('Password reset email error:', error);
-        window.alert(this._translate.instant('PROFILE.ERROR_RESET_PASSWORD'));
-      });
+  }
+
+  /**
+   * Handle closing the reset password modal
+   */
+  onCloseResetPassword(): void {
+    this.showResetPasswordModal = false;
+    this.resetSuccess = false;
   }
 
   /** Close modals */

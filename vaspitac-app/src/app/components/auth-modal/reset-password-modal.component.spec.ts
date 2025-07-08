@@ -33,6 +33,7 @@ describe('ResetPasswordModalComponent', () => {
     expect(component.email).toBe('');
     expect(component.isLoading).toBe(false);
     expect(component.errorMessage).toBeNull();
+    expect(component.disableEmail).toBe(false);
     expect(component.success).toBe(false);
     expect(component.localEmail).toBe('');
   });
@@ -114,6 +115,14 @@ describe('ResetPasswordModalComponent', () => {
     
     component.success = false;
     expect(component.success).toBe(false);
+  });
+
+  it('should handle disableEmail input property', () => {
+    component.disableEmail = true;
+    expect(component.disableEmail).toBe(true);
+    
+    component.disableEmail = false;
+    expect(component.disableEmail).toBe(false);
   });
 
   it('should handle email input property', () => {

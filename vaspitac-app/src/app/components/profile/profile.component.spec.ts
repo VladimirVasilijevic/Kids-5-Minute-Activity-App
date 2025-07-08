@@ -1,4 +1,4 @@
-import { ComponentFixture, TestBed, fakeAsync, tick, flushMicrotasks } from '@angular/core/testing';
+import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { ProfileComponent } from './profile.component';
 import { AuthService } from '../../services/auth.service';
 import { UserService } from '../../services/user.service';
@@ -144,44 +144,29 @@ describe('ProfileComponent', () => {
       spyOn(window, 'alert');
     });
 
-    it('should send password reset email successfully', fakeAsync(() => {
+    it('should show reset password modal', () => {
+      component.onResetPassword();
+      
+      expect(component.showResetPasswordModal).toBe(true);
+      expect(component.resetError).toBeNull();
+      expect(component.resetSuccess).toBe(false);
+    });
+
+    it('should send password reset email successfully', async () => {
       const mockUser = { uid: '1', displayName: 'Test', email: 'test@test.com', avatarUrl: '', createdAt: '2023-01-01' };
       userServiceSpy.getUserProfile.and.returnValue(of(mockUser));
       authServiceSpy.sendPasswordResetEmail.and.returnValue(Promise.resolve());
       
       fixture.detectChanges();
       userSubject.next({ uid: '1' });
-      tick(); // Wait for async operations to complete
       
-      component.onResetPassword();
-      flushMicrotasks(); // Wait for all microtasks (promises) to complete
+      await component.onSendResetPassword('test@test.com');
       
       expect(authServiceSpy.sendPasswordResetEmail).toHaveBeenCalledWith('test@test.com');
-      expect(window.alert).toHaveBeenCalledWith(translateService.instant('PROFILE.RESET_PASSWORD_SUCCESS'));
-    }));
-
-    it('should handle password reset when user has no email', fakeAsync(() => {
-      const mockUser = { uid: '1', displayName: 'Test', email: '', avatarUrl: '', createdAt: '2023-01-01' };
-      userServiceSpy.getUserProfile.and.returnValue(of(mockUser));
-      
-      fixture.detectChanges();
-      userSubject.next({ uid: '1' });
-      tick(); // Wait for async operations to complete
-      
-      component.onResetPassword();
-      
-      expect(window.alert).toHaveBeenCalledWith(translateService.instant('PROFILE.ERROR_NO_EMAIL'));
-      expect(authServiceSpy.sendPasswordResetEmail).not.toHaveBeenCalled();
-    }));
-
-    it('should handle password reset when no user is selected', fakeAsync(() => {
-      component.selectedUser = null;
-      
-      component.onResetPassword();
-      
-      expect(window.alert).toHaveBeenCalledWith(translateService.instant('PROFILE.ERROR_NO_EMAIL'));
-      expect(authServiceSpy.sendPasswordResetEmail).not.toHaveBeenCalled();
-    }));
+      expect(component.resetSuccess).toBe(true);
+      expect(component.resetError).toBeNull();
+      expect(component.resetLoading).toBe(false);
+    });
 
     it('should handle password reset error', async () => {
       const mockUser = { uid: '1', displayName: 'Test', email: 'test@test.com', avatarUrl: '', createdAt: '2023-01-01' };
@@ -191,19 +176,33 @@ describe('ProfileComponent', () => {
       fixture.detectChanges();
       userSubject.next({ uid: '1' });
       
-      // Wait for the component to initialize
-      await new Promise(resolve => setTimeout(resolve, 0));
-      
-      component.onResetPassword();
-      
-      // Wait for the promise to be handled
-      await new Promise(resolve => setTimeout(resolve, 0));
+      await component.onSendResetPassword('test@test.com');
       
       expect(authServiceSpy.sendPasswordResetEmail).toHaveBeenCalledWith('test@test.com');
-      expect(window.alert).toHaveBeenCalledWith(translateService.instant('PROFILE.ERROR_RESET_PASSWORD'));
+      expect(component.resetError).toBe('Network error');
+      expect(component.resetSuccess).toBe(false);
+      expect(component.resetLoading).toBe(false);
     });
 
+    it('should close reset password modal', () => {
+      component.showResetPasswordModal = true;
+      component.resetSuccess = true;
+      
+      component.onCloseResetPassword();
+      
+      expect(component.showResetPasswordModal).toBe(false);
+      expect(component.resetSuccess).toBe(false);
+    });
 
+    it('should set loading state during reset password email sending', async () => {
+      authServiceSpy.sendPasswordResetEmail.and.returnValue(Promise.resolve());
+      
+      const resetPromise = component.onSendResetPassword('test@test.com');
+      expect(component.resetLoading).toBe(true);
+      
+      await resetPromise;
+      expect(component.resetLoading).toBe(false);
+    });
   });
 
   describe('Component State Management', () => {
@@ -213,7 +212,11 @@ describe('ProfileComponent', () => {
       expect(component.passwordChangeError).toBeNull();
       expect(component.showEditProfileModal).toBe(false);
       expect(component.showChangePasswordModal).toBe(false);
+      expect(component.showResetPasswordModal).toBe(false);
       expect(component.selectedUser).toBeNull();
+      expect(component.resetLoading).toBe(false);
+      expect(component.resetError).toBeNull();
+      expect(component.resetSuccess).toBe(false);
     });
 
     it('should set loading to false after user profile is loaded', fakeAsync(() => {

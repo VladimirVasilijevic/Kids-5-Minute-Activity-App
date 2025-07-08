@@ -122,6 +122,15 @@
     [user]="selectedUser"
     (close)="closeEditProfile()"
   ></app-edit-profile-modal>
-  <!-- Remove change password modal and all (save)="onSavePassword($event)" references -->
-  <!-- Only keep the reset password button and other relevant UI -->
+  
+  <app-reset-password-modal
+    [isOpen]="showResetPasswordModal"
+    [email]="selectedUser?.email || ''"
+    [isLoading]="resetLoading"
+    [errorMessage]="resetError"
+    [success]="resetSuccess"
+    [disableEmail]="!!selectedUser?.email"
+    (close)="onCloseResetPassword()"
+    (send)="onSendResetPassword($event)"
+  ></app-reset-password-modal>
 </div> 
