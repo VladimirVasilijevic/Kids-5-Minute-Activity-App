@@ -64,30 +64,6 @@
       </button>
     </form>
 
-    <!-- Social login -->
-    <div class="mt-4 flex flex-col gap-2">
-      <button
-        type="button"
-        (click)="onSocialLogin('google')"
-        class="w-full flex items-center justify-center gap-2 border border-gray-300 rounded-lg py-2 hover:bg-gray-50"
-        [disabled]="isLoading"
-        [attr.aria-label]="'AUTH.LOGIN_GOOGLE' | translate"
-      >
-        <span class="i-lucide--google h-5 w-5"></span>
-        <span>{{ 'AUTH.LOGIN_GOOGLE' | translate }}</span>
-      </button>
-      <button
-        type="button"
-        (click)="onSocialLogin('facebook')"
-        class="w-full flex items-center justify-center gap-2 border border-gray-300 rounded-lg py-2 hover:bg-gray-50"
-        [disabled]="isLoading"
-        [attr.aria-label]="'AUTH.LOGIN_FACEBOOK' | translate"
-      >
-        <span class="i-lucide--facebook h-5 w-5"></span>
-        <span>{{ 'AUTH.LOGIN_FACEBOOK' | translate }}</span>
-      </button>
-    </div>
-
     <!-- Toggle login/register -->
     <div class="mt-4 text-center">
       <button

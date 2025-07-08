@@ -107,15 +107,4 @@ describe('AuthModalComponent', () => {
     expect(userServiceSpy.setUserProfile).toHaveBeenCalled();
     expect(component.onClose).toHaveBeenCalled();
   }));
-
-  it('should call AuthService.signInWithProvider and UserService.setUserProfile on social login', fakeAsync(() => {
-    authServiceSpy.signInWithProvider.and.returnValue(Promise.resolve({ uid: '1', displayName: 'Test', email: 'test@test.com', photoURL: '' } as any));
-    userServiceSpy.setUserProfile.and.returnValue(Promise.resolve());
-    spyOn(component, 'onClose');
-    component.onSocialLogin('google');
-    tick();
-    expect(authServiceSpy.signInWithProvider).toHaveBeenCalledWith('google');
-    expect(userServiceSpy.setUserProfile).toHaveBeenCalled();
-    expect(component.onClose).toHaveBeenCalled();
-  }));
 }); 
