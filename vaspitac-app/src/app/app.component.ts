@@ -1,6 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { Router, NavigationEnd } from '@angular/router';
+import { Location } from '@angular/common';
+import { App as CapacitorApp } from '@capacitor/app';
 
 import { LanguageService } from './services/language.service';
 import { ActivityService } from './services/activity.service';
@@ -16,22 +18,25 @@ import { BlogPost } from './models/blog-post.model';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
 })
-export class AppComponent implements OnInit {
+export class AppComponent implements OnInit, OnDestroy {
   currentLang = 'sr';
   activeRoute = '';
   isSearchOpen = false;
   activities: Activity[] = [];
   blogPosts: BlogPost[] = [];
+  private backButtonListener: any;
 
   /**
    * Initializes the app component with translation and routing services
    * @param translate - Translation service for i18n support
    * @param router - Angular router for navigation
+   * @param location - Location service for back navigation
    * @param languageService - Service for language management
    */
   constructor(
     private translate: TranslateService,
     private _router: Router,
+    private _location: Location,
     private _languageService: LanguageService,
     private _activityService: ActivityService,
     private _blogService: BlogService
@@ -47,10 +52,34 @@ export class AppComponent implements OnInit {
         this.activeRoute = event.urlAfterRedirects;
       }
     });
+
+    // Register Android hardware back button handler using Capacitor
+    this.registerAndroidBackButton();
   }
 
   ngOnInit(): void {
     this.loadData();
+  }
+
+  ngOnDestroy(): void {
+    if (this.backButtonListener) {
+      this.backButtonListener.remove();
+    }
+  }
+
+  /**
+   * Register Android hardware back button handler using Capacitor
+   */
+  private registerAndroidBackButton(): void {
+    this.backButtonListener = CapacitorApp.addListener('backButton', ({ canGoBack }: any) => {
+      // If Angular can go back, do so
+      if (window.history.length > 1) {
+        this._location.back();
+      } else {
+        // Otherwise, exit the app
+        CapacitorApp.exitApp();
+      }
+    });
   }
 
   /**
