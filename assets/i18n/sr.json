@@ -176,7 +176,8 @@
     "RESET_PASSWORD_CHECK_INBOX": "Proverite vaš inbox.",
     "RESET_PASSWORD_EMAIL_PLACEHOLDER": "Unesite vaš email",
     "RESET_PASSWORD_SEND": "Pošalji",
-    "RESET_PASSWORD_CANCEL": "Otkaži"
+    "RESET_PASSWORD_CANCEL": "Otkaži",
+    "EMAIL_PREFILLED": "Email je unapred popunjen sa vašeg profila"
   },
   "USERCARD": {
     "WELCOME": "Dobrodošli, {{name}}!",
