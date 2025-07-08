@@ -32,8 +32,9 @@ export class ResetPasswordModalComponent {
   }
 
   onSend(): void {
-    if (!this.localEmail) return;
-    this.send.emit(this.localEmail);
+    const trimmedEmail = this.localEmail.trim();
+    if (!trimmedEmail) return;
+    this.send.emit(trimmedEmail);
   }
 
   onClose(): void {
