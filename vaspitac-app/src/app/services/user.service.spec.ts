@@ -1,23 +1,33 @@
 import { TestBed } from '@angular/core/testing';
 import { UserService } from './user.service';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
+import { LoadingService } from './loading.service';
+import { TranslateService } from '@ngx-translate/core';
 import { of } from 'rxjs';
 import { UserProfile } from '../models/user-profile.model';
 
 describe('UserService', () => {
   let service: UserService;
   let afsSpy: jasmine.SpyObj<AngularFirestore>;
+  let loadingServiceSpy: jasmine.SpyObj<LoadingService>;
+  let translateServiceSpy: jasmine.SpyObj<TranslateService>;
   let docSpy: any;
 
   beforeEach(() => {
     docSpy = jasmine.createSpyObj('doc', ['valueChanges', 'set']);
     afsSpy = jasmine.createSpyObj('AngularFirestore', ['doc']);
+    loadingServiceSpy = jasmine.createSpyObj('LoadingService', ['showWithMessage', 'hide']);
+    translateServiceSpy = jasmine.createSpyObj('TranslateService', ['instant']);
+    
     afsSpy.doc.and.returnValue(docSpy);
+    translateServiceSpy.instant.and.returnValue('Loading profile...');
 
     TestBed.configureTestingModule({
       providers: [
         UserService,
         { provide: AngularFirestore, useValue: afsSpy },
+        { provide: LoadingService, useValue: loadingServiceSpy },
+        { provide: TranslateService, useValue: translateServiceSpy },
       ],
     });
     service = TestBed.inject(UserService);
@@ -38,6 +48,8 @@ describe('UserService', () => {
     docSpy.valueChanges.and.returnValue(of(profile));
     service.getUserProfile('1').subscribe(result => {
       expect(result).toEqual(profile);
+      expect(loadingServiceSpy.showWithMessage).toHaveBeenCalledWith('Loading profile...');
+      expect(loadingServiceSpy.hide).toHaveBeenCalled();
       done();
     });
     expect(afsSpy.doc).toHaveBeenCalledWith('users/1' as any);
@@ -47,6 +59,8 @@ describe('UserService', () => {
     docSpy.valueChanges.and.returnValue(of(undefined));
     service.getUserProfile('2').subscribe(result => {
       expect(result).toBeNull();
+      expect(loadingServiceSpy.showWithMessage).toHaveBeenCalledWith('Loading profile...');
+      expect(loadingServiceSpy.hide).toHaveBeenCalled();
       done();
     });
     expect(afsSpy.doc).toHaveBeenCalledWith('users/2' as any);

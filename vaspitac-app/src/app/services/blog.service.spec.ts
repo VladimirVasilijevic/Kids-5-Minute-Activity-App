@@ -5,14 +5,27 @@ import { mockFirestoreService } from '../../test-utils/mock-firestore-service';
 import { mockBlogPosts } from '../../test-utils/mock-blog-posts';
 
 import { FirestoreService } from './firestore.service';
+import { LoadingService } from './loading.service';
+import { TranslateService } from '@ngx-translate/core';
 import { BlogService } from './blog.service';
 
 describe('BlogService', () => {
   let service: BlogService;
+  let loadingServiceSpy: jasmine.SpyObj<LoadingService>;
+  let translateServiceSpy: jasmine.SpyObj<TranslateService>;
 
   beforeEach(() => {
+    loadingServiceSpy = jasmine.createSpyObj('LoadingService', ['showWithMessage', 'hide']);
+    translateServiceSpy = jasmine.createSpyObj('TranslateService', ['instant']);
+    translateServiceSpy.instant.and.returnValue('Loading blog posts...');
+
     TestBed.configureTestingModule({
-      providers: [BlogService, { provide: FirestoreService, useValue: mockFirestoreService }],
+      providers: [
+        BlogService, 
+        { provide: FirestoreService, useValue: mockFirestoreService },
+        { provide: LoadingService, useValue: loadingServiceSpy },
+        { provide: TranslateService, useValue: translateServiceSpy }
+      ],
     });
     service = TestBed.inject(BlogService);
     mockFirestoreService.getBlogPosts.calls.reset();

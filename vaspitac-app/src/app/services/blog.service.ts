@@ -1,7 +1,9 @@
 import { Injectable } from '@angular/core';
-import { Observable, map } from 'rxjs';
+import { Observable, map, tap } from 'rxjs';
+import { TranslateService } from '@ngx-translate/core';
 
 import { FirestoreService } from './firestore.service';
+import { LoadingService } from './loading.service';
 import { BlogPost } from '../models/blog-post.model';
 
 /**
@@ -10,25 +12,39 @@ import { BlogPost } from '../models/blog-post.model';
 @Injectable({ providedIn: 'root' })
 export class BlogService {
   /**
-   * Initializes the blog service with Firestore dependency
+   * Initializes the blog service with required dependencies
    * @param _firestoreService - Firestore service for data access
+   * @param _loadingService - Service for managing loading state
+   * @param _translateService - Service for internationalization
    */
-  constructor(private _firestoreService: FirestoreService) {}
+  constructor(
+    private _firestoreService: FirestoreService,
+    private _loadingService: LoadingService,
+    private _translateService: TranslateService
+  ) {}
 
   /**
-   * Retrieves all blog posts from Firestore
+   * Retrieves all blog posts from Firestore with loading indicator
    * @returns {Observable<BlogPost[]>} Observable of blog posts array
    */
   getBlogPosts(): Observable<BlogPost[]> {
-    return this._firestoreService.getBlogPosts();
+    this._loadingService.showWithMessage(this._translateService.instant('BLOG.LOADING'));
+    
+    return this._firestoreService.getBlogPosts().pipe(
+      tap(() => {
+        this._loadingService.hide();
+      })
+    );
   }
 
   /**
-   * Retrieves a specific blog post by its ID
+   * Retrieves a specific blog post by its ID with loading indicator
    * @param id - The ID of the blog post to retrieve
    * @returns {Observable<BlogPost>} Observable of the blog post
    */
   getBlogPostById(id: number): Observable<BlogPost> {
+    this._loadingService.showWithMessage(this._translateService.instant('BLOG.LOADING_SINGLE'));
+    
     return this._firestoreService.getBlogPosts().pipe(
       map(posts => {
         const post = posts.find(p => p.id === id);
@@ -36,6 +52,9 @@ export class BlogService {
           throw new Error(`Blog post with ID ${id} not found`);
         }
         return post;
+      }),
+      tap(() => {
+        this._loadingService.hide();
       })
     );
   }

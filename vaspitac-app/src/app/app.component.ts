@@ -11,6 +11,7 @@ import { UserProfile } from './models/user-profile.model';
 import { LanguageService } from './services/language.service';
 import { ActivityService } from './services/activity.service';
 import { BlogService } from './services/blog.service';
+import { LoadingService } from './services/loading.service';
 import { Activity } from './models/activity.model';
 import { BlogPost } from './models/blog-post.model';
 
@@ -32,6 +33,7 @@ export class AppComponent implements OnInit, OnDestroy {
 
   userProfile$: Observable<UserProfile | null> = of(null);
   showAuthModal = false;
+  loadingState$ = this._loadingService.loadingState$;
 
   /**
    * Initializes the app component with translation and routing services
@@ -39,6 +41,7 @@ export class AppComponent implements OnInit, OnDestroy {
    * @param router - Angular router for navigation
    * @param location - Location service for back navigation
    * @param languageService - Service for language management
+   * @param loadingService - Service for managing loading states
    */
   constructor(
     private translate: TranslateService,
@@ -47,6 +50,7 @@ export class AppComponent implements OnInit, OnDestroy {
     private _languageService: LanguageService,
     private _activityService: ActivityService,
     private _blogService: BlogService,
+    private _loadingService: LoadingService,
     private _auth: AuthService,
     private _userService: UserService
   ) {

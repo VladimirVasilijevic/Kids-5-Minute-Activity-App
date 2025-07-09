@@ -1,0 +1,125 @@
+<div class="splash-demo-container">
+  <div class="demo-header">
+    <h1>SplashScreen Demo</h1>
+    <p>Test different loading scenarios and see how the SplashScreen component works.</p>
+  </div>
+
+  <div class="demo-buttons">
+    <div class="button-group">
+      <h3>Basic Loading</h3>
+      <button 
+        class="demo-button primary"
+        (click)="showBasicLoading()"
+      >
+        Show Basic Loading
+      </button>
+      <p class="button-description">
+        Shows the splash screen with default settings.
+      </p>
+    </div>
+
+    <div class="button-group">
+      <h3>Custom Message</h3>
+      <button 
+        class="demo-button secondary"
+        (click)="showLoadingWithMessage()"
+      >
+        Show Loading with Message
+      </button>
+      <p class="button-description">
+        Shows the splash screen with a custom message.
+      </p>
+    </div>
+
+    <div class="button-group">
+      <h3>Without Spinner</h3>
+      <button 
+        class="demo-button tertiary"
+        (click)="showLoadingWithoutSpinner()"
+      >
+        Show Loading without Spinner
+      </button>
+      <p class="button-description">
+        Shows the splash screen without the spinning animation.
+      </p>
+    </div>
+
+    <div class="button-group">
+      <h3>Duration Loading</h3>
+      <button 
+        class="demo-button primary"
+        (click)="showLoadingForDuration()"
+      >
+        Show Loading for Duration
+      </button>
+      <p class="button-description">
+        Shows the splash screen for exactly 2.5 seconds using the duration method.
+      </p>
+    </div>
+
+    <div class="button-group">
+      <h3>Async Operation</h3>
+      <button 
+        class="demo-button secondary"
+        (click)="showLoadingWhileAsync()"
+      >
+        Show Loading with Async Operation
+      </button>
+      <p class="button-description">
+        Shows loading while executing an async operation that takes 2 seconds.
+      </p>
+    </div>
+
+    <div class="button-group">
+      <h3>Network Call Simulation</h3>
+      <button 
+        class="demo-button tertiary"
+        (click)="simulateNetworkCall()"
+      >
+        Simulate Network Call
+      </button>
+      <p class="button-description">
+        Simulates a network call with potential errors and shows loading during the process.
+      </p>
+    </div>
+
+    <div class="button-group">
+      <h3>Hide Splash Screen</h3>
+      <button 
+        class="demo-button primary"
+        (click)="hideSplashScreen()"
+      >
+        Hide Splash Screen
+      </button>
+      <p class="button-description">
+        Hides the splash screen to return to the demo page.
+      </p>
+    </div>
+  </div>
+
+  <div class="demo-info">
+    <h3>How to Use in Your Components</h3>
+    <div class="code-example">
+      <h4>1. Inject the LoadingService:</h4>
+      <pre><code>constructor(private _loadingService: LoadingService) {{ '{' }}{{ '}' }}</code></pre>
+      
+      <h4>2. Show loading during operations:</h4>
+      <pre><code>// Basic usage
+this._loadingService.show();
+// ... do work ...
+this._loadingService.hide();
+
+// With custom message
+this._loadingService.showWithMessage('Loading data...');
+
+// For async operations
+await this._loadingService.showWhile(
+  async () => {{ '{' }}
+    // Your async operation here
+    return result;
+  {{ '}' }},
+  'Processing...'
+);</code></pre>
+    </div>
+  </div>
+</div> 

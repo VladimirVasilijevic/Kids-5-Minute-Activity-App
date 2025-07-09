@@ -1,0 +1,28 @@
+<div 
+  *ngIf="isVisible" 
+  class="splash-screen"
+  [@fadeInOut]
+>
+  <div class="splash-content">
+    <div class="logo-container">
+      <div class="logo-background">
+        <img 
+          src="assets/android-chrome-192x192.png" 
+          alt="Ana Vaspitac Logo" 
+          class="logo-image"
+        />
+      </div>
+    </div>
+    
+    <div class="text-content">
+      <h1 class="welcome-title">{{ getWelcomeMessage() }}</h1>
+      <p class="welcome-subtitle" [@quoteFade]="quoteAnimationState">
+        {{ getDisplayMessage() }}
+      </p>
+    </div>
+    
+    <div *ngIf="showSpinner" class="spinner-container">
+      <div class="spinner"></div>
+    </div>
+  </div>
+</div> 

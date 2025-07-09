@@ -4,21 +4,32 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { UserProfile } from '../models/user-profile.model';
-import { Observable } from 'rxjs';
+import { Observable, tap } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { TranslateService } from '@ngx-translate/core';
+import { LoadingService } from './loading.service';
 
 @Injectable({ providedIn: 'root' })
 export class UserService {
-  constructor(private _afs: AngularFirestore) {}
+  constructor(
+    private _afs: AngularFirestore,
+    private _loadingService: LoadingService,
+    private _translateService: TranslateService
+  ) {}
 
   /**
-   * Get a user profile by UID
+   * Get a user profile by UID with loading indicator
    * @param uid - Firebase Auth UID
    * @returns Observable of UserProfile or null
    */
   getUserProfile(uid: string): Observable<UserProfile | null> {
+    this._loadingService.showWithMessage(this._translateService.instant('PROFILE.LOADING'));
+    
     return this._afs.doc<UserProfile>(`users/${uid}`).valueChanges().pipe(
-      map(profile => profile ?? null)
+      map(profile => profile ?? null),
+      tap(() => {
+        this._loadingService.hide();
+      })
     );
   }
 

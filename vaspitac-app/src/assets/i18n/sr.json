@@ -41,7 +41,9 @@
     "BACK": "Nazad na početnu",
     "EMPTY": "Nema dostupnih aktivnosti.",
     "START": "Započni aktivnost",
-    "ALL": "Sve"
+    "ALL": "Sve",
+    "LOADING": "Učitavanje aktivnosti...",
+    "LOADING_SINGLE": "Učitavanje aktivnosti..."
   },
   "ACTIVITY": {
     "VIDEO_NOT_AVAILABLE": "Video nije dostupan",
@@ -128,7 +130,9 @@
     "POST2_AUTHOR": "Marko Petrović",
     "POST3_TITLE": "Kako razviti ljubav prema čitanju",
     "POST3_EXCERPT": "Čitanje je temelj obrazovanja. Evo kako možete da inspirišete dete da zavoli knjige.",
-    "POST3_AUTHOR": "Jelena Stojanović"
+    "POST3_AUTHOR": "Jelena Stojanović",
+    "LOADING": "Učitavanje blog članaka...",
+    "LOADING_SINGLE": "Učitavanje blog članka..."
   },
   "TIPS": {
     "BACK": "Nazad na početnu",
@@ -144,7 +148,8 @@
     "TIP3_DESC": "Svaki napredak je važan. Pohvaljivanje motiviše dete i gradi samopoštovanje.",
     "TIP4_TITLE": "Budite kreativni",
     "TIP4_DESC": "Koristite svakodnevne situacije za učenje. Brojanje prilikom kuvanja, boje tokom šetnje...",
-    "EMPTY": "Nema dostupnih saveta."
+    "EMPTY": "Nema dostupnih saveta.",
+    "LOADING": "Učitavanje saveta..."
   },
   "SEARCH": {
     "PLACEHOLDER": "Pretražite aktivnosti i blogove...",
@@ -199,24 +204,25 @@
     "CHANGE_PASSWORD": "Promeni Lozinku",
     "CHANGE_PASSWORD_TITLE": "Promeni lozinku",
     "CURRENT_PASSWORD": "Trenutna lozinka",
-    "CURRENT_PASSWORD_PLACEHOLDER": "Unesite trenutnu lozinku",
+    "CURRENT_PASSWORD_PLACEHOLDER": "Unesite vašu trenutnu lozinku",
     "ERROR_CURRENT_PASSWORD_REQUIRED": "Trenutna lozinka je obavezna",
     "NEW_PASSWORD": "Nova lozinka",
-    "NEW_PASSWORD_PLACEHOLDER": "Unesite novu lozinku",
+    "NEW_PASSWORD_PLACEHOLDER": "Unesite vašu novu lozinku",
     "ERROR_PASSWORD_MINLENGTH": "Lozinka mora imati najmanje 6 karaktera",
     "CONFIRM_PASSWORD": "Potvrdi lozinku",
-    "CONFIRM_PASSWORD_PLACEHOLDER": "Ponovo unesite novu lozinku",
+    "CONFIRM_PASSWORD_PLACEHOLDER": "Ponovo unesite vašu novu lozinku",
     "ERROR_PASSWORD_MISMATCH": "Lozinke se ne poklapaju",
-    "NO_USER": "Profil korisnika nije pronađen. Molimo prijavite se.",
-    "EDIT_TITLE": "Izmeni profil",
-    "CHANGE_AVATAR": "Promeni avatar",
-    "REMOVE_AVATAR": "Ukloni avatar",
+    "NO_USER": "Korisnički profil nije pronađen. Molimo prijavite se.",
+    "EDIT_TITLE": "Izmeni Profil",
+    "CHANGE_AVATAR": "Promeni Avatar",
+    "REMOVE_AVATAR": "Ukloni Avatar",
     "NAME": "Ime",
     "NAME_PLACEHOLDER": "Unesite vaše ime",
     "ERROR_NAME_REQUIRED": "Ime je obavezno",
-    "ERROR_NO_EMAIL": "Nije pronađena email adresa korisnika. Prijavite se ponovo.",
+    "ERROR_NO_EMAIL": "Email adresa korisnika nije pronađena. Molimo prijavite se ponovo.",
     "RESET_PASSWORD_SUCCESS": "Email za resetovanje lozinke je poslat! Proverite vaš inbox.",
-    "ERROR_RESET_PASSWORD": "Došlo je do greške pri slanju emaila za reset lozinke. Pokušajte ponovo."
+    "ERROR_RESET_PASSWORD": "Došlo je do greške prilikom slanja email-a za resetovanje lozinke. Pokušajte ponovo.",
+    "LOADING": "Učitavanje profila..."
   },
   "COMMON": {
     "CANCEL": "Otkaži",

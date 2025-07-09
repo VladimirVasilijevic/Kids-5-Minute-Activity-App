@@ -41,7 +41,9 @@
     "BACK": "Back to home",
     "EMPTY": "No activities available.",
     "START": "Start Activity",
-    "ALL": "All"
+    "ALL": "All",
+    "LOADING": "Loading activities...",
+    "LOADING_SINGLE": "Loading activity..."
   },
   "ACTIVITY": {
     "VIDEO_NOT_AVAILABLE": "Video not available",
@@ -128,7 +130,9 @@
     "POST3_TITLE": "How to develop a love for reading",
     "POST3_EXCERPT": "Reading is the foundation of education. Here's how you can inspire your child to love books.",
     "POST3_AUTHOR": "Jelena Stojanovic",
-    "BACK": "Back to home"
+    "BACK": "Back to home",
+    "LOADING": "Loading blog posts...",
+    "LOADING_SINGLE": "Loading blog post..."
   },
   "TIPS": {
     "TITLE": "Tips",
@@ -144,7 +148,8 @@
     "BACK": "Back to home",
     "QUICK_TITLE": "Quick Tips",
     "QUICK_SUBTITLE": "Simple tips for every day",
-    "EMPTY": "No tips available."
+    "EMPTY": "No tips available.",
+    "LOADING": "Loading tips..."
   },
   "SEARCH": {
     "PLACEHOLDER": "Search activities and blogs...",
@@ -216,7 +221,8 @@
     "ERROR_NAME_REQUIRED": "Name is required",
     "ERROR_NO_EMAIL": "User email address not found. Please log in again.",
     "RESET_PASSWORD_SUCCESS": "Password reset email has been sent! Check your inbox.",
-    "ERROR_RESET_PASSWORD": "An error occurred while sending the password reset email. Please try again."
+    "ERROR_RESET_PASSWORD": "An error occurred while sending the password reset email. Please try again.",
+    "LOADING": "Loading profile..."
   },
   "COMMON": {
     "CANCEL": "Cancel",

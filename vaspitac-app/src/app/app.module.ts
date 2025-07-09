@@ -46,6 +46,8 @@ import { ProfileComponent } from './components/profile/profile.component';
 import { UserCardComponent } from './components/user-card/user-card.component';
 import { EditProfileModalComponent } from './components/profile/edit-profile-modal.component';
 import { ResetPasswordModalComponent } from './components/auth-modal/reset-password-modal.component';
+import { SplashScreenComponent } from './components/splash-screen/splash-screen.component';
+import { SplashDemoComponent } from './components/splash-demo/splash-demo.component';
 
 // AoT requires an exported function for factories
 /**
@@ -80,6 +82,8 @@ export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
     UserCardComponent,
     EditProfileModalComponent,
     ResetPasswordModalComponent,
+    SplashScreenComponent,
+    SplashDemoComponent,
   ],
   imports: [
     BrowserModule,
@@ -97,6 +101,7 @@ export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
       { path: 'blog/:id', component: BlogDetailComponent },
       { path: 'tips', component: TipsComponent },
       { path: 'profile', component: ProfileComponent },
+      { path: 'splash-demo', component: SplashDemoComponent },
       { path: '**', redirectTo: '' },
     ]),
     TranslateModule.forRoot({

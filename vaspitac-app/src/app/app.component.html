@@ -86,6 +86,13 @@
 
 <app-auth-modal [isOpen]="showAuthModal" (close)="closeAuthModal()"></app-auth-modal>
 
+<!-- Splash Screen -->
+<app-splash-screen
+  [isVisible]="(loadingState$ | async)?.isVisible || false"
+  [message]="(loadingState$ | async)?.message || ''"
+  [showSpinner]="(loadingState$ | async)?.showSpinner || true"
+></app-splash-screen>
+
 <main class="main-content px-4 py-4 md:py-6">
   <router-outlet></router-outlet>
 </main>
