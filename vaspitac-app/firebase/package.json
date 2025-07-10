@@ -1,0 +1,13 @@
+{
+  "name": "firebase",
+  "version": "1.0.0",
+  "description": "This guide sets up Firebase for user roles and permissions with scripts to create users with different roles.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs"
+}

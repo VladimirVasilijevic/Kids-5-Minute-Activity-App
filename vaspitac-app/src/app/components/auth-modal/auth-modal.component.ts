@@ -5,7 +5,7 @@
 import { Component, EventEmitter, Output, Input } from '@angular/core';
 import { AuthService } from '../../services/auth.service';
 import { UserService } from '../../services/user.service';
-import { UserProfile } from '../../models/user-profile.model';
+import { UserProfile, UserRole, Permission } from '../../models/user-profile.model';
 import { TranslateService } from '@ngx-translate/core';
 
 /**
@@ -84,7 +84,9 @@ export class AuthModalComponent {
             displayName: this.name,
             email: this.email,
             avatarUrl: user.photoURL || '',
-            createdAt: new Date().toISOString()
+            createdAt: new Date().toISOString(),
+            role: UserRole.FREE_USER,
+            permissions: [Permission.VIEW_PROFILE, Permission.EDIT_PROFILE]
           };
           await this._userService.setUserProfile(profile);
         }

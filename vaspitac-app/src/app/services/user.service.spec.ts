@@ -4,7 +4,7 @@ import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { LoadingService } from './loading.service';
 import { TranslateService } from '@ngx-translate/core';
 import { of } from 'rxjs';
-import { UserProfile } from '../models/user-profile.model';
+import { mockFreeUser } from '../../test-utils/mock-user-profiles';
 
 describe('UserService', () => {
   let service: UserService;
@@ -38,16 +38,9 @@ describe('UserService', () => {
   });
 
   it('should get user profile as observable', (done) => {
-    const profile: UserProfile = {
-      uid: '1',
-      displayName: 'Test',
-      email: 'test@test.com',
-      avatarUrl: '',
-      createdAt: '2023-01-01',
-    };
-    docSpy.valueChanges.and.returnValue(of(profile));
+    docSpy.valueChanges.and.returnValue(of(mockFreeUser));
     service.getUserProfile('1').subscribe(result => {
-      expect(result).toEqual(profile);
+      expect(result).toEqual(mockFreeUser);
       expect(loadingServiceSpy.showWithMessage).toHaveBeenCalledWith('Loading profile...');
       expect(loadingServiceSpy.hide).toHaveBeenCalled();
       done();
@@ -67,16 +60,9 @@ describe('UserService', () => {
   });
 
   it('should set user profile in Firestore', async () => {
-    const profile: UserProfile = {
-      uid: '1',
-      displayName: 'Test',
-      email: 'test@test.com',
-      avatarUrl: '',
-      createdAt: '2023-01-01',
-    };
     docSpy.set.and.returnValue(Promise.resolve());
-    await service.setUserProfile(profile);
+    await service.setUserProfile(mockFreeUser);
     expect(afsSpy.doc).toHaveBeenCalledWith('users/1' as any);
-    expect(docSpy.set).toHaveBeenCalledWith(profile, { merge: true });
+    expect(docSpy.set).toHaveBeenCalledWith(mockFreeUser, { merge: true });
   });
 }); 

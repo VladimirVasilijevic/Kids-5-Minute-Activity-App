@@ -1,5 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { HttpClientModule } from '@angular/common/http';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { of } from 'rxjs';
 
 import { SplashScreenComponent } from './splash-screen.component';
@@ -18,7 +20,11 @@ describe('SplashScreenComponent', () => {
 
     await TestBed.configureTestingModule({
       declarations: [SplashScreenComponent],
-      imports: [TranslateModule.forRoot()],
+      imports: [
+        TranslateModule.forRoot(),
+        HttpClientModule,
+        NoopAnimationsModule
+      ],
       providers: [
         { provide: TranslateService, useValue: translateServiceSpy }
       ]
@@ -90,11 +96,11 @@ describe('SplashScreenComponent', () => {
   it('should display default subtitle when no custom message is provided', () => {
     component.isVisible = true;
     component.message = '';
-    translateService.instant.and.returnValue('Default Subtitle');
+    translateService.instant.and.returnValue('Loading...');
     fixture.detectChanges();
     
     const subtitleElement = fixture.nativeElement.querySelector('.welcome-subtitle');
-    expect(subtitleElement.textContent.trim()).toBe('Default Subtitle');
+    expect(subtitleElement.textContent.trim()).toBe('Loading...');
   });
 
   it('should call getWelcomeMessage and return text from quotes', () => {
@@ -129,11 +135,11 @@ describe('SplashScreenComponent', () => {
 
   it('should return default subtitle when no custom message', () => {
     component.message = '';
-    translateService.instant.and.returnValue('Default subtitle');
+    translateService.instant.and.returnValue('Loading...');
     
     const result = component.getDisplayMessage();
     
-    expect(result).toBe('Default subtitle');
+    expect(result).toBe('Loading...');
   });
 
   it('should emit hideSplash event when called', () => {

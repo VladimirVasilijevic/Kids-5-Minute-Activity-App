@@ -64,9 +64,13 @@ describe('LoadingService', () => {
       showSpinner: true
     };
 
+    let emissionCount = 0;
     service.loadingState$.subscribe(state => {
-      expect(state).toEqual(expectedState);
-      done();
+      emissionCount++;
+      if (emissionCount === 2) { // Skip initial state, check the one after showWithMessage
+        expect(state).toEqual(expectedState);
+        done();
+      }
     });
 
     service.showWithMessage('Test message');
@@ -137,15 +141,23 @@ describe('LoadingService', () => {
   it('should maintain state consistency across multiple subscribers', (done) => {
     let subscriber1Called = false;
     let subscriber2Called = false;
+    let emissionCount1 = 0;
+    let emissionCount2 = 0;
     
     service.loadingState$.subscribe(state => {
-      subscriber1Called = true;
-      expect(state.isVisible).toBe(true);
+      emissionCount1++;
+      if (emissionCount1 === 2) { // Skip initial state
+        subscriber1Called = true;
+        expect(state.isVisible).toBe(true);
+      }
     });
     
     service.loadingState$.subscribe(state => {
-      subscriber2Called = true;
-      expect(state.isVisible).toBe(true);
+      emissionCount2++;
+      if (emissionCount2 === 2) { // Skip initial state
+        subscriber2Called = true;
+        expect(state.isVisible).toBe(true);
+      }
     });
     
     service.show();

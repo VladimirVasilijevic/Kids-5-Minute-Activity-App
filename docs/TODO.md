@@ -268,39 +268,106 @@ TODO: Implement user profile page <!-- id: task-027 -->
 - [ ] Option to reset profile  
 - [ ] Unit tests for profile logic
 
-TODO: Add admin authentication and role-based access <!-- id: task-028 -->
+TODO: Implement comprehensive user role and permission system <!-- id: task-028 -->
 **Acceptance Criteria**  
-- [ ] Google and email/password login for admin users  
-- [ ] Admin role restricts access to content editing features  
-- [ ] Non-admin users cannot access edit screens  
-- [ ] Unit tests for auth and role logic
+- [x] UserProfile model extended with role, permissions, and subscription fields
+- [x] PermissionService created with role-based access control methods
+- [x] SubscriptionService created for subscription management and payment processing
+- [x] PermissionGuard created for route protection based on permissions
+- [x] Translation keys added for subscription and permission messages
+- [ ] Update existing components to use permission checks for premium content
+- [ ] Update UserService to handle new UserProfile structure with roles and permissions
+- [ ] Update AuthService to assign default roles and permissions on user registration
+- [ ] Unit tests updated for all services with new permission system
+- [ ] Integration tests for permission-based content access
 
-TODO: Implement admin-only content editor for activities/blog/tips <!-- id: task-029 -->
+TODO: Configure Firebase for user roles and subscription management <!-- id: task-029 -->
 **Acceptance Criteria**  
-- [ ] Admins can add/edit/delete activities, blog posts, and tips  
-- [ ] Changes sync to Firestore  
-- [ ] Editor UI is mobile-friendly  
-- [ ] Unit tests for editor logic
+- [x] Firestore security rules updated to enforce role-based access
+- [x] User profiles collection structure updated to include role, permissions, and subscription data
+- [x] Firestore indexes created for efficient user queries by role and subscription status
+- [x] Firebase Authentication configured with custom claims for admin users
+- [x] Cloud Functions created for subscription status updates and permission management
+- [x] Firebase Storage rules updated to restrict premium content access
+- [x] Real-time database rules configured for subscription status synchronization
+- [x] Firebase Analytics events added for subscription conversions and permission checks
 
-TODO: Add backend logic for advanced features <!-- id: task-030 -->
+TODO: Implement subscription management UI and payment integration <!-- id: task-030 -->
 **Acceptance Criteria**  
-- [ ] Cloud Functions or backend for moderation, analytics, or notifications  
-- [ ] Secure endpoints for admin actions  
-- [ ] Document backend endpoints and usage
+- [ ] Subscription plans page with pricing and feature comparison
+- [ ] Payment integration with PayPal, Stripe, or local payment methods
+- [ ] Subscription status display in user profile
+- [ ] Subscription management (cancel, renew, upgrade) functionality
+- [ ] Trial period implementation with automatic expiration
+- [ ] Subscription upgrade/downgrade flow with proration handling
+- [ ] Payment failure handling and retry mechanisms
+- [ ] Receipt generation and email notifications for payments
+- [ ] Unit tests for payment processing and subscription logic
 
-TODO: Add E2E tests for admin/content flows <!-- id: task-031 -->
+TODO: Implement admin-only content editor for activities/blog/tips <!-- id: task-031 -->
+**Acceptance Criteria**  
+- [ ] Admin dashboard with content management interface
+- [ ] Content editor for activities, blog posts, and tips with rich text support
+- [ ] Media upload functionality for images and videos
+- [ ] Content preview and publishing workflow
+- [ ] Content versioning and rollback capabilities
+- [ ] Bulk content operations (import, export, delete)
+- [ ] Content moderation tools and approval workflow
+- [ ] Analytics dashboard for content performance
+- [ ] Mobile-responsive admin interface
+- [ ] Unit tests for admin content management logic
+
+TODO: Implement premium content access and download functionality <!-- id: task-032 -->
+**Acceptance Criteria**  
+- [ ] Premium content indicators and upgrade prompts throughout the app
+- [ ] Download functionality for PDF guides and video materials
+- [ ] Offline access to premium content for subscribers
+- [ ] Content access logging and analytics
+- [ ] Premium content filtering and search functionality
+- [ ] Content recommendation system based on subscription level
+- [ ] Progressive content unlocking based on user engagement
+- [ ] Unit tests for premium content access and download logic
+
+TODO: Add comprehensive testing for permission and subscription system <!-- id: task-033 -->
+**Acceptance Criteria**  
+- [ ] Unit tests for PermissionService with all permission scenarios
+- [ ] Unit tests for SubscriptionService with payment and subscription lifecycle
+- [ ] Unit tests for PermissionGuard with route protection scenarios
+- [ ] Integration tests for user registration with role assignment
+- [ ] Integration tests for subscription creation and management
+- [ ] E2E tests for premium content access and upgrade flows
+- [ ] E2E tests for admin content management workflows
+- [ ] Performance tests for permission checking under load
+- [ ] Security tests for permission bypass attempts
+- [ ] Code coverage > 90% for permission and subscription modules
+
+TODO: Add backend logic for advanced features <!-- id: task-034 -->
+**Acceptance Criteria**  
+- [ ] Cloud Functions for subscription webhook processing and payment validation
+- [ ] Cloud Functions for automatic permission updates based on subscription changes
+- [ ] Cloud Functions for admin user management and role assignment
+- [ ] Cloud Functions for content moderation and approval workflows
+- [ ] Secure endpoints for admin actions with proper authentication
+- [ ] Document backend endpoints and usage with OpenAPI/Swagger
+- [ ] Unit tests for Cloud Functions with proper mocking
+
+TODO: Add E2E tests for admin/content flows <!-- id: task-035 -->
 **Acceptance Criteria**  
 - [ ] E2E tests for admin login, content editing, and publishing  
-- [ ] Tests run in CI  
+- [ ] E2E tests for subscription management and payment flows
+- [ ] E2E tests for permission-based content access and restrictions
+- [ ] Tests run in CI with proper test data setup
 - [ ] Coverage > 80% for E2E flows
 
-TODO: Integrate error monitoring and reporting <!-- id: task-032 -->
+TODO: Integrate error monitoring and reporting <!-- id: task-036 -->
 **Acceptance Criteria**  
 - [ ] Integrate Sentry or similar for error tracking  
-- [ ] Errors are logged with user context (if available)  
-- [ ] Alerts for critical failures
+- [ ] Errors are logged with user context (role, subscription status)  
+- [ ] Alerts for critical failures in payment processing
+- [ ] Alerts for permission system failures
+- [ ] Performance monitoring for permission checking operations
 
-TODO: Improve code documentation and enforce TypeScript code style <!-- id: task-033 -->
+TODO: Improve code documentation and enforce TypeScript code style <!-- id: task-037 -->
 **Acceptance Criteria**  
 - [x] Add JSDoc comments to all public functions/classes  
 - [x] Enforce code style with ESLint/TSLint and Prettier  

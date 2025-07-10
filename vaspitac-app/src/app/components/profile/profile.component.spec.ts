@@ -7,6 +7,8 @@ import { of, Subject, Observable } from 'rxjs';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { AngularFireModule } from '@angular/fire/compat';
 import { TranslateService, TranslateModule } from '@ngx-translate/core';
+import { UserProfile, UserRole, Permission } from '../../models/user-profile.model';
+import { mockFreeUser, mockSubscriber, mockTrialUser, mockAdminUser } from '../../../test-utils/mock-user-profiles';
 
 // Mock TranslateService class
 class MockTranslateService {
@@ -98,13 +100,12 @@ describe('ProfileComponent', () => {
   }));
 
   it('should display user profile if logged in', fakeAsync(() => {
-    const user = { uid: '1', displayName: 'Test', email: 'test@test.com', avatarUrl: '', createdAt: '2023-01-01' };
-    userServiceSpy.getUserProfile.and.returnValue(of(user));
+    userServiceSpy.getUserProfile.and.returnValue(of(mockFreeUser));
     fixture.detectChanges();
     userSubject.next({ uid: '1' });
     tick();
     component.userProfile$.subscribe(profile => {
-      expect(profile).toEqual(user);
+      expect(profile).toEqual(mockFreeUser);
     });
   }));
 
@@ -153,8 +154,7 @@ describe('ProfileComponent', () => {
     });
 
     it('should send password reset email successfully', async () => {
-      const mockUser = { uid: '1', displayName: 'Test', email: 'test@test.com', avatarUrl: '', createdAt: '2023-01-01' };
-      userServiceSpy.getUserProfile.and.returnValue(of(mockUser));
+      userServiceSpy.getUserProfile.and.returnValue(of(mockFreeUser));
       authServiceSpy.sendPasswordResetEmail.and.returnValue(Promise.resolve());
       
       fixture.detectChanges();
@@ -169,8 +169,7 @@ describe('ProfileComponent', () => {
     });
 
     it('should handle password reset error', async () => {
-      const mockUser = { uid: '1', displayName: 'Test', email: 'test@test.com', avatarUrl: '', createdAt: '2023-01-01' };
-      userServiceSpy.getUserProfile.and.returnValue(of(mockUser));
+      userServiceSpy.getUserProfile.and.returnValue(of(mockFreeUser));
       authServiceSpy.sendPasswordResetEmail.and.returnValue(Promise.reject(new Error('Network error')));
       
       fixture.detectChanges();
@@ -220,15 +219,14 @@ describe('ProfileComponent', () => {
     });
 
     it('should set loading to false after user profile is loaded', fakeAsync(() => {
-      const mockUser = { uid: '1', displayName: 'Test', email: 'test@test.com', avatarUrl: '', createdAt: '2023-01-01' };
-      userServiceSpy.getUserProfile.and.returnValue(of(mockUser));
+      userServiceSpy.getUserProfile.and.returnValue(of(mockFreeUser));
       
       fixture.detectChanges();
       userSubject.next({ uid: '1' });
       tick();
       
       expect(component.isLoading).toBe(false);
-      expect(component.selectedUser).toEqual(mockUser);
+      expect(component.selectedUser).toEqual(mockFreeUser);
     }));
 
     it('should handle user profile loading error gracefully', fakeAsync(() => {
