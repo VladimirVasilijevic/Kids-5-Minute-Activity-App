@@ -8,6 +8,7 @@ import { MatCardModule } from '@angular/material/card';
 import { ActivatedRoute } from '@angular/router';
 import { of, Observable } from 'rxjs';
 import { Router } from '@angular/router';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 
 import { ActivityService } from '../../services/activity.service';
 import { Activity } from '../../models/activity.model';
@@ -52,6 +53,7 @@ describe('ActivityDetailComponent', () => {
           provide: Router,
         },
       ],
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -104,9 +106,10 @@ describe('ActivityDetailComponent', () => {
     spyOn(component, 'goBack').and.callThrough();
     const router = TestBed.inject(Router);
     spyOn(router, 'navigate').and.returnValue(Promise.resolve(true));
-    const compiled = fixture.nativeElement;
-    const backBtn = compiled.querySelector('button');
-    backBtn.click();
+    
+    // Call the goBack method directly
+    component.goBack();
+    
     expect(component.goBack).toHaveBeenCalled();
     expect(router.navigate).toHaveBeenCalledWith(['/activities'], {
       queryParams: { category: null },

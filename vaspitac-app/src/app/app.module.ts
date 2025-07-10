@@ -3,7 +3,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 // Firebase imports
 import { AngularFireModule } from '@angular/fire/compat';
@@ -32,7 +32,6 @@ import { AppComponent } from './app.component';
 import { HomeComponent } from './components/home/home.component';
 import { ActivityListComponent } from './components/activity-list/activity-list.component';
 import { ActivityDetailComponent } from './components/activity-detail/activity-detail.component';
-import { SettingsComponent } from './components/settings/settings.component';
 import { ShopComponent } from './components/shop/shop.component';
 import { AboutComponent } from './components/about/about.component';
 import { BlogComponent } from './components/blog/blog.component';
@@ -48,6 +47,10 @@ import { EditProfileModalComponent } from './components/profile/edit-profile-mod
 import { ResetPasswordModalComponent } from './components/auth-modal/reset-password-modal.component';
 import { SplashScreenComponent } from './components/splash-screen/splash-screen.component';
 import { SplashDemoComponent } from './components/splash-demo/splash-demo.component';
+import { AdminDashboardComponent } from './components/admin/admin-dashboard.component';
+import { AdminActivitiesComponent } from './components/admin/admin-activities.component';
+import { AdminBlogsComponent } from './components/admin/admin-blogs.component';
+import { BackButtonComponent } from './components/back-button/back-button.component';
 
 // AoT requires an exported function for factories
 /**
@@ -68,7 +71,6 @@ export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
     HomeComponent,
     ActivityListComponent,
     ActivityDetailComponent,
-    SettingsComponent,
     ShopComponent,
     AboutComponent,
     BlogComponent,
@@ -84,17 +86,21 @@ export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
     ResetPasswordModalComponent,
     SplashScreenComponent,
     SplashDemoComponent,
+    AdminDashboardComponent,
+    AdminActivitiesComponent,
+    AdminBlogsComponent,
+    BackButtonComponent,
   ],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
     HttpClientModule,
     FormsModule,
+    ReactiveFormsModule,
     RouterModule.forRoot([
       { path: '', component: HomeComponent },
       { path: 'activities', component: ActivityListComponent },
       { path: 'activity/:id', component: ActivityDetailComponent },
-      { path: 'settings', component: SettingsComponent },
       { path: 'shop', component: ShopComponent },
       { path: 'about', component: AboutComponent },
       { path: 'blog', component: BlogComponent },
@@ -102,6 +108,9 @@ export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
       { path: 'tips', component: TipsComponent },
       { path: 'profile', component: ProfileComponent },
       { path: 'splash-demo', component: SplashDemoComponent },
+      { path: 'admin', component: AdminDashboardComponent },
+      { path: 'admin/activities', component: AdminActivitiesComponent },
+      { path: 'admin/blogs', component: AdminBlogsComponent },
       { path: '**', redirectTo: '' },
     ]),
     TranslateModule.forRoot({

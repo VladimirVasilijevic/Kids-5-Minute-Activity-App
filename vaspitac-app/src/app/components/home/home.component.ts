@@ -104,4 +104,20 @@ export class HomeComponent implements OnInit {
   onLogout(): void {
     this._auth.signOut();
   }
+
+  /**
+   * Navigate to admin dashboard
+   */
+  navigateToAdmin(): void {
+    this._router.navigate(['/admin']);
+  }
+
+  /**
+   * Checks if the current user has admin privileges
+   * @param userProfile - The user profile to check
+   * @returns True if user is admin, false otherwise
+   */
+  isAdmin(userProfile: UserProfile | null): boolean {
+    return userProfile?.role === 'admin';
+  }
 }

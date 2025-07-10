@@ -1,15 +1,10 @@
 <div class="max-w-2xl mx-auto px-4 py-6">
   <!-- Header -->
   <div class="flex items-center justify-between mb-6">
-    <button 
-      (click)="goBack()"
-      class="flex items-center text-green-600 hover:text-green-700 transition-colors"
-    >
-      <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
-      </svg>
-      {{ 'PROFILE.BACK' | translate }}
-    </button>
+    <app-back-button
+      [label]="'PROFILE.BACK' | translate"
+      (back)="goBack()"
+    ></app-back-button>
     <h1 class="text-2xl font-bold text-green-800">{{ 'PROFILE.TITLE' | translate }}</h1>
     <button 
       (click)="onLogout()"

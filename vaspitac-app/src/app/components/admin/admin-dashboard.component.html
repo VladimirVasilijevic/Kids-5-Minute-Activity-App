@@ -1,0 +1,135 @@
+<!-- Admin Access Check -->
+<ng-container *ngIf="userProfile$ | async as userProfile">
+  <div *ngIf="!isAdmin(userProfile)" class="min-h-screen bg-gray-50 flex items-center justify-center p-4 sm:p-6">
+    <div class="text-center">
+      <h1 class="text-xl sm:text-2xl font-bold text-red-600 mb-4">{{ 'ADMIN.ACCESS_DENIED' | translate }}</h1>
+      <p class="text-gray-600 mb-6">{{ 'ADMIN.ACCESS_DENIED_MESSAGE' | translate }}</p>
+      <button 
+        (click)="navigateToHome()"
+        class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg w-full max-w-xs mx-auto"
+      >
+        {{ 'COMMON.BACK_TO_HOME' | translate }}
+      </button>
+      <!-- Debug info -->
+      <div class="mt-6 p-4 bg-yellow-100 text-yellow-800 rounded text-left text-xs sm:text-sm overflow-x-auto">
+        <div><strong>Debug info:</strong></div>
+        <div>User profile: <pre>{{ userProfile | json }}</pre></div>
+        <div>User role: <strong>{{ userProfile?.role || 'none' }}</strong></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Admin Dashboard Content -->
+  <div *ngIf="isAdmin(userProfile)" class="min-h-screen bg-gray-50 p-2 sm:p-4 md:p-6">
+    <div class="max-w-7xl mx-auto">
+      <!-- Header -->
+      <div class="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 mb-6 sm:mb-8">
+        <app-back-button
+          [label]="'ADMIN.BACK_TO_HOME' | translate"
+          (back)="navigateToHome()"
+        ></app-back-button>
+        <div>
+          <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">{{ 'ADMIN.DASHBOARD_TITLE' | translate }}</h1>
+          <p class="text-gray-600 mt-1 sm:mt-2 text-sm sm:text-base">{{ 'ADMIN.DASHBOARD_SUBTITLE' | translate }}</p>
+        </div>
+      </div>
+
+      <!-- Stats Cards -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
+        <!-- Total Blogs Card -->
+        <div class="bg-white rounded-lg shadow p-4 sm:p-6 flex flex-col justify-between min-h-[120px]">
+          <div class="flex items-center justify-between mb-2 sm:mb-4">
+            <h3 class="text-xs sm:text-sm font-medium text-gray-600">{{ 'ADMIN.TOTAL_BLOGS' | translate }}</h3>
+            <svg class="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+            </svg>
+          </div>
+          <div class="text-xl sm:text-2xl font-bold text-gray-900">{{ stats.totalBlogs }}</div>
+          <p class="text-xs text-gray-500 mt-1">
+            {{ stats.publishedBlogs }} {{ 'ADMIN.PUBLISHED' | translate }}
+          </p>
+        </div>
+
+        <!-- Total Activities Card -->
+        <div class="bg-white rounded-lg shadow p-4 sm:p-6 flex flex-col justify-between min-h-[120px]">
+          <div class="flex items-center justify-between mb-2 sm:mb-4">
+            <h3 class="text-xs sm:text-sm font-medium text-gray-600">{{ 'ADMIN.TOTAL_ACTIVITIES' | translate }}</h3>
+            <svg class="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+          </div>
+          <div class="text-xl sm:text-2xl font-bold text-gray-900">{{ stats.totalActivities }}</div>
+          <p class="text-xs text-gray-500 mt-1">
+            {{ 'ADMIN.CRAFT_ACTIVITIES' | translate }}
+          </p>
+        </div>
+
+        <!-- Total Users Card -->
+        <div class="bg-white rounded-lg shadow p-4 sm:p-6 flex flex-col justify-between min-h-[120px]">
+          <div class="flex items-center justify-between mb-2 sm:mb-4">
+            <h3 class="text-xs sm:text-sm font-medium text-gray-600">{{ 'ADMIN.TOTAL_USERS' | translate }}</h3>
+            <svg class="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+              <circle cx="9" cy="7" r="4" />
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+              <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+            </svg>
+          </div>
+          <div class="text-xl sm:text-2xl font-bold text-gray-900">{{ stats.totalUsers }}</div>
+          <p class="text-xs text-gray-500 mt-1">
+            {{ 'ADMIN.REGISTERED_USERS' | translate }}
+          </p>
+        </div>
+
+        <!-- Engagement Card -->
+        <div class="bg-white rounded-lg shadow p-4 sm:p-6 flex flex-col justify-between min-h-[120px]">
+          <div class="flex items-center justify-between mb-2 sm:mb-4">
+            <h3 class="text-xs sm:text-sm font-medium text-gray-600">{{ 'ADMIN.ENGAGEMENT' | translate }}</h3>
+            <svg class="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M3 3v18h18" />
+              <path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3" />
+            </svg>
+          </div>
+          <div class="text-xl sm:text-2xl font-bold text-gray-900">
+            {{ stats.totalBlogs + stats.totalActivities }}
+          </div>
+          <p class="text-xs text-gray-500 mt-1">
+            {{ 'ADMIN.TOTAL_CONTENT' | translate }}
+          </p>
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="bg-white rounded-lg shadow mt-4">
+        <div class="p-4 sm:p-6 border-b border-gray-200">
+          <h2 class="text-base sm:text-lg font-semibold text-gray-900">{{ 'ADMIN.QUICK_ACTIONS' | translate }}</h2>
+        </div>
+        <div class="p-4 sm:p-6">
+          <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <!-- Manage Blogs Button -->
+            <button
+              (click)="navigateToBlogs()"
+              class="h-20 sm:h-24 flex flex-col items-center justify-center space-y-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors w-full"
+            >
+              <svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+              </svg>
+              <span class="font-medium text-xs sm:text-base">{{ 'ADMIN.MANAGE_BLOGS' | translate }}</span>
+            </button>
+            
+            <!-- Manage Activities Button -->
+            <button
+              (click)="navigateToActivities()"
+              class="h-20 sm:h-24 flex flex-col items-center justify-center space-y-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors w-full"
+            >
+              <svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+              <span class="font-medium text-xs sm:text-base">{{ 'ADMIN.MANAGE_ACTIVITIES' | translate }}</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-container> 

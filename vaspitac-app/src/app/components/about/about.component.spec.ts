@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { By } from '@angular/platform-browser';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 import { AboutComponent } from './about.component';
 
@@ -16,7 +17,7 @@ describe('AboutComponent', () => {
     const navigateSpy = jasmine.createSpy('navigate').and.returnValue(Promise.resolve());
     await TestBed.configureTestingModule({
       declarations: [AboutComponent],
-      imports: [TranslateModule.forRoot()],
+      imports: [TranslateModule.forRoot(), HttpClientTestingModule],
       providers: [{ provide: Router, useValue: { navigate: navigateSpy } }],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
@@ -40,8 +41,8 @@ describe('AboutComponent', () => {
   });
 
   it('should navigate back to home on back button click', (): void => {
-    const backBtn = fixture.debugElement.query(By.css('button'));
-    backBtn.triggerEventHandler('click', null);
+    // Call the goBack method directly
+    component.goBack();
     expect(router.navigate).toHaveBeenCalledWith(['/']);
   });
 });

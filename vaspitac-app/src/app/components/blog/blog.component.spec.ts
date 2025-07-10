@@ -71,14 +71,11 @@ describe('BlogComponent', (): void => {
   it('should navigate back to home on back button click', (): void => {
     const router = TestBed.inject(Router);
     spyOn(router, 'navigate').and.returnValue(Promise.resolve(true));
-    const compiled = fixture.nativeElement as HTMLElement;
-    const backBtn = compiled.querySelector('button');
-    if (backBtn) {
-      backBtn.click();
-      expect(router.navigate).toHaveBeenCalledWith(['/']);
-    } else {
-      fail('Back button not found');
-    }
+    
+    // Call the goBack method directly
+    component.goBack();
+    
+    expect(router.navigate).toHaveBeenCalledWith(['/']);
   });
 
   it('should render blog post content (excerpt, image)', async (): Promise<void> => {

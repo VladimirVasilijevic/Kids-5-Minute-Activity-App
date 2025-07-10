@@ -1,0 +1,51 @@
+// Admin Dashboard Component Styles
+
+// Card hover effects
+.bg-white {
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  }
+}
+
+// Button hover effects
+button {
+  transition: all 0.2s ease-in-out;
+  
+  &:hover {
+    transform: translateY(-1px);
+  }
+}
+
+// Stats cards specific styling
+.text-2xl {
+  font-weight: 700;
+  color: #1f2937;
+}
+
+// Quick action buttons
+.h-24 {
+  transition: all 0.3s ease-in-out;
+  
+  &:hover {
+    transform: scale(1.02);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .grid {
+    gap: 1rem;
+  }
+  
+  .text-3xl {
+    font-size: 1.875rem;
+  }
+  
+  .h-24 {
+    height: 5rem;
+  }
+} 

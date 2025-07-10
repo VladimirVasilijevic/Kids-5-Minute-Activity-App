@@ -3,22 +3,10 @@
     <!-- Back Button and Header -->
     <div class="sticky top-0 z-50 bg-white shadow-sm border-b border-green-100">
       <div class="px-4 py-3 flex items-center space-x-3">
-        <button
-          (click)="goBack()"
-          class="text-green-600 hover:text-green-700 p-0 h-auto font-medium flex items-center gap-1"
-          [attr.aria-label]="'ACTIVITY.BACK' | translate"
-        >
-          <svg
-            class="h-4 w-4 text-green-600"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            viewBox="0 0 24 24"
-          >
-            <path d="M15 19l-7-7 7-7" />
-          </svg>
-          {{ 'ACTIVITY.BACK' | translate }}
-        </button>
+        <app-back-button
+          [label]="'ACTIVITY.BACK' | translate"
+          (back)="goBack()"
+        ></app-back-button>
         <h1 class="font-semibold text-gray-900 flex-1 text-sm md:text-base truncate">
           {{ activity.title }}
         </h1>

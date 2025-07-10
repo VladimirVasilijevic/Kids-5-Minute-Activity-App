@@ -1,0 +1,94 @@
+// Admin Blogs Component Styles
+
+// Form styles
+form {
+  .space-y-6 > * + * {
+    margin-top: 1.5rem;
+  }
+}
+
+// Input and textarea focus states
+input, textarea, select {
+  transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  
+  &:focus {
+    border-color: #10b981;
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+  }
+}
+
+// Button hover effects
+button {
+  transition: all 0.2s ease-in-out;
+  
+  &:hover {
+    transform: translateY(-1px);
+  }
+}
+
+// Table styles
+table {
+  border-collapse: collapse;
+  
+  th {
+    font-weight: 600;
+    color: #1f2937;
+  }
+  
+  td {
+    vertical-align: top;
+  }
+  
+  tr:hover {
+    background-color: #f9fafb;
+  }
+}
+
+// Status badge styles
+.inline-flex {
+  display: inline-flex;
+  align-items: center;
+}
+
+// Card hover effects
+.bg-white {
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  }
+}
+
+// Action button styles
+.text-blue-600, .text-green-600, .text-yellow-600, .text-red-600 {
+  transition: all 0.2s ease-in-out;
+  
+  &:hover {
+    transform: scale(1.1);
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .text-3xl {
+    font-size: 1.875rem;
+  }
+  
+  .overflow-x-auto {
+    overflow-x: auto;
+  }
+  
+  table {
+    min-width: 600px;
+  }
+  
+  .flex.gap-2 {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+} 

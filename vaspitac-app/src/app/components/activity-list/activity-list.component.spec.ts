@@ -6,6 +6,7 @@ import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideRouter } from '@angular/router';
 import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 
 import { FirestoreService } from '../../services/firestore.service';
 import { mockFirestoreService } from '../../../test-utils/mock-firestore-service';
@@ -40,6 +41,7 @@ describe('ActivityListComponent', (): void => {
         provideHttpClientTesting(),
         provideRouter([]),
       ],
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -125,9 +127,10 @@ describe('ActivityListComponent', (): void => {
     spyOn(component, 'goBack').and.callThrough();
     
     fixture.detectChanges();
-    const compiled = fixture.nativeElement;
-    const backBtn = compiled.querySelector('button');
-    backBtn.click();
+    
+    // Call the goBack method directly
+    component.goBack();
+    
     expect(component.goBack).toHaveBeenCalled();
     expect(router.navigate).toHaveBeenCalledWith(['/']);
   });

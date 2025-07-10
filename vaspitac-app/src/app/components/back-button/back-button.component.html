@@ -1,0 +1,11 @@
+<button
+  type="button"
+  (click)="onClick()"
+  class="flex items-center gap-1 text-green-600 hover:text-green-700 font-medium focus:outline-none focus:ring-2 focus:ring-green-500 rounded-lg"
+  [attr.aria-label]="label"
+>
+  <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+    <path d="M15 19l-7-7 7-7" />
+  </svg>
+  <span class="text-xs sm:text-sm">{{ label }}</span>
+</button> 

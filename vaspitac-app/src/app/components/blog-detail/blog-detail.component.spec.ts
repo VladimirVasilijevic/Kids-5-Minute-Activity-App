@@ -5,6 +5,8 @@ import { BlogDetailComponent } from './blog-detail.component';
 import { BlogService } from '../../services/blog.service';
 import { mockBlogPosts } from '../../../test-utils/mock-blog-posts';
 import { TranslateModule } from '@ngx-translate/core';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 
 describe('BlogDetailComponent', () => {
   let component: BlogDetailComponent;
@@ -22,12 +24,13 @@ describe('BlogDetailComponent', () => {
 
     await TestBed.configureTestingModule({
       declarations: [ BlogDetailComponent ],
-      imports: [ TranslateModule.forRoot() ],
+      imports: [ TranslateModule.forRoot(), HttpClientTestingModule ],
       providers: [
         { provide: BlogService, useValue: blogServiceSpy },
         { provide: Router, useValue: routerSpy },
         { provide: ActivatedRoute, useValue: activatedRouteSpy }
-      ]
+      ],
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
 
     mockBlogService = TestBed.inject(BlogService) as jasmine.SpyObj<BlogService>;

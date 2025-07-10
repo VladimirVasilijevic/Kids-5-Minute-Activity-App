@@ -1,0 +1,237 @@
+<!-- Admin Access Check -->
+<ng-container *ngIf="userProfile$ | async as userProfile">
+  <div *ngIf="!isAdmin(userProfile)" class="min-h-screen bg-gray-50 flex items-center justify-center p-4 sm:p-6">
+    <div class="text-center">
+      <h1 class="text-xl sm:text-2xl font-bold text-red-600 mb-4">{{ 'ADMIN.ACCESS_DENIED' | translate }}</h1>
+      <p class="text-gray-600 mb-6">{{ 'ADMIN.ACCESS_DENIED_MESSAGE' | translate }}</p>
+      <button 
+        (click)="navigateToAdmin()"
+        class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg w-full max-w-xs mx-auto"
+      >
+        {{ 'ADMIN.BACK_TO_HOME' | translate }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Admin Activities Content -->
+  <div *ngIf="isAdmin(userProfile)">
+    <!-- Form View -->
+    <div *ngIf="showForm" class="min-h-screen bg-gray-50 p-2 sm:p-4 md:p-6">
+      <div class="max-w-4xl mx-auto">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 mb-4 sm:mb-6">
+          <app-back-button
+            [label]="'ADMIN.BACK_TO_ACTIVITIES' | translate"
+            (back)="resetForm()"
+          ></app-back-button>
+          <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">
+            {{ editingActivity ? ('ADMIN.EDIT_ACTIVITY' | translate) : ('ADMIN.ADD_NEW_ACTIVITY' | translate) }}
+          </h1>
+        </div>
+
+        <div class="bg-white rounded-lg shadow">
+          <div class="p-4 sm:p-6 border-b border-gray-200">
+            <h2 class="text-base sm:text-lg font-semibold text-gray-900">{{ 'ADMIN.ACTIVITY_DETAILS' | translate }}</h2>
+          </div>
+          <div class="p-4 sm:p-6">
+            <form (submit)="handleSubmit($event)" class="space-y-4 sm:space-y-6">
+              <div>
+                <label class="block text-xs sm:text-sm font-medium mb-2">{{ 'ADMIN.TITLE' | translate }}</label>
+                <input
+                  type="text"
+                  [(ngModel)]="formData.title"
+                  name="title"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 text-sm"
+                  [placeholder]="'ADMIN.ENTER_TITLE' | translate"
+                  required
+                />
+              </div>
+
+              <div>
+                <label class="block text-xs sm:text-sm font-medium mb-2">{{ 'ADMIN.DESCRIPTION' | translate }}</label>
+                <textarea
+                  [(ngModel)]="formData.description"
+                  name="description"
+                  rows="3"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 text-sm"
+                  [placeholder]="'ADMIN.ENTER_DESCRIPTION' | translate"
+                  required
+                ></textarea>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                <div>
+                  <label class="block text-xs sm:text-sm font-medium mb-2">{{ 'ADMIN.AGE_GROUP' | translate }}</label>
+                  <select
+                    [(ngModel)]="formData.ageGroup"
+                    name="ageGroup"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 text-sm"
+                    required
+                  >
+                    <option value="">{{ 'ADMIN.SELECT_AGE_GROUP' | translate }}</option>
+                    <option *ngFor="let group of ageGroups" [value]="group">{{ group }}</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label class="block text-xs sm:text-sm font-medium mb-2">{{ 'ADMIN.DURATION' | translate }} ({{ 'ADMIN.MINUTES' | translate }})</label>
+                  <input
+                    type="number"
+                    [(ngModel)]="formData.duration"
+                    name="duration"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 text-sm"
+                    placeholder="30"
+                    min="1"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-xs sm:text-sm font-medium mb-2">{{ 'ADMIN.INSTRUCTIONS' | translate }}</label>
+                <textarea
+                  [(ngModel)]="formData.instructions"
+                  name="instructions"
+                  rows="8"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 text-sm"
+                  [placeholder]="'ADMIN.ENTER_INSTRUCTIONS' | translate"
+                  required
+                ></textarea>
+              </div>
+
+              <div>
+                <label class="block text-xs sm:text-sm font-medium mb-2">{{ 'ADMIN.IMAGE_URL' | translate }}</label>
+                <input
+                  type="url"
+                  [(ngModel)]="formData.image"
+                  name="image"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 text-sm"
+                  [placeholder]="'ADMIN.ENTER_IMAGE_URL' | translate"
+                />
+              </div>
+
+              <div class="flex flex-col sm:flex-row gap-2 sm:gap-4">
+                <button
+                  type="submit"
+                  class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg w-full sm:w-auto"
+                >
+                  {{ 'ADMIN.SAVE_ACTIVITY' | translate }}
+                </button>
+                <button
+                  type="button"
+                  (click)="resetForm()"
+                  class="bg-gray-300 hover:bg-gray-400 text-gray-700 font-semibold py-2 px-4 rounded-lg w-full sm:w-auto"
+                >
+                  {{ 'COMMON.CANCEL' | translate }}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- List View -->
+    <div *ngIf="!showForm" class="min-h-screen bg-gray-50 p-2 sm:p-4 md:p-6">
+      <div class="max-w-7xl mx-auto">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 sm:gap-4 mb-4 sm:mb-6">
+          <div class="flex flex-col gap-2 sm:gap-4">
+            <app-back-button
+              [label]="'ADMIN.BACK_TO_ADMIN' | translate"
+              (back)="navigateToAdmin()"
+            ></app-back-button>
+            <div>
+              <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">{{ 'ADMIN.ACTIVITIES_TITLE' | translate }}</h1>
+              <p class="text-gray-600 mt-1 sm:mt-2 text-sm sm:text-base">{{ 'ADMIN.ACTIVITIES_SUBTITLE' | translate }}</p>
+            </div>
+          </div>
+          <button
+            (click)="showForm = true"
+            class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg flex items-center gap-2 w-full sm:w-auto"
+          >
+            <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M12 4v16m8-8H4" />
+            </svg>
+            {{ 'ADMIN.ADD_NEW_ACTIVITY' | translate }}
+          </button>
+        </div>
+
+        <div class="bg-white rounded-lg shadow">
+          <div class="p-4 sm:p-6 border-b border-gray-200">
+            <h2 class="text-base sm:text-lg font-semibold text-gray-900">{{ 'ADMIN.ALL_ACTIVITIES' | translate }} ({{ activities.length }})</h2>
+          </div>
+          <div class="p-4 sm:p-6">
+            <div *ngIf="activities.length === 0" class="text-center py-8 sm:py-12">
+              <p class="text-gray-500 mb-4">{{ 'ADMIN.NO_ACTIVITIES' | translate }}</p>
+              <button
+                (click)="showForm = true"
+                class="bg-gray-300 hover:bg-gray-400 text-gray-700 font-semibold py-2 px-4 rounded-lg flex items-center gap-2 mx-auto w-full sm:w-auto"
+              >
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path d="M12 4v16m8-8H4" />
+                </svg>
+                {{ 'ADMIN.CREATE_FIRST_ACTIVITY' | translate }}
+              </button>
+            </div>
+
+            <div *ngIf="activities.length > 0" class="overflow-x-auto">
+              <table class="w-full min-w-[600px]">
+                <thead>
+                  <tr class="border-b border-gray-200">
+                    <th class="text-left py-2 sm:py-3 px-2 sm:px-4 font-medium text-gray-900 text-xs sm:text-sm">{{ 'ADMIN.TITLE' | translate }}</th>
+                    <th class="text-left py-2 sm:py-3 px-2 sm:px-4 font-medium text-gray-900 text-xs sm:text-sm">{{ 'ADMIN.AGE_GROUP' | translate }}</th>
+                    <th class="text-left py-2 sm:py-3 px-2 sm:px-4 font-medium text-gray-900 text-xs sm:text-sm">{{ 'ADMIN.DURATION' | translate }}</th>
+                    <th class="text-left py-2 sm:py-3 px-2 sm:px-4 font-medium text-gray-900 text-xs sm:text-sm">{{ 'ADMIN.CREATED' | translate }}</th>
+                    <th class="text-left py-2 sm:py-3 px-2 sm:px-4 font-medium text-gray-900 text-xs sm:text-sm">{{ 'ADMIN.ACTIONS' | translate }}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let activity of activities" class="border-b border-gray-100 hover:bg-gray-50">
+                    <td class="py-2 sm:py-3 px-2 sm:px-4">
+                      <div>
+                        <div class="font-medium text-xs sm:text-sm">{{ activity.title }}</div>
+                        <div class="text-xs text-gray-500 truncate max-w-xs">
+                          {{ activity.description }}
+                        </div>
+                      </div>
+                    </td>
+                    <td class="py-2 sm:py-3 px-2 sm:px-4 text-xs sm:text-sm">
+                      {{ activity.ageGroup }}
+                    </td>
+                    <td class="py-2 sm:py-3 px-2 sm:px-4 text-xs sm:text-sm">
+                      {{ activity.duration }}
+                    </td>
+                    <td class="py-2 sm:py-3 px-2 sm:px-4 text-xs text-gray-500">
+                      {{ formatDate(activity.createdAt || activity.id) }}
+                    </td>
+                    <td class="py-2 sm:py-3 px-2 sm:px-4">
+                      <div class="flex flex-col sm:flex-row gap-2">
+                        <button
+                          (click)="handleEdit(activity)"
+                          class="text-blue-600 hover:text-blue-700 text-xs sm:text-sm"
+                          title="{{ 'ADMIN.EDIT' | translate }}"
+                        >
+                          <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                          </svg>
+                        </button>
+                        <button
+                          (click)="handleDelete(activity)"
+                          class="text-red-600 hover:text-red-700 text-xs sm:text-sm"
+                          title="{{ 'ADMIN.DELETE' | translate }}"
+                        >
+                          <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                          </svg>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-container> 

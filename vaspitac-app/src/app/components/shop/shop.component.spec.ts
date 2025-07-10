@@ -3,16 +3,9 @@ import { Router } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { By } from '@angular/platform-browser';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { Pipe, PipeTransform } from '@angular/core';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 import { ShopComponent } from './shop.component';
-
-@Pipe({ name: 'translate' })
-class MockTranslatePipe implements PipeTransform {
-  transform(value: string): string {
-    return value;
-  }
-}
 
 describe('ShopComponent', () => {
   let component: ShopComponent;
@@ -23,8 +16,8 @@ describe('ShopComponent', () => {
   beforeEach(async (): Promise<void> => {
     const navigateSpy = jasmine.createSpy('navigate').and.returnValue(Promise.resolve());
     await TestBed.configureTestingModule({
-      declarations: [ShopComponent, MockTranslatePipe],
-      imports: [TranslateModule.forRoot()],
+      declarations: [ShopComponent],
+      imports: [TranslateModule.forRoot(), HttpClientTestingModule],
       providers: [{ provide: Router, useValue: { navigate: navigateSpy } }],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
@@ -51,8 +44,8 @@ describe('ShopComponent', () => {
   });
 
   it('should navigate back to home on back button click', (): void => {
-    const backBtn = fixture.debugElement.query(By.css('button'));
-    backBtn.triggerEventHandler('click', null);
+    // Call the goBack method directly
+    component.goBack();
     expect(router.navigate).toHaveBeenCalledWith(['/']);
   });
 

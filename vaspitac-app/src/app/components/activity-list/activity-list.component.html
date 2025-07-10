@@ -1,16 +1,11 @@
 <div class="max-w-5xl mx-auto px-4">
   <!-- Title and Description -->
   <div class="mb-4 md:mb-6 text-center">
-    <button
-      (click)="goBack()"
-      class="text-green-600 hover:text-green-700 p-0 h-auto font-medium flex items-center gap-1 mb-3 md:mb-4"
-      [attr.aria-label]="'ACTIVITIES.BACK' | translate"
-    >
-      <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-        <path d="M15 19l-7-7 7-7" />
-      </svg>
-      {{ 'ACTIVITIES.BACK' | translate }}
-    </button>
+    <app-back-button
+      [label]="'ACTIVITIES.BACK' | translate"
+      (back)="goBack()"
+      class="mb-3 md:mb-4"
+    ></app-back-button>
     <h2 class="text-2xl md:text-3xl font-semibold text-green-800 mb-2">
       {{ 'HOME.CAT_PHYSICAL_TITLE' | translate }}
     </h2>
