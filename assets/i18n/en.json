@@ -43,7 +43,10 @@
     "START": "Start Activity",
     "ALL": "All",
     "LOADING": "Loading activities...",
-    "LOADING_SINGLE": "Loading activity..."
+    "LOADING_SINGLE": "Loading activity...",
+    "CREATING": "Creating activity...",
+    "UPDATING": "Updating activity...",
+    "DELETING": "Deleting activity..."
   },
   "ACTIVITY": {
     "VIDEO_NOT_AVAILABLE": "Video not available",
@@ -119,6 +122,7 @@
     "LOCATION": "Belgrade, Serbia"
   },
   "BLOG": {
+    "BACK": "Back to home",
     "TITLE": "Blog",
     "SUBTITLE": "Articles about parenting and child development",
     "POST1_TITLE": "5 ways to encourage creativity in children",
@@ -130,11 +134,11 @@
     "POST3_TITLE": "How to develop a love for reading",
     "POST3_EXCERPT": "Reading is the foundation of education. Here's how you can inspire your child to love books.",
     "POST3_AUTHOR": "Jelena Stojanovic",
-    "BACK": "Back to home",
     "LOADING": "Loading blog posts...",
     "LOADING_SINGLE": "Loading blog post..."
   },
   "TIPS": {
+    "BACK": "Back to home",
     "TITLE": "Tips",
     "SUBTITLE": "Useful tips for everyday parenting",
     "TIP1_TITLE": "Listen actively",
@@ -145,7 +149,6 @@
     "TIP3_DESC": "Every progress is important. Praise motivates the child and builds self-esteem.",
     "TIP4_TITLE": "Be creative",
     "TIP4_DESC": "Use everyday situations for learning. Counting while cooking, colors during walks...",
-    "BACK": "Back to home",
     "QUICK_TITLE": "Quick Tips",
     "QUICK_SUBTITLE": "Simple tips for every day",
     "EMPTY": "No tips available.",
@@ -227,7 +230,8 @@
   "COMMON": {
     "CANCEL": "Cancel",
     "SAVE": "Save",
-    "SAVING": "Saving..."
+    "SAVING": "Saving...",
+    "CLOSE": "Close"
   },
   "SUBSCRIPTION": {
     "TITLE": "Subscription",
@@ -308,6 +312,10 @@
     "DESCRIPTION": "Description",
     "AGE_GROUP": "Age Group",
     "DURATION": "Duration",
+    "CATEGORY": "Category",
+    "SELECT_CATEGORY": "Select category",
+    "LANGUAGE": "Language",
+    "SELECT_LANGUAGE": "Select language",
     "INSTRUCTIONS": "Instructions",
     "IMAGE_URL": "Image URL",
     "EXCERPT": "Excerpt",
@@ -332,6 +340,10 @@
     "ENTER_CONTENT": "Write your blog content here...",
     "ENTER_AUTHOR": "Enter author name",
     "ENTER_READ_TIME": "5 min",
-    "ENTER_COVER_IMAGE": "https://example.com/image.jpg"
+    "ENTER_COVER_IMAGE": "https://example.com/image.jpg",
+    "MANAGING_LANGUAGE": "Managing Language",
+    "SHOWING": "Showing",
+    "OF": "of",
+    "CLOSE": "Close"
   }
 }

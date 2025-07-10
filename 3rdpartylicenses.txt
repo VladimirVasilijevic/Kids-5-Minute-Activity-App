@@ -303,6 +303,12 @@ Apache-2.0
 @firebase/logger
 Apache-2.0
 
+@firebase/storage
+Apache-2.0
+
+@firebase/storage-compat
+Apache-2.0
+
 @firebase/util
 Apache-2.0
 
@@ -331,6 +337,8 @@ firebase/compat/app
 firebase/compat/auth
 
 firebase/compat/firestore
+
+firebase/compat/storage
 
 flag-icons
 MIT
