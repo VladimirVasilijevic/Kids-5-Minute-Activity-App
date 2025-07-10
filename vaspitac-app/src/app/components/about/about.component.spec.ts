@@ -1,7 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { By } from '@angular/platform-browser';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 

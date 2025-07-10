@@ -7,8 +7,7 @@ import { of, Subject, Observable } from 'rxjs';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { AngularFireModule } from '@angular/fire/compat';
 import { TranslateService, TranslateModule } from '@ngx-translate/core';
-import { UserProfile, UserRole, Permission } from '../../models/user-profile.model';
-import { mockFreeUser, mockSubscriber, mockTrialUser, mockAdminUser } from '../../../test-utils/mock-user-profiles';
+import { mockFreeUser } from '../../../test-utils/mock-user-profiles';
 
 // Mock TranslateService class
 class MockTranslateService {

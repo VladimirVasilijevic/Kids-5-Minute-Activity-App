@@ -17,31 +17,21 @@
       <!-- Video/Image Section -->
       <div class="overflow-hidden bg-white shadow-sm border border-green-100 rounded-xl">
         <div class="relative h-40 md:h-48 bg-gray-100">
-          <img
-            [src]="activity.imageUrl"
-            [alt]="activity.title"
-            class="w-full h-full object-cover"
-          />
-          <ng-container *ngIf="activity.videoUrl">
-            <div class="absolute inset-0 bg-black/20 flex items-center justify-center">
-              <a
-                [href]="activity.videoUrl"
-                target="_blank"
-                class="bg-white/90 text-green-600 hover:bg-white rounded-full px-4 md:px-6 py-2 flex items-center gap-2 shadow-lg text-sm md:text-base"
-              >
-                <svg
-                  class="h-4 w-4 md:h-5 md:w-5"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  viewBox="0 0 24 24"
-                >
-                  <polygon points="6 3 20 12 6 21 6 3" />
-                </svg>
-                {{ 'ACTIVITY.PLAY_VIDEO' | translate }}
-              </a>
-            </div>
+          <ng-container *ngIf="activity.videoUrl; else showImage">
+            <video
+              [src]="activity.videoUrl"
+              controls
+              class="w-full h-full object-cover rounded-lg"
+              [attr.title]="activity.title"
+            ></video>
           </ng-container>
+          <ng-template #showImage>
+            <img
+              [src]="activity.imageUrl"
+              [alt]="activity.title"
+              class="w-full h-full object-cover"
+            />
+          </ng-template>
         </div>
       </div>
 

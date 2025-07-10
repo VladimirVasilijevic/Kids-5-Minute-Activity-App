@@ -26,9 +26,13 @@ export interface UserProfile {
  * User roles in the system
  */
 export enum UserRole {
+  // eslint-disable-next-line no-unused-vars
   ADMIN = 'admin',
+  // eslint-disable-next-line no-unused-vars
   SUBSCRIBER = 'subscriber',
+  // eslint-disable-next-line no-unused-vars
   TRIAL_USER = 'trial_user',
+  // eslint-disable-next-line no-unused-vars
   FREE_USER = 'free_user'
 }
 
@@ -58,10 +62,15 @@ export interface Subscription {
  * Subscription status
  */
 export enum SubscriptionStatus {
+  // eslint-disable-next-line no-unused-vars
   ACTIVE = 'active',
+  // eslint-disable-next-line no-unused-vars
   EXPIRED = 'expired',
+  // eslint-disable-next-line no-unused-vars
   CANCELLED = 'cancelled',
+  // eslint-disable-next-line no-unused-vars
   PENDING = 'pending',
+  // eslint-disable-next-line no-unused-vars
   TRIAL = 'trial'
 }
 
@@ -69,8 +78,11 @@ export enum SubscriptionStatus {
  * Subscription types
  */
 export enum SubscriptionType {
+  // eslint-disable-next-line no-unused-vars
   MONTHLY = 'monthly',
+  // eslint-disable-next-line no-unused-vars
   YEARLY = 'yearly',
+  // eslint-disable-next-line no-unused-vars
   TRIAL = 'trial'
 }
 
@@ -79,25 +91,40 @@ export enum SubscriptionType {
  */
 export enum Permission {
   // Content access permissions
+  // eslint-disable-next-line no-unused-vars
   ACCESS_ALL_ACTIVITIES = 'access_all_activities',
+  // eslint-disable-next-line no-unused-vars
   ACCESS_PREMIUM_ACTIVITIES = 'access_premium_activities',
+  // eslint-disable-next-line no-unused-vars
   ACCESS_BLOG_POSTS = 'access_blog_posts',
+  // eslint-disable-next-line no-unused-vars
   ACCESS_PREMIUM_BLOG = 'access_premium_blog',
+  // eslint-disable-next-line no-unused-vars
   ACCESS_TIPS = 'access_tips',
+  // eslint-disable-next-line no-unused-vars
   ACCESS_PREMIUM_TIPS = 'access_premium_tips',
   
   // Download permissions
+  // eslint-disable-next-line no-unused-vars
   DOWNLOAD_PDF_GUIDES = 'download_pdf_guides',
+  // eslint-disable-next-line no-unused-vars
   DOWNLOAD_VIDEO_MATERIALS = 'download_video_materials',
   
   // Admin permissions
+  // eslint-disable-next-line no-unused-vars
   MANAGE_CONTENT = 'manage_content',
+  // eslint-disable-next-line no-unused-vars
   MANAGE_USERS = 'manage_users',
+  // eslint-disable-next-line no-unused-vars
   VIEW_ANALYTICS = 'view_analytics',
+  // eslint-disable-next-line no-unused-vars
   MANAGE_SUBSCRIPTIONS = 'manage_subscriptions',
   
   // User permissions
+  // eslint-disable-next-line no-unused-vars
   EDIT_PROFILE = 'edit_profile',
+  // eslint-disable-next-line no-unused-vars
   VIEW_PROFILE = 'view_profile',
+  // eslint-disable-next-line no-unused-vars
   MANAGE_OWN_SUBSCRIPTION = 'manage_own_subscription'
 } 

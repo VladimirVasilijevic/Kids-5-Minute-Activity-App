@@ -6,7 +6,7 @@ import { Injectable } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { Observable, of, throwError, from } from 'rxjs';
 import { map, switchMap, tap } from 'rxjs/operators';
-import { UserProfile, UserRole, Subscription, SubscriptionStatus, SubscriptionType, Permission } from '../models/user-profile.model';
+import { UserProfile, UserRole, Subscription, SubscriptionStatus, SubscriptionType } from '../models/user-profile.model';
 import { PermissionService } from './permission.service';
 import { LoadingService } from './loading.service';
 import { TranslateService } from '@ngx-translate/core';
@@ -253,11 +253,11 @@ export class SubscriptionService {
 
   /**
    * Process payment for subscription
-   * @param amount - Payment amount
-   * @param paymentMethod - Payment method
+   * @param _amount - Payment amount
+   * @param _paymentMethod - Payment method
    * @returns Observable of payment result
    */
-  processPayment(amount: number, paymentMethod: string): Observable<{ success: boolean; transactionId?: string }> {
+  processPayment(_amount: number, _paymentMethod: string): Observable<{ success: boolean; transactionId?: string }> {
     this._loadingService.showWithMessage(this._translateService.instant('SUBSCRIPTION.PROCESSING_PAYMENT'));
     
     // Simulate payment processing

@@ -20,11 +20,11 @@ describe('AdminDashboardComponent', (): void => {
   let component: AdminDashboardComponent;
   let fixture: ComponentFixture<AdminDashboardComponent>;
   let router: Router;
-  let authService: jasmine.SpyObj<AuthService>;
+  let _authService: jasmine.SpyObj<AuthService>;
   let userService: jasmine.SpyObj<UserService>;
   let activityService: jasmine.SpyObj<ActivityService>;
   let blogService: jasmine.SpyObj<BlogService>;
-  let translate: TranslateService;
+  let _translate: TranslateService;
 
   const mockUserProfile = mockAdminUser;
 
@@ -56,12 +56,12 @@ describe('AdminDashboardComponent', (): void => {
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
 
-    authService = TestBed.inject(AuthService) as jasmine.SpyObj<AuthService>;
+    _authService = TestBed.inject(AuthService) as jasmine.SpyObj<AuthService>;
     userService = TestBed.inject(UserService) as jasmine.SpyObj<UserService>;
     activityService = TestBed.inject(ActivityService) as jasmine.SpyObj<ActivityService>;
     blogService = TestBed.inject(BlogService) as jasmine.SpyObj<BlogService>;
     router = TestBed.inject(Router);
-    translate = TestBed.inject(TranslateService);
+    _translate = TestBed.inject(TranslateService);
   }));
 
   beforeEach((): void => {

@@ -9,6 +9,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AngularFireModule } from '@angular/fire/compat';
 import { AngularFirestoreModule } from '@angular/fire/compat/firestore';
 import { AngularFireAuthModule } from '@angular/fire/compat/auth';
+import { AngularFireStorageModule } from '@angular/fire/compat/storage';
 
 // Angular Material imports
 import { MatToolbarModule } from '@angular/material/toolbar';
@@ -45,6 +46,8 @@ import { ProfileComponent } from './components/profile/profile.component';
 import { UserCardComponent } from './components/user-card/user-card.component';
 import { EditProfileModalComponent } from './components/profile/edit-profile-modal.component';
 import { ResetPasswordModalComponent } from './components/auth-modal/reset-password-modal.component';
+import { ErrorModalComponent } from './components/shared/error-modal.component';
+import { ConfirmationModalComponent } from './components/shared/confirmation-modal.component';
 import { SplashScreenComponent } from './components/splash-screen/splash-screen.component';
 import { SplashDemoComponent } from './components/splash-demo/splash-demo.component';
 import { AdminDashboardComponent } from './components/admin/admin-dashboard.component';
@@ -84,6 +87,8 @@ export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
     UserCardComponent,
     EditProfileModalComponent,
     ResetPasswordModalComponent,
+    ErrorModalComponent,
+    ConfirmationModalComponent,
     SplashScreenComponent,
     SplashDemoComponent,
     AdminDashboardComponent,
@@ -125,6 +130,7 @@ export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
     AngularFireModule.initializeApp(environment.firebase),
     AngularFirestoreModule,
     AngularFireAuthModule,
+    AngularFireStorageModule,
     // Angular Material modules
     MatToolbarModule,
     MatButtonModule,

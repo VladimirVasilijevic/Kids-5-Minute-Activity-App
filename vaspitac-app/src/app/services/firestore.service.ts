@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { HttpClient } from '@angular/common/http';
-import { Observable, of, catchError, switchMap, map } from 'rxjs';
+import { Observable, of, catchError, switchMap, map, firstValueFrom } from 'rxjs';
 
 import { Activity } from '../models/activity.model';
 import { Category } from '../models/category.model';
@@ -157,5 +157,101 @@ export class FirestoreService {
           });
         })
       );
+  }
+
+  /**
+   * Create a new blog post in Firestore
+   * @param blogPost - The blog post to create
+   * @returns Promise resolved when the blog post is created
+   */
+  createBlogPost(blogPost: BlogPost): Promise<void> {
+    return firstValueFrom(this._languageService.getLanguage().pipe(
+      switchMap((lang) => {
+        return this._firestore
+          .collection<BlogPost>(`blog_${lang}`)
+          .doc(blogPost.id.toString())
+          .set(blogPost);
+      })
+    ));
+  }
+
+  /**
+   * Update an existing blog post in Firestore
+   * @param blogPost - The blog post to update
+   * @returns Promise resolved when the blog post is updated
+   */
+  updateBlogPost(blogPost: BlogPost): Promise<void> {
+    return firstValueFrom(this._languageService.getLanguage().pipe(
+      switchMap((lang) => {
+        return this._firestore
+          .collection<BlogPost>(`blog_${lang}`)
+          .doc(blogPost.id.toString())
+          .update(blogPost);
+      })
+    ));
+  }
+
+  /**
+   * Delete a blog post from Firestore
+   * @param blogId - The ID of the blog post to delete
+   * @returns Promise resolved when the blog post is deleted
+   */
+  deleteBlogPost(blogId: number): Promise<void> {
+    return firstValueFrom(this._languageService.getLanguage().pipe(
+      switchMap((lang) => {
+        return this._firestore
+          .collection<BlogPost>(`blog_${lang}`)
+          .doc(blogId.toString())
+          .delete();
+      })
+    ));
+  }
+
+  /**
+   * Create a new activity in Firestore
+   * @param activity - The activity to create
+   * @returns Promise resolved when the activity is created
+   */
+  createActivity(activity: Activity): Promise<void> {
+    return firstValueFrom(this._languageService.getLanguage().pipe(
+      switchMap((lang) => {
+        return this._firestore
+          .collection<Activity>(`activities_${lang}`)
+          .doc(activity.id)
+          .set(activity);
+      })
+    ));
+  }
+
+  /**
+   * Update an existing activity in Firestore
+   * @param activity - The activity to update
+   * @returns Promise resolved when the activity is updated
+   */
+  updateActivity(activity: Activity): Promise<void> {
+    return firstValueFrom(this._languageService.getLanguage().pipe(
+      switchMap((lang) => {
+        return this._firestore
+          .collection<Activity>(`activities_${lang}`)
+          .doc(activity.id)
+          .update(activity);
+      })
+    ));
+  }
+
+  /**
+   * Delete an activity from Firestore
+   * @param activityId - The ID of the activity to delete
+   * @returns Promise resolved when the activity is deleted
+   */
+  deleteActivity(activityId: string): Promise<void> {
+    return firstValueFrom(this._languageService.getLanguage().pipe(
+      switchMap((lang) => {
+        return this._firestore
+          .collection<Activity>(`activities_${lang}`)
+          .doc(activityId)
+          .delete();
+      })
+    ));
   }
 }

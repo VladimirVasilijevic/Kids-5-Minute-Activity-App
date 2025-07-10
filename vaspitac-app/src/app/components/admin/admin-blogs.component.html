@@ -45,10 +45,12 @@
                   type="text"
                   [(ngModel)]="formData.title"
                   name="title"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 text-sm"
+                  class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 text-sm"
+                  [ngClass]="formErrors['title'] ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-green-500'"
                   [placeholder]="'ADMIN.ENTER_BLOG_TITLE' | translate"
                   required
                 />
+                <div *ngIf="formErrors['title']" class="text-red-500 text-xs mt-1">{{ formErrors['title'] }}</div>
               </div>
 
               <div>
@@ -57,10 +59,12 @@
                   [(ngModel)]="formData.excerpt"
                   name="excerpt"
                   rows="3"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 text-sm"
+                  class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 text-sm"
+                  [ngClass]="formErrors['excerpt'] ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-green-500'"
                   [placeholder]="'ADMIN.ENTER_EXCERPT' | translate"
                   required
                 ></textarea>
+                <div *ngIf="formErrors['excerpt']" class="text-red-500 text-xs mt-1">{{ formErrors['excerpt'] }}</div>
               </div>
 
               <div>
@@ -69,10 +73,12 @@
                   [(ngModel)]="formData.fullContent"
                   name="fullContent"
                   rows="8"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 text-sm"
+                  class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 text-sm"
+                  [ngClass]="formErrors['fullContent'] ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-green-500'"
                   [placeholder]="'ADMIN.ENTER_CONTENT' | translate"
                   required
                 ></textarea>
+                <div *ngIf="formErrors['fullContent']" class="text-red-500 text-xs mt-1">{{ formErrors['fullContent'] }}</div>
               </div>
 
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
@@ -82,10 +88,12 @@
                     type="text"
                     [(ngModel)]="formData.author"
                     name="author"
-                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 text-sm"
+                    class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 text-sm"
+                    [ngClass]="formErrors['author'] ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-green-500'"
                     [placeholder]="'ADMIN.ENTER_AUTHOR' | translate"
                     required
                   />
+                  <div *ngIf="formErrors['author']" class="text-red-500 text-xs mt-1">{{ formErrors['author'] }}</div>
                 </div>
 
                 <div>
@@ -94,22 +102,89 @@
                     type="text"
                     [(ngModel)]="formData.readTime"
                     name="readTime"
-                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 text-sm"
+                    class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 text-sm"
+                    [ngClass]="formErrors['readTime'] ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-green-500'"
                     [placeholder]="'ADMIN.ENTER_READ_TIME' | translate"
                     required
                   />
+                  <div *ngIf="formErrors['readTime']" class="text-red-500 text-xs mt-1">{{ formErrors['readTime'] }}</div>
                 </div>
               </div>
 
               <div>
                 <label class="block text-xs sm:text-sm font-medium mb-2">{{ 'ADMIN.COVER_IMAGE' | translate }}</label>
+                
+                <!-- Image Upload Area -->
+                <div
+                  (dragover)="onDragOver($event)"
+                  (drop)="onDrop($event)"
+                  class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-green-500 transition-colors"
+                  [ngClass]="isUploadingImage ? 'border-green-500 bg-green-50' : ''"
+                >
+                  <!-- Image Preview -->
+                  <div *ngIf="imagePreview || formData.imageUrl" class="mb-4">
+                    <img
+                      [src]="imagePreview || formData.imageUrl"
+                      alt="Cover image preview"
+                      class="max-w-full h-32 object-cover rounded mx-auto"
+                    />
+                    <button
+                      type="button"
+                      (click)="removeImage()"
+                      class="mt-2 text-red-600 hover:text-red-700 text-sm"
+                    >
+                      Remove Image
+                    </button>
+                  </div>
+                  
+                  <!-- Upload Instructions -->
+                  <div *ngIf="!imagePreview && !formData.imageUrl">
+                    <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                      <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                    <p class="mt-2 text-sm text-gray-600">
+                      Drag and drop an image here, or
+                      <label for="image-upload" class="text-green-600 hover:text-green-700 cursor-pointer">
+                        click to select
+                      </label>
+                    </p>
+                    <p class="text-xs text-gray-500 mt-1">
+                      PNG, JPG, GIF, WebP up to 5MB
+                    </p>
+                  </div>
+                  
+                  <!-- Upload Progress -->
+                  <div *ngIf="isUploadingImage" class="mt-4">
+                    <div class="flex items-center justify-center">
+                      <svg class="animate-spin h-5 w-5 text-green-600 mr-2" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      <span class="text-sm text-gray-600">Uploading...</span>
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Hidden file input -->
                 <input
-                  type="url"
-                  [(ngModel)]="formData.imageUrl"
-                  name="imageUrl"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 text-sm"
-                  [placeholder]="'ADMIN.ENTER_COVER_IMAGE' | translate"
+                  id="image-upload"
+                  type="file"
+                  accept="image/*"
+                  (change)="onImageSelected($event)"
+                  class="hidden"
                 />
+                
+                <!-- URL input as fallback -->
+                <div class="mt-2">
+                  <label class="block text-xs text-gray-600 mb-1">Or enter image URL:</label>
+                  <input
+                    type="url"
+                    [(ngModel)]="formData.imageUrl"
+                    name="imageUrl"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 text-sm"
+                    [placeholder]="'ADMIN.ENTER_COVER_IMAGE' | translate"
+                  />
+                </div>
               </div>
 
               <div class="flex flex-col sm:flex-row gap-2 sm:gap-4">
@@ -153,6 +228,19 @@
             <div>
               <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">{{ 'ADMIN.BLOGS_TITLE' | translate }}</h1>
               <p class="text-gray-600 mt-1 sm:mt-2 text-sm sm:text-base">{{ 'ADMIN.BLOGS_SUBTITLE' | translate }}</p>
+              
+              <!-- Language Context -->
+              <div class="flex items-center gap-2 mt-2">
+                <span class="text-sm text-gray-500">{{ 'ADMIN.MANAGING_LANGUAGE' | translate }}:</span>
+                <select
+                  [(ngModel)]="currentLanguage"
+                  (change)="changeLanguage(currentLanguage)"
+                  class="px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-green-500"
+                >
+                  <option value="sr">SR</option>
+                  <option value="en">EN</option>
+                </select>
+              </div>
             </div>
           </div>
           <button
@@ -168,7 +256,14 @@
 
         <div class="bg-white rounded-lg shadow">
           <div class="p-4 sm:p-6 border-b border-gray-200">
-            <h2 class="text-base sm:text-lg font-semibold text-gray-900">{{ 'ADMIN.ALL_BLOGS' | translate }} ({{ blogs.length }})</h2>
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+              <h2 class="text-base sm:text-lg font-semibold text-gray-900">{{ 'ADMIN.ALL_BLOGS' | translate }} ({{ blogs.length }})</h2>
+              
+              <!-- Items Info -->
+              <div class="flex items-center gap-4 text-sm text-gray-600">
+                <span>{{ 'ADMIN.SHOWING' | translate }} {{ displayedBlogs.length }} {{ 'ADMIN.OF' | translate }} {{ blogs.length }}</span>
+              </div>
+            </div>
           </div>
           <div class="p-4 sm:p-6">
             <div *ngIf="blogs.length === 0" class="text-center py-8 sm:py-12">
@@ -184,7 +279,7 @@
               </button>
             </div>
 
-            <div *ngIf="blogs.length > 0" class="overflow-x-auto">
+            <div *ngIf="blogs.length > 0" class="overflow-x-auto max-h-96 overflow-y-auto" (scroll)="onScroll($event)">
               <table class="w-full min-w-[600px]">
                 <thead>
                   <tr class="border-b border-gray-200">
@@ -196,7 +291,7 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr *ngFor="let blog of blogs" class="border-b border-gray-100 hover:bg-gray-50">
+                  <tr *ngFor="let blog of displayedBlogs" class="border-b border-gray-100 hover:bg-gray-50">
                     <td class="py-2 sm:py-3 px-2 sm:px-4">
                       <div>
                         <div class="font-medium text-xs sm:text-sm">{{ blog.title }}</div>
@@ -264,10 +359,69 @@
                   </tr>
                 </tbody>
               </table>
+              
+              <!-- Loading More Indicator -->
+              <div *ngIf="isLoadingMore" class="flex justify-center items-center py-4">
+                <div class="flex items-center gap-2">
+                  <svg class="animate-spin h-5 w-5 text-green-600" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  <span class="text-sm text-gray-600">Loading more...</span>
+                </div>
+              </div>
+              
+              <!-- No More Items Indicator -->
+              <div *ngIf="!hasMoreItems && displayedBlogs.length > 0" class="text-center py-4">
+                <span class="text-sm text-gray-500">No more items to load</span>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
   </div>
-</ng-container> 
+</ng-container>
+
+<!-- Success Message -->
+<div *ngIf="showSuccessMessage" class="fixed top-4 right-4 z-50 bg-green-500 text-white px-6 py-4 rounded-lg shadow-xl border border-green-400 min-w-80">
+  <div class="flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path d="M5 13l4 4L19 7" />
+      </svg>
+      <span class="font-medium">{{ successMessage }}</span>
+    </div>
+    <button
+      (click)="showSuccessMessage = false"
+      class="ml-4 p-1 hover:bg-green-600 rounded-full transition-colors"
+      title="Close"
+    >
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
+  </div>
+</div>
+
+<!-- Error Modal -->
+<app-error-modal
+  [isOpen]="showErrorModal"
+  [title]="errorTitle"
+  [message]="errorMessage"
+  [showRetry]="false"
+  [showClose]="true"
+  (close)="closeErrorModal()"
+></app-error-modal>
+
+<!-- Confirmation Modal -->
+<app-confirmation-modal
+  [isOpen]="showConfirmModal"
+  [title]="confirmTitle"
+  [message]="confirmMessage"
+  [confirmText]="'ADMIN.DELETE' | translate"
+  [cancelText]="'COMMON.CANCEL' | translate"
+  [confirmVariant]="'danger'"
+  (close)="closeConfirmModal()"
+  (confirm)="onConfirmAction()"
+></app-confirmation-modal> 

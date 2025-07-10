@@ -10,4 +10,6 @@ export interface AdminActivity extends Activity {
   isDeleting?: boolean;
   /** ISO string of creation date (optional) */
   createdAt?: string;
+  /** Language of the activity (en/sr) */
+  language?: string;
 } 

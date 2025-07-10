@@ -9,7 +9,7 @@ import { map, switchMap, catchError } from 'rxjs/operators';
 import { AuthService } from '../services/auth.service';
 import { UserService } from '../services/user.service';
 import { PermissionService } from '../services/permission.service';
-import { Permission } from '../models/user-profile.model';
+import { Permission, UserProfile } from '../models/user-profile.model';
 
 export interface PermissionGuardData {
   /** Required permissions for the route */
@@ -83,7 +83,7 @@ export class PermissionGuard implements CanActivate {
    * @returns Observable of boolean indicating if access is allowed
    */
   private _checkPermissions(
-    userProfile: any,
+    userProfile: UserProfile,
     guardData: PermissionGuardData
   ): Observable<boolean> {
     // Check if subscription is required
@@ -122,7 +122,7 @@ export class PermissionGuard implements CanActivate {
    * @returns Observable of boolean indicating if access is allowed
    */
   private _checkSpecificPermissions(
-    userProfile: any,
+    userProfile: UserProfile,
     guardData: PermissionGuardData
   ): Observable<boolean> {
     if (!guardData.permissions || guardData.permissions.length === 0) {

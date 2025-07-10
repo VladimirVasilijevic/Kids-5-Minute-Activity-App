@@ -58,4 +58,52 @@ export class BlogService {
       })
     );
   }
+
+  /**
+   * Creates a new blog post with loading indicator
+   * @param blogPost - The blog post to create
+   * @returns Promise resolved when the blog post is created
+   */
+  createBlogPost(blogPost: BlogPost): Promise<void> {
+    this._loadingService.showWithMessage(this._translateService.instant('BLOG.CREATING'));
+    
+    return this._firestoreService.createBlogPost(blogPost).then(() => {
+      this._loadingService.hide();
+    }).catch((error) => {
+      this._loadingService.hide();
+      throw error;
+    });
+  }
+
+  /**
+   * Updates an existing blog post with loading indicator
+   * @param blogPost - The blog post to update
+   * @returns Promise resolved when the blog post is updated
+   */
+  updateBlogPost(blogPost: BlogPost): Promise<void> {
+    this._loadingService.showWithMessage(this._translateService.instant('BLOG.UPDATING'));
+    
+    return this._firestoreService.updateBlogPost(blogPost).then(() => {
+      this._loadingService.hide();
+    }).catch((error) => {
+      this._loadingService.hide();
+      throw error;
+    });
+  }
+
+  /**
+   * Deletes a blog post with loading indicator
+   * @param blogId - The ID of the blog post to delete
+   * @returns Promise resolved when the blog post is deleted
+   */
+  deleteBlogPost(blogId: number): Promise<void> {
+    this._loadingService.showWithMessage(this._translateService.instant('BLOG.DELETING'));
+    
+    return this._firestoreService.deleteBlogPost(blogId).then(() => {
+      this._loadingService.hide();
+    }).catch((error) => {
+      this._loadingService.hide();
+      throw error;
+    });
+  }
 }

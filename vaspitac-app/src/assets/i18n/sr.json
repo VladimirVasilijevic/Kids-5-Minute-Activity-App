@@ -43,7 +43,10 @@
     "START": "Započni aktivnost",
     "ALL": "Sve",
     "LOADING": "Učitavanje aktivnosti...",
-    "LOADING_SINGLE": "Učitavanje aktivnosti..."
+    "LOADING_SINGLE": "Učitavanje aktivnosti...",
+    "CREATING": "Kreiranje aktivnosti...",
+    "UPDATING": "Ažuriranje aktivnosti...",
+    "DELETING": "Brisanje aktivnosti..."
   },
   "ACTIVITY": {
     "VIDEO_NOT_AVAILABLE": "Video nije dostupan",
@@ -227,7 +230,8 @@
   "COMMON": {
     "CANCEL": "Otkaži",
     "SAVE": "Sačuvaj",
-    "SAVING": "Čuvanje..."
+    "SAVING": "Čuvanje...",
+    "CLOSE": "Zatvori"
   },
   "SUBSCRIPTION": {
     "TITLE": "Pretplata",
@@ -308,6 +312,10 @@
     "DESCRIPTION": "Opis",
     "AGE_GROUP": "Starosna Grupa",
     "DURATION": "Trajanje",
+    "CATEGORY": "Kategorija",
+    "SELECT_CATEGORY": "Izaberite kategoriju",
+    "LANGUAGE": "Jezik",
+    "SELECT_LANGUAGE": "Izaberite jezik",
     "INSTRUCTIONS": "Uputstva",
     "IMAGE_URL": "URL Slike",
     "EXCERPT": "Izvod",
@@ -332,6 +340,10 @@
     "ENTER_CONTENT": "Napišite sadržaj bloga ovde...",
     "ENTER_AUTHOR": "Unesite ime autora",
     "ENTER_READ_TIME": "5 min",
-    "ENTER_COVER_IMAGE": "https://example.com/image.jpg"
+    "ENTER_COVER_IMAGE": "https://example.com/image.jpg",
+    "MANAGING_LANGUAGE": "Jezik upravljanja",
+    "SHOWING": "Prikazano",
+    "OF": "od",
+    "CLOSE": "Zatvori"
   }
 }

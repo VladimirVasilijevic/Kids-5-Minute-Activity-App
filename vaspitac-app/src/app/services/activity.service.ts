@@ -53,4 +53,52 @@ export class ActivityService {
       })
     );
   }
+
+  /**
+   * Creates a new activity with loading indicator
+   * @param activity - The activity to create
+   * @returns Promise resolved when the activity is created
+   */
+  createActivity(activity: Activity): Promise<void> {
+    this._loadingService.showWithMessage(this._translateService.instant('ACTIVITIES.CREATING'));
+    
+    return this._firestoreService.createActivity(activity).then(() => {
+      this._loadingService.hide();
+    }).catch((error: Error) => {
+      this._loadingService.hide();
+      throw error;
+    });
+  }
+
+  /**
+   * Updates an existing activity with loading indicator
+   * @param activity - The activity to update
+   * @returns Promise resolved when the activity is updated
+   */
+  updateActivity(activity: Activity): Promise<void> {
+    this._loadingService.showWithMessage(this._translateService.instant('ACTIVITIES.UPDATING'));
+    
+    return this._firestoreService.updateActivity(activity).then(() => {
+      this._loadingService.hide();
+    }).catch((error: Error) => {
+      this._loadingService.hide();
+      throw error;
+    });
+  }
+
+  /**
+   * Deletes an activity with loading indicator
+   * @param activityId - The ID of the activity to delete
+   * @returns Promise resolved when the activity is deleted
+   */
+  deleteActivity(activityId: string): Promise<void> {
+    this._loadingService.showWithMessage(this._translateService.instant('ACTIVITIES.DELETING'));
+    
+    return this._firestoreService.deleteActivity(activityId).then(() => {
+      this._loadingService.hide();
+    }).catch((error: Error) => {
+      this._loadingService.hide();
+      throw error;
+    });
+  }
 }

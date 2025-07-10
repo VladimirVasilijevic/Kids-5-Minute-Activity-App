@@ -17,6 +17,20 @@ service firebase.storage {
         firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data.role == 'admin';
     }
     
+    // Blog images - admin only
+    match /blog-images/{allPaths=**} {
+      allow read: if true;
+      allow write: if request.auth != null && 
+        firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+    
+    // Activity images - admin only
+    match /activity-images/{allPaths=**} {
+      allow read: if true;
+      allow write: if request.auth != null && 
+        firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+    
     // User avatars - users can upload their own
     match /avatars/{userId}/{allPaths=**} {
       allow read: if true;

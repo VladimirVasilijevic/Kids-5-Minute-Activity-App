@@ -116,23 +116,29 @@ describe('ActivityDetailComponent', () => {
     });
   });
 
-  it('should render video link if videoUrl is present', (): void => {
+  it('should render video if videoUrl is present', (): void => {
     const compiled = fixture.nativeElement;
-    const videoLink = compiled.querySelector('a[href="' + mockActivity.videoUrl + '"]');
     if (mockActivity.videoUrl) {
-      expect(videoLink).toBeTruthy();
-      expect(videoLink.textContent).toContain('ACTIVITY.PLAY_VIDEO');
+      const video = compiled.querySelector('video');
+      expect(video).toBeTruthy();
+      expect(video.src).toContain(mockActivity.videoUrl);
     } else {
-      expect(videoLink).toBeFalsy();
+      const video = compiled.querySelector('video');
+      expect(video).toBeFalsy();
     }
   });
 
-  it('should render image with correct src and alt', (): void => {
+  it('should render image with correct src and alt if no videoUrl', (): void => {
     const compiled = fixture.nativeElement;
-    const img = compiled.querySelector('img');
-    expect(img).toBeTruthy();
-    expect(img.getAttribute('src')).toBe(mockActivity.imageUrl);
-    expect(img.getAttribute('alt')).toBe(mockActivity.title);
+    if (!mockActivity.videoUrl) {
+      const img = compiled.querySelector('img');
+      expect(img).toBeTruthy();
+      expect(img.getAttribute('src')).toBe(mockActivity.imageUrl);
+      expect(img.getAttribute('alt')).toBe(mockActivity.title);
+    } else {
+      const img = compiled.querySelector('img');
+      expect(img).toBeFalsy();
+    }
   });
 
   it('should render materials if present', (): void => {
