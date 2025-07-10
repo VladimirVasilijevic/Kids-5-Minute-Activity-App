@@ -3,11 +3,9 @@ import { Router } from '@angular/router';
 import { Observable, of, switchMap } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
 import { UserService } from '../../services/user.service';
-import { UserProfile } from '../../models/user-profile.model';
+import { UserProfile, UserRole } from '../../models/user-profile.model';
 import { ActivityService } from '../../services/activity.service';
 import { BlogService } from '../../services/blog.service';
-import { Activity } from '../../models/activity.model';
-import { BlogPost } from '../../models/blog-post.model';
 
 /**
  * Admin dashboard component that provides overview of content management system
@@ -108,6 +106,6 @@ export class AdminDashboardComponent implements OnInit {
    * @returns True if user is admin, false otherwise
    */
   isAdmin(userProfile: UserProfile | null): boolean {
-    return userProfile?.role === 'admin';
+    return userProfile?.role === UserRole.ADMIN;
   }
 } 

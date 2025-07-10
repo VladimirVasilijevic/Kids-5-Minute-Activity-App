@@ -3,21 +3,9 @@ import { Router } from '@angular/router';
 import { Observable, of, switchMap } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
 import { UserService } from '../../services/user.service';
-import { UserProfile } from '../../models/user-profile.model';
+import { UserProfile, UserRole } from '../../models/user-profile.model';
 import { BlogService } from '../../services/blog.service';
-import { BlogPost } from '../../models/blog-post.model';
-
-/**
- * Interface for admin blog post with additional management properties
- */
-interface AdminBlogPost extends BlogPost {
-  /** Whether the blog post is being edited */
-  isEditing?: boolean;
-  /** Whether the blog post is being deleted */
-  isDeleting?: boolean;
-  /** Status of the blog post */
-  status?: 'published' | 'draft';
-}
+import { AdminBlogPost } from '../../models/admin-blog-post.model';
 
 /**
  * Admin blogs component for managing blog posts
@@ -210,7 +198,7 @@ export class AdminBlogsComponent implements OnInit {
    * @returns True if user is admin, false otherwise
    */
   isAdmin(userProfile: UserProfile | null): boolean {
-    return userProfile?.role === 'admin';
+    return userProfile?.role === UserRole.ADMIN;
   }
 
   /**

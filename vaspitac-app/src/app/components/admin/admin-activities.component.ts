@@ -3,21 +3,9 @@ import { Router } from '@angular/router';
 import { Observable, of, switchMap } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
 import { UserService } from '../../services/user.service';
-import { UserProfile } from '../../models/user-profile.model';
+import { UserProfile, UserRole } from '../../models/user-profile.model';
 import { ActivityService } from '../../services/activity.service';
-import { Activity } from '../../models/activity.model';
-
-/**
- * Interface for admin activity with additional management properties
- */
-interface AdminActivity extends Activity {
-  /** Whether the activity is being edited */
-  isEditing?: boolean;
-  /** Whether the activity is being deleted */
-  isDeleting?: boolean;
-  /** ISO string of creation date (optional) */
-  createdAt?: string;
-}
+import { AdminActivity } from '../../models/admin-activity.model';
 
 /**
  * Admin activities component for managing craft activities and tutorials
@@ -214,7 +202,7 @@ export class AdminActivitiesComponent implements OnInit {
    * @returns True if user is admin, false otherwise
    */
   isAdmin(userProfile: UserProfile | null): boolean {
-    return userProfile?.role === 'admin';
+    return userProfile?.role === UserRole.ADMIN;
   }
 
   /**
