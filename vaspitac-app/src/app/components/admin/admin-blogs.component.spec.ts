@@ -102,8 +102,7 @@ describe('AdminBlogsComponent', (): void => {
     expect(component.blogs[0]).toEqual(jasmine.objectContaining({
       ...mockBlogPosts[0],
       isEditing: false,
-      isDeleting: false,
-      status: 'draft' // Component sets default status to 'draft'
+      isDeleting: false
     }));
   });
 
@@ -141,8 +140,7 @@ describe('AdminBlogsComponent', (): void => {
       fullContent: 'New Content',
       author: 'New Author',
       readTime: '10 min',
-      imageUrl: 'new-blog.jpg',
-      status: 'draft' as const
+      imageUrl: 'new-blog.jpg'
     };
     
     component.handleSubmit(event);
@@ -172,8 +170,7 @@ describe('AdminBlogsComponent', (): void => {
       fullContent: 'Updated Content',
       author: 'Updated Author',
       readTime: '15 min',
-      imageUrl: 'updated-blog.jpg',
-      status: 'published' as const
+      imageUrl: 'updated-blog.jpg'
     };
     
     component.handleSubmit(event);
@@ -249,8 +246,7 @@ describe('AdminBlogsComponent', (): void => {
       fullContent: 'Test',
       author: 'Test',
       readTime: '5 min',
-      imageUrl: 'test.jpg',
-      status: 'draft' as const
+      imageUrl: 'test.jpg'
     };
     component.editingBlog = mockAdminBlogPosts[0];
     component.showForm = true;
@@ -262,21 +258,7 @@ describe('AdminBlogsComponent', (): void => {
     expect(component.showForm).toBe(false);
   });
 
-  it('should publish blog', (): void => {
-    const blog = { ...mockAdminBlogPosts[0], status: 'draft' as const };
-    
-    component.publishBlog(blog);
-    
-    expect(blog.status).toBe('published');
-  });
 
-  it('should unpublish blog', (): void => {
-    const blog = { ...mockAdminBlogPosts[0], status: 'published' as const };
-    
-    component.unpublishBlog(blog);
-    
-    expect(blog.status).toBe('draft');
-  });
 
   it('should format date correctly', (): void => {
     const dateString = '2024-01-01';

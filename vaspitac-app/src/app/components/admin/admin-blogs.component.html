@@ -18,7 +18,7 @@
     <!-- Form View -->
     <div *ngIf="showForm" class="min-h-screen bg-gray-50 p-2 sm:p-4 md:p-6">
       <div class="max-w-4xl mx-auto">
-        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 mb-4 sm:mb-6">
+        <div class="flex flex-col items-start gap-2 sm:gap-4 mb-4 sm:mb-6">
           <button
             (click)="resetForm()"
             class="flex items-center gap-2 text-green-600 hover:text-green-700 font-medium"
@@ -190,17 +190,9 @@
               <div class="flex flex-col sm:flex-row gap-2 sm:gap-4">
                 <button
                   type="submit"
-                  (click)="formData.status = 'published'"
                   class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg w-full sm:w-auto"
                 >
-                  {{ 'ADMIN.PUBLISH' | translate }}
-                </button>
-                <button
-                  type="submit"
-                  (click)="formData.status = 'draft'"
-                  class="bg-gray-600 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded-lg w-full sm:w-auto"
-                >
-                  {{ 'ADMIN.DRAFT' | translate }}
+                  {{ 'ADMIN.SAVE_BLOG' | translate }}
                 </button>
                 <button
                   type="button"
@@ -285,13 +277,12 @@
                   <tr class="border-b border-gray-200">
                     <th class="text-left py-2 sm:py-3 px-2 sm:px-4 font-medium text-gray-900 text-xs sm:text-sm">{{ 'ADMIN.TITLE' | translate }}</th>
                     <th class="text-left py-2 sm:py-3 px-2 sm:px-4 font-medium text-gray-900 text-xs sm:text-sm">{{ 'ADMIN.AUTHOR' | translate }}</th>
-                    <th class="text-left py-2 sm:py-3 px-2 sm:px-4 font-medium text-gray-900 text-xs sm:text-sm">{{ 'ADMIN.STATUS' | translate }}</th>
                     <th class="text-left py-2 sm:py-3 px-2 sm:px-4 font-medium text-gray-900 text-xs sm:text-sm">{{ 'ADMIN.CREATED' | translate }}</th>
                     <th class="text-left py-2 sm:py-3 px-2 sm:px-4 font-medium text-gray-900 text-xs sm:text-sm">{{ 'ADMIN.ACTIONS' | translate }}</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr *ngFor="let blog of displayedBlogs" class="border-b border-gray-100 hover:bg-gray-50">
+                  <tr *ngFor="let blog of displayedBlogs" class="border-b border-gray-100 hover:bg-gray-50 cursor-pointer" (click)="handleEdit(blog)">
                     <td class="py-2 sm:py-3 px-2 sm:px-4">
                       <div>
                         <div class="font-medium text-xs sm:text-sm">{{ blog.title }}</div>
@@ -303,21 +294,13 @@
                     <td class="py-2 sm:py-3 px-2 sm:px-4 text-xs sm:text-sm">
                       {{ blog.author }}
                     </td>
-                    <td class="py-2 sm:py-3 px-2 sm:px-4">
-                      <span 
-                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
-                        [ngClass]="blog.status === 'published' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'"
-                      >
-                        {{ blog.status === 'published' ? ('ADMIN.PUBLISHED_STATUS' | translate) : ('ADMIN.DRAFT_STATUS' | translate) }}
-                      </span>
-                    </td>
                     <td class="py-2 sm:py-3 px-2 sm:px-4 text-xs text-gray-500">
                       {{ formatDate(blog.date) }}
                     </td>
                     <td class="py-2 sm:py-3 px-2 sm:px-4">
                       <div class="flex flex-col sm:flex-row gap-2">
                         <button
-                          (click)="handleEdit(blog)"
+                          (click)="handleEdit(blog); $event.stopPropagation()"
                           class="text-blue-600 hover:text-blue-700 text-xs sm:text-sm"
                           title="{{ 'ADMIN.EDIT' | translate }}"
                         >
@@ -326,27 +309,7 @@
                           </svg>
                         </button>
                         <button
-                          *ngIf="blog.status === 'draft'"
-                          (click)="publishBlog(blog)"
-                          class="text-green-600 hover:text-green-700 text-xs sm:text-sm"
-                          title="{{ 'ADMIN.PUBLISH' | translate }}"
-                        >
-                          <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                            <path d="M5 13l4 4L19 7" />
-                          </svg>
-                        </button>
-                        <button
-                          *ngIf="blog.status === 'published'"
-                          (click)="unpublishBlog(blog)"
-                          class="text-yellow-600 hover:text-yellow-700 text-xs sm:text-sm"
-                          title="{{ 'ADMIN.DRAFT' | translate }}"
-                        >
-                          <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                            <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
-                          </svg>
-                        </button>
-                        <button
-                          (click)="handleDelete(blog)"
+                          (click)="handleDelete(blog); $event.stopPropagation()"
                           class="text-red-600 hover:text-red-700 text-xs sm:text-sm"
                           title="{{ 'ADMIN.DELETE' | translate }}"
                         >

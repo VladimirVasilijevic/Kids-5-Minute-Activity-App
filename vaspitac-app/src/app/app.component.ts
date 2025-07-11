@@ -165,4 +165,9 @@ export class AppComponent implements OnInit, OnDestroy {
   onProfileClick(): void {
     this._router.navigate(['/profile']);
   }
+
+  /** Navigate to home page */
+  navigateToHome(): void {
+    this._router.navigate(['/']);
+  }
 }

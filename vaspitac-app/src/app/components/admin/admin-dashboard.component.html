@@ -23,7 +23,7 @@
   <div *ngIf="isAdmin(userProfile)" class="min-h-screen bg-gray-50 p-2 sm:p-4 md:p-6">
     <div class="max-w-7xl mx-auto">
       <!-- Header -->
-      <div class="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 mb-6 sm:mb-8">
+      <div class="flex flex-col items-start gap-2 sm:gap-4 mb-6 sm:mb-8">
         <app-back-button
           [label]="'ADMIN.BACK_TO_HOME' | translate"
           (back)="navigateToHome()"

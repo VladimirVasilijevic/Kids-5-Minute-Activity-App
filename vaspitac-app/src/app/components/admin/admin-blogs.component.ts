@@ -62,8 +62,7 @@ export class AdminBlogsComponent implements OnInit {
     fullContent: '',
     author: '',
     readTime: '',
-    imageUrl: '',
-    status: 'draft' as 'draft' | 'published'
+    imageUrl: ''
   };
 
   /**
@@ -117,8 +116,7 @@ export class AdminBlogsComponent implements OnInit {
       this.blogs = blogs.map(blog => ({
         ...blog,
         isEditing: false,
-        isDeleting: false,
-        status: 'draft' as const // Default status for existing blog posts
+        isDeleting: false
       }));
       this.initializeInfiniteScroll();
     });
@@ -378,7 +376,6 @@ export class AdminBlogsComponent implements OnInit {
       readTime: this.formData.readTime,
       date: new Date().toISOString(),
       imageUrl: this.formData.imageUrl,
-      status: this.formData.status,
       isEditing: false,
       isDeleting: false
     };
@@ -409,8 +406,7 @@ export class AdminBlogsComponent implements OnInit {
       fullContent: this.formData.fullContent,
       author: this.formData.author,
       readTime: this.formData.readTime,
-      imageUrl: this.formData.imageUrl,
-      status: this.formData.status
+      imageUrl: this.formData.imageUrl
     };
 
     // Update blog post in service
@@ -440,8 +436,7 @@ export class AdminBlogsComponent implements OnInit {
       fullContent: '',
       author: '',
       readTime: '',
-      imageUrl: '',
-      status: 'draft' as const
+      imageUrl: ''
     };
     this.editingBlog = null;
     this.imagePreview = null; // Clear image preview
@@ -460,8 +455,7 @@ export class AdminBlogsComponent implements OnInit {
       fullContent: blog.fullContent,
       author: blog.author,
       readTime: blog.readTime,
-      imageUrl: blog.imageUrl,
-      status: blog.status || 'draft'
+      imageUrl: blog.imageUrl
     };
     this.imagePreview = blog.imageUrl; // Set image preview for editing
     this.showForm = true;
@@ -514,37 +508,5 @@ export class AdminBlogsComponent implements OnInit {
     return new Date(dateString).toLocaleDateString();
   }
 
-  /**
-   * Publishes a blog post
-   * @param blog - The blog post to publish
-   */
-  publishBlog(blog: AdminBlogPost): void {
-    blog.status = 'published';
-    // Update blog post in service
-    this._blogService.updateBlogPost(blog).then(() => {
-      this.showSuccess('Blog post published successfully!');
-    }).catch((error: Error) => {
-      console.error('Error publishing blog post:', error);
-      // Revert status on error
-      blog.status = 'draft';
-      this.showError('Publish Error', 'Failed to publish blog post. Please try again.');
-    });
-  }
 
-  /**
-   * Unpublishes a blog post
-   * @param blog - The blog post to unpublish
-   */
-  unpublishBlog(blog: AdminBlogPost): void {
-    blog.status = 'draft';
-    // Update blog post in service
-    this._blogService.updateBlogPost(blog).then(() => {
-      this.showSuccess('Blog post unpublished successfully!');
-    }).catch((error: Error) => {
-      console.error('Error unpublishing blog post:', error);
-      // Revert status on error
-      blog.status = 'published';
-      this.showError('Unpublish Error', 'Failed to unpublish blog post. Please try again.');
-    });
-  }
 } 

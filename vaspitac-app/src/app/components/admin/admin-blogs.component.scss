@@ -87,7 +87,8 @@ table {
     min-width: 600px;
   }
   
-  .flex.gap-2 {
+  // Only apply column layout to specific elements, not all flex.gap-2
+  .flex.gap-2:not(button) {
     flex-direction: column;
     gap: 0.5rem;
   }
