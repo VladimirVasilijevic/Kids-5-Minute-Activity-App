@@ -105,7 +105,7 @@
           <h2 class="text-base sm:text-lg font-semibold text-gray-900">{{ 'ADMIN.QUICK_ACTIONS' | translate }}</h2>
         </div>
         <div class="p-4 sm:p-6">
-          <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
             <!-- Manage Blogs Button -->
             <button
               (click)="navigateToBlogs()"
@@ -126,6 +126,20 @@
                 <path d="M13 10V3L4 14h7v7l9-11h-7z" />
               </svg>
               <span class="font-medium text-xs sm:text-base">{{ 'ADMIN.MANAGE_ACTIVITIES' | translate }}</span>
+            </button>
+            
+            <!-- Manage Users Button -->
+            <button
+              (click)="navigateToUsers()"
+              class="h-20 sm:h-24 flex flex-col items-center justify-center space-y-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors w-full"
+            >
+              <svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                <circle cx="9" cy="7" r="4" />
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+              </svg>
+              <span class="font-medium text-xs sm:text-base">{{ 'ADMIN.MANAGE_USERS' | translate }}</span>
             </button>
           </div>
         </div>

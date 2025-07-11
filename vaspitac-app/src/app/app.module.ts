@@ -53,6 +53,7 @@ import { SplashDemoComponent } from './components/splash-demo/splash-demo.compon
 import { AdminDashboardComponent } from './components/admin/admin-dashboard.component';
 import { AdminActivitiesComponent } from './components/admin/admin-activities.component';
 import { AdminBlogsComponent } from './components/admin/admin-blogs.component';
+import { AdminUsersComponent } from './components/admin/admin-users.component';
 import { BackButtonComponent } from './components/back-button/back-button.component';
 
 // AoT requires an exported function for factories
@@ -94,6 +95,7 @@ export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
     AdminDashboardComponent,
     AdminActivitiesComponent,
     AdminBlogsComponent,
+    AdminUsersComponent,
     BackButtonComponent,
   ],
   imports: [
@@ -116,6 +118,7 @@ export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
       { path: 'admin', component: AdminDashboardComponent },
       { path: 'admin/activities', component: AdminActivitiesComponent },
       { path: 'admin/blogs', component: AdminBlogsComponent },
+      { path: 'admin/users', component: AdminUsersComponent },
       { path: '**', redirectTo: '' },
     ]),
     TranslateModule.forRoot({

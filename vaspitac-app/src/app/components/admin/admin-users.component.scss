@@ -1,0 +1,52 @@
+/* TODO: Add styles for admin-users component */
+
+.min-h-screen {
+  min-height: 100vh;
+}
+
+.bg-gray-50 {
+  background-color: #f9fafb;
+}
+
+.max-w-7xl {
+  max-width: 80rem;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.text-3xl {
+  font-size: 1.875rem;
+  font-weight: 700;
+}
+
+.text-gray-900 {
+  color: #111827;
+}
+
+.mb-6 {
+  margin-bottom: 1.5rem;
+}
+
+/* Modal styles */
+.fixed.inset-0 {
+  z-index: 50;
+}
+.bg-black.bg-opacity-50 {
+  background: rgba(0,0,0,0.5);
+}
+
+/* Table styles */
+.table th, .table td {
+  padding: 0.75rem 1.5rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .max-w-7xl {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+  .overflow-x-auto {
+    overflow-x: auto;
+  }
+} 
