@@ -225,7 +225,15 @@
     "ERROR_NO_EMAIL": "Email adresa korisnika nije pronađena. Molimo prijavite se ponovo.",
     "RESET_PASSWORD_SUCCESS": "Email za resetovanje lozinke je poslat! Proverite vaš inbox.",
     "ERROR_RESET_PASSWORD": "Došlo je do greške prilikom slanja email-a za resetovanje lozinke. Pokušajte ponovo.",
-    "LOADING": "Učitavanje profila..."
+    "LOADING": "Učitavanje profila...",
+    "SUCCESS_UPDATE": "Profil je uspešno ažuriran!",
+    "SUCCESS_UPDATE_AVATAR_LIMIT": "Profil je uspešno ažuriran! (Avatar je sačuvan u profilu ali nije sinhronizovan sa nalogom zbog dužine URL-a)",
+    "ERROR_UPDATE_TITLE": "Greška Ažuriranja",
+    "ERROR_UPDATE_MESSAGE": "Greška prilikom ažuriranja profila. Pokušajte ponovo.",
+    "ERROR_INVALID_IMAGE": "Molimo izaberite validnu sliku (JPEG, PNG, GIF, WebP) manju od 5MB.",
+    "ERROR_UPLOAD_FAILED": "Greška prilikom učitavanja slike. Pokušajte ponovo.",
+    "UPLOADING_IMAGE": "Učitavanje slike...",
+    "CLOSE": "Zatvori"
   },
   "COMMON": {
     "CANCEL": "Otkaži",
