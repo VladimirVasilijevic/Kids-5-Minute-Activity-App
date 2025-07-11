@@ -182,15 +182,15 @@ export class ProfileComponent implements OnInit {
       
       // Show success message
       if (profileData.avatarUrl && profileData.avatarUrl.length >= 2000) {
-        this.showSuccess('Profile updated successfully! (Avatar stored in profile but not synced to account due to URL length)');
+        this.showSuccess(this._translate.instant('PROFILE.SUCCESS_UPDATE_AVATAR_LIMIT'));
       } else {
-        this.showSuccess('Profile updated successfully!');
+        this.showSuccess(this._translate.instant('PROFILE.SUCCESS_UPDATE'));
       }
       
     } catch (error) {
       console.error('Error updating profile:', error);
-      const errorMessage = (error as Error).message || 'Failed to update profile. Please try again.';
-      this.showError('Update Error', errorMessage);
+      const errorMessage = (error as Error).message || this._translate.instant('PROFILE.ERROR_UPDATE_MESSAGE');
+      this.showError(this._translate.instant('PROFILE.ERROR_UPDATE_TITLE'), errorMessage);
     }
   }
 

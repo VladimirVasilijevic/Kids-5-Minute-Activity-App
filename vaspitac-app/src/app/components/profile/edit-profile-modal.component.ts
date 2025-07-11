@@ -1,4 +1,5 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { TranslateService } from '@ngx-translate/core';
 import { UserProfile } from '../../models/user-profile.model';
 import { ImageUploadService } from '../../services/image-upload.service';
 
@@ -29,7 +30,10 @@ export class EditProfileModalComponent {
   isUploadingImage = false;
   imagePreview: string | null = null;
 
-  constructor(private _imageUploadService: ImageUploadService) {}
+  constructor(
+    private _imageUploadService: ImageUploadService,
+    private _translate: TranslateService
+  ) {}
 
   ngOnChanges(): void {
     if (this.user) {
@@ -45,7 +49,7 @@ export class EditProfileModalComponent {
       const file = input.files[0];
       
       if (!this._imageUploadService.isValidImage(file)) {
-        this.error.emit('Please select a valid image file (JPEG, PNG, GIF, WebP) under 5MB.');
+        this.error.emit(this._translate.instant('PROFILE.ERROR_INVALID_IMAGE'));
         return;
       }
       
@@ -66,7 +70,7 @@ export class EditProfileModalComponent {
       error: (error: Error) => {
         console.error('Error uploading image:', error);
         this.isUploadingImage = false;
-        this.error.emit(error.message || 'Failed to upload image. Please try again.');
+        this.error.emit(error.message || this._translate.instant('PROFILE.ERROR_UPLOAD_FAILED'));
       }
     });
   }

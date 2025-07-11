@@ -225,7 +225,15 @@
     "ERROR_NO_EMAIL": "User email address not found. Please log in again.",
     "RESET_PASSWORD_SUCCESS": "Password reset email has been sent! Check your inbox.",
     "ERROR_RESET_PASSWORD": "An error occurred while sending the password reset email. Please try again.",
-    "LOADING": "Loading profile..."
+    "LOADING": "Loading profile...",
+    "SUCCESS_UPDATE": "Profile updated successfully!",
+    "SUCCESS_UPDATE_AVATAR_LIMIT": "Profile updated successfully! (Avatar stored in profile but not synced to account due to URL length)",
+    "ERROR_UPDATE_TITLE": "Update Error",
+    "ERROR_UPDATE_MESSAGE": "Failed to update profile. Please try again.",
+    "ERROR_INVALID_IMAGE": "Please select a valid image file (JPEG, PNG, GIF, WebP) under 5MB.",
+    "ERROR_UPLOAD_FAILED": "Failed to upload image. Please try again.",
+    "UPLOADING_IMAGE": "Uploading image...",
+    "CLOSE": "Close"
   },
   "COMMON": {
     "CANCEL": "Cancel",
