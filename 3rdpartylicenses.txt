@@ -300,6 +300,12 @@ Apache-2.0
 @firebase/firestore-compat
 Apache-2.0
 
+@firebase/functions
+Apache-2.0
+
+@firebase/functions-compat
+Apache-2.0
+
 @firebase/logger
 Apache-2.0
 
@@ -337,6 +343,8 @@ firebase/compat/app
 firebase/compat/auth
 
 firebase/compat/firestore
+
+firebase/compat/functions
 
 firebase/compat/storage
 
