@@ -31,9 +31,9 @@ export enum UserRole {
   // eslint-disable-next-line no-unused-vars
   SUBSCRIBER = 'subscriber',
   // eslint-disable-next-line no-unused-vars
-  TRIAL_USER = 'trial_user',
+  TRIAL_USER = 'trial',
   // eslint-disable-next-line no-unused-vars
-  FREE_USER = 'free_user'
+  FREE_USER = 'free'
 }
 
 /**

@@ -231,6 +231,8 @@
     "CANCEL": "Cancel",
     "SAVE": "Save",
     "SAVING": "Saving...",
+    "DELETING": "Deleting...",
+    "SENDING": "Sending...",
     "CLOSE": "Close"
   },
   "SUBSCRIPTION": {

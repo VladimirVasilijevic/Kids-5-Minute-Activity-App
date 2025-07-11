@@ -8,13 +8,15 @@ import { Observable, tap } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { TranslateService } from '@ngx-translate/core';
 import { LoadingService } from './loading.service';
+import { AngularFireFunctions } from '@angular/fire/compat/functions';
 
 @Injectable({ providedIn: 'root' })
 export class UserService {
   constructor(
     private _afs: AngularFirestore,
     private _loadingService: LoadingService,
-    private _translateService: TranslateService
+    private _translateService: TranslateService,
+    private _functions: AngularFireFunctions
   ) {}
 
   /**
@@ -51,6 +53,66 @@ export class UserService {
     return this._afs.collection<UserProfile>('users').valueChanges().pipe(
       tap(() => {
         this._loadingService.hide();
+      })
+    );
+  }
+
+  /**
+   * Create a new user via Firebase Callable Function
+   * @param data - { email, password, displayName, role }
+   * @returns Observable from the callable function
+   */
+  createUser(data: { email: string; password: string; displayName: string; role: string }) {
+    this._loadingService.showWithMessage(this._translateService.instant('COMMON.SAVING'));
+    return this._functions.httpsCallable('createUser')(data).pipe(
+      tap({
+        next: () => this._loadingService.hide(),
+        error: () => this._loadingService.hide()
+      })
+    );
+  }
+
+  /**
+   * Update an existing user via Firebase Callable Function
+   * @param data - { uid, displayName, role }
+   * @returns Observable from the callable function
+   */
+  updateUser(data: { uid: string; displayName: string; role: string }) {
+    this._loadingService.showWithMessage(this._translateService.instant('COMMON.SAVING'));
+    return this._functions.httpsCallable('updateUser')(data).pipe(
+      tap({
+        next: () => this._loadingService.hide(),
+        error: () => this._loadingService.hide()
+      })
+    );
+  }
+
+  /**
+   * Delete a user via Firebase Callable Function
+   * @param data - { uid }
+   * @returns Observable from the callable function
+   */
+  deleteUser(data: { uid: string }) {
+    this._loadingService.showWithMessage(this._translateService.instant('COMMON.DELETING'));
+    return this._functions.httpsCallable('deleteUser')(data).pipe(
+      tap({
+        next: () => this._loadingService.hide(),
+        error: () => this._loadingService.hide()
+      })
+    );
+  }
+
+  /**
+   * Reset user password via Firebase Callable Function
+   * @param data - { email }
+   * @returns Observable from the callable function
+   */
+  resetUserPassword(data: { email: string }) {
+    this._loadingService.showWithMessage(this._translateService.instant('COMMON.SENDING'));
+    return this._functions.httpsCallable('resetUserPassword')(data).pipe(
+      tap({
+        next: () => this._loadingService.hide(),
+        error: () => this._loadingService.hide()
       })
     );
   }

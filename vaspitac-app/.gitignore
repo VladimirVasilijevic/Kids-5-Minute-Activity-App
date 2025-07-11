@@ -59,6 +59,8 @@ pglite-debug.log
 **/scripts/node_modules
 
 **/firebase/functions/node_modules
+**/firebase/functions/lib
+**/firebase/functions/lib/**
 # Compiled output
 /out-tsc
 

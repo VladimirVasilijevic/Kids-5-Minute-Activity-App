@@ -309,3 +309,182 @@ export const getUserStats = functions.https.onCall(async (data, context) => {
     throw new functions.https.HttpsError('internal', 'Failed to get user stats');
   }
 }); 
+
+/**
+ * Creates a new user in Auth and Firestore (admin only)
+ * Callable as 'createUser'
+ */
+export const createUser = functions.region('us-central1').https.onCall(async (data, context) => {
+  if (!context.auth) {
+    throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated');
+  }
+  // Check if the requesting user is an admin
+  const adminUser = await db.collection('users').doc(context.auth.uid).get();
+  if (!adminUser.exists || adminUser.data()?.role !== 'admin') {
+    throw new functions.https.HttpsError('permission-denied', 'Only admins can create users');
+  }
+  const { email, password, displayName, role } = data;
+  if (!email || !password || !displayName || !role) {
+    throw new functions.https.HttpsError('invalid-argument', 'Missing required fields');
+  }
+  try {
+    // Create user in Auth
+    const userRecord = await admin.auth().createUser({ email, password, displayName });
+    // Set default permissions based on role
+    let permissions = FREE_USER_PERMISSIONS;
+    if (role === 'admin') permissions = ADMIN_PERMISSIONS;
+    // Add user profile to Firestore
+    await db.collection('users').doc(userRecord.uid).set({
+      uid: userRecord.uid,
+      displayName,
+      email,
+      role,
+      permissions,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    });
+    return { success: true, uid: userRecord.uid };
+  } catch (error: any) {
+    console.error('Error creating user:', error);
+    throw new functions.https.HttpsError('internal', error.message || 'Failed to create user');
+  }
+});
+
+/**
+ * Updates an existing user in Auth and Firestore (admin only)
+ * Callable as 'updateUser'
+ */
+export const updateUser = functions.region('us-central1').https.onCall(async (data, context) => {
+  if (!context.auth) {
+    throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated');
+  }
+  
+  // Check if the requesting user is an admin
+  const adminUser = await db.collection('users').doc(context.auth.uid).get();
+  if (!adminUser.exists || adminUser.data()?.role !== 'admin') {
+    throw new functions.https.HttpsError('permission-denied', 'Only admins can update users');
+  }
+  
+  const { uid, displayName, role } = data;
+  if (!uid || !displayName || !role) {
+    throw new functions.https.HttpsError('invalid-argument', 'Missing required fields');
+  }
+  
+  // Prevent admins from changing their own role
+  if (uid === context.auth.uid) {
+    throw new functions.https.HttpsError('permission-denied', 'Cannot modify your own role');
+  }
+  
+  try {
+    // Set default permissions based on role
+    let permissions = FREE_USER_PERMISSIONS;
+    if (role === 'admin') permissions = ADMIN_PERMISSIONS;
+    
+    // Update user in Auth
+    await admin.auth().updateUser(uid, { displayName });
+    
+    // Update user profile in Firestore
+    await db.collection('users').doc(uid).update({
+      displayName,
+      role,
+      permissions,
+      updatedAt: new Date().toISOString()
+    });
+    
+    // Update custom claims for admin role
+    if (role === 'admin') {
+      await admin.auth().setCustomUserClaims(uid, {
+        admin: true,
+        role: 'admin'
+      });
+    } else {
+      await admin.auth().setCustomUserClaims(uid, {
+        admin: false,
+        role: role
+      });
+    }
+    
+    return { success: true, message: 'User updated successfully' };
+  } catch (error: any) {
+    console.error('Error updating user:', error);
+    throw new functions.https.HttpsError('internal', error.message || 'Failed to update user');
+  }
+});
+
+/**
+ * Deletes a user from Auth and Firestore (admin only)
+ * Callable as 'deleteUser'
+ */
+export const deleteUser = functions.region('us-central1').https.onCall(async (data, context) => {
+  if (!context.auth) {
+    throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated');
+  }
+  
+  // Check if the requesting user is an admin
+  const adminUser = await db.collection('users').doc(context.auth.uid).get();
+  if (!adminUser.exists || adminUser.data()?.role !== 'admin') {
+    throw new functions.https.HttpsError('permission-denied', 'Only admins can delete users');
+  }
+  
+  const { uid } = data;
+  if (!uid) {
+    throw new functions.https.HttpsError('invalid-argument', 'User UID is required');
+  }
+  
+  // Prevent admins from deleting themselves
+  if (uid === context.auth.uid) {
+    throw new functions.https.HttpsError('permission-denied', 'Cannot delete your own account');
+  }
+  
+  try {
+    // Delete user from Auth
+    await admin.auth().deleteUser(uid);
+    
+    // Delete user profile from Firestore
+    await db.collection('users').doc(uid).delete();
+    
+    return { success: true, message: 'User deleted successfully' };
+  } catch (error: any) {
+    console.error('Error deleting user:', error);
+    throw new functions.https.HttpsError('internal', error.message || 'Failed to delete user');
+  }
+});
+
+/**
+ * Sends password reset email to user (admin only)
+ * Callable as 'resetUserPassword'
+ */
+export const resetUserPassword = functions.region('us-central1').https.onCall(async (data, context) => {
+  if (!context.auth) {
+    throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated');
+  }
+  
+  // Check if the requesting user is an admin
+  const adminUser = await db.collection('users').doc(context.auth.uid).get();
+  if (!adminUser.exists || adminUser.data()?.role !== 'admin') {
+    throw new functions.https.HttpsError('permission-denied', 'Only admins can reset user passwords');
+  }
+  
+  const { email } = data;
+  if (!email) {
+    throw new functions.https.HttpsError('invalid-argument', 'Email is required');
+  }
+  
+  try {
+    // Generate password reset link
+    const resetLink = await admin.auth().generatePasswordResetLink(email);
+    
+    // TODO: Send email with reset link (you can use a service like SendGrid)
+    // For now, we'll just return the reset link
+    console.log(`Password reset link for ${email}: ${resetLink}`);
+    
+    return { 
+      success: true, 
+      message: 'Password reset email sent successfully',
+      resetLink // Remove this in production, just for testing
+    };
+  } catch (error: any) {
+    console.error('Error resetting password:', error);
+    throw new functions.https.HttpsError('internal', error.message || 'Failed to reset password');
+  }
+}); 

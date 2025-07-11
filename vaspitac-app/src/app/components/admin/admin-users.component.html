@@ -54,7 +54,7 @@
               <td class="px-6 py-4 whitespace-nowrap">{{ user.email }}</td>
               <td class="px-6 py-4 whitespace-nowrap">
                 <span [ngClass]="getRoleBadgeClass(user.role)" class="px-2 py-1 rounded text-xs font-semibold">
-                  {{ user.role | titlecase }}
+                  {{ getRoleDisplayName(user.role) }}
                 </span>
               </td>
               <td class="px-6 py-4 whitespace-nowrap">{{ user.createdAt | date:'mediumDate' }}</td>
@@ -144,8 +144,8 @@
             >
               <option value="admin">{{ 'ADMIN.ROLE_ADMIN' | translate }}</option>
               <option value="subscriber">{{ 'ADMIN.ROLE_SUBSCRIBER' | translate }}</option>
-              <option value="free_user">{{ 'ADMIN.ROLE_FREE_USER' | translate }}</option>
-              <option value="trial_user">{{ 'ADMIN.ROLE_TRIAL_USER' | translate }}</option>
+              <option value="free">{{ 'ADMIN.ROLE_FREE_USER' | translate }}</option>
+              <option value="trial">{{ 'ADMIN.ROLE_TRIAL_USER' | translate }}</option>
             </select>
           </div>
           <div class="flex gap-2 pt-4">
@@ -185,5 +185,19 @@
       (close)="closeResetConfirmModal()"
       (confirm)="onConfirmResetPassword()"
     ></app-confirmation-modal>
+
+    <!-- Error Modal -->
+    <app-error-modal
+      *ngIf="showErrorModal"
+      [isOpen]="showErrorModal"
+      [title]="errorTitle"
+      [message]="errorMessage"
+      (close)="closeErrorModal()"
+    ></app-error-modal>
+
+    <!-- Success Message -->
+    <div *ngIf="showSuccessMessage" class="fixed top-6 left-1/2 transform -translate-x-1/2 z-50 bg-green-600 text-white px-6 py-3 rounded shadow-lg transition-all">
+      {{ successMessage }}
+    </div>
   </div>
 </div> 
