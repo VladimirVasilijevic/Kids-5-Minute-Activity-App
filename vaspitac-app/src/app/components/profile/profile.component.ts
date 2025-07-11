@@ -32,6 +32,13 @@ export class ProfileComponent implements OnInit {
   resetError: string | null = null;
   resetSuccess = false;
 
+  // Error and success modal state
+  showErrorModal = false;
+  errorMessage = '';
+  errorTitle = '';
+  showSuccessMessage = false;
+  successMessage = '';
+
   constructor(
     private _router: Router,
     private _auth: AuthService,
@@ -115,5 +122,109 @@ export class ProfileComponent implements OnInit {
   closeChangePassword(): void {
     this.showChangePasswordModal = false;
     this.passwordChangeError = null;
+  }
+
+  /**
+   * Handle saving profile changes from the edit modal
+   */
+  async onSaveProfile(profileData: { displayName: string; avatarUrl?: string | null }): Promise<void> {
+    if (!this.selectedUser) return;
+
+    try {
+      // Prepare the update data - only include fields that have values
+      const updateData: Partial<UserProfile> = {
+        displayName: profileData.displayName,
+        updatedAt: new Date().toISOString()
+      };
+
+      // Only include avatarUrl if it has a value (not null or undefined)
+      if (profileData.avatarUrl) {
+        updateData.avatarUrl = profileData.avatarUrl;
+      }
+
+      // Update the user profile in Firestore (merge will only update provided fields)
+      await this._userService.setUserProfile({
+        ...this.selectedUser,
+        ...updateData
+      });
+      
+      // Update Firebase Auth display name and photo URL
+      const currentUser = await this._auth.getCurrentUser();
+      if (currentUser) {
+        // Check if avatar URL is too long for Firebase Auth (limit is ~2048 characters)
+        let photoURL: string | null = null;
+        let avatarUrlTooLong = false;
+        
+        if (profileData.avatarUrl) {
+          if (profileData.avatarUrl.length < 2000) {
+            photoURL = profileData.avatarUrl;
+          } else {
+            // If URL is too long, we'll store it in Firestore but not in Firebase Auth
+            console.warn('Avatar URL too long for Firebase Auth, storing only in Firestore');
+            avatarUrlTooLong = true;
+          }
+        }
+        
+        await currentUser.updateProfile({
+          displayName: profileData.displayName,
+          photoURL: photoURL
+        });
+      }
+      
+      // Update the local user profile
+      this.selectedUser = {
+        ...this.selectedUser,
+        ...updateData
+      };
+      
+      // Close the modal
+      this.closeEditProfile();
+      
+      // Show success message
+      if (profileData.avatarUrl && profileData.avatarUrl.length >= 2000) {
+        this.showSuccess('Profile updated successfully! (Avatar stored in profile but not synced to account due to URL length)');
+      } else {
+        this.showSuccess('Profile updated successfully!');
+      }
+      
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      const errorMessage = (error as Error).message || 'Failed to update profile. Please try again.';
+      this.showError('Update Error', errorMessage);
+    }
+  }
+
+  /**
+   * Shows error modal with specified message
+   * @param title - Error title
+   * @param message - Error message
+   */
+  showError(title: string, message: string): void {
+    this.errorTitle = title;
+    this.errorMessage = message;
+    this.showErrorModal = true;
+  }
+
+  /**
+   * Shows success message
+   * @param message - Success message
+   */
+  private showSuccess(message: string): void {
+    this.successMessage = message;
+    this.showSuccessMessage = true;
+    
+    // Auto-hide success message after 5 seconds
+    setTimeout(() => {
+      this.showSuccessMessage = false;
+    }, 5000);
+  }
+
+  /**
+   * Closes the error modal
+   */
+  closeErrorModal(): void {
+    this.showErrorModal = false;
+    this.errorTitle = '';
+    this.errorMessage = '';
   }
 } 

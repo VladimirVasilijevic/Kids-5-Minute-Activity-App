@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { UserProfile } from '../../models/user-profile.model';
+import { ImageUploadService } from '../../services/image-upload.service';
 
 /**
  * Modal for editing user profile (name and avatar)
@@ -18,44 +19,65 @@ export class EditProfileModalComponent {
   @Output() close = new EventEmitter<void>();
   /** Emits the updated profile */
   @Output() save = new EventEmitter<{ displayName: string; avatarUrl?: string | null }>();
+  /** Emits when an error occurs */
+  @Output() error = new EventEmitter<string>();
 
   // Local state for form fields
   displayName = '';
   avatarUrl: string | null = null;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  avatarFile: any = null;
+  avatarFile: File | null = null;
+  isUploadingImage = false;
+  imagePreview: string | null = null;
+
+  constructor(private _imageUploadService: ImageUploadService) {}
 
   ngOnChanges(): void {
     if (this.user) {
       this.displayName = this.user.displayName;
       this.avatarUrl = this.user.avatarUrl || null;
+      this.imagePreview = this.user.avatarUrl || null;
     }
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  onAvatarChange(event: any): void {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const input = event.target as any;
+  onAvatarChange(event: Event): void {
+    const input = event.target as HTMLInputElement;
     if (input.files && input.files[0]) {
       const file = input.files[0];
+      
+      if (!this._imageUploadService.isValidImage(file)) {
+        this.error.emit('Please select a valid image file (JPEG, PNG, GIF, WebP) under 5MB.');
+        return;
+      }
+      
       this.avatarFile = file;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const reader = new (window as any).FileReader();
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      reader.onload = (e: any): void => {
-        this.avatarUrl = e.target?.result as string;
-      };
-      reader.readAsDataURL(file);
+      this.uploadImage(file);
     }
+  }
+
+  private uploadImage(file: File): void {
+    this.isUploadingImage = true;
+    
+    this._imageUploadService.uploadImage(file, 'profile-avatars/').subscribe({
+      next: (downloadUrl) => {
+        this.avatarUrl = downloadUrl;
+        this.imagePreview = downloadUrl;
+        this.isUploadingImage = false;
+      },
+      error: (error: Error) => {
+        console.error('Error uploading image:', error);
+        this.isUploadingImage = false;
+        this.error.emit(error.message || 'Failed to upload image. Please try again.');
+      }
+    });
   }
 
   removeAvatar(): void {
     this.avatarUrl = null;
     this.avatarFile = null;
+    this.imagePreview = null;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  onSave(event: any): void {
+  onSave(event: Event): void {
     event.preventDefault();
     this.save.emit({ displayName: this.displayName, avatarUrl: this.avatarUrl });
   }

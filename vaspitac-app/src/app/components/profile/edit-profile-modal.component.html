@@ -9,23 +9,34 @@
     </h2>
     <form class="space-y-4" autocomplete="off" (ngSubmit)="onSave($event)">
       <div class="flex flex-col items-center gap-2 mb-4">
-        <div class="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center overflow-hidden border border-gray-300">
-          <img *ngIf="avatarUrl; else defaultAvatar" [src]="avatarUrl" alt="avatar" class="w-full h-full object-cover" />
+        <div class="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center overflow-hidden border border-gray-300 relative">
+          <img *ngIf="imagePreview; else defaultAvatar" [src]="imagePreview" alt="avatar" class="w-full h-full object-cover" />
           <ng-template #defaultAvatar>
             <svg class="h-10 w-10 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
               <path d="M16 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
               <circle cx="12" cy="7" r="4" />
             </svg>
           </ng-template>
+          
+          <!-- Upload loading overlay -->
+          <div *ngIf="isUploadingImage" class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center rounded-full">
+            <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div>
+          </div>
         </div>
+        
         <div class="flex gap-2 mt-2">
-          <label class="cursor-pointer text-green-600 hover:underline text-sm">
+          <label class="cursor-pointer text-green-600 hover:underline text-sm" [class.opacity-50]="isUploadingImage">
             {{ 'PROFILE.CHANGE_AVATAR' | translate }}
-            <input type="file" accept="image/*" (change)="onAvatarChange($event)" class="hidden" />
+            <input type="file" accept="image/*" (change)="onAvatarChange($event)" class="hidden" [disabled]="isUploadingImage" />
           </label>
-          <button type="button" (click)="removeAvatar()" class="text-red-500 hover:underline text-sm">
+          <button type="button" (click)="removeAvatar()" class="text-red-500 hover:underline text-sm" [disabled]="isUploadingImage">
             {{ 'PROFILE.REMOVE_AVATAR' | translate }}
           </button>
+        </div>
+        
+        <!-- Upload status -->
+        <div *ngIf="isUploadingImage" class="text-sm text-gray-600">
+          Uploading image...
         </div>
       </div>
       <div>
@@ -34,8 +45,8 @@
         <div *ngIf="!displayName" class="text-red-500 text-xs mt-1">{{ 'PROFILE.ERROR_NAME_REQUIRED' | translate }}</div>
       </div>
       <div class="flex justify-end gap-2 mt-6">
-        <button type="button" (click)="onClose()" class="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-100">{{ 'COMMON.CANCEL' | translate }}</button>
-        <button type="submit" class="px-4 py-2 rounded-lg bg-green-600 text-white font-semibold hover:bg-green-700" [disabled]="!displayName">{{ 'COMMON.SAVE' | translate }}</button>
+        <button type="button" (click)="onClose()" class="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-100" [disabled]="isUploadingImage">{{ 'COMMON.CANCEL' | translate }}</button>
+        <button type="submit" class="px-4 py-2 rounded-lg bg-green-600 text-white font-semibold hover:bg-green-700" [disabled]="!displayName || isUploadingImage">{{ 'COMMON.SAVE' | translate }}</button>
       </div>
     </form>
   </div>

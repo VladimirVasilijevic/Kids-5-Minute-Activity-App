@@ -19,6 +19,16 @@
     <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
   </div>
 
+  <!-- Success Message -->
+  <div *ngIf="showSuccessMessage" class="fixed top-4 right-4 z-50 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded shadow-lg">
+    <div class="flex items-center">
+      <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+      </svg>
+      {{ successMessage }}
+    </div>
+  </div>
+
   <!-- Profile Content -->
   <ng-container *ngIf="userProfile$ | async as user; else noUser">
     <div class="bg-white rounded-lg shadow-md p-6">
@@ -116,6 +126,8 @@
     [isOpen]="showEditProfileModal"
     [user]="selectedUser"
     (close)="closeEditProfile()"
+    (save)="onSaveProfile($event)"
+    (error)="showError('Upload Error', $event)"
   ></app-edit-profile-modal>
   
   <app-reset-password-modal
@@ -128,4 +140,32 @@
     (close)="onCloseResetPassword()"
     (send)="onSendResetPassword($event)"
   ></app-reset-password-modal>
+
+  <!-- Error Modal -->
+  <div *ngIf="showErrorModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+      <div class="flex items-center mb-4">
+        <div class="flex-shrink-0">
+          <svg class="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+          </svg>
+        </div>
+        <div class="ml-3">
+          <h3 class="text-lg font-medium text-gray-900">{{ errorTitle }}</h3>
+        </div>
+      </div>
+      <div class="mb-4">
+        <p class="text-sm text-gray-600">{{ errorMessage }}</p>
+      </div>
+      <div class="flex justify-end">
+        <button
+          type="button"
+          (click)="closeErrorModal()"
+          class="bg-red-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+        >
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
 </div> 
