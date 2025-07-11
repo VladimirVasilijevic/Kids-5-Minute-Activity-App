@@ -41,4 +41,17 @@ export class UserService {
   setUserProfile(profile: UserProfile): Promise<void> {
     return this._afs.doc<UserProfile>(`users/${profile.uid}`).set(profile, { merge: true });
   }
+
+  /**
+   * Get all user profiles from Firestore
+   * @returns Observable of UserProfile[]
+   */
+  getAllUsers(): Observable<UserProfile[]> {
+    this._loadingService.showWithMessage(this._translateService.instant('PROFILE.LOADING'));
+    return this._afs.collection<UserProfile>('users').valueChanges().pipe(
+      tap(() => {
+        this._loadingService.hide();
+      })
+    );
+  }
 } 

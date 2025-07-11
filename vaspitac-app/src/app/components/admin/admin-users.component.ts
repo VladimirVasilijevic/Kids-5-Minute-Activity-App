@@ -1,51 +1,25 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-
-interface MockUser {
-  id: string;
-  displayName: string;
-  email: string;
-  role: 'admin' | 'subscriber' | 'free_user' | 'trial_user';
-  createdAt: string;
-  avatarUrl: string;
-  isEditing?: boolean;
-  isDeleting?: boolean;
-}
+import { UserService } from '../../services/user.service';
+import { UserProfile, UserRole } from '../../models/user-profile.model';
 
 @Component({
   selector: 'app-admin-users',
   templateUrl: './admin-users.component.html',
   styleUrls: ['./admin-users.component.scss']
 })
-export class AdminUsersComponent {
-  users: MockUser[] = [
-    {
-      id: '1',
-      displayName: 'Test Admin',
-      email: 'admin@test.com',
-      role: 'admin',
-      createdAt: '2024-01-01T12:00:00Z',
-      avatarUrl: 'https://ui-avatars.com/api/?name=Test+Admin&background=22c55e&color=fff'
-    },
-    {
-      id: '2',
-      displayName: 'Jane Doe',
-      email: 'jane@example.com',
-      role: 'subscriber',
-      createdAt: '2024-02-15T09:30:00Z',
-      avatarUrl: 'https://ui-avatars.com/api/?name=Jane+Doe&background=22c55e&color=fff'
-    }
-  ];
+export class AdminUsersComponent implements OnInit {
+  users: UserProfile[] = [];
   searchTerm = '';
-  filteredUsers: MockUser[] = this.users;
+  filteredUsers: UserProfile[] = [];
   isUserModalOpen = false;
   isDeleteModalOpen = false;
-  selectedUser: MockUser | null = null;
+  selectedUser: UserProfile | null = null;
   userFormModel = {
     displayName: '',
     email: '',
     password: '',
-    role: 'subscriber' as 'admin' | 'subscriber' | 'free_user' | 'trial_user'
+    role: UserRole.SUBSCRIBER as UserRole
   };
 
   // Confirmation modal state for reset password
@@ -54,10 +28,13 @@ export class AdminUsersComponent {
   resetConfirmMessage = '';
   resetConfirmAction: (() => void) | null = null;
 
-  constructor(private _router: Router) {}
+  constructor(private _router: Router, private _userService: UserService) {}
 
   ngOnInit() {
-    this.filterUsers();
+    this._userService.getAllUsers().subscribe(users => {
+      this.users = users;
+      this.filterUsers();
+    });
   }
 
   onSearchChange() {
@@ -67,13 +44,13 @@ export class AdminUsersComponent {
   filterUsers() {
     const term = this.searchTerm.toLowerCase();
     this.filteredUsers = this.users.filter(user =>
-      user.displayName.toLowerCase().includes(term) ||
-      user.email.toLowerCase().includes(term) ||
-      user.role.toLowerCase().includes(term)
+      (user.displayName?.toLowerCase().includes(term) ||
+      user.email?.toLowerCase().includes(term) ||
+      user.role?.toLowerCase().includes(term))
     );
   }
 
-  openUserModal(user?: MockUser) {
+  openUserModal(user?: UserProfile) {
     this.isUserModalOpen = true;
     if (user) {
       this.selectedUser = user;
@@ -89,7 +66,7 @@ export class AdminUsersComponent {
         displayName: '',
         email: '',
         password: '',
-        role: 'subscriber'
+        role: UserRole.SUBSCRIBER
       };
     }
   }
@@ -99,7 +76,7 @@ export class AdminUsersComponent {
     this.selectedUser = null;
   }
 
-  openDeleteModal(user: MockUser) {
+  openDeleteModal(user: UserProfile) {
     this.selectedUser = user;
     this.isDeleteModalOpen = true;
   }
@@ -114,7 +91,7 @@ export class AdminUsersComponent {
     this.closeUserModal();
   }
 
-  resetPassword(user: MockUser) {
+  resetPassword(user: UserProfile) {
     this.resetConfirmTitle = 'Reset Password';
     this.resetConfirmMessage = `Are you sure you want to send a password reset email to ${user.email}?`;
     this.resetConfirmAction = () => {
@@ -143,17 +120,17 @@ export class AdminUsersComponent {
     this.closeDeleteModal();
   }
 
-  getAvatarUrl(user: MockUser) {
-    return user.avatarUrl;
+  getAvatarUrl(user: UserProfile) {
+    return user.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.displayName)}&background=22c55e&color=fff`;
   }
 
   getRoleBadgeClass(role: string) {
     switch (role) {
-      case 'admin':
+      case UserRole.ADMIN:
         return 'bg-red-100 text-red-800';
-      case 'subscriber':
+      case UserRole.SUBSCRIBER:
         return 'bg-green-100 text-green-800';
-      case 'trial_user':
+      case UserRole.TRIAL_USER:
         return 'bg-blue-100 text-blue-800';
       default:
         return 'bg-gray-100 text-gray-800';
