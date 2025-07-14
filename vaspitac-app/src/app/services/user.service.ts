@@ -116,4 +116,19 @@ export class UserService {
       })
     );
   }
+
+  /**
+   * Delete own profile via Firebase Callable Function
+   * @param data - { password }
+   * @returns Observable from the callable function
+   */
+  deleteOwnProfile(data: { password: string }) {
+    this._loadingService.showWithMessage(this._translateService.instant('COMMON.DELETING'));
+    return this._functions.httpsCallable('deleteOwnProfile')(data).pipe(
+      tap({
+        next: () => this._loadingService.hide(),
+        error: () => this._loadingService.hide()
+      })
+    );
+  }
 } 

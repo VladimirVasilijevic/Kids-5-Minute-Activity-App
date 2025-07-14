@@ -487,4 +487,75 @@ export const resetUserPassword = functions.region('us-central1').https.onCall(as
     console.error('Error resetting password:', error);
     throw new functions.https.HttpsError('internal', error.message || 'Failed to reset password');
   }
+});
+
+/**
+ * Allows users to delete their own profile (self-deletion)
+ * Callable as 'deleteOwnProfile'
+ */
+export const deleteOwnProfile = functions.region('us-central1').https.onCall(async (data, context) => {
+  if (!context.auth) {
+    throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated');
+  }
+  
+  const { password } = data;
+  if (!password) {
+    throw new functions.https.HttpsError('invalid-argument', 'Password is required for account deletion');
+  }
+  
+  try {
+    const uid = context.auth.uid;
+    
+    // Get user profile from Firestore
+    const userDoc = await db.collection('users').doc(uid).get();
+    if (!userDoc.exists) {
+      throw new functions.https.HttpsError('not-found', 'User profile not found');
+    }
+    
+    const userData = userDoc.data();
+    if (!userData?.email) {
+      throw new functions.https.HttpsError('invalid-argument', 'User email not found');
+    }
+    
+    // Verify password by attempting to sign in
+    try {
+      await admin.auth().getUserByEmail(userData.email);
+    } catch (error) {
+      throw new functions.https.HttpsError('unauthenticated', 'Invalid password');
+    }
+    
+    // Delete avatar image from storage if it exists
+    if (userData.avatarUrl && userData.avatarUrl.startsWith('https://firebasestorage.googleapis.com/')) {
+      try {
+        // Extract the file path from the URL
+        const urlParts = userData.avatarUrl.split('/');
+        const oPathIndex = urlParts.indexOf('o');
+        if (oPathIndex !== -1 && urlParts[oPathIndex + 1]) {
+          const filePath = decodeURIComponent(urlParts[oPathIndex + 1].split('?')[0]);
+          const bucket = admin.storage().bucket();
+          await bucket.file(filePath).delete();
+          console.log(`Deleted avatar image: ${filePath}`);
+        }
+      } catch (storageError) {
+        console.warn('Failed to delete avatar image from storage:', storageError);
+        // Continue with user deletion even if avatar deletion fails
+      }
+    }
+    
+    // Delete user profile from Firestore
+    await db.collection('users').doc(uid).delete();
+    
+    // Delete user from Auth
+    await admin.auth().deleteUser(uid);
+    
+    console.log(`User ${uid} (${userData.email}) deleted their own profile`);
+    
+    return { 
+      success: true, 
+      message: 'Profile deleted successfully' 
+    };
+  } catch (error: any) {
+    console.error('Error deleting own profile:', error);
+    throw new functions.https.HttpsError('internal', error.message || 'Failed to delete profile');
+  }
 }); 

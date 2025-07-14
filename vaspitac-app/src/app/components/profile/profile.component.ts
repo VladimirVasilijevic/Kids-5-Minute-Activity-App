@@ -25,12 +25,18 @@ export class ProfileComponent implements OnInit {
   showEditProfileModal = false;
   showChangePasswordModal = false;
   showResetPasswordModal = false;
+  showDeleteProfileModal = false;
   selectedUser: UserProfile | null = null;
   
   // Reset password modal state
   resetLoading = false;
   resetError: string | null = null;
   resetSuccess = false;
+
+  // Delete profile modal state
+  deleteProfilePassword = '';
+  deleteProfileLoading = false;
+  deleteProfileError: string | null = null;
 
   // Error and success modal state
   showErrorModal = false;
@@ -87,6 +93,71 @@ export class ProfileComponent implements OnInit {
     this.resetError = null;
     this.resetSuccess = false;
     this.showResetPasswordModal = true;
+  }
+
+  /**
+   * Show the delete profile modal
+   */
+  onDeleteProfile(): void {
+    this.deleteProfilePassword = '';
+    this.deleteProfileError = null;
+    this.showDeleteProfileModal = true;
+  }
+
+  /**
+   * Handle password input change for delete profile
+   */
+  onDeleteProfilePasswordChange(event: Event): void {
+    this.deleteProfilePassword = (event.target as HTMLInputElement).value;
+  }
+
+  /**
+   * Confirm delete profile with password verification
+   */
+  async confirmDeleteProfile(): Promise<void> {
+    if (!this.selectedUser || !this.deleteProfilePassword) {
+      return;
+    }
+
+    this.deleteProfileLoading = true;
+    this.deleteProfileError = null;
+
+    try {
+      // First, verify the password by attempting to re-authenticate
+      const currentUser = await this._auth.getCurrentUser();
+      if (!currentUser || !currentUser.email) {
+        throw new Error(this._translate.instant('PROFILE.ERROR_NO_EMAIL'));
+      }
+
+      // Re-authenticate with the provided password
+      await this._auth.signIn(currentUser.email, this.deleteProfilePassword!);
+
+      // Now delete the user profile using the new Cloud Function
+      await this._userService.deleteOwnProfile({ password: this.deleteProfilePassword }).toPromise();
+
+      // Sign out and redirect to home
+      await this._auth.signOut();
+      this._router.navigate(['/']);
+
+    } catch (error) {
+      console.error('Error deleting profile:', error);
+      this.deleteProfileError = (error as Error).message || this._translate.instant('PROFILE.DELETE_PROFILE_ERROR');
+      this.showError(
+        this._translate.instant('PROFILE.ERROR_UPDATE_TITLE'), 
+        this.deleteProfileError || this._translate.instant('PROFILE.DELETE_PROFILE_ERROR')
+      );
+    } finally {
+      this.deleteProfileLoading = false;
+    }
+  }
+
+  /**
+   * Close the delete profile modal
+   */
+  closeDeleteProfileModal(): void {
+    this.showDeleteProfileModal = false;
+    this.deleteProfilePassword = '';
+    this.deleteProfileError = null;
   }
 
   /**
