@@ -9,6 +9,8 @@ import { Category } from '../../models/category.model';
 import { CATEGORY_KEYS } from '../../models/category-keys';
 import { CategoryService } from '../../services/category.service';
 import { map } from 'rxjs/operators';
+import { AboutService } from '../../services/about.service';
+import { AboutContent } from '../../models/about-content.model';
 
 /**
  *
@@ -22,6 +24,7 @@ export class HomeComponent implements OnInit {
   categories$!: Observable<Category[]>;
   userProfile$: Observable<UserProfile | null> = of(null);
   showAuthModal = false;
+  aboutContent$!: Observable<AboutContent | null>;
 
   /**
    *
@@ -34,7 +37,8 @@ export class HomeComponent implements OnInit {
     private _http: HttpClient,
     private _categoryService: CategoryService,
     private _auth: AuthService,
-    private _userService: UserService
+    private _userService: UserService,
+    private _aboutService: AboutService
   ) {}
 
   /**
@@ -47,6 +51,7 @@ export class HomeComponent implements OnInit {
     this.userProfile$ = this._auth.user$.pipe(
       switchMap(user => user ? this._userService.getUserProfile(user.uid) : of(null))
     );
+    this.aboutContent$ = this._aboutService.getAboutContent();
   }
 
   /**

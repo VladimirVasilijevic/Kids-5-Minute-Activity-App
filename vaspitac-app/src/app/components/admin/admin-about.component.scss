@@ -1,0 +1,187 @@
+// Admin About Component Styles
+
+// Form styles
+form {
+  .space-y-6 > * + * {
+    margin-top: 1.5rem;
+  }
+}
+
+// Input and textarea focus states
+input, textarea, select {
+  transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  
+  &:focus {
+    border-color: #10b981;
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+  }
+}
+
+// Button hover effects
+button {
+  transition: all 0.2s ease-in-out;
+  
+  &:hover {
+    transform: translateY(-1px);
+  }
+}
+
+// Experience card styles
+.border-l-4 {
+  border-left-width: 4px;
+  border-left-color: #10b981;
+}
+
+// Image preview styles
+img {
+  transition: transform 0.2s ease-in-out;
+  
+  &:hover {
+    transform: scale(1.05);
+  }
+}
+
+// Form validation styles
+.text-red-500 {
+  color: #ef4444;
+}
+
+.border-red-500 {
+  border-color: #ef4444;
+}
+
+.focus\:ring-red-500:focus {
+  --tw-ring-color: #ef4444;
+}
+
+// Success message styles
+.bg-green-600 {
+  background-color: #059669;
+}
+
+// Error modal styles
+.fixed {
+  position: fixed;
+}
+
+.bg-black.bg-opacity-50 {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+// Card hover effects
+.bg-white {
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  }
+}
+
+// Action button styles
+.text-blue-600, .text-green-600, .text-yellow-600, .text-red-600 {
+  transition: all 0.2s ease-in-out;
+  
+  &:hover {
+    transform: scale(1.1);
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .text-3xl {
+    font-size: 1.875rem;
+  }
+  
+  .max-w-4xl {
+    max-width: 100%;
+  }
+  
+  // Only apply column layout to specific elements, not all flex.gap-2
+  .flex.gap-2:not(button) {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  // Improve mobile form spacing
+  .space-y-4 > * + * {
+    margin-top: 1rem;
+  }
+  
+  .space-y-6 > * + * {
+    margin-top: 1.5rem;
+  }
+}
+
+// Language selector styles
+select {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right 0.5rem center;
+  background-repeat: no-repeat;
+  background-size: 1.5em 1.5em;
+  padding-right: 2.5rem;
+}
+
+// Loading states
+.isUploadingImage {
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+// Form section spacing
+.space-y-4 > * + * {
+  margin-top: 1rem;
+}
+
+.space-y-6 > * + * {
+  margin-top: 1.5rem;
+}
+
+// Experience section styles
+.experience-item {
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+  
+  &:hover {
+    border-color: #10b981;
+  }
+}
+
+// Biography paragraph styles
+.bio-paragraph {
+  position: relative;
+  
+  .remove-button {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    opacity: 0;
+    transition: opacity 0.2s ease-in-out;
+  }
+  
+  &:hover .remove-button {
+    opacity: 1;
+  }
+}
+
+// Success message animation
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.fixed.top-4.right-4 {
+  animation: slideIn 0.3s ease-out;
+} 

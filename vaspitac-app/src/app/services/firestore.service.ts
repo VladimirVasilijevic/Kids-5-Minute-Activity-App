@@ -7,6 +7,7 @@ import { Activity } from '../models/activity.model';
 import { Category } from '../models/category.model';
 import { BlogPost } from '../models/blog-post.model';
 import { Tip } from '../models/tip.model';
+import { AboutContent, AboutContentData } from '../models/about-content.model';
 
 import { LanguageService } from './language.service';
 
@@ -134,6 +135,52 @@ export class FirestoreService {
           );
       })
     );
+  }
+
+  /**
+   * Get about content from Firestore with JSON fallback
+   * @returns {Observable<AboutContent>} Observable of about content
+   */
+  getAboutContent(): Observable<AboutContent> {
+    return this._languageService.getLanguage().pipe(
+      switchMap((lang) => {
+        return this._firestore
+          .doc<AboutContent>(`about_${lang}/content`)
+          .valueChanges()
+          .pipe(
+            map((content) => {
+              if (!content) {
+                throw new Error('About content not found in Firestore');
+              }
+              return content;
+            }),
+            catchError(() => {
+              console.log(`Falling back to JSON for about_${lang}`);
+              return this._http.get<AboutContentData>(`assets/about_${lang}.json`).pipe(
+                map((response: AboutContentData) => response.data)
+              );
+            })
+          );
+      })
+    );
+  }
+
+  /**
+   * Update about content in Firestore
+   * @param content - The about content to update
+   * @returns Promise resolved when the content is updated
+   */
+  updateAboutContent(content: AboutContent): Promise<void> {
+    return firstValueFrom(this._languageService.getLanguage().pipe(
+      switchMap((lang) => {
+        return this._firestore
+          .doc<AboutContent>(`about_${lang}/content`)
+          .set({
+            ...content,
+            lastUpdated: new Date().toISOString()
+          });
+      })
+    ));
   }
 
   /**

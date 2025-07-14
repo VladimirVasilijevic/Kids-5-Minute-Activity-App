@@ -101,6 +101,13 @@ export class AdminDashboardComponent implements OnInit {
   }
 
   /**
+   * Navigates to the admin about page management
+   */
+  navigateToAbout(): void {
+    this._router.navigate(['/admin/about']);
+  }
+
+  /**
    * Navigates back to the home page
    */
   navigateToHome(): void {

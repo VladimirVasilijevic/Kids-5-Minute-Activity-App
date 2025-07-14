@@ -41,7 +41,12 @@ export class ImageUploadService {
           catchError(error => {
             console.error('Upload error:', error);
             if (error.code === 'storage/unauthorized') {
-              return throwError(() => new Error('You do not have permission to upload images. Please ensure you are logged in as an admin.'));
+              // Check if this is an admin upload path
+              if (path.startsWith('admin-uploads/')) {
+                return throwError(() => new Error('You do not have admin permissions to upload images. Please ensure you are logged in as an admin user.'));
+              } else {
+                return throwError(() => new Error('You do not have permission to upload images. Please ensure you are logged in.'));
+              }
             } else if (error.code === 'storage/retry-limit-exceeded') {
               return throwError(() => new Error('Upload failed due to network issues. Please check your connection and try again.'));
             } else {

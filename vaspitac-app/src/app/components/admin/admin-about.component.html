@@ -1,0 +1,411 @@
+<!-- Admin Access Check -->
+<ng-container *ngIf="userProfile$ | async as userProfile">
+  <div *ngIf="!isAdmin(userProfile)" class="min-h-screen bg-gray-50 flex items-center justify-center p-4 sm:p-6">
+    <div class="text-center">
+      <h1 class="text-xl sm:text-2xl font-bold text-red-600 mb-4">{{ 'ADMIN.ACCESS_DENIED' | translate }}</h1>
+      <p class="text-gray-600 mb-6">{{ 'ADMIN.ACCESS_DENIED_MESSAGE' | translate }}</p>
+      <button 
+        (click)="navigateToAdmin()"
+        class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg w-full max-w-xs mx-auto"
+      >
+        {{ 'ADMIN.BACK_TO_HOME' | translate }}
+      </button>
+      
+      <!-- Debug info -->
+      <div class="mt-6 p-4 bg-yellow-100 text-yellow-800 rounded text-left text-xs sm:text-sm overflow-x-auto">
+        <div><strong>Debug info:</strong></div>
+        <div>User profile: <pre>{{ userProfile | json }}</pre></div>
+        <div>User role: <strong>{{ userProfile?.role || 'none' }}</strong></div>
+        <div>User UID: <strong>{{ userProfile?.uid || 'none' }}</strong></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Admin About Content -->
+  <div *ngIf="isAdmin(userProfile)">
+    <!-- Form View -->
+    <div *ngIf="showForm" class="min-h-screen bg-gray-50 p-2 sm:p-4 md:p-6">
+      <div class="max-w-4xl mx-auto">
+        <div class="flex flex-col items-start gap-2 sm:gap-4 mb-4 sm:mb-6">
+          <button
+            (click)="showForm = false"
+            class="flex items-center gap-2 text-green-600 hover:text-green-700 font-medium"
+          >
+            <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M15 19l-7-7 7-7" />
+            </svg>
+            {{ 'ADMIN.BACK_TO_ABOUT' | translate }}
+          </button>
+          <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">
+            {{ 'ADMIN.EDIT_ABOUT_PAGE' | translate }}
+          </h1>
+        </div>
+
+        <div class="bg-white rounded-lg shadow">
+          <div class="p-4 sm:p-6 border-b border-gray-200">
+            <h2 class="text-base sm:text-lg font-semibold text-gray-900">{{ 'ADMIN.ABOUT_DETAILS' | translate }}</h2>
+          </div>
+          <div class="p-4 sm:p-6">
+            <form (submit)="handleSubmit($event)" class="space-y-4 sm:space-y-6">
+              <!-- Basic Information -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                <div>
+                  <label class="block text-xs sm:text-sm font-medium mb-2">{{ 'ADMIN.NAME' | translate }}</label>
+                  <input
+                    type="text"
+                    [(ngModel)]="formData.name"
+                    name="name"
+                    class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 text-sm"
+                    [ngClass]="formErrors['name'] ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-green-500'"
+                    [placeholder]="'ADMIN.ENTER_NAME' | translate"
+                    required
+                  />
+                  <div *ngIf="formErrors['name']" class="text-red-500 text-xs mt-1">{{ formErrors['name'] }}</div>
+                </div>
+
+                <div>
+                  <label class="block text-xs sm:text-sm font-medium mb-2">{{ 'ADMIN.ROLE' | translate }}</label>
+                  <input
+                    type="text"
+                    [(ngModel)]="formData.role"
+                    name="role"
+                    class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 text-sm"
+                    [ngClass]="formErrors['role'] ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-green-500'"
+                    [placeholder]="'ADMIN.ENTER_ROLE' | translate"
+                    required
+                  />
+                  <div *ngIf="formErrors['role']" class="text-red-500 text-xs mt-1">{{ formErrors['role'] }}</div>
+                </div>
+              </div>
+
+              <!-- Biography Paragraphs -->
+              <div>
+                <label class="block text-xs sm:text-sm font-medium mb-2">{{ 'ADMIN.BIOGRAPHY' | translate }}</label>
+                <div class="space-y-3">
+                  <div *ngFor="let paragraph of formData.bioParagraphs; let i = index" class="flex gap-2">
+                    <textarea
+                      [(ngModel)]="formData.bioParagraphs[i]"
+                      [name]="'bioParagraph' + i"
+                      rows="3"
+                      class="flex-1 px-3 py-2 border rounded-md focus:outline-none focus:ring-2 text-sm"
+                      [ngClass]="formErrors['bioParagraphs'] ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-green-500'"
+                      [placeholder]="'ADMIN.ENTER_BIO_PARAGRAPH' | translate"
+                    ></textarea>
+                    <button
+                      *ngIf="formData.bioParagraphs.length > 1"
+                      type="button"
+                      (click)="removeBioParagraph(i)"
+                      class="px-2 py-1 text-red-600 hover:text-red-700 text-sm"
+                    >
+                      <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      </svg>
+                    </button>
+                  </div>
+                  <button
+                    type="button"
+                    (click)="addBioParagraph()"
+                    class="text-green-600 hover:text-green-700 text-sm font-medium"
+                  >
+                    + {{ 'ADMIN.ADD_BIO_PARAGRAPH' | translate }}
+                  </button>
+                </div>
+                <div *ngIf="formErrors['bioParagraphs']" class="text-red-500 text-xs mt-1">{{ formErrors['bioParagraphs'] }}</div>
+              </div>
+
+              <!-- Experiences -->
+              <div>
+                <label class="block text-xs sm:text-sm font-medium mb-2">{{ 'ADMIN.EXPERIENCES' | translate }}</label>
+                <div class="space-y-4">
+                  <div *ngFor="let experience of formData.experiences; let i = index" class="border border-gray-200 rounded-lg p-3">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
+                      <div>
+                        <label class="block text-xs font-medium mb-1">{{ 'ADMIN.EXPERIENCE_TITLE' | translate }}</label>
+                        <input
+                          type="text"
+                          [(ngModel)]="experience.title"
+                          [name]="'expTitle' + i"
+                          class="w-full px-2 py-1 border border-gray-300 rounded text-sm"
+                          [placeholder]="'ADMIN.ENTER_EXPERIENCE_TITLE' | translate"
+                        />
+                      </div>
+                      <div>
+                        <label class="block text-xs font-medium mb-1">{{ 'ADMIN.DATE_RANGE' | translate }}</label>
+                        <input
+                          type="text"
+                          [(ngModel)]="experience.dateRange"
+                          [name]="'expDateRange' + i"
+                          class="w-full px-2 py-1 border border-gray-300 rounded text-sm"
+                          [placeholder]="'ADMIN.ENTER_DATE_RANGE' | translate"
+                        />
+                      </div>
+                    </div>
+                    <div class="mb-3">
+                      <label class="block text-xs font-medium mb-1">{{ 'ADMIN.EXPERIENCE_DESCRIPTION' | translate }}</label>
+                      <textarea
+                        [(ngModel)]="experience.description"
+                        [name]="'expDesc' + i"
+                        rows="2"
+                        class="w-full px-2 py-1 border border-gray-300 rounded text-sm"
+                        [placeholder]="'ADMIN.ENTER_EXPERIENCE_DESCRIPTION' | translate"
+                      ></textarea>
+                    </div>
+                    <button
+                      type="button"
+                      (click)="removeExperience(i)"
+                      class="text-red-600 hover:text-red-700 text-xs"
+                    >
+                      {{ 'ADMIN.REMOVE_EXPERIENCE' | translate }}
+                    </button>
+                  </div>
+                  <button
+                    type="button"
+                    (click)="addExperience()"
+                    class="text-green-600 hover:text-green-700 text-sm font-medium"
+                  >
+                    + {{ 'ADMIN.ADD_EXPERIENCE' | translate }}
+                  </button>
+                </div>
+              </div>
+
+              <!-- Contact Information -->
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
+                <div>
+                  <label class="block text-xs sm:text-sm font-medium mb-2">{{ 'ADMIN.EMAIL' | translate }}</label>
+                  <input
+                    type="email"
+                    [(ngModel)]="formData.email"
+                    name="email"
+                    class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 text-sm"
+                    [ngClass]="formErrors['email'] ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-green-500'"
+                    [placeholder]="'ADMIN.ENTER_EMAIL' | translate"
+                    required
+                  />
+                  <div *ngIf="formErrors['email']" class="text-red-500 text-xs mt-1">{{ formErrors['email'] }}</div>
+                </div>
+
+                <div>
+                  <label class="block text-xs sm:text-sm font-medium mb-2">{{ 'ADMIN.PHONE' | translate }}</label>
+                  <input
+                    type="tel"
+                    [(ngModel)]="formData.phone"
+                    name="phone"
+                    class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 text-sm"
+                    [ngClass]="formErrors['phone'] ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-green-500'"
+                    [placeholder]="'ADMIN.ENTER_PHONE' | translate"
+                    required
+                  />
+                  <div *ngIf="formErrors['phone']" class="text-red-500 text-xs mt-1">{{ formErrors['phone'] }}</div>
+                </div>
+
+                <div>
+                  <label class="block text-xs sm:text-sm font-medium mb-2">{{ 'ADMIN.LOCATION' | translate }}</label>
+                  <input
+                    type="text"
+                    [(ngModel)]="formData.location"
+                    name="location"
+                    class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 text-sm"
+                    [ngClass]="formErrors['location'] ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-green-500'"
+                    [placeholder]="'ADMIN.ENTER_LOCATION' | translate"
+                    required
+                  />
+                  <div *ngIf="formErrors['location']" class="text-red-500 text-xs mt-1">{{ formErrors['location'] }}</div>
+                </div>
+              </div>
+
+              <!-- Profile Image -->
+              <div>
+                <label class="block text-xs sm:text-sm font-medium mb-2">{{ 'ADMIN.PROFILE_IMAGE' | translate }}</label>
+                
+                <!-- Image Preview -->
+                <div *ngIf="imagePreview" class="mb-3">
+                  <img [src]="imagePreview" alt="Profile preview" class="w-24 h-24 rounded-full object-cover border-2 border-gray-200" />
+                </div>
+
+                <!-- Upload Button -->
+                <div class="flex items-center gap-3">
+                  <label
+                    for="image-upload"
+                    class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg cursor-pointer text-sm"
+                  >
+                    <span *ngIf="!isUploadingImage">{{ 'ADMIN.UPLOAD_IMAGE' | translate }}</span>
+                    <span *ngIf="isUploadingImage">{{ 'ADMIN.UPLOADING_IMAGE' | translate }}</span>
+                  </label>
+                  <input
+                    id="image-upload"
+                    type="file"
+                    accept="image/*"
+                    (change)="onImageSelected($event)"
+                    class="hidden"
+                  />
+                  
+                  <!-- URL input as fallback -->
+                  <div class="flex-1">
+                    <input
+                      type="url"
+                      [(ngModel)]="formData.profileImageUrl"
+                      name="profileImageUrl"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 text-sm"
+                      [placeholder]="'ADMIN.ENTER_IMAGE_URL' | translate"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div class="flex flex-col sm:flex-row gap-2 sm:gap-4">
+                <button
+                  type="submit"
+                  class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg w-full sm:w-auto"
+                >
+                  {{ 'ADMIN.SAVE_ABOUT' | translate }}
+                </button>
+                <button
+                  type="button"
+                  (click)="showForm = false"
+                  class="bg-gray-300 hover:bg-gray-400 text-gray-700 font-semibold py-2 px-4 rounded-lg w-full sm:w-auto"
+                >
+                  {{ 'COMMON.CANCEL' | translate }}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- List View -->
+    <div *ngIf="!showForm" class="min-h-screen bg-gray-50 p-2 sm:p-4 md:p-6">
+      <div class="max-w-4xl mx-auto">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 sm:gap-4 mb-4 sm:mb-6">
+          <div class="flex flex-col gap-2 sm:gap-4">
+            <app-back-button
+              [label]="'ADMIN.BACK_TO_ADMIN' | translate"
+              (back)="navigateToAdmin()"
+            ></app-back-button>
+            <div>
+              <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">{{ 'ADMIN.ABOUT_TITLE' | translate }}</h1>
+              <p class="text-gray-600 mt-1 sm:mt-2 text-sm sm:text-base">{{ 'ADMIN.ABOUT_SUBTITLE' | translate }}</p>
+              
+              <!-- Language Context -->
+              <div class="flex items-center gap-2 mt-2">
+                <span class="text-sm text-gray-500">{{ 'ADMIN.MANAGING_LANGUAGE' | translate }}:</span>
+                <select
+                  [(ngModel)]="currentLanguage"
+                  (change)="changeLanguage(currentLanguage)"
+                  class="px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-green-500"
+                >
+                  <option value="sr">SR</option>
+                  <option value="en">EN</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <button
+            (click)="showForm = true"
+            class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg flex items-center gap-2 w-full sm:w-auto"
+          >
+            <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+            </svg>
+            {{ 'ADMIN.EDIT_ABOUT_PAGE' | translate }}
+          </button>
+        </div>
+
+        <div class="bg-white rounded-lg shadow">
+          <div class="p-4 sm:p-6 border-b border-gray-200">
+            <h2 class="text-base sm:text-lg font-semibold text-gray-900">{{ 'ADMIN.CURRENT_ABOUT_CONTENT' | translate }}</h2>
+          </div>
+          <div class="p-4 sm:p-6">
+            <div *ngIf="aboutContent" class="space-y-6">
+              <!-- Basic Info -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <h3 class="font-semibold text-gray-900 mb-2">{{ 'ADMIN.NAME' | translate }}</h3>
+                  <p class="text-gray-700">{{ aboutContent.name }}</p>
+                </div>
+                <div>
+                  <h3 class="font-semibold text-gray-900 mb-2">{{ 'ADMIN.ROLE' | translate }}</h3>
+                  <p class="text-gray-700">{{ aboutContent.role }}</p>
+                </div>
+              </div>
+
+              <!-- Biography -->
+              <div>
+                <h3 class="font-semibold text-gray-900 mb-2">{{ 'ADMIN.BIOGRAPHY' | translate }}</h3>
+                <div class="space-y-2">
+                  <p *ngFor="let paragraph of aboutContent.bioParagraphs" class="text-gray-700">{{ paragraph }}</p>
+                </div>
+              </div>
+
+              <!-- Experiences -->
+              <div *ngIf="aboutContent.experiences && aboutContent.experiences.length > 0">
+                <h3 class="font-semibold text-gray-900 mb-2">{{ 'ADMIN.EXPERIENCES' | translate }}</h3>
+                <div class="space-y-3">
+                  <div *ngFor="let experience of aboutContent.experiences" class="border-l-4 border-green-500 pl-3">
+                    <h4 class="font-medium text-gray-900">{{ experience.title }}</h4>
+                    <p *ngIf="experience.dateRange" class="text-green-600 text-sm">{{ experience.dateRange }}</p>
+                    <p class="text-gray-700 mt-1">{{ experience.description }}</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Contact Info -->
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div>
+                  <h3 class="font-semibold text-gray-900 mb-2">{{ 'ADMIN.EMAIL' | translate }}</h3>
+                  <p class="text-gray-700">{{ aboutContent.email }}</p>
+                </div>
+                <div>
+                  <h3 class="font-semibold text-gray-900 mb-2">{{ 'ADMIN.PHONE' | translate }}</h3>
+                  <p class="text-gray-700">{{ aboutContent.phone }}</p>
+                </div>
+                <div>
+                  <h3 class="font-semibold text-gray-900 mb-2">{{ 'ADMIN.LOCATION' | translate }}</h3>
+                  <p class="text-gray-700">{{ aboutContent.location }}</p>
+                </div>
+              </div>
+
+              <!-- Last Updated -->
+              <div *ngIf="aboutContent.lastUpdated">
+                <h3 class="font-semibold text-gray-900 mb-2">{{ 'ADMIN.LAST_UPDATED' | translate }}</h3>
+                <p class="text-gray-700">{{ aboutContent.lastUpdated | date:'medium' }}</p>
+              </div>
+            </div>
+
+            <div *ngIf="!aboutContent" class="text-center py-8 sm:py-12">
+              <p class="text-gray-500 mb-4">{{ 'ADMIN.NO_ABOUT_CONTENT' | translate }}</p>
+              <button
+                (click)="showForm = true"
+                class="bg-gray-300 hover:bg-gray-400 text-gray-700 font-semibold py-2 px-4 rounded-lg flex items-center gap-2 mx-auto w-full sm:w-auto"
+              >
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path d="M12 4v16m8-8H4" />
+                </svg>
+                {{ 'ADMIN.CREATE_ABOUT_CONTENT' | translate }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-container>
+
+<!-- Error Modal -->
+<div *ngIf="showErrorModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+  <div class="bg-white rounded-lg max-w-md w-full p-6">
+    <h3 class="text-lg font-semibold text-gray-900 mb-2">{{ errorTitle }}</h3>
+    <p class="text-gray-700 mb-4">{{ errorMessage }}</p>
+    <button
+      (click)="hideError()"
+      class="w-full bg-gray-300 hover:bg-gray-400 text-gray-700 font-semibold py-2 px-4 rounded-lg"
+    >
+      {{ 'COMMON.CLOSE' | translate }}
+    </button>
+  </div>
+</div>
+
+<!-- Success Message -->
+<div *ngIf="showSuccessMessage" class="fixed top-4 right-4 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg z-50">
+  {{ successMessage }}
+</div> 

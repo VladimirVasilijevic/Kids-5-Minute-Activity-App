@@ -141,6 +141,21 @@
               </svg>
               <span class="font-medium text-xs sm:text-base">{{ 'ADMIN.MANAGE_USERS' | translate }}</span>
             </button>
+            
+            <!-- Manage About Page Button -->
+            <button
+              (click)="navigateToAbout()"
+              class="h-20 sm:h-24 flex flex-col items-center justify-center space-y-2 bg-orange-600 hover:bg-orange-700 text-white rounded-lg transition-colors w-full"
+            >
+              <svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                <circle cx="10" cy="7" r="4" />
+                <path d="m21.8 16-3.5-3.5" />
+                <path d="m15.8 10-3.5-3.5" />
+                <path d="m9.8 4-3.5-3.5" />
+              </svg>
+              <span class="font-medium text-xs sm:text-base">{{ 'ADMIN.MANAGE_ABOUT' | translate }}</span>
+            </button>
           </div>
         </div>
       </div>
