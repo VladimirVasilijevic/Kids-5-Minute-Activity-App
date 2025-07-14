@@ -425,6 +425,8 @@
     "CURRENT_ABOUT_CONTENT": "Current About Content",
     "NO_ABOUT_CONTENT": "No about content found",
     "CREATE_ABOUT_CONTENT": "Create about content",
-    "LAST_UPDATED": "Last Updated"
+    "LAST_UPDATED": "Last Updated",
+    "MATERIALS": "Materials",
+    "ENTER_MATERIALS": "Enter one material per line"
   }
 }
