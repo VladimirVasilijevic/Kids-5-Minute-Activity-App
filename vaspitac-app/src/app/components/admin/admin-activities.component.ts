@@ -10,6 +10,7 @@ import { AdminActivity } from '../../models/admin-activity.model';
 import { ImageUploadService } from '../../services/image-upload.service';
 import { LanguageService } from '../../services/language.service';
 import { CATEGORY_KEYS } from '../../models/category-keys';
+import { ContentVisibility } from '../../models/content-visibility.model';
 
 /**
  * Admin activities component for managing craft activities and tutorials
@@ -62,7 +63,9 @@ export class AdminActivitiesComponent implements OnInit {
     image: '',
     video: '',
     category: '',
-    language: 'en'
+    language: 'en',
+    visibility: ContentVisibility.PUBLIC,
+    isPremium: false
   };
 
   /** Available age groups for activities */
@@ -210,6 +213,8 @@ export class AdminActivitiesComponent implements OnInit {
       videoUrl: this.formData.video || '',
       category: this.formData.category,
       language: this.formData.language,
+      visibility: this.formData.visibility,
+      isPremium: this.formData.isPremium,
       isEditing: false,
       isDeleting: false,
       createdAt: new Date().toISOString()
@@ -278,7 +283,9 @@ export class AdminActivitiesComponent implements OnInit {
       image: '',
       video: '',
       category: '',
-      language: 'en'
+      language: 'en',
+      visibility: ContentVisibility.PUBLIC,
+      isPremium: false
     };
     this.editingActivity = null;
     this.imagePreview = null; // Clear image preview
@@ -482,7 +489,9 @@ export class AdminActivitiesComponent implements OnInit {
       image: activity.imageUrl || '',
       video: activity.videoUrl || '',
       category: activity.category || '',
-      language: activity.language || 'en'
+      language: activity.language || 'en',
+      visibility: activity.visibility || ContentVisibility.PUBLIC,
+      isPremium: activity.isPremium || false
     };
     this.imagePreview = activity.imageUrl || null;
     this.videoPreview = activity.videoUrl || null;

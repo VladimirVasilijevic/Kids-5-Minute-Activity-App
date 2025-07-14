@@ -8,6 +8,7 @@ import { BlogService } from '../../services/blog.service';
 import { AdminBlogPost } from '../../models/admin-blog-post.model';
 import { ImageUploadService } from '../../services/image-upload.service';
 import { LanguageService } from '../../services/language.service';
+import { ContentVisibility } from '../../models/content-visibility.model';
 
 /**
  * Admin blogs component for managing blog posts
@@ -62,7 +63,9 @@ export class AdminBlogsComponent implements OnInit {
     fullContent: '',
     author: '',
     readTime: '',
-    imageUrl: ''
+    imageUrl: '',
+    visibility: ContentVisibility.PUBLIC,
+    isPremium: false
   };
 
   /**
@@ -376,6 +379,8 @@ export class AdminBlogsComponent implements OnInit {
       readTime: this.formData.readTime,
       date: new Date().toISOString(),
       imageUrl: this.formData.imageUrl,
+      visibility: this.formData.visibility,
+      isPremium: this.formData.isPremium,
       isEditing: false,
       isDeleting: false
     };
@@ -436,7 +441,9 @@ export class AdminBlogsComponent implements OnInit {
       fullContent: '',
       author: '',
       readTime: '',
-      imageUrl: ''
+      imageUrl: '',
+      visibility: ContentVisibility.PUBLIC,
+      isPremium: false
     };
     this.editingBlog = null;
     this.imagePreview = null; // Clear image preview
@@ -455,7 +462,9 @@ export class AdminBlogsComponent implements OnInit {
       fullContent: blog.fullContent,
       author: blog.author,
       readTime: blog.readTime,
-      imageUrl: blog.imageUrl
+      imageUrl: blog.imageUrl,
+      visibility: blog.visibility || ContentVisibility.PUBLIC,
+      isPremium: blog.isPremium || false
     };
     this.imagePreview = blog.imageUrl; // Set image preview for editing
     this.showForm = true;

@@ -1,3 +1,5 @@
+import { ContentVisibility } from './content-visibility.model';
+
 /**
  * Represents a blog post in the application
  */
@@ -18,4 +20,8 @@ export interface BlogPost {
   date: string;
   /** URL to the blog post's featured image */
   imageUrl: string;
+  /** Content visibility level - who can access this content */
+  visibility: ContentVisibility;
+  /** Whether this is premium content requiring subscription */
+  isPremium: boolean;
 }

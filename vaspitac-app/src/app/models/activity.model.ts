@@ -1,3 +1,5 @@
+import { ContentVisibility } from './content-visibility.model';
+
 /**
  * Represents a single activity for children
  */
@@ -22,6 +24,10 @@ export interface Activity {
   instructions?: string[];
   /** URL to video demonstration (optional) */
   videoUrl?: string;
+  /** Content visibility level - who can access this content */
+  visibility: ContentVisibility;
+  /** Whether this is premium content requiring subscription */
+  isPremium: boolean;
 }
 
 /**
