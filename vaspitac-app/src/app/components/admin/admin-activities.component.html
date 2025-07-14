@@ -60,18 +60,29 @@
                 <div *ngIf="formErrors['description']" class="text-red-500 text-xs mt-1">{{ formErrors['description'] }}</div>
               </div>
 
+              <div>
+                <label class="block text-xs sm:text-sm font-medium mb-2">{{ 'ADMIN.MATERIALS' | translate }}</label>
+                <textarea
+                  [(ngModel)]="formData.materials"
+                  name="materials"
+                  rows="3"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 text-sm"
+                  [placeholder]="'ADMIN.ENTER_MATERIALS' | translate"
+                ></textarea>
+                <div *ngIf="formErrors['materials']" class="text-red-500 text-xs mt-1">{{ formErrors['materials'] }}</div>
+              </div>
+
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                 <div>
                   <label class="block text-xs sm:text-sm font-medium mb-2">{{ 'ADMIN.AGE_GROUP' | translate }}</label>
-                  <select
+                  <input
+                    type="text"
                     [(ngModel)]="formData.ageGroup"
                     name="ageGroup"
                     class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 text-sm"
+                    [placeholder]="'ADMIN.AGE_GROUP' | translate"
                     required
-                  >
-                    <option value="">{{ 'ADMIN.SELECT_AGE_GROUP' | translate }}</option>
-                    <option *ngFor="let group of ageGroups" [value]="group">{{ group }}</option>
-                  </select>
+                  />
                   <div *ngIf="formErrors['ageGroup']" class="text-red-500 text-xs mt-1">{{ formErrors['ageGroup'] }}</div>
                 </div>
 

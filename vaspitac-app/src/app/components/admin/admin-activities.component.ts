@@ -55,6 +55,7 @@ export class AdminActivitiesComponent implements OnInit {
   formData = {
     title: '',
     description: '',
+    materials: '',
     ageGroup: '',
     duration: '30',
     instructions: '',
@@ -199,6 +200,7 @@ export class AdminActivitiesComponent implements OnInit {
       id: Date.now().toString(),
       title: this.formData.title,
       description: this.formData.description,
+      materials: this.formData.materials ? this.formData.materials.split('\n').filter(line => line.trim() !== '') : [],
       ageGroup: this.formData.ageGroup,
       duration: this.formData.duration ? `${this.formData.duration} min` : '',
       instructions: this.formData.instructions
@@ -235,6 +237,7 @@ export class AdminActivitiesComponent implements OnInit {
       ...this.editingActivity,
       title: this.formData.title,
       description: this.formData.description,
+      materials: this.formData.materials ? this.formData.materials.split('\n').filter(line => line.trim() !== '') : [],
       ageGroup: this.formData.ageGroup,
       duration: this.formData.duration ? `${this.formData.duration} min` : '',
       instructions: this.formData.instructions
@@ -268,6 +271,7 @@ export class AdminActivitiesComponent implements OnInit {
     this.formData = {
       title: '',
       description: '',
+      materials: '',
       ageGroup: '',
       duration: '30',
       instructions: '',
@@ -471,6 +475,7 @@ export class AdminActivitiesComponent implements OnInit {
     this.formData = {
       title: activity.title,
       description: activity.description,
+      materials: activity.materials ? activity.materials.join('\n') : '',
       ageGroup: activity.ageGroup || '',
       duration: activity.duration ? activity.duration.replace(' min', '') : '',
       instructions: activity.instructions ? activity.instructions.join('\n') : '',

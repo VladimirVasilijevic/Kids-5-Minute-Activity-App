@@ -425,6 +425,8 @@
     "CURRENT_ABOUT_CONTENT": "Trenutni sadržaj O meni",
     "NO_ABOUT_CONTENT": "Nema pronađenog sadržaja O meni",
     "CREATE_ABOUT_CONTENT": "Kreiraj sadržaj O meni",
-    "LAST_UPDATED": "Poslednji put ažurirano"
+    "LAST_UPDATED": "Poslednji put ažurirano",
+    "MATERIALS": "Materijali",
+    "ENTER_MATERIALS": "Unesite po jedan materijal u svaki red"
   }
 }
