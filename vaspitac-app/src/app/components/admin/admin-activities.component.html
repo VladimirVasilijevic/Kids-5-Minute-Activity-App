@@ -131,6 +131,37 @@
                 </div>
               </div>
 
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                <div>
+                  <label class="block text-xs sm:text-sm font-medium mb-2">{{ 'ADMIN.VISIBILITY' | translate }}</label>
+                  <select
+                    [(ngModel)]="formData.visibility"
+                    name="visibility"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 text-sm"
+                    required
+                  >
+                    <option [value]="ContentVisibility.PUBLIC">{{ 'ADMIN.VISIBILITY_PUBLIC' | translate }}</option>
+                    <option [value]="ContentVisibility.SUBSCRIBER">{{ 'ADMIN.VISIBILITY_SUBSCRIBER' | translate }}</option>
+                    <option [value]="ContentVisibility.ADMIN">{{ 'ADMIN.VISIBILITY_ADMIN' | translate }}</option>
+                  </select>
+                  <div *ngIf="formErrors['visibility']" class="text-red-500 text-xs mt-1">{{ formErrors['visibility'] }}</div>
+                </div>
+
+                <div>
+                  <label class="block text-xs sm:text-sm font-medium mb-2">{{ 'ADMIN.PREMIUM_CONTENT' | translate }}</label>
+                  <div class="flex items-center mt-2">
+                    <input
+                      type="checkbox"
+                      [(ngModel)]="formData.isPremium"
+                      name="isPremium"
+                      class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded"
+                    />
+                    <label class="ml-2 text-sm text-gray-700">{{ 'ADMIN.IS_PREMIUM' | translate }}</label>
+                  </div>
+                  <div *ngIf="formErrors['isPremium']" class="text-red-500 text-xs mt-1">{{ formErrors['isPremium'] }}</div>
+                </div>
+              </div>
+
               <div>
                 <label class="block text-xs sm:text-sm font-medium mb-2">{{ 'ADMIN.INSTRUCTIONS' | translate }}</label>
                 <textarea
@@ -155,7 +186,7 @@
                     (click)="removeImage()"
                     class="mt-2 text-red-600 hover:text-red-700 text-xs"
                   >
-                    Remove Image
+                    {{ 'ADMIN.REMOVE_IMAGE' | translate }}
                   </button>
                 </div>
                 <!-- Video Preview -->
@@ -166,7 +197,7 @@
                     (click)="removeVideo()"
                     class="mt-2 text-red-600 hover:text-red-700 text-xs"
                   >
-                    Remove Video
+                    {{ 'ADMIN.REMOVE_VIDEO' | translate }}
                   </button>
                 </div>
                 <!-- Upload Area -->
@@ -190,15 +221,15 @@
                           class="hidden"
                           [disabled]="videoPreview"
                         />
-                        <p class="text-xs text-gray-500 mt-2">or drag and drop</p>
-                        <p class="text-xs text-gray-400">PNG, JPG, GIF, WebP up to 5MB</p>
+                                          <p class="text-xs text-gray-500 mt-2">{{ 'ADMIN.OR_DRAG_DROP' | translate }}</p>
+                  <p class="text-xs text-gray-400">{{ 'ADMIN.IMAGE_FORMATS' | translate }}</p>
                       </div>
                       <div *ngIf="isUploadingImage" class="flex items-center justify-center">
                         <svg class="animate-spin h-8 w-8 text-green-600" fill="none" viewBox="0 0 24 24">
                           <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                           <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                         </svg>
-                        <span class="ml-2 text-sm text-gray-600">Uploading...</span>
+                        <span class="ml-2 text-sm text-gray-600">{{ 'ADMIN.UPLOADING' | translate }}</span>
                       </div>
                     </div>
                   </div>
@@ -226,7 +257,7 @@
                           <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                           <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                         </svg>
-                        <span class="ml-2 text-sm text-blue-600">Uploading...</span>
+                        <span class="ml-2 text-sm text-blue-600">{{ 'ADMIN.UPLOADING' | translate }}</span>
                       </div>
                     </div>
                   </div>
@@ -267,6 +298,19 @@
             <div>
               <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">{{ 'ADMIN.ACTIVITIES_TITLE' | translate }}</h1>
               <p class="text-gray-600 mt-1 sm:mt-2 text-sm sm:text-base">{{ 'ADMIN.ACTIVITIES_SUBTITLE' | translate }}</p>
+              
+              <!-- Language Context -->
+              <div class="flex items-center gap-2 mt-2">
+                <span class="text-sm text-gray-500">{{ 'ADMIN.MANAGING_LANGUAGE' | translate }}:</span>
+                <select
+                  [(ngModel)]="currentLanguage"
+                  (change)="changeLanguage(currentLanguage)"
+                  class="px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-green-500"
+                >
+                  <option value="sr">SR</option>
+                  <option value="en">EN</option>
+                </select>
+              </div>
             </div>
           </div>
           <button

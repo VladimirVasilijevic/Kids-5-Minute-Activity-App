@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Observable, of, switchMap } from 'rxjs';
+import { TranslateService } from '@ngx-translate/core';
 import { AuthService } from '../../services/auth.service';
 import { UserService } from '../../services/user.service';
 import { UserProfile, UserRole } from '../../models/user-profile.model';
@@ -27,6 +28,9 @@ export class AdminBlogsComponent implements OnInit {
   editingBlog: AdminBlogPost | null = null;
   currentLanguage = 'sr';
   availableLanguages = ['sr', 'en'];
+  
+  // Content visibility enum for template access
+  ContentVisibility = ContentVisibility;
 
   // Error handling
   showErrorModal = false;
@@ -83,7 +87,8 @@ export class AdminBlogsComponent implements OnInit {
     private _userService: UserService,
     private _blogService: BlogService,
     private _languageService: LanguageService,
-    private _imageUploadService: ImageUploadService
+    private _imageUploadService: ImageUploadService,
+    private _translate: TranslateService
   ) {}
 
   /**
@@ -115,7 +120,7 @@ export class AdminBlogsComponent implements OnInit {
    * Loads blogs from the service
    */
   private loadBlogs(): void {
-    this._blogService.getBlogPosts().subscribe(blogs => {
+    this._blogService.getBlogPosts(this.currentLanguage).subscribe(blogs => {
       this.blogs = blogs.map(blog => ({
         ...blog,
         isEditing: false,
@@ -391,7 +396,7 @@ export class AdminBlogsComponent implements OnInit {
       this.blogs.push(newBlog);
       this.initializeInfiniteScroll();
       this.resetForm();
-      this.showSuccess('Blog post created successfully!');
+      this.showSuccess(this._translate.instant('ADMIN.BLOG_CREATED_SUCCESS'));
     }).catch((error: Error) => {
       console.error('Error creating blog post:', error);
       this.showError('Create Error', 'Failed to create blog post. Please try again.');
@@ -411,20 +416,24 @@ export class AdminBlogsComponent implements OnInit {
       fullContent: this.formData.fullContent,
       author: this.formData.author,
       readTime: this.formData.readTime,
-      imageUrl: this.formData.imageUrl
+      imageUrl: this.formData.imageUrl,
+      visibility: this.formData.visibility,
+      isPremium: this.formData.isPremium
     };
 
     // Update blog post in service
     this._blogService.updateBlogPost(updatedBlog).then(() => {
       console.log('Blog update successful, showing success message'); // Debug log
+      console.log('Updated blog data:', updatedBlog); // Debug log for visibility and premium fields
       // Update local array after successful update
       const index = this.blogs.findIndex(b => b.id === this.editingBlog?.id);
       if (index !== -1) {
         this.blogs[index] = { ...updatedBlog, isEditing: false, isDeleting: false };
+        console.log('Local array updated at index:', index, 'with data:', this.blogs[index]); // Debug log
       }
       this.initializeInfiniteScroll();
       this.resetForm();
-      this.showSuccess('Blog post updated successfully!');
+      this.showSuccess(this._translate.instant('ADMIN.BLOG_UPDATED_SUCCESS'));
     }).catch((error: Error) => {
       console.error('Error updating blog post:', error);
       this.showError('Update Error', 'Failed to update blog post. Please try again.');
@@ -475,15 +484,15 @@ export class AdminBlogsComponent implements OnInit {
    * @param blog - The blog post to delete
    */
   handleDelete(blog: AdminBlogPost): void {
-    this.confirmTitle = 'Delete Blog Post';
-    this.confirmMessage = `Are you sure you want to delete "${blog.title}"? This action cannot be undone.`;
+    this.confirmTitle = this._translate.instant('ADMIN.DELETE_BLOG_TITLE');
+    this.confirmMessage = this._translate.instant('ADMIN.DELETE_BLOG_MESSAGE', { title: blog.title });
     this.confirmAction = (): void => {
       // Delete blog post from service
       this._blogService.deleteBlogPost(blog.id).then(() => {
         // Remove from local array after successful deletion
         this.blogs = this.blogs.filter(b => b.id !== blog.id);
         this.initializeInfiniteScroll();
-        this.showSuccess('Blog post deleted successfully!');
+        this.showSuccess(this._translate.instant('ADMIN.BLOG_DELETED_SUCCESS'));
       }).catch((error: Error) => {
         console.error('Error deleting blog post:', error);
         this.showError('Delete Error', 'Failed to delete blog post. Please try again.');

@@ -558,4 +558,203 @@ export const deleteOwnProfile = functions.region('us-central1').https.onCall(asy
     console.error('Error deleting own profile:', error);
     throw new functions.https.HttpsError('internal', error.message || 'Failed to delete profile');
   }
+});
+
+/**
+ * Content visibility levels
+ */
+enum ContentVisibility {
+  PUBLIC = 'public',
+  SUBSCRIBER = 'subscriber',
+  ADMIN = 'admin'
+}
+
+/**
+ * Helper function to check if user can access content based on role and visibility
+ * @param userRole - User's role
+ * @param visibility - Content visibility level
+ * @param isPremium - Whether content is premium
+ * @returns boolean indicating if user can access the content
+ */
+function canAccessContent(userRole: string | null, visibility: string, isPremium: boolean): boolean {
+  // Public content is accessible to everyone
+  if (visibility === ContentVisibility.PUBLIC) {
+    return true;
+  }
+
+  // Admin can access everything
+  if (userRole === 'admin') {
+    return true;
+  }
+
+  // Subscriber content requires subscriber or trial role
+  if (visibility === ContentVisibility.SUBSCRIBER) {
+    return userRole === 'subscriber' || userRole === 'trial';
+  }
+
+  // Admin content requires admin role
+  if (visibility === ContentVisibility.ADMIN) {
+    return userRole === 'admin';
+  }
+
+  return false;
+}
+
+/**
+ * Get filtered activities based on user role and content visibility
+ * Callable as 'getFilteredActivities'
+ */
+export const getFilteredActivities = functions.region('us-central1').https.onCall(async (data, context) => {
+  if (!context.auth) {
+    throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated');
+  }
+
+  const { language = 'en' } = data;
+  
+  try {
+    const uid = context.auth.uid;
+    
+    // Get user profile to determine role
+    const userDoc = await db.collection('users').doc(uid).get();
+    const userRole = userDoc.exists ? userDoc.data()?.role : null;
+    
+    console.log(`User ${uid} with role ${userRole} requesting activities in ${language}`);
+    
+    // Get activities from the specified language collection
+    const activitiesSnapshot = await db.collection(`activities_${language}`).get();
+    
+    if (activitiesSnapshot.empty) {
+      return { activities: [] };
+    }
+    
+    const activities = activitiesSnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    })) as any[];
+    
+    // Filter activities based on user role and content visibility
+    const filteredActivities = activities.filter(activity => {
+      const visibility = activity.visibility || ContentVisibility.PUBLIC;
+      const isPremium = activity.isPremium || false;
+      
+      return canAccessContent(userRole, visibility, isPremium);
+    });
+    
+    console.log(`Filtered ${activities.length} activities to ${filteredActivities.length} for user ${uid}`);
+    
+    return { 
+      activities: filteredActivities,
+      totalCount: activities.length,
+      filteredCount: filteredActivities.length,
+      userRole: userRole
+    };
+  } catch (error: any) {
+    console.error('Error getting filtered activities:', error);
+    throw new functions.https.HttpsError('internal', error.message || 'Failed to get activities');
+  }
+});
+
+
+/**
+ * Get filtered blog posts based on user role and content visibility
+ * Callable as 'getFilteredBlogPosts'
+ */
+export const getFilteredBlogPosts = functions.region('us-central1').https.onCall(async (data, context) => {
+  if (!context.auth) {
+    throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated');
+  }
+
+  const { language = 'en' } = data;
+  
+  try {
+    const uid = context.auth.uid;
+    
+    // Get user profile to determine role
+    const userDoc = await db.collection('users').doc(uid).get();
+    const userRole = userDoc.exists ? userDoc.data()?.role : null;
+    
+    console.log(`User ${uid} with role ${userRole} requesting blog posts in ${language}`);
+    
+    // Get blog posts from the specified language collection
+    const blogPostsSnapshot = await db.collection(`blog_${language}`).get();
+    
+    if (blogPostsSnapshot.empty) {
+      return { blogPosts: [] };
+    }
+    
+    const blogPosts = blogPostsSnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    })) as any[];
+    
+    // Filter blog posts based on user role and content visibility
+    const filteredBlogPosts = blogPosts.filter(blogPost => {
+      const visibility = blogPost.visibility || ContentVisibility.PUBLIC;
+      const isPremium = blogPost.isPremium || false;
+      
+      return canAccessContent(userRole, visibility, isPremium);
+    });
+    
+    console.log(`Filtered ${blogPosts.length} blog posts to ${filteredBlogPosts.length} for user ${uid}`);
+    
+    return { 
+      blogPosts: filteredBlogPosts,
+      totalCount: blogPosts.length,
+      filteredCount: filteredBlogPosts.length,
+      userRole: userRole
+    };
+  } catch (error: any) {
+    console.error('Error getting filtered blog posts:', error);
+    throw new functions.https.HttpsError('internal', error.message || 'Failed to get blog posts');
+  }
+});
+
+
+/**
+ * Get public content for non-authenticated users
+ * Callable as 'getPublicContent'
+ */
+export const getPublicContent = functions.region('us-central1').https.onCall(async (data, context) => {
+  const { contentType, language = 'en' } = data;
+  
+  if (!contentType || !['activities', 'blog'].includes(contentType)) {
+    throw new functions.https.HttpsError('invalid-argument', 'contentType must be "activities" or "blog"');
+  }
+  
+  try {
+    console.log(`Anonymous user requesting public ${contentType} in ${language}`);
+    
+    // Get content from the specified language collection
+    const collectionName = contentType === 'activities' ? `activities_${language}` : `blog_${language}`;
+    const contentSnapshot = await db.collection(collectionName).get();
+    
+    if (contentSnapshot.empty) {
+      return { content: [] };
+    }
+    
+    const content = contentSnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    })) as any[];
+    
+    // Filter to only public, non-premium content
+    const publicContent = content.filter(item => {
+      const visibility = item.visibility || ContentVisibility.PUBLIC;
+      const isPremium = item.isPremium || false;
+      
+      return visibility === ContentVisibility.PUBLIC && !isPremium;
+    });
+    
+    console.log(`Filtered ${content.length} ${contentType} to ${publicContent.length} public items`);
+    
+    return { 
+      content: publicContent,
+      totalCount: content.length,
+      publicCount: publicContent.length,
+      contentType: contentType
+    };
+  } catch (error: any) {
+    console.error(`Error getting public ${contentType}:`, error);
+    throw new functions.https.HttpsError('internal', error.message || `Failed to get ${contentType}`);
+  }
 }); 

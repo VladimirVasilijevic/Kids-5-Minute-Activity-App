@@ -26,6 +26,10 @@ export class AdminActivitiesComponent implements OnInit {
   activities: AdminActivity[] = [];
   showForm = false;
   editingActivity: AdminActivity | null = null;
+  currentLanguage = 'sr';
+  
+  // Content visibility enum for template access
+  ContentVisibility = ContentVisibility;
   
   // Error handling
   showErrorModal = false;
@@ -125,13 +129,23 @@ export class AdminActivitiesComponent implements OnInit {
    * Loads activities from the service
    */
   private loadActivities(): void {
-    this._activityService.getActivities().subscribe(activities => {
+    this._activityService.getActivities(this.currentLanguage).subscribe(activities => {
       this.activities = activities.map(activity => ({
         ...activity,
         isEditing: false,
         isDeleting: false
       }));
     });
+  }
+
+  /**
+   * Changes the language context
+   * @param language - Language code to switch to
+   */
+  changeLanguage(language: string): void {
+    this._languageService.setLanguage(language);
+    this.currentLanguage = language;
+    this.loadActivities();
   }
 
   /**
@@ -225,7 +239,7 @@ export class AdminActivitiesComponent implements OnInit {
       // Add to local array after successful creation
       this.activities.push(newActivity);
       this.resetForm();
-      this.showSuccess('Activity created successfully!');
+      this.showSuccess(this._translate.instant('ADMIN.ACTIVITY_CREATED_SUCCESS'));
     }).catch((error: Error) => {
       console.error('Error creating activity:', error);
       this.showError('Create Error', 'Failed to create activity. Please try again.');
@@ -251,18 +265,22 @@ export class AdminActivitiesComponent implements OnInit {
       imageUrl: this.formData.image || '',
       videoUrl: this.formData.video || '',
       category: this.formData.category,
-      language: this.formData.language
+      language: this.formData.language,
+      visibility: this.formData.visibility,
+      isPremium: this.formData.isPremium
     };
 
     // Update activity in service
     this._activityService.updateActivity(updatedActivity).then(() => {
+      console.log('Activity update successful, updated data:', updatedActivity); // Debug log
       // Update local array after successful update
       const index = this.activities.findIndex(a => a.id === this.editingActivity?.id);
       if (index !== -1) {
         this.activities[index] = updatedActivity;
+        console.log('Local array updated at index:', index, 'with data:', this.activities[index]); // Debug log
       }
       this.resetForm();
-      this.showSuccess('Activity updated successfully!');
+      this.showSuccess(this._translate.instant('ADMIN.ACTIVITY_UPDATED_SUCCESS'));
     }).catch((error: Error) => {
       console.error('Error updating activity:', error);
       this.showError('Update Error', 'Failed to update activity. Please try again.');
@@ -503,14 +521,14 @@ export class AdminActivitiesComponent implements OnInit {
    * @param activity - The activity to delete
    */
   handleDelete(activity: AdminActivity): void {
-    this.confirmTitle = 'Delete Activity';
-    this.confirmMessage = `Are you sure you want to delete "${activity.title}"? This action cannot be undone.`;
+    this.confirmTitle = this._translate.instant('ADMIN.DELETE_ACTIVITY_TITLE');
+    this.confirmMessage = this._translate.instant('ADMIN.DELETE_ACTIVITY_MESSAGE', { title: activity.title });
     this.confirmAction = (): void => {
       // Delete activity from service
       this._activityService.deleteActivity(activity.id).then(() => {
         // Remove from local array after successful deletion
         this.activities = this.activities.filter(a => a.id !== activity.id);
-        this.showSuccess('Activity deleted successfully!');
+        this.showSuccess(this._translate.instant('ADMIN.ACTIVITY_DELETED_SUCCESS'));
       }).catch((error: Error) => {
         console.error('Error deleting activity:', error);
         this.showError('Delete Error', 'Failed to delete activity. Please try again.');

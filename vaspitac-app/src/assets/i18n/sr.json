@@ -136,7 +136,8 @@
     "POST3_EXCERPT": "Čitanje je temelj obrazovanja. Evo kako možete da inspirišete dete da zavoli knjige.",
     "POST3_AUTHOR": "Jelena Stojanović",
     "LOADING": "Učitavanje blog članaka...",
-    "LOADING_SINGLE": "Učitavanje blog članka..."
+    "LOADING_SINGLE": "Učitavanje blog članka...",
+    "EMPTY": "Nema dostupnih blog članaka."
   },
   "TIPS": {
     "BACK": "Nazad na početnu",
@@ -448,6 +449,34 @@
     "CREATE_ABOUT_CONTENT": "Kreiraj sadržaj O meni",
     "LAST_UPDATED": "Poslednji put ažurirano",
     "MATERIALS": "Materijali",
-    "ENTER_MATERIALS": "Unesite po jedan materijal u svaki red"
+    "ENTER_MATERIALS": "Unesite po jedan materijal u svaki red",
+    "VISIBILITY": "Vidljivost",
+    "VISIBILITY_PUBLIC": "Javno",
+    "VISIBILITY_SUBSCRIBER": "Pretplatnik",
+    "VISIBILITY_ADMIN": "Admin",
+    "PREMIUM_CONTENT": "Premium Sadržaj",
+    "IS_PREMIUM": "Premium",
+    "REMOVE_IMAGE": "Ukloni sliku",
+    "REMOVE_VIDEO": "Ukloni video",
+    "UPLOADING": "Učitavanje...",
+    "LOADING_MORE": "Učitavanje još...",
+    "NO_MORE_ITEMS": "Nema više stavki za učitavanje",
+    "DRAG_DROP_IMAGE": "Prevucite sliku ovde, ili",
+    "CLICK_TO_SELECT": "kliknite da izaberete",
+    "IMAGE_FORMATS": "PNG, JPG, GIF, WebP do 5MB",
+    "OR_ENTER_URL": "Ili unesite URL slike:",
+    "OR_DRAG_DROP": "ili prevucite i pustite",
+    "DELETE_BLOG_TITLE": "Brisanje blog članka",
+    "DELETE_BLOG_MESSAGE": "Da li ste sigurni da želite da obrišete \"{{title}}\"? Ova akcija je nepovratna.",
+    "DELETE_ACTIVITY_TITLE": "Brisanje aktivnosti",
+    "DELETE_ACTIVITY_MESSAGE": "Da li ste sigurni da želite da obrišete \"{{title}}\"? Ova akcija je nepovratna.",
+    "RESET_PASSWORD_TITLE": "Resetovanje lozinke",
+    "RESET_PASSWORD_MESSAGE": "Da li ste sigurni da želite da pošaljete email za resetovanje lozinke na {{email}}?",
+    "ACTIVITY_CREATED_SUCCESS": "Aktivnost je uspešno kreirana!",
+    "ACTIVITY_UPDATED_SUCCESS": "Aktivnost je uspešno ažurirana!",
+    "ACTIVITY_DELETED_SUCCESS": "Aktivnost je uspešno obrisana!",
+    "BLOG_CREATED_SUCCESS": "Blog članak je uspešno kreiran!",
+    "BLOG_UPDATED_SUCCESS": "Blog članak je uspešno ažuriran!",
+    "BLOG_DELETED_SUCCESS": "Blog članak je uspešno obrisan!"
   }
 }

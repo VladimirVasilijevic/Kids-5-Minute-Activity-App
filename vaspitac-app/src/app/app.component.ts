@@ -108,6 +108,8 @@ export class AppComponent implements OnInit, OnDestroy {
     this.currentLang = this.currentLang === 'sr' ? 'en' : 'sr';
     this.translate.use(this.currentLang);
     this._languageService.setLanguage(this.currentLang);
+    // Reload data with new language
+    this.loadData();
   }
 
   /**
@@ -123,11 +125,11 @@ export class AppComponent implements OnInit, OnDestroy {
    * Loads activities and blog posts data for search functionality
    */
   private loadData(): void {
-    this._activityService.getActivities().subscribe(activities => {
+    this._activityService.getActivities(this.currentLang).subscribe(activities => {
       this.activities = activities;
     });
 
-    this._blogService.getBlogPosts().subscribe(blogPosts => {
+    this._blogService.getBlogPosts(this.currentLang).subscribe(blogPosts => {
       this.blogPosts = blogPosts;
     });
   }

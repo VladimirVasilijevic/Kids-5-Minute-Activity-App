@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { Observable, combineLatest, BehaviorSubject } from 'rxjs';
-import { map, startWith } from 'rxjs/operators';
+import { map, startWith, switchMap } from 'rxjs/operators';
 import { Router, ActivatedRoute } from '@angular/router';
 
 import { Activity } from '../../models/activity.model';
@@ -53,22 +53,23 @@ export class ActivityListComponent implements OnInit {
       }
     });
 
-    this._activityService.getActivities().subscribe((activities) => {
-      this.allActivities = activities;
-      this.categories = Array.from(new Set(activities.map((a) => a.category)));
-    });
-
     this.activities$ = combineLatest([
-      this._activityService.getActivities(),
       this._translate.onLangChange.pipe(
         map((e) => e.lang as string),
         startWith(this.lang)
       ),
       this.categoryFilter$,
     ]).pipe(
-      map(([activities, lang, category]) => {
+      switchMap(([lang, category]: [string, string]) => {
         this.lang = lang;
-        return category ? activities.filter((a) => a.category === category) : activities;
+        // Load activities for the current language
+        return this._activityService.getActivities(lang).pipe(
+          map((activities) => {
+            this.allActivities = activities;
+            this.categories = Array.from(new Set(activities.map((a) => a.category)));
+            return category ? activities.filter((a) => a.category === category) : activities;
+          })
+        );
       })
     );
   }
@@ -95,6 +96,13 @@ export class ActivityListComponent implements OnInit {
     this._router.navigate(['/activity', id], {
       queryParams: { category: this.selectedCategory || null },
     });
+  }
+
+  /**
+   * Navigates to subscription page for premium content
+   */
+  goToSubscription(): void {
+    this._router.navigate(['/subscription']);
   }
 
   /**

@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { Observable } from 'rxjs';
+import { Observable, combineLatest } from 'rxjs';
+import { map, startWith, switchMap } from 'rxjs/operators';
+import { TranslateService } from '@ngx-translate/core';
 
 import { BlogPost } from '../../models/blog-post.model';
 import { BlogService } from '../../services/blog.service';
@@ -15,22 +17,36 @@ import { BlogService } from '../../services/blog.service';
 })
 export class BlogComponent implements OnInit {
   blogPosts$!: Observable<BlogPost[]>;
+  lang!: string;
 
   /**
    * Initializes the blog component with required services
    * @param _router - Angular router for navigation
    * @param _blogService - Service for blog post data
+   * @param _translate - Service for internationalization
    */
   constructor(
     private _router: Router,
-    private _blogService: BlogService
+    private _blogService: BlogService,
+    private _translate: TranslateService
   ) {}
 
   /**
-   * Loads blog posts on init
+   * Loads blog posts on init with language-aware filtering
    */
   ngOnInit(): void {
-    this.blogPosts$ = this._blogService.getBlogPosts();
+    this.lang = this._translate.currentLang || this._translate.getDefaultLang() || 'en';
+
+    // Load blog posts with language parameter for secure filtering
+    this.blogPosts$ = this._translate.onLangChange.pipe(
+      map((e) => e.lang as string),
+      startWith(this.lang)
+    ).pipe(
+      switchMap((lang: string) => {
+        this.lang = lang;
+        return this._blogService.getBlogPosts(lang);
+      })
+    );
   }
 
   /**
@@ -42,6 +58,13 @@ export class BlogComponent implements OnInit {
         window.scrollTo({ top: 0, behavior: 'smooth' });
       }
     });
+  }
+
+  /**
+   * Navigates to subscription page for premium content
+   */
+  goToSubscription(): void {
+    this._router.navigate(['/subscription']);
   }
 
   /**

@@ -48,7 +48,10 @@ export class ActivityDetailComponent implements OnInit {
       switchMap(([id, lang]) => {
         this.lang = lang;
         if (!id) return of(undefined);
-        return this._activityService.getActivityById(id);
+        // Get all activities for the current language and find the specific one
+        return this._activityService.getActivities(lang).pipe(
+          map(activities => activities.find(activity => activity.id === id))
+        );
       })
     );
   }

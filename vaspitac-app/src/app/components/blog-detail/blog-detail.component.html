@@ -59,6 +59,6 @@
 
   <!-- Loading state -->
   <div class="flex justify-center items-center min-h-screen" *ngIf="!(blogPost$ | async)">
-    <div class="text-gray-500">Loading...</div>
+    <div class="text-gray-500">{{ 'BLOG.LOADING_SINGLE' | translate }}</div>
   </div>
 </div> 
