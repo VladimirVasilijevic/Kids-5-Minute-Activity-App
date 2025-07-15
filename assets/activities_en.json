@@ -9,7 +9,9 @@
     "imageUrl": "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=400&h=300&fit=crop",
     "ageGroup": "3-7",
     "materials": ["Paper", "Crayons"],
-    "instructions": ["Prepare the materials.", "Follow the activity steps.", "Have fun!"]
+    "instructions": ["Prepare the materials.", "Follow the activity steps.", "Have fun!"],
+    "visibility": "public",
+    "isPremium": false
   },
   {
     "id": "002",

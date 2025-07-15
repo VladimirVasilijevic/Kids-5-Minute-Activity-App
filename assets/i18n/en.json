@@ -136,7 +136,8 @@
     "POST3_EXCERPT": "Reading is the foundation of education. Here's how you can inspire your child to love books.",
     "POST3_AUTHOR": "Jelena Stojanovic",
     "LOADING": "Loading blog posts...",
-    "LOADING_SINGLE": "Loading blog post..."
+    "LOADING_SINGLE": "Loading blog post...",
+    "EMPTY": "No blog posts available."
   },
   "TIPS": {
     "BACK": "Back to home",
@@ -448,6 +449,34 @@
     "CREATE_ABOUT_CONTENT": "Create about content",
     "LAST_UPDATED": "Last Updated",
     "MATERIALS": "Materials",
-    "ENTER_MATERIALS": "Enter one material per line"
+    "ENTER_MATERIALS": "Enter one material per line",
+    "VISIBILITY": "Visibility",
+    "VISIBILITY_PUBLIC": "Public",
+    "VISIBILITY_SUBSCRIBER": "Subscriber",
+    "VISIBILITY_ADMIN": "Admin",
+    "PREMIUM_CONTENT": "Premium Content",
+    "IS_PREMIUM": "Premium",
+    "REMOVE_IMAGE": "Remove Image",
+    "REMOVE_VIDEO": "Remove Video",
+    "UPLOADING": "Uploading...",
+    "LOADING_MORE": "Loading more...",
+    "NO_MORE_ITEMS": "No more items to load",
+    "DRAG_DROP_IMAGE": "Drag and drop an image here, or",
+    "CLICK_TO_SELECT": "click to select",
+    "IMAGE_FORMATS": "PNG, JPG, GIF, WebP up to 5MB",
+    "OR_ENTER_URL": "Or enter image URL:",
+    "OR_DRAG_DROP": "or drag and drop",
+    "DELETE_BLOG_TITLE": "Delete Blog Post",
+    "DELETE_BLOG_MESSAGE": "Are you sure you want to delete \"{{title}}\"? This action cannot be undone.",
+    "DELETE_ACTIVITY_TITLE": "Delete Activity",
+    "DELETE_ACTIVITY_MESSAGE": "Are you sure you want to delete \"{{title}}\"? This action cannot be undone.",
+    "RESET_PASSWORD_TITLE": "Reset Password",
+    "RESET_PASSWORD_MESSAGE": "Are you sure you want to send a password reset email to {{email}}?",
+    "ACTIVITY_CREATED_SUCCESS": "Activity created successfully!",
+    "ACTIVITY_UPDATED_SUCCESS": "Activity updated successfully!",
+    "ACTIVITY_DELETED_SUCCESS": "Activity deleted successfully!",
+    "BLOG_CREATED_SUCCESS": "Blog post created successfully!",
+    "BLOG_UPDATED_SUCCESS": "Blog post updated successfully!",
+    "BLOG_DELETED_SUCCESS": "Blog post deleted successfully!"
   }
 }
