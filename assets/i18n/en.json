@@ -20,6 +20,8 @@
     "CAT_ABOUT_DESC": "Get to know the author and my experience",
     "CAT_SHOP_TITLE": "Shop",
     "CAT_SHOP_DESC": "Educational materials and activity guides",
+    "CAT_SUBSCRIBE_TITLE": "Subscribe",
+    "CAT_SUBSCRIBE_DESC": "Choose a subscription plan that suits you",
     "CAT_BLOG_TITLE": "Blog",
     "CAT_BLOG_DESC": "Articles about parenting and child development",
     "CAT_TIPS_TITLE": "Tips",
@@ -245,7 +247,27 @@
     "ERROR_INVALID_IMAGE": "Please select a valid image file (JPEG, PNG, GIF, WebP) under 5MB.",
     "ERROR_UPLOAD_FAILED": "Failed to upload image. Please try again.",
     "UPLOADING_IMAGE": "Uploading image...",
-    "CLOSE": "Close"
+    "CLOSE": "Close",
+    "SUBSCRIPTION_TITLE": "Subscription",
+    "CURRENT_PLAN": "Current Plan",
+    "PLAN_FREE": "Free",
+    "PLAN_PREMIUM": "Premium",
+    "PLAN_TRIAL": "Trial",
+    "PLAN_EXPIRED": "Expired",
+    "EXPIRES_ON": "Expires on",
+    "NO_EXPIRATION": "No expiration",
+    "UPGRADE_BUTTON": "Upgrade to Premium",
+    "MANAGE_BUTTON": "Manage Subscription",
+    "CANCEL_BUTTON": "Cancel Subscription",
+    "RENEW_BUTTON": "Renew Subscription",
+    "NO_SUBSCRIPTION": "No active subscription",
+    "SUBSCRIPTION_ACTIVE": "Active subscription",
+    "SUBSCRIPTION_EXPIRED": "Subscription expired",
+    "SUBSCRIPTION_TRIAL": "Trial subscription",
+    "UNSUBSCRIBE": "Unsubscribe",
+    "UNSUBSCRIBE_CONFIRMATION": "Are you sure you want to unsubscribe?",
+    "UNSUBSCRIBE_WARNING": "You will lose access to premium content immediately.",
+    "UNSUBSCRIBE_SUCCESS": "Successfully unsubscribed from premium plan."
   },
   "COMMON": {
     "SAVE": "Save",
@@ -477,6 +499,62 @@
     "ACTIVITY_DELETED_SUCCESS": "Activity deleted successfully!",
     "BLOG_CREATED_SUCCESS": "Blog post created successfully!",
     "BLOG_UPDATED_SUCCESS": "Blog post updated successfully!",
-    "BLOG_DELETED_SUCCESS": "Blog post deleted successfully!"
+        "BLOG_DELETED_SUCCESS": "Blog post deleted successfully!"
+  },
+  "SUBSCRIBE": {
+    "TITLE": "Choose your plan",
+    "SUBTITLE": "Access rich content of activities and parenting tips",
+    "BACK_TO_HOME": "Back to home",
+    "FREE": {
+      "NAME": "Free",
+      "PRICE": "Free",
+      "DESCRIPTION": "Basic features to get started",
+      "FEATURES": [
+        "Access to basic activities",
+        "Limited tips",
+        "Read blog articles"
+      ],
+      "FEATURES.0": "Access to basic activities",
+      "FEATURES.1": "Limited tips",
+      "FEATURES.2": "Read blog articles",
+      "LIMITATIONS": [
+        "Limited activities per day",
+        "No exclusive content"
+      ],
+      "LIMITATIONS.0": "Limited activities per day",
+      "LIMITATIONS.1": "No exclusive content",
+      "BUTTON": "Current Plan"
+    },
+    "PREMIUM": {
+      "NAME": "Premium",
+      "PRICE": "$9.99/month",
+      "DESCRIPTION": "All features for serious parents",
+      "FEATURES": [
+        "Unlimited access to all activities",
+        "Exclusive content and activities",
+        "Personalized tips",
+        "Priority support",
+        "Offline content access",
+        "Monthly activity guides"
+      ],
+      "FEATURES.0": "Unlimited access to all activities",
+      "FEATURES.1": "Exclusive content and activities",
+      "FEATURES.2": "Personalized tips",
+      "FEATURES.3": "Priority support",
+      "FEATURES.4": "Offline content access",
+      "FEATURES.5": "Monthly activity guides",
+      "BUTTON": "Subscribe",
+      "POPULAR": "Most Popular"
+    },
+    "INCLUDES": "Includes:",
+    "LIMITATIONS": "Limitations:",
+    "CONTACT_TITLE": "Have questions about subscription plans?",
+    "CONTACT_BUTTON": "Contact us",
+    "PAYMENT": {
+      "PROCESSING": "Processing payment...",
+      "SUCCESS": "Payment successful!",
+      "ERROR": "Payment failed. Please try again.",
+      "MOCK_MESSAGE": "This is a mock payment flow. In production, this would integrate with Stripe."
+    }
   }
 }
