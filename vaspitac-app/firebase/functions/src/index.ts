@@ -1,5 +1,6 @@
 import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
+import { UserRole, SubscriptionStatus, SubscriptionType, ContentVisibility } from './types';
 
 admin.initializeApp();
 
@@ -51,7 +52,7 @@ export const assignAdminRole = functions.https.onCall(async (data, context) => {
     // Check if the requesting user is an admin
     const adminUser = await db.collection('users').doc(context.auth.uid).get();
     
-    if (!adminUser.exists || adminUser.data()?.role !== 'admin') {
+    if (!adminUser.exists || adminUser.data()?.role !== UserRole.ADMIN) {
       throw new functions.https.HttpsError('permission-denied', 'Only admins can assign admin role');
     }
 
@@ -60,11 +61,11 @@ export const assignAdminRole = functions.https.onCall(async (data, context) => {
     
     // Update user profile in Firestore
     await db.collection('users').doc(targetUserId).update({
-      role: 'admin',
+      role: UserRole.ADMIN,
       permissions: ADMIN_PERMISSIONS,
       subscription: {
-        type: 'admin',
-        status: 'active',
+        type: SubscriptionType.TRIAL, // Using trial type for admin
+        status: SubscriptionStatus.ACTIVE,
         startDate: new Date().toISOString(),
         autoRenew: true
       },
@@ -74,7 +75,7 @@ export const assignAdminRole = functions.https.onCall(async (data, context) => {
     // Set custom claims for admin
     await admin.auth().setCustomUserClaims(targetUserId, {
       admin: true,
-      role: 'admin'
+      role: UserRole.ADMIN
     });
 
     return { 
@@ -111,7 +112,7 @@ export const removeAdminRole = functions.https.onCall(async (data, context) => {
     // Check if the requesting user is an admin
     const adminUser = await db.collection('users').doc(context.auth.uid).get();
     
-    if (!adminUser.exists || adminUser.data()?.role !== 'admin') {
+    if (!adminUser.exists || adminUser.data()?.role !== UserRole.ADMIN) {
       throw new functions.https.HttpsError('permission-denied', 'Only admins can remove admin role');
     }
 
@@ -120,7 +121,7 @@ export const removeAdminRole = functions.https.onCall(async (data, context) => {
     
     // Update user profile in Firestore
     await db.collection('users').doc(targetUserId).update({
-      role: 'free',
+      role: UserRole.FREE_USER,
       permissions: FREE_USER_PERMISSIONS,
       subscription: null,
       updatedAt: new Date().toISOString()
@@ -129,7 +130,7 @@ export const removeAdminRole = functions.https.onCall(async (data, context) => {
     // Remove custom claims
     await admin.auth().setCustomUserClaims(targetUserId, {
       admin: false,
-      role: 'free'
+      role: UserRole.FREE_USER
     });
 
     return { 
@@ -159,7 +160,7 @@ export const checkSubscriptionStatus = functions.pubsub
     try {
       // Find expired subscriptions
       const expiredUsers = await db.collection('users')
-        .where('subscription.status', 'in', ['active', 'trial'])
+        .where('subscription.status', 'in', [SubscriptionStatus.ACTIVE, SubscriptionStatus.TRIAL])
         .where('subscription.endDate', '<', now)
         .get();
 
@@ -175,13 +176,13 @@ export const checkSubscriptionStatus = functions.pubsub
         const userData = doc.data();
         
         // Don't update admin users
-        if (userData.role === 'admin') {
+        if (userData.role === UserRole.ADMIN) {
           return;
         }
         
         batch.update(doc.ref, {
-          'subscription.status': 'expired',
-          'role': 'free',
+          'subscription.status': SubscriptionStatus.EXPIRED,
+          'role': UserRole.FREE_USER,
           'permissions': FREE_USER_PERMISSIONS,
           updatedAt: new Date().toISOString()
         });
@@ -332,7 +333,7 @@ export const createUser = functions.region('us-central1').https.onCall(async (da
     const userRecord = await admin.auth().createUser({ email, password, displayName });
     // Set default permissions based on role
     let permissions = FREE_USER_PERMISSIONS;
-    if (role === 'admin') permissions = ADMIN_PERMISSIONS;
+    if (role === UserRole.ADMIN) permissions = ADMIN_PERMISSIONS;
     // Add user profile to Firestore
     await db.collection('users').doc(userRecord.uid).set({
       uid: userRecord.uid,
@@ -361,7 +362,7 @@ export const updateUser = functions.region('us-central1').https.onCall(async (da
   
   // Check if the requesting user is an admin
   const adminUser = await db.collection('users').doc(context.auth.uid).get();
-  if (!adminUser.exists || adminUser.data()?.role !== 'admin') {
+  if (!adminUser.exists || adminUser.data()?.role !== UserRole.ADMIN) {
     throw new functions.https.HttpsError('permission-denied', 'Only admins can update users');
   }
   
@@ -378,7 +379,7 @@ export const updateUser = functions.region('us-central1').https.onCall(async (da
   try {
     // Set default permissions based on role
     let permissions = FREE_USER_PERMISSIONS;
-    if (role === 'admin') permissions = ADMIN_PERMISSIONS;
+    if (role === UserRole.ADMIN) permissions = ADMIN_PERMISSIONS;
     
     // Update user in Auth
     await admin.auth().updateUser(uid, { displayName });
@@ -563,11 +564,7 @@ export const deleteOwnProfile = functions.region('us-central1').https.onCall(asy
 /**
  * Content visibility levels
  */
-enum ContentVisibility {
-  PUBLIC = 'public',
-  SUBSCRIBER = 'subscriber',
-  ADMIN = 'admin'
-}
+
 
 /**
  * Helper function to check if user can access content based on role and visibility

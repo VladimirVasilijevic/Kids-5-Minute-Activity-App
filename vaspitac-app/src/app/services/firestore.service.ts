@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { HttpClient } from '@angular/common/http';
-import { Observable, of, catchError, switchMap, map, firstValueFrom } from 'rxjs';
+import { Observable, of, catchError, switchMap, map, firstValueFrom, tap } from 'rxjs';
 
 import { Activity } from '../models/activity.model';
 import { Category } from '../models/category.model';
@@ -88,9 +88,13 @@ export class FirestoreService {
           .collection<Category>(`categories_${lang}`)
           .valueChanges()
           .pipe(
-            catchError(() => {
-              console.log(`Falling back to JSON for categories_${lang}`);
-              return this._http.get<Category[]>(`assets/categories_${lang}.json`);
+            catchError((error) => {
+              console.log(`Falling back to JSON for categories_${lang}`, error);
+              return this._http.get<Category[]>(`assets/categories_${lang}.json`).pipe(
+                tap((categories) => {
+                  console.log(`FirestoreService: Loaded ${categories.length} categories from JSON for ${lang}:`, categories);
+                })
+              );
             })
           );
       })

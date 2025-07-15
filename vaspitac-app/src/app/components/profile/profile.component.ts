@@ -8,7 +8,7 @@ import { Observable, of, switchMap } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
 import { AuthService } from '../../services/auth.service';
 import { UserService } from '../../services/user.service';
-import { UserProfile } from '../../models/user-profile.model';
+import { UserProfile, UserRole } from '../../models/user-profile.model';
 
 @Component({
   selector: 'app-profile',
@@ -16,6 +16,7 @@ import { UserProfile } from '../../models/user-profile.model';
   styleUrls: ['./profile.component.scss']
 })
 export class ProfileComponent implements OnInit {
+  public UserRole = UserRole;
   userProfile$: Observable<UserProfile | null> = of(null);
   isLoading = true;
   isChangingPassword = false;
@@ -37,6 +38,10 @@ export class ProfileComponent implements OnInit {
   deleteProfilePassword = '';
   deleteProfileLoading = false;
   deleteProfileError: string | null = null;
+
+  // Unsubscribe modal state
+  showUnsubscribeModal = false;
+  unsubscribeLoading = false;
 
   // Error and success modal state
   showErrorModal = false;
@@ -79,6 +84,85 @@ export class ProfileComponent implements OnInit {
   onLogout(): void {
     this._auth.signOut();
     this._router.navigate(['/']);
+  }
+
+  /**
+   * Navigate to subscription page
+   */
+  navigateToSubscribe(): void {
+    this._router.navigate(['/subscribe']);
+  }
+
+  /**
+   * Manage subscription (placeholder for future implementation)
+   */
+  manageSubscription(): void {
+    // TODO: Implement subscription management
+    console.log('Manage subscription clicked');
+    this.showSuccess('Subscription management coming soon!');
+  }
+
+  /**
+   * Cancel subscription (placeholder for future implementation)
+   */
+  cancelSubscription(): void {
+    // TODO: Implement subscription cancellation
+    console.log('Cancel subscription clicked');
+    this.showSuccess('Subscription cancellation coming soon!');
+  }
+
+  /**
+   * Renew subscription (placeholder for future implementation)
+   */
+  renewSubscription(): void {
+    // TODO: Implement subscription renewal
+    console.log('Renew subscription clicked');
+    this.showSuccess('Subscription renewal coming soon!');
+  }
+
+  /**
+   * Show the unsubscribe confirmation modal
+   */
+  onUnsubscribe(): void {
+    this.showUnsubscribeModal = true;
+  }
+
+  /**
+   * Confirm unsubscribe action
+   */
+  async confirmUnsubscribe(): Promise<void> {
+    if (!this.selectedUser) {
+      return;
+    }
+
+    this.unsubscribeLoading = true;
+
+    try {
+      // TODO: Implement actual unsubscribe logic with backend
+      // For now, just show success message
+      console.log('Unsubscribing user:', this.selectedUser.uid);
+      
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Close modal and show success
+      this.closeUnsubscribeModal();
+      this.showSuccess(this._translate.instant('PROFILE.UNSUBSCRIBE_SUCCESS'));
+      
+    } catch (error) {
+      console.error('Error unsubscribing:', error);
+      const errorMessage = (error as Error).message || this._translate.instant('PROFILE.ERROR_UPDATE_MESSAGE');
+      this.showError(this._translate.instant('PROFILE.ERROR_UPDATE_TITLE'), errorMessage);
+    } finally {
+      this.unsubscribeLoading = false;
+    }
+  }
+
+  /**
+   * Close the unsubscribe modal
+   */
+  closeUnsubscribeModal(): void {
+    this.showUnsubscribeModal = false;
   }
 
   /** Open edit profile modal */

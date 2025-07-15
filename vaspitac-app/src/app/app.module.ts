@@ -56,6 +56,7 @@ import { AdminBlogsComponent } from './components/admin/admin-blogs.component';
 import { AdminAboutComponent } from './components/admin/admin-about.component';
 import { AdminUsersComponent } from './components/admin/admin-users.component';
 import { BackButtonComponent } from './components/back-button/back-button.component';
+import { SubscribeComponent } from './components/subscribe/subscribe.component';
 
 // AoT requires an exported function for factories
 /**
@@ -99,6 +100,7 @@ export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
     AdminAboutComponent,
     AdminUsersComponent,
     BackButtonComponent,
+    SubscribeComponent,
   ],
   imports: [
     BrowserModule,
@@ -122,6 +124,7 @@ export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
       { path: 'admin/blogs', component: AdminBlogsComponent },
       { path: 'admin/about', component: AdminAboutComponent },
       { path: 'admin/users', component: AdminUsersComponent },
+      { path: 'subscribe', component: SubscribeComponent },
       { path: '**', redirectTo: '' },
     ]),
     TranslateModule.forRoot({

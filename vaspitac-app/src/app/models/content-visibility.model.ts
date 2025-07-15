@@ -1,11 +1,10 @@
+import { UserRole } from './user-profile.model';
+
 /**
- * Content visibility levels for different content types
+ * Content visibility levels
  */
 export enum ContentVisibility {
-  /** Visible to all users */
   PUBLIC = 'public',
-  /** Visible to subscribers and admins */
-  SUBSCRIBER = 'subscriber',
-  /** Visible to admins only */
-  ADMIN = 'admin'
+  SUBSCRIBER = UserRole.SUBSCRIBER,
+  ADMIN = UserRole.ADMIN
 } 

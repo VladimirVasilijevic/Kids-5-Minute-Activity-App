@@ -20,6 +20,8 @@
     "CAT_ABOUT_DESC": "Upoznajte se sa autorom i mojim iskustvom",
     "CAT_SHOP_TITLE": "Prodavnica",
     "CAT_SHOP_DESC": "Edukativni materijali i vodiči za aktivnosti",
+    "CAT_SUBSCRIBE_TITLE": "Pretplata",
+    "CAT_SUBSCRIBE_DESC": "Izaberite plan pretplate koji vam odgovara",
     "CAT_BLOG_TITLE": "Blog",
     "CAT_BLOG_DESC": "Članci o roditeljstvu i razvoju dece",
     "CAT_TIPS_TITLE": "Saveti",
@@ -245,7 +247,27 @@
     "ERROR_INVALID_IMAGE": "Molimo izaberite validnu sliku (JPEG, PNG, GIF, WebP) manju od 5MB.",
     "ERROR_UPLOAD_FAILED": "Greška prilikom učitavanja slike. Pokušajte ponovo.",
     "UPLOADING_IMAGE": "Učitavanje slike...",
-    "CLOSE": "Zatvori"
+    "CLOSE": "Zatvori",
+    "SUBSCRIPTION_TITLE": "Pretplata",
+    "CURRENT_PLAN": "Trenutni plan",
+    "PLAN_FREE": "Besplatno",
+    "PLAN_PREMIUM": "Premium",
+    "PLAN_TRIAL": "Probni period",
+    "PLAN_EXPIRED": "Isteklo",
+    "EXPIRES_ON": "Ističe",
+    "NO_EXPIRATION": "Bez isteka",
+    "UPGRADE_BUTTON": "Nadogradi na Premium",
+    "MANAGE_BUTTON": "Upravljaj pretplatom",
+    "CANCEL_BUTTON": "Otkaži pretplatu",
+    "RENEW_BUTTON": "Obnovi pretplatu",
+    "NO_SUBSCRIPTION": "Nema aktivne pretplate",
+    "SUBSCRIPTION_ACTIVE": "Aktivna pretplata",
+    "SUBSCRIPTION_EXPIRED": "Pretplata istekla",
+    "SUBSCRIPTION_TRIAL": "Probna pretplata",
+    "UNSUBSCRIBE": "Otkaži pretplatu",
+    "UNSUBSCRIBE_CONFIRMATION": "Da li ste sigurni da želite da otkažete pretplatu?",
+    "UNSUBSCRIBE_WARNING": "Odmah ćete izgubiti pristup premium sadržaju.",
+    "UNSUBSCRIBE_SUCCESS": "Uspešno ste otkazali pretplatu."
   },
   "COMMON": {
     "SAVE": "Sačuvaj",
@@ -477,6 +499,62 @@
     "ACTIVITY_DELETED_SUCCESS": "Aktivnost je uspešno obrisana!",
     "BLOG_CREATED_SUCCESS": "Blog članak je uspešno kreiran!",
     "BLOG_UPDATED_SUCCESS": "Blog članak je uspešno ažuriran!",
-    "BLOG_DELETED_SUCCESS": "Blog članak je uspešno obrisan!"
+        "BLOG_DELETED_SUCCESS": "Blog članak je uspešno obrisan!"
+  },
+  "SUBSCRIBE": {
+    "TITLE": "Izaberite svoj plan",
+    "SUBTITLE": "Pristupite bogatom sadržaju aktivnosti i saveta za vaspitanje dece",
+    "BACK_TO_HOME": "Nazad na početnu",
+    "FREE": {
+      "NAME": "Besplatno",
+      "PRICE": "Besplatno",
+      "DESCRIPTION": "Osnovne funkcionalnosti za početak",
+      "FEATURES": [
+        "Pristup osnovnim aktivnostima",
+        "Ograničeni saveti",
+        "Čitanje blog članaka"
+      ],
+      "FEATURES.0": "Pristup osnovnim aktivnostima",
+      "FEATURES.1": "Ograničeni saveti",
+      "FEATURES.2": "Čitanje blog članaka",
+      "LIMITATIONS": [
+        "Ograničen broj aktivnosti dnevno",
+        "Bez ekskluzivnog sadržaja"
+      ],
+      "LIMITATIONS.0": "Ograničen broj aktivnosti dnevno",
+      "LIMITATIONS.1": "Bez ekskluzivnog sadržaja",
+      "BUTTON": "Trenutni plan"
+    },
+    "PREMIUM": {
+      "NAME": "Premium",
+      "PRICE": "$9.99/mesečno",
+      "DESCRIPTION": "Sve funkcionalnosti za ozbiljne roditelje",
+      "FEATURES": [
+        "Neograničen pristup svim aktivnostima",
+        "Ekskluzivni sadržaj i aktivnosti",
+        "Personalizovani saveti",
+        "Prioritetna podrška",
+        "Offline pristup sadržaju",
+        "Mesečni vodiči za aktivnosti"
+      ],
+      "FEATURES.0": "Neograničen pristup svim aktivnostima",
+      "FEATURES.1": "Ekskluzivni sadržaj i aktivnosti",
+      "FEATURES.2": "Personalizovani saveti",
+      "FEATURES.3": "Prioritetna podrška",
+      "FEATURES.4": "Offline pristup sadržaju",
+      "FEATURES.5": "Mesečni vodiči za aktivnosti",
+      "BUTTON": "Pretplati se",
+      "POPULAR": "Najpopularniji"
+    },
+    "INCLUDES": "Uključuje:",
+    "LIMITATIONS": "Ograničenja:",
+    "CONTACT_TITLE": "Imate pitanja o planovima pretplate?",
+    "CONTACT_BUTTON": "Kontaktirajte nas",
+    "PAYMENT": {
+      "PROCESSING": "Obrađivanje plaćanja...",
+      "SUCCESS": "Plaćanje uspešno!",
+      "ERROR": "Plaćanje neuspešno. Pokušajte ponovo.",
+      "MOCK_MESSAGE": "Ovo je simulacija plaćanja. U produkciji bi se integrisalo sa Stripe-om."
+    }
   }
 }

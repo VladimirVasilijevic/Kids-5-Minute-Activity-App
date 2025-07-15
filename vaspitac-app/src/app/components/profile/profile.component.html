@@ -72,6 +72,73 @@
           </div>
         </div>
 
+        <!-- Subscription Section -->
+        <div class="border-t pt-4">
+          <h3 class="text-lg font-medium text-gray-900 mb-3">{{ 'PROFILE.SUBSCRIPTION_TITLE' | translate }}</h3>
+          <div class="bg-gray-50 rounded-lg p-4 mb-4">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-sm font-medium text-gray-700">{{ 'PROFILE.CURRENT_PLAN' | translate }}:</span>
+              <span class="text-sm font-semibold" 
+                    [ngClass]="{
+                      'text-green-600': user.role === UserRole.SUBSCRIBER || user.role === UserRole.ADMIN,
+                      'text-gray-600': user.role === UserRole.FREE_USER
+                    }">
+                {{ user.role === UserRole.ADMIN ? ('PROFILE.PLAN_PREMIUM' | translate) : 
+                   user.role === UserRole.SUBSCRIBER ? ('PROFILE.PLAN_PREMIUM' | translate) : 
+                   ('PROFILE.PLAN_FREE' | translate) }}
+              </span>
+            </div>
+            
+            <!-- Subscription Status -->
+            <div class="text-xs text-gray-500 mb-3">
+              <ng-container *ngIf="user.subscription">
+                <div *ngIf="user.subscription.status === 'active'">
+                  {{ 'PROFILE.SUBSCRIPTION_ACTIVE' | translate }}
+                  <span *ngIf="user.subscription.endDate">
+                    - {{ 'PROFILE.EXPIRES_ON' | translate }} {{ user.subscription.endDate | date:'mediumDate' }}
+                  </span>
+                </div>
+                <div *ngIf="user.subscription.status === 'trial'">
+                  {{ 'PROFILE.SUBSCRIPTION_TRIAL' | translate }}
+                  <span *ngIf="user.subscription.endDate">
+                    - {{ 'PROFILE.EXPIRES_ON' | translate }} {{ user.subscription.endDate | date:'mediumDate' }}
+                  </span>
+                </div>
+                <div *ngIf="user.subscription.status === 'expired'">
+                  {{ 'PROFILE.SUBSCRIPTION_EXPIRED' | translate }}
+                </div>
+              </ng-container>
+              <div *ngIf="!user.subscription">
+                {{ 'PROFILE.NO_SUBSCRIPTION' | translate }}
+              </div>
+            </div>
+            
+            <!-- Subscription Actions -->
+            <div class="flex flex-wrap gap-2">
+              <button *ngIf="user.role === UserRole.FREE_USER" 
+                      (click)="navigateToSubscribe()"
+                      class="bg-teal-500 hover:bg-teal-600 text-white text-xs px-3 py-1 rounded-md transition-colors">
+                {{ 'PROFILE.UPGRADE_BUTTON' | translate }}
+              </button>
+              <button *ngIf="user.role === UserRole.SUBSCRIBER && user.subscription?.status === 'active'"
+                      (click)="manageSubscription()"
+                      class="bg-blue-500 hover:bg-blue-600 text-white text-xs px-3 py-1 rounded-md transition-colors">
+                {{ 'PROFILE.MANAGE_BUTTON' | translate }}
+              </button>
+              <button *ngIf="user.role === UserRole.SUBSCRIBER && user.subscription?.status === 'active'"
+                      (click)="cancelSubscription()"
+                      class="bg-red-500 hover:bg-red-600 text-white text-xs px-3 py-1 rounded-md transition-colors">
+                {{ 'PROFILE.CANCEL_BUTTON' | translate }}
+              </button>
+              <button *ngIf="user.subscription?.status === 'expired'"
+                      (click)="renewSubscription()"
+                      class="bg-green-500 hover:bg-green-600 text-white text-xs px-3 py-1 rounded-md transition-colors">
+                {{ 'PROFILE.RENEW_BUTTON' | translate }}
+              </button>
+            </div>
+          </div>
+        </div>
+
         <!-- Account Actions -->
         <div class="border-t pt-4">
           <h3 class="text-lg font-medium text-gray-900 mb-3">{{ 'PROFILE.ACCOUNT_ACTIONS' | translate }}</h3>
@@ -98,6 +165,21 @@
                   <span class="text-blue-700">{{ 'AUTH.RESET_PASSWORD' | translate }}</span>
                 </div>
                 <svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                </svg>
+              </div>
+            </button>
+            <button *ngIf="user.role === UserRole.SUBSCRIBER || user.role === UserRole.ADMIN" 
+                    class="w-full text-left p-3 rounded-lg border border-orange-200 hover:bg-orange-50 transition-colors" 
+                    (click)="onUnsubscribe()">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center">
+                  <svg class="w-5 h-5 text-orange-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                  </svg>
+                  <span class="text-orange-700">{{ 'PROFILE.UNSUBSCRIBE' | translate }}</span>
+                </div>
+                <svg class="w-4 h-4 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
                 </svg>
               </div>
@@ -210,6 +292,48 @@
           <span *ngIf="deleteProfileLoading" class="flex items-center">
             <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
             {{ 'PROFILE.DELETE_PROFILE_CONFIRM' | translate }}
+          </span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Unsubscribe Modal -->
+  <div *ngIf="showUnsubscribeModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+      <div class="flex items-center mb-4">
+        <div class="flex-shrink-0">
+          <svg class="h-6 w-6 text-orange-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+          </svg>
+        </div>
+        <div class="ml-3">
+          <h3 class="text-lg font-medium text-gray-900">{{ 'PROFILE.UNSUBSCRIBE' | translate }}</h3>
+        </div>
+      </div>
+      <div class="mb-4">
+        <p class="text-sm text-gray-600 mb-4">{{ 'PROFILE.UNSUBSCRIBE_CONFIRMATION' | translate }}</p>
+        <p class="text-sm text-orange-600 mb-4">{{ 'PROFILE.UNSUBSCRIBE_WARNING' | translate }}</p>
+      </div>
+      <div class="flex justify-end gap-2">
+        <button
+          type="button"
+          (click)="closeUnsubscribeModal()"
+          class="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-100"
+          [disabled]="unsubscribeLoading"
+        >
+          {{ 'PROFILE.DELETE_PROFILE_CANCEL' | translate }}
+        </button>
+        <button
+          type="button"
+          (click)="confirmUnsubscribe()"
+          class="bg-orange-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500"
+          [disabled]="unsubscribeLoading"
+        >
+          <span *ngIf="!unsubscribeLoading">{{ 'PROFILE.UNSUBSCRIBE' | translate }}</span>
+          <span *ngIf="unsubscribeLoading" class="flex items-center">
+            <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+            {{ 'PROFILE.UNSUBSCRIBE' | translate }}
           </span>
         </button>
       </div>

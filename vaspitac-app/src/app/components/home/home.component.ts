@@ -1,10 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
-import { Observable, of, switchMap } from 'rxjs';
+import { Observable, of, switchMap, Subscription } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
 import { UserService } from '../../services/user.service';
-import { UserProfile } from '../../models/user-profile.model';
+import { UserProfile, UserRole } from '../../models/user-profile.model';
 import { Category } from '../../models/category.model';
 import { CATEGORY_KEYS } from '../../models/category-keys';
 import { CategoryService } from '../../services/category.service';
@@ -46,7 +46,10 @@ export class HomeComponent implements OnInit {
    */
   ngOnInit(): void {
     this.categories$ = this._categoryService.getCategories().pipe(
-      map(categories => categories.slice().sort((a, b) => (a.order ?? 0) - (b.order ?? 0)))
+      map(categories => {
+        const sortedCategories = categories.slice().sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+        return sortedCategories;
+      })
     );
     this.userProfile$ = this._auth.user$.pipe(
       switchMap(user => user ? this._userService.getUserProfile(user.uid) : of(null))
@@ -65,6 +68,9 @@ export class HomeComponent implements OnInit {
         break;
       case CATEGORY_KEYS.SHOP:
         this._router.navigate(['/shop']).then((): void => this.scrollToTop());
+        break;
+      case CATEGORY_KEYS.SUBSCRIBE:
+        this._router.navigate(['/subscribe']).then((): void => this.scrollToTop());
         break;
       case CATEGORY_KEYS.BLOG:
         this._router.navigate(['/blog']).then((): void => this.scrollToTop());
@@ -118,11 +124,11 @@ export class HomeComponent implements OnInit {
   }
 
   /**
-   * Checks if the current user has admin privileges
-   * @param userProfile - The user profile to check
-   * @returns True if user is admin, false otherwise
+   * Check if user is admin
+   * @param userProfile - User profile to check
+   * @returns True if user is admin
    */
   isAdmin(userProfile: UserProfile | null): boolean {
-    return userProfile?.role === 'admin';
+    return userProfile?.role === UserRole.ADMIN;
   }
 }

@@ -54,6 +54,8 @@ export class AppComponent implements OnInit, OnDestroy {
     private _auth: AuthService,
     private _userService: UserService
   ) {
+    // Add available languages
+    translate.addLangs(['sr', 'en']);
     // Set default language
     translate.setDefaultLang('sr');
     translate.use('sr');

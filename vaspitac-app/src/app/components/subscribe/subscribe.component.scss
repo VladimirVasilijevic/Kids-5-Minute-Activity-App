@@ -1,0 +1,39 @@
+// Subscription component styles
+// Most styling is handled by Tailwind CSS classes
+
+.subscribe-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+}
+
+.plan-card {
+  transition: all 0.3s ease;
+  
+  &:hover {
+    transform: translateY(-2px);
+  }
+}
+
+.popular-badge {
+  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+}
+
+.subscribe-button {
+  transition: all 0.2s ease;
+  
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.processing-overlay {
+  backdrop-filter: blur(4px);
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .plan-card {
+    margin-bottom: 1rem;
+  }
+} 

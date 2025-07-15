@@ -1,9 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
+import { TranslateService } from '@ngx-translate/core';
+import { AuthService } from '../../services/auth.service';
 import { UserService } from '../../services/user.service';
 import { UserProfile, UserRole } from '../../models/user-profile.model';
-import { EMPTY } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { Observable, of, Subscription, EMPTY } from 'rxjs';
+import { switchMap, catchError } from 'rxjs/operators';
 
 @Component({
   selector: 'app-admin-users',
@@ -216,6 +218,11 @@ export class AdminUsersComponent implements OnInit {
     }
   }
 
+  /**
+   * Get display name for user role
+   * @param role - User role
+   * @returns Display name for the role
+   */
   getRoleDisplayName(role: string): string {
     switch (role) {
       case UserRole.ADMIN:
