@@ -67,13 +67,6 @@ jobs:
       working-directory: vaspitac-app/android/app
       run: |
         echo '${{ secrets.GOOGLE_SERVICES_JSON }}' > google-services.json
-        
-    - name: Debug google-services.json content
-      working-directory: vaspitac-app/android/app
-      run: |
-        echo "=== google-services.json content ==="
-        cat google-services.json
-        echo "=== End of file ==="
 
     - name: Make gradlew executable
       working-directory: vaspitac-app/android
@@ -93,7 +86,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: vaspitac-app-debug-dev
-        path: vaspitac-app/android/app/build/outputs/apk/debug/app-debug.apk
+        path: vaspitac-app/android/app/build/outputs/apk/development/debug/app-development-debug.apk
         retention-days: 30
 
     - name: Deploy Firebase to Development
@@ -101,6 +94,9 @@ jobs:
       env:
         GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
       run: |
+        # Create service account key file
+        echo '${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}' > service-account-key.json
+        
         # Install Firebase CLI
         npm install -g firebase-tools
         
@@ -116,14 +112,14 @@ jobs:
         fi
         
         # Deploy Firestore rules and indexes
-        firebase deploy --only firestore:rules,firestore:indexes --config firebase.dev.json
+        firebase deploy --only firestore:rules,firestore:indexes --config firebase.dev.json --token "${{ secrets.FIREBASE_TOKEN }}"
         
         # Deploy Storage rules
-        firebase deploy --only storage --config firebase.dev.json
+        firebase deploy --only storage --config firebase.dev.json --token "${{ secrets.FIREBASE_TOKEN }}"
         
         # Deploy Functions if they exist
         if [ -d "functions" ]; then
-          firebase deploy --only functions --config firebase.dev.json
+          firebase deploy --only functions --config firebase.dev.json --token "${{ secrets.FIREBASE_TOKEN }}"
         fi
 
   build-android-prod:
@@ -185,13 +181,6 @@ jobs:
       working-directory: vaspitac-app/android/app
       run: |
         echo '${{ secrets.GOOGLE_SERVICES_JSON }}' > google-services.json
-        
-    - name: Debug google-services.json content
-      working-directory: vaspitac-app/android/app
-      run: |
-        echo "=== google-services.json content ==="
-        cat google-services.json
-        echo "=== End of file ==="
 
     - name: Make gradlew executable
       working-directory: vaspitac-app/android
@@ -211,7 +200,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: vaspitac-app-debug-prod
-        path: vaspitac-app/android/app/build/outputs/apk/debug/app-debug.apk
+        path: vaspitac-app/android/app/build/outputs/apk/production/debug/app-production-debug.apk
         retention-days: 30 
 
     - name: Deploy Firebase to Production
@@ -219,6 +208,9 @@ jobs:
       env:
         GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
       run: |
+        # Create service account key file
+        echo '${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}' > service-account-key.json
+        
         # Install Firebase CLI
         npm install -g firebase-tools
         
@@ -234,12 +226,12 @@ jobs:
         fi
         
         # Deploy Firestore rules and indexes
-        firebase deploy --only firestore:rules,firestore:indexes --config firebase.prod.json
+        firebase deploy --only firestore:rules,firestore:indexes --config firebase.prod.json --token "${{ secrets.FIREBASE_TOKEN }}"
         
         # Deploy Storage rules
-        firebase deploy --only storage --config firebase.prod.json
+        firebase deploy --only storage --config firebase.prod.json --token "${{ secrets.FIREBASE_TOKEN }}"
         
         # Deploy Functions if they exist
         if [ -d "functions" ]; then
-          firebase deploy --only functions --config firebase.prod.json
+          firebase deploy --only functions --config firebase.prod.json --token "${{ secrets.FIREBASE_TOKEN }}"
         fi 
