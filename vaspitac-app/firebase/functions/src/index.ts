@@ -1,6 +1,6 @@
 import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
-import { UserRole, SubscriptionStatus, SubscriptionType, ContentVisibility } from './types';
+import { UserRole, SubscriptionStatus, SubscriptionType, ContentVisibility, ContentVisibilityType } from './types';
 
 admin.initializeApp();
 
@@ -315,7 +315,7 @@ export const getUserStats = functions.https.onCall(async (data, context) => {
  * Creates a new user in Auth and Firestore (admin only)
  * Callable as 'createUser'
  */
-export const createUser = functions.region('us-central1').https.onCall(async (data, context) => {
+export const createUser = functions.https.onCall(async (data, context) => {
   if (!context.auth) {
     throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated');
   }
@@ -355,7 +355,7 @@ export const createUser = functions.region('us-central1').https.onCall(async (da
  * Updates an existing user in Auth and Firestore (admin only)
  * Callable as 'updateUser'
  */
-export const updateUser = functions.region('us-central1').https.onCall(async (data, context) => {
+export const updateUser = functions.https.onCall(async (data, context) => {
   if (!context.auth) {
     throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated');
   }
@@ -416,7 +416,7 @@ export const updateUser = functions.region('us-central1').https.onCall(async (da
  * Deletes a user from Auth and Firestore (admin only)
  * Callable as 'deleteUser'
  */
-export const deleteUser = functions.region('us-central1').https.onCall(async (data, context) => {
+export const deleteUser = functions.https.onCall(async (data, context) => {
   if (!context.auth) {
     throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated');
   }
@@ -455,7 +455,7 @@ export const deleteUser = functions.region('us-central1').https.onCall(async (da
  * Sends password reset email to user (admin only)
  * Callable as 'resetUserPassword'
  */
-export const resetUserPassword = functions.region('us-central1').https.onCall(async (data, context) => {
+export const resetUserPassword = functions.https.onCall(async (data, context) => {
   if (!context.auth) {
     throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated');
   }
@@ -494,7 +494,7 @@ export const resetUserPassword = functions.region('us-central1').https.onCall(as
  * Allows users to delete their own profile (self-deletion)
  * Callable as 'deleteOwnProfile'
  */
-export const deleteOwnProfile = functions.region('us-central1').https.onCall(async (data, context) => {
+export const deleteOwnProfile = functions.https.onCall(async (data, context) => {
   if (!context.auth) {
     throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated');
   }
@@ -573,7 +573,7 @@ export const deleteOwnProfile = functions.region('us-central1').https.onCall(asy
  * @param isPremium - Whether content is premium
  * @returns boolean indicating if user can access the content
  */
-function canAccessContent(userRole: string | null, visibility: string, isPremium: boolean): boolean {
+function canAccessContent(userRole: string | null, visibility: ContentVisibilityType, isPremium: boolean): boolean {
   // Public content is accessible to everyone
   if (visibility === ContentVisibility.PUBLIC) {
     return true;
@@ -601,7 +601,7 @@ function canAccessContent(userRole: string | null, visibility: string, isPremium
  * Get filtered activities based on user role and content visibility
  * Callable as 'getFilteredActivities'
  */
-export const getFilteredActivities = functions.region('us-central1').https.onCall(async (data, context) => {
+export const getFilteredActivities = functions.https.onCall(async (data, context) => {
   if (!context.auth) {
     throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated');
   }
@@ -656,7 +656,7 @@ export const getFilteredActivities = functions.region('us-central1').https.onCal
  * Get filtered blog posts based on user role and content visibility
  * Callable as 'getFilteredBlogPosts'
  */
-export const getFilteredBlogPosts = functions.region('us-central1').https.onCall(async (data, context) => {
+export const getFilteredBlogPosts = functions.https.onCall(async (data, context) => {
   if (!context.auth) {
     throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated');
   }
@@ -711,7 +711,7 @@ export const getFilteredBlogPosts = functions.region('us-central1').https.onCall
  * Get public content for non-authenticated users
  * Callable as 'getPublicContent'
  */
-export const getPublicContent = functions.region('us-central1').https.onCall(async (data, context) => {
+export const getPublicContent = functions.https.onCall(async (data, context) => {
   const { contentType, language = 'en' } = data;
   
   if (!contentType || !['activities', 'blog'].includes(contentType)) {

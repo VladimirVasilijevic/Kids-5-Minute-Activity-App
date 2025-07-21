@@ -1,0 +1,33 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Development environment - more permissive for testing
+    
+    // Allow all access for development testing
+    match /{document=**} {
+      allow read, write: if true;
+    }
+    
+    // Optional: Add some basic structure for development
+    match /users/{userId} {
+      allow read, write: if true;
+    }
+    
+    match /activities/{activityId} {
+      allow read, write: if true;
+    }
+    
+    match /categories/{categoryId} {
+      allow read, write: if true;
+    }
+    
+    match /blog-posts/{postId} {
+      allow read, write: if true;
+    }
+    
+    // Admin operations for development
+    match /admin/{document=**} {
+      allow read, write: if true;
+    }
+  }
+} 

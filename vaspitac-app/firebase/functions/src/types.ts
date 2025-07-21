@@ -31,8 +31,10 @@ export enum SubscriptionType {
 /**
  * Content visibility levels
  */
-export enum ContentVisibility {
-  PUBLIC = 'public',
-  SUBSCRIBER = UserRole.SUBSCRIBER,
-  ADMIN = UserRole.ADMIN
-} 
+export const ContentVisibility = {
+  PUBLIC: 'public',
+  SUBSCRIBER: UserRole.SUBSCRIBER,
+  ADMIN: UserRole.ADMIN
+} as const;
+
+export type ContentVisibilityType = typeof ContentVisibility[keyof typeof ContentVisibility]; 
