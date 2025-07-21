@@ -9,6 +9,7 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    environment: development
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -29,7 +30,7 @@ jobs:
         run: |
           cat <<EOF > src/environments/environment.ts
           export const environment = {
-            production: true,
+            production: false,
             firebase: {
               apiKey: "${{ secrets.FIREBASE_API_KEY }}",
               authDomain: "${{ secrets.FIREBASE_AUTH_DOMAIN }}",

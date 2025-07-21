@@ -8,8 +8,10 @@ on:
   workflow_dispatch: # Allow manual trigger
 
 jobs:
-  build-android:
+  build-android-dev:
     runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/develop'
+    environment: development
     
     steps:
     - name: Checkout code
@@ -35,7 +37,90 @@ jobs:
       working-directory: vaspitac-app
       run: npm ci
 
-    - name: Create environment.ts from secrets
+    - name: Create environment.ts from secrets for DEV
+      working-directory: vaspitac-app
+      run: |
+        cat <<EOF > src/environments/environment.ts
+        export const environment = {
+          production: false,
+          firebase: {
+            apiKey: "${{ secrets.FIREBASE_API_KEY }}",
+            authDomain: "${{ secrets.FIREBASE_AUTH_DOMAIN }}",
+            projectId: "${{ secrets.FIREBASE_PROJECT_ID }}",
+            storageBucket: "${{ secrets.FIREBASE_STORAGE_BUCKET }}",
+            messagingSenderId: "${{ secrets.FIREBASE_MESSAGING_SENDER_ID }}",
+            appId: "${{ secrets.FIREBASE_APP_ID }}",
+            measurementId: "${{ secrets.FIREBASE_MEASUREMENT_ID }}"
+          }
+        }
+        EOF
+
+    - name: Build Angular app
+      working-directory: vaspitac-app
+      run: npm run build
+      
+    - name: Sync Capacitor
+      working-directory: vaspitac-app
+      run: npx cap sync
+
+    - name: Create google-services.json from secret for DEV
+      working-directory: vaspitac-app/android/app
+      run: |
+        echo '${{ secrets.GOOGLE_SERVICES_JSON }}' > google-services.json
+      env:
+        GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
+
+    - name: Make gradlew executable
+      working-directory: vaspitac-app/android
+      run: chmod +x gradlew
+      
+    - name: Clean previous Android build
+      working-directory: vaspitac-app/android
+      run: ./gradlew clean
+      
+    - name: Build Android APK
+      working-directory: vaspitac-app/android
+      run: ./gradlew assembleDebug
+      env:
+        ANDROID_HOME: ${{ env.ANDROID_SDK_ROOT }}
+        
+    - name: Upload APK artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: vaspitac-app-debug-dev
+        path: vaspitac-app/android/app/build/outputs/apk/debug/app-debug.apk
+        retention-days: 30
+
+  build-android-prod:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    environment: production
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: 'vaspitac-app/package-lock.json'
+        
+    - name: Setup Java
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'zulu'
+        java-version: '17'
+        
+    - name: Setup Android SDK
+      uses: android-actions/setup-android@v3
+      
+    - name: Install dependencies
+      working-directory: vaspitac-app
+      run: npm ci
+
+    - name: Create environment.ts from secrets for PROD
       working-directory: vaspitac-app
       run: |
         cat <<EOF > src/environments/environment.ts
@@ -61,7 +146,7 @@ jobs:
       working-directory: vaspitac-app
       run: npx cap sync
 
-    - name: Create google-services.json from secret
+    - name: Create google-services.json from secret for PROD
       working-directory: vaspitac-app/android/app
       run: |
         echo '${{ secrets.GOOGLE_SERVICES_JSON }}' > google-services.json
@@ -85,6 +170,6 @@ jobs:
     - name: Upload APK artifact
       uses: actions/upload-artifact@v4
       with:
-        name: vaspitac-app-debug
+        name: vaspitac-app-debug-prod
         path: vaspitac-app/android/app/build/outputs/apk/debug/app-debug.apk
         retention-days: 30 
