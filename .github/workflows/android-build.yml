@@ -91,10 +91,8 @@ jobs:
 
     - name: Deploy Firebase to Development
       working-directory: vaspitac-app/firebase
-      env:
-        GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
       run: |
-        # Create service account key file
+        # Create service account key file from secret
         echo '${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}' > service-account-key.json
         
         # Set the environment variable to point to the service account file
@@ -114,18 +112,18 @@ jobs:
           cd ..
         fi
         
-        # Deploy Firestore rules and indexes (skip if fails)
-        firebase deploy --only firestore:rules,firestore:indexes --config firebase.dev.json || echo "Firestore deployment skipped due to permissions"
+        # Deploy Firestore rules and indexes
+        firebase deploy --only firestore:rules,firestore:indexes --config firebase.dev.json
+
+        # Deploy Storage rules
+        firebase deploy --only storage --config firebase.dev.json
         
-        # Deploy Storage rules (skip if fails)
-        firebase deploy --only storage --config firebase.dev.json || echo "Storage deployment skipped due to permissions"
-        
-        # Deploy Functions if they exist (skip if fails)
+        # Deploy Functions if they exist
         if [ -d "functions" ]; then
-          firebase deploy --only functions --config firebase.dev.json || echo "Functions deployment skipped due to permissions"
+          firebase deploy --only functions --config firebase.dev.json
         fi
         
-        echo "Firebase deployment completed (some services may have been skipped due to permissions)"
+        echo "Firebase deployment completed"
 
   build-android-prod:
     runs-on: ubuntu-latest
@@ -210,10 +208,8 @@ jobs:
 
     - name: Deploy Firebase to Production
       working-directory: vaspitac-app/firebase
-      env:
-        GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
       run: |
-        # Create service account key file
+        # Create service account key file from secret
         echo '${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}' > service-account-key.json
         
         # Set the environment variable to point to the service account file
@@ -233,15 +229,15 @@ jobs:
           cd ..
         fi
         
-        # Deploy Firestore rules and indexes (skip if fails)
-        firebase deploy --only firestore:rules,firestore:indexes --config firebase.prod.json || echo "Firestore deployment skipped due to permissions"
+        # Deploy Firestore rules and indexes
+        firebase deploy --only firestore:rules,firestore:indexes --config firebase.prod.json
         
-        # Deploy Storage rules (skip if fails)
-        firebase deploy --only storage --config firebase.prod.json || echo "Storage deployment skipped due to permissions"
+        # Deploy Storage rules
+        firebase deploy --only storage --config firebase.prod.json
         
-        # Deploy Functions if they exist (skip if fails)
+        # Deploy Functions if they exist
         if [ -d "functions" ]; then
-          firebase deploy --only functions --config firebase.prod.json || echo "Functions deployment skipped due to permissions"
+          firebase deploy --only functions --config firebase.prod.json
         fi
         
-        echo "Firebase deployment completed (some services may have been skipped due to permissions)" 
+        echo "Firebase deployment completed" 
