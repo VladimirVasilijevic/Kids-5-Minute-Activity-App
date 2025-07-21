@@ -8,7 +8,7 @@ android {
     namespace "com.vaspitac.app"
     compileSdk rootProject.ext.compileSdkVersion
     defaultConfig {
-        applicationId "com.vaspitac.app"
+        applicationId "com.ana.vaspitac"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
@@ -37,13 +37,13 @@ android {
     productFlavors {
         development {
             dimension "environment"
-            applicationId "com.vaspitac.app.dev"
+            applicationId "com.vaspitac.app"
             versionNameSuffix "-dev"
             resValue "string", "app_name", "Vaspitac Dev"
         }
         production {
             dimension "environment"
-            applicationId "com.vaspitac.app"
+            applicationId "com.ana.vaspitac"
             resValue "string", "app_name", "Vaspitac"
         }
     }

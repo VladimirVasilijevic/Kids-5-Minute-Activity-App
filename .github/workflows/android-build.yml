@@ -67,6 +67,13 @@ jobs:
       working-directory: vaspitac-app/android/app
       run: |
         echo '${{ secrets.GOOGLE_SERVICES_JSON }}' > google-services.json
+        
+    - name: Debug google-services.json content
+      working-directory: vaspitac-app/android/app
+      run: |
+        echo "=== google-services.json content ==="
+        cat google-services.json
+        echo "=== End of file ==="
 
     - name: Make gradlew executable
       working-directory: vaspitac-app/android
@@ -178,6 +185,13 @@ jobs:
       working-directory: vaspitac-app/android/app
       run: |
         echo '${{ secrets.GOOGLE_SERVICES_JSON }}' > google-services.json
+        
+    - name: Debug google-services.json content
+      working-directory: vaspitac-app/android/app
+      run: |
+        echo "=== google-services.json content ==="
+        cat google-services.json
+        echo "=== End of file ==="
 
     - name: Make gradlew executable
       working-directory: vaspitac-app/android
