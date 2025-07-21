@@ -1,4 +1,5 @@
 import * as functions from 'firebase-functions';
+import { onSchedule } from 'firebase-functions/v2/scheduler';
 import * as admin from 'firebase-admin';
 import { UserRole, SubscriptionStatus, SubscriptionType, ContentVisibility, ContentVisibilityType } from './types';
 
@@ -152,52 +153,48 @@ export const removeAdminRole = functions.https.onCall(async (data: any, context:
  * Function to check subscription status daily (scheduled)
  * Runs every 24 hours to update expired subscriptions
  */
-export const checkSubscriptionStatus = (functions.pubsub as any)
-  .schedule('every 24 hours')
-  .onRun(async (context: any) => {
-    const now = new Date();
-    
-    try {
-      // Find expired subscriptions
-      const expiredUsers = await db.collection('users')
-        .where('subscription.status', 'in', [SubscriptionStatus.ACTIVE, SubscriptionStatus.TRIAL])
-        .where('subscription.endDate', '<', now)
-        .get();
+export const checkSubscriptionStatus = onSchedule('every 24 hours', async (event) => {
+  const now = new Date();
+  
+  try {
+    // Find expired subscriptions
+    const expiredUsers = await db.collection('users')
+      .where('subscription.status', 'in', [SubscriptionStatus.ACTIVE, SubscriptionStatus.TRIAL])
+      .where('subscription.endDate', '<', now)
+      .get();
 
-      if (expiredUsers.empty) {
-        console.log('No expired subscriptions found');
-        return null;
-      }
-
-      const batch = db.batch();
-      let updatedCount = 0;
-      
-      expiredUsers.forEach(doc => {
-        const userData = doc.data();
-        
-        // Don't update admin users
-        if (userData.role === UserRole.ADMIN) {
-          return;
-        }
-        
-        batch.update(doc.ref, {
-          'subscription.status': SubscriptionStatus.EXPIRED,
-          'role': UserRole.FREE_USER,
-          'permissions': FREE_USER_PERMISSIONS,
-          updatedAt: new Date().toISOString()
-        });
-        updatedCount++;
-      });
-
-      await batch.commit();
-      console.log(`Updated ${updatedCount} expired subscriptions`);
-      
-      return { updatedCount };
-    } catch (error) {
-      console.error('Error checking subscription status:', error);
-      throw error;
+    if (expiredUsers.empty) {
+      console.log('No expired subscriptions found');
+      return;
     }
-  });
+
+    const batch = db.batch();
+    let updatedCount = 0;
+    
+    expiredUsers.forEach(doc => {
+      const userData = doc.data();
+      
+      // Don't update admin users
+      if (userData.role === UserRole.ADMIN) {
+        return;
+      }
+      
+      batch.update(doc.ref, {
+        'subscription.status': SubscriptionStatus.EXPIRED,
+        'role': UserRole.FREE_USER,
+        'permissions': FREE_USER_PERMISSIONS,
+        updatedAt: new Date().toISOString()
+      });
+      updatedCount++;
+    });
+
+    await batch.commit();
+    console.log(`Updated ${updatedCount} expired subscriptions`);
+  } catch (error) {
+    console.error('Error checking subscription status:', error);
+    throw error;
+  }
+});
 
 /**
  * Function to create user profile on sign up
