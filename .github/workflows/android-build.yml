@@ -93,25 +93,27 @@ jobs:
 
     - name: Deploy Firebase to Development
       working-directory: vaspitac-app/firebase
+      env:
+        FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
       run: |
         # Install Firebase CLI
         npm install -g firebase-tools
         
         # Set Firebase project to development
-        firebase use development
+        firebase use development --token "$FIREBASE_TOKEN"
         
         # Deploy Firestore rules and indexes
-        firebase deploy --only firestore:rules,firestore:indexes --config firebase.dev.json --token "${{ secrets.FIREBASE_TOKEN }}"
+        firebase deploy --only firestore:rules,firestore:indexes --config firebase.dev.json --token "$FIREBASE_TOKEN"
         
         # Deploy Storage rules
-        firebase deploy --only storage --config firebase.dev.json --token "${{ secrets.FIREBASE_TOKEN }}"
+        firebase deploy --only storage --config firebase.dev.json --token "$FIREBASE_TOKEN"
         
         # Deploy Functions if they exist
         if [ -d "functions" ]; then
           cd functions
           npm install
           cd ..
-          firebase deploy --only functions --config firebase.dev.json --token "${{ secrets.FIREBASE_TOKEN }}"
+          firebase deploy --only functions --config firebase.dev.json --token "$FIREBASE_TOKEN"
         fi
 
   build-android-prod:
@@ -199,23 +201,25 @@ jobs:
 
     - name: Deploy Firebase to Production
       working-directory: vaspitac-app/firebase
+      env:
+        FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
       run: |
         # Install Firebase CLI
         npm install -g firebase-tools
         
         # Set Firebase project to production
-        firebase use production
+        firebase use production --token "$FIREBASE_TOKEN"
         
         # Deploy Firestore rules and indexes
-        firebase deploy --only firestore:rules,firestore:indexes --config firebase.prod.json --token "${{ secrets.FIREBASE_TOKEN }}"
+        firebase deploy --only firestore:rules,firestore:indexes --config firebase.prod.json --token "$FIREBASE_TOKEN"
         
         # Deploy Storage rules
-        firebase deploy --only storage --config firebase.prod.json --token "${{ secrets.FIREBASE_TOKEN }}"
+        firebase deploy --only storage --config firebase.prod.json --token "$FIREBASE_TOKEN"
         
         # Deploy Functions if they exist
         if [ -d "functions" ]; then
           cd functions
           npm install
           cd ..
-          firebase deploy --only functions --config firebase.prod.json --token "${{ secrets.FIREBASE_TOKEN }}"
+          firebase deploy --only functions --config firebase.prod.json --token "$FIREBASE_TOKEN"
         fi 
