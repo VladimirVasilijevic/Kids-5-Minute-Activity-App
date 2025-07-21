@@ -37,9 +37,9 @@ const FREE_USER_PERMISSIONS = [
  * Function to assign admin role (callable function)
  * Only existing admins can assign admin role to others
  */
-export const assignAdminRole = functions.https.onCall(async (data, context) => {
+export const assignAdminRole = functions.https.onCall(async (data: any, context: any) => {
   // Check if user is authenticated
-  if (!context.auth) {
+  if (!context?.auth) {
     throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated');
   }
 
@@ -97,9 +97,9 @@ export const assignAdminRole = functions.https.onCall(async (data, context) => {
  * Function to remove admin role (callable function)
  * Only existing admins can remove admin role from others
  */
-export const removeAdminRole = functions.https.onCall(async (data, context) => {
+export const removeAdminRole = functions.https.onCall(async (data: any, context: any) => {
   // Check if user is authenticated
-  if (!context.auth) {
+  if (!context?.auth) {
     throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated');
   }
 
@@ -152,9 +152,9 @@ export const removeAdminRole = functions.https.onCall(async (data, context) => {
  * Function to check subscription status daily (scheduled)
  * Runs every 24 hours to update expired subscriptions
  */
-export const checkSubscriptionStatus = functions.pubsub
+export const checkSubscriptionStatus = (functions.pubsub as any)
   .schedule('every 24 hours')
-  .onRun(async (context) => {
+  .onRun(async (context: any) => {
     const now = new Date();
     
     try {
@@ -203,7 +203,7 @@ export const checkSubscriptionStatus = functions.pubsub
  * Function to create user profile on sign up
  * Automatically creates user profile with default role and permissions
  */
-export const createUserProfile = functions.auth.user().onCreate(async (user) => {
+export const createUserProfile = ((functions as any).auth as any).user().onCreate(async (user: any) => {
   try {
     // Check if user profile already exists
     const userDoc = await db.collection('users').doc(user.uid).get();
@@ -239,7 +239,7 @@ export const createUserProfile = functions.auth.user().onCreate(async (user) => 
  * Function to delete user profile on account deletion
  * Cleans up user data when account is deleted
  */
-export const deleteUserProfile = functions.auth.user().onDelete(async (user) => {
+export const deleteUserProfile = ((functions as any).auth as any).user().onDelete(async (user: any) => {
   try {
     // Delete user profile from Firestore
     await db.collection('users').doc(user.uid).delete();
@@ -256,14 +256,14 @@ export const deleteUserProfile = functions.auth.user().onDelete(async (user) => 
  * Function to get user statistics (admin only)
  * Returns user counts by role and subscription status
  */
-export const getUserStats = functions.https.onCall(async (data, context) => {
+export const getUserStats = functions.https.onCall(async (data: any, context: any) => {
   // Check if user is authenticated and is admin
-  if (!context.auth) {
+  if (!context?.auth) {
     throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated');
   }
 
   try {
-    const adminUser = await db.collection('users').doc(context.auth.uid).get();
+    const adminUser = await db.collection('users').doc(context?.auth?.uid).get();
     
     if (!adminUser.exists || adminUser.data()?.role !== 'admin') {
       throw new functions.https.HttpsError('permission-denied', 'Only admins can view user stats');
@@ -315,12 +315,12 @@ export const getUserStats = functions.https.onCall(async (data, context) => {
  * Creates a new user in Auth and Firestore (admin only)
  * Callable as 'createUser'
  */
-export const createUser = functions.https.onCall(async (data, context) => {
-  if (!context.auth) {
+export const createUser = functions.https.onCall(async (data: any, context: any) => {
+  if (!context?.auth) {
     throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated');
   }
   // Check if the requesting user is an admin
-  const adminUser = await db.collection('users').doc(context.auth.uid).get();
+  const adminUser = await db.collection('users').doc(context?.auth?.uid).get();
   if (!adminUser.exists || adminUser.data()?.role !== 'admin') {
     throw new functions.https.HttpsError('permission-denied', 'Only admins can create users');
   }
@@ -355,13 +355,13 @@ export const createUser = functions.https.onCall(async (data, context) => {
  * Updates an existing user in Auth and Firestore (admin only)
  * Callable as 'updateUser'
  */
-export const updateUser = functions.https.onCall(async (data, context) => {
-  if (!context.auth) {
+export const updateUser = functions.https.onCall(async (data: any, context: any) => {
+  if (!context?.auth) {
     throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated');
   }
   
   // Check if the requesting user is an admin
-  const adminUser = await db.collection('users').doc(context.auth.uid).get();
+  const adminUser = await db.collection('users').doc(context?.auth?.uid).get();
   if (!adminUser.exists || adminUser.data()?.role !== UserRole.ADMIN) {
     throw new functions.https.HttpsError('permission-denied', 'Only admins can update users');
   }
@@ -416,13 +416,13 @@ export const updateUser = functions.https.onCall(async (data, context) => {
  * Deletes a user from Auth and Firestore (admin only)
  * Callable as 'deleteUser'
  */
-export const deleteUser = functions.https.onCall(async (data, context) => {
-  if (!context.auth) {
+export const deleteUser = functions.https.onCall(async (data: any, context: any) => {
+  if (!context?.auth) {
     throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated');
   }
   
   // Check if the requesting user is an admin
-  const adminUser = await db.collection('users').doc(context.auth.uid).get();
+  const adminUser = await db.collection('users').doc(context?.auth?.uid).get();
   if (!adminUser.exists || adminUser.data()?.role !== 'admin') {
     throw new functions.https.HttpsError('permission-denied', 'Only admins can delete users');
   }
@@ -455,13 +455,13 @@ export const deleteUser = functions.https.onCall(async (data, context) => {
  * Sends password reset email to user (admin only)
  * Callable as 'resetUserPassword'
  */
-export const resetUserPassword = functions.https.onCall(async (data, context) => {
-  if (!context.auth) {
+export const resetUserPassword = functions.https.onCall(async (data: any, context: any) => {
+  if (!context?.auth) {
     throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated');
   }
   
   // Check if the requesting user is an admin
-  const adminUser = await db.collection('users').doc(context.auth.uid).get();
+  const adminUser = await db.collection('users').doc(context?.auth?.uid).get();
   if (!adminUser.exists || adminUser.data()?.role !== 'admin') {
     throw new functions.https.HttpsError('permission-denied', 'Only admins can reset user passwords');
   }
@@ -494,8 +494,8 @@ export const resetUserPassword = functions.https.onCall(async (data, context) =>
  * Allows users to delete their own profile (self-deletion)
  * Callable as 'deleteOwnProfile'
  */
-export const deleteOwnProfile = functions.https.onCall(async (data, context) => {
-  if (!context.auth) {
+export const deleteOwnProfile = functions.https.onCall(async (data: any, context: any) => {
+  if (!context?.auth) {
     throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated');
   }
   
@@ -601,8 +601,8 @@ function canAccessContent(userRole: string | null, visibility: ContentVisibility
  * Get filtered activities based on user role and content visibility
  * Callable as 'getFilteredActivities'
  */
-export const getFilteredActivities = functions.https.onCall(async (data, context) => {
-  if (!context.auth) {
+export const getFilteredActivities = functions.https.onCall(async (data: any, context: any) => {
+  if (!context?.auth) {
     throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated');
   }
 
@@ -656,8 +656,8 @@ export const getFilteredActivities = functions.https.onCall(async (data, context
  * Get filtered blog posts based on user role and content visibility
  * Callable as 'getFilteredBlogPosts'
  */
-export const getFilteredBlogPosts = functions.https.onCall(async (data, context) => {
-  if (!context.auth) {
+export const getFilteredBlogPosts = functions.https.onCall(async (data: any, context: any) => {
+  if (!context?.auth) {
     throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated');
   }
 
@@ -711,7 +711,7 @@ export const getFilteredBlogPosts = functions.https.onCall(async (data, context)
  * Get public content for non-authenticated users
  * Callable as 'getPublicContent'
  */
-export const getPublicContent = functions.https.onCall(async (data, context) => {
+export const getPublicContent = functions.https.onCall(async (data: any, context: any) => {
   const { contentType, language = 'en' } = data;
   
   if (!contentType || !['activities', 'blog'].includes(contentType)) {
