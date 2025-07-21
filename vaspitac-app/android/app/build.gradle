@@ -20,10 +20,28 @@ android {
             ignoreAssetsPattern '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
+    
     buildTypes {
+        debug {
+            applicationIdSuffix ".dev"
+            debuggable true
+        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    
+    flavorDimensions "environment"
+    productFlavors {
+        development {
+            dimension "environment"
+            applicationId "com.vaspitac.app.dev"
+            versionNameSuffix "-dev"
+        }
+        production {
+            dimension "environment"
+            applicationId "com.vaspitac.app"
         }
     }
 }

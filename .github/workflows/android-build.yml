@@ -80,7 +80,7 @@ jobs:
       
     - name: Build Android APK
       working-directory: vaspitac-app/android
-      run: ./gradlew assembleDebug
+      run: ./gradlew assembleDevelopmentDebug
       env:
         ANDROID_HOME: ${{ env.ANDROID_SDK_ROOT }}
         
@@ -163,7 +163,7 @@ jobs:
       
     - name: Build Android APK
       working-directory: vaspitac-app/android
-      run: ./gradlew assembleDebug
+      run: ./gradlew assembleProductionDebug
       env:
         ANDROID_HOME: ${{ env.ANDROID_SDK_ROOT }}
         
