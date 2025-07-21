@@ -1,5 +1,6 @@
-import * as functions from 'firebase-functions';
+import { HttpsError, onCall } from 'firebase-functions/v2/https';
 import { onSchedule } from 'firebase-functions/v2/scheduler';
+import { onMessagePublished } from 'firebase-functions/v2/pubsub';
 import * as admin from 'firebase-admin';
 import { UserRole, SubscriptionStatus, SubscriptionType, ContentVisibility, ContentVisibilityType } from './types';
 
@@ -38,34 +39,30 @@ const FREE_USER_PERMISSIONS = [
  * Function to assign admin role (callable function)
  * Only existing admins can assign admin role to others
  */
-export const assignAdminRole = functions.https.onCall(async (data: any, context: any) => {
-  // Check if user is authenticated
-  if (!context?.auth) {
-    throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated');
+export const assignAdminRole = onCall(async (request) => {
+  if (!request.auth) {
+    throw new HttpsError('unauthenticated', 'User must be authenticated');
   }
 
-  const { targetUserId } = data;
+  const { targetUserId } = request.data;
   if (!targetUserId) {
-    throw new functions.https.HttpsError('invalid-argument', 'targetUserId is required');
+    throw new HttpsError('invalid-argument', 'targetUserId is required');
   }
 
   try {
-    // Check if the requesting user is an admin
-    const adminUser = await db.collection('users').doc(context.auth.uid).get();
+    const adminUser = await db.collection('users').doc(request.auth.uid).get();
     
     if (!adminUser.exists || adminUser.data()?.role !== UserRole.ADMIN) {
-      throw new functions.https.HttpsError('permission-denied', 'Only admins can assign admin role');
+      throw new HttpsError('permission-denied', 'Only admins can assign admin role');
     }
 
-    // Get target user record
     const targetUserRecord = await admin.auth().getUser(targetUserId);
     
-    // Update user profile in Firestore
     await db.collection('users').doc(targetUserId).update({
       role: UserRole.ADMIN,
       permissions: ADMIN_PERMISSIONS,
       subscription: {
-        type: SubscriptionType.TRIAL, // Using trial type for admin
+        type: SubscriptionType.TRIAL,
         status: SubscriptionStatus.ACTIVE,
         startDate: new Date().toISOString(),
         autoRenew: true
@@ -73,7 +70,6 @@ export const assignAdminRole = functions.https.onCall(async (data: any, context:
       updatedAt: new Date().toISOString()
     });
 
-    // Set custom claims for admin
     await admin.auth().setCustomUserClaims(targetUserId, {
       admin: true,
       role: UserRole.ADMIN
@@ -90,7 +86,8 @@ export const assignAdminRole = functions.https.onCall(async (data: any, context:
     };
   } catch (error) {
     console.error('Error assigning admin role:', error);
-    throw new functions.https.HttpsError('internal', 'Failed to assign admin role');
+    if (error instanceof HttpsError) throw error;
+    throw new HttpsError('internal', 'Failed to assign admin role');
   }
 });
 
@@ -98,29 +95,25 @@ export const assignAdminRole = functions.https.onCall(async (data: any, context:
  * Function to remove admin role (callable function)
  * Only existing admins can remove admin role from others
  */
-export const removeAdminRole = functions.https.onCall(async (data: any, context: any) => {
-  // Check if user is authenticated
-  if (!context?.auth) {
-    throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated');
+export const removeAdminRole = onCall(async (request) => {
+  if (!request.auth) {
+    throw new HttpsError('unauthenticated', 'User must be authenticated');
   }
 
-  const { targetUserId } = data;
+  const { targetUserId } = request.data;
   if (!targetUserId) {
-    throw new functions.https.HttpsError('invalid-argument', 'targetUserId is required');
+    throw new HttpsError('invalid-argument', 'targetUserId is required');
   }
 
   try {
-    // Check if the requesting user is an admin
-    const adminUser = await db.collection('users').doc(context.auth.uid).get();
+    const adminUser = await db.collection('users').doc(request.auth.uid).get();
     
     if (!adminUser.exists || adminUser.data()?.role !== UserRole.ADMIN) {
-      throw new functions.https.HttpsError('permission-denied', 'Only admins can remove admin role');
+      throw new HttpsError('permission-denied', 'Only admins can remove admin role');
     }
 
-    // Get target user record
     const targetUserRecord = await admin.auth().getUser(targetUserId);
     
-    // Update user profile in Firestore
     await db.collection('users').doc(targetUserId).update({
       role: UserRole.FREE_USER,
       permissions: FREE_USER_PERMISSIONS,
@@ -128,7 +121,6 @@ export const removeAdminRole = functions.https.onCall(async (data: any, context:
       updatedAt: new Date().toISOString()
     });
 
-    // Remove custom claims
     await admin.auth().setCustomUserClaims(targetUserId, {
       admin: false,
       role: UserRole.FREE_USER
@@ -145,7 +137,8 @@ export const removeAdminRole = functions.https.onCall(async (data: any, context:
     };
   } catch (error) {
     console.error('Error removing admin role:', error);
-    throw new functions.https.HttpsError('internal', 'Failed to remove admin role');
+    if (error instanceof HttpsError) throw error;
+    throw new HttpsError('internal', 'Failed to remove admin role');
   }
 });
 
@@ -157,7 +150,6 @@ export const checkSubscriptionStatus = onSchedule('every 24 hours', async (event
   const now = new Date();
   
   try {
-    // Find expired subscriptions
     const expiredUsers = await db.collection('users')
       .where('subscription.status', 'in', [SubscriptionStatus.ACTIVE, SubscriptionStatus.TRIAL])
       .where('subscription.endDate', '<', now)
@@ -174,7 +166,6 @@ export const checkSubscriptionStatus = onSchedule('every 24 hours', async (event
     expiredUsers.forEach(doc => {
       const userData = doc.data();
       
-      // Don't update admin users
       if (userData.role === UserRole.ADMIN) {
         return;
       }
@@ -192,25 +183,28 @@ export const checkSubscriptionStatus = onSchedule('every 24 hours', async (event
     console.log(`Updated ${updatedCount} expired subscriptions`);
   } catch (error) {
     console.error('Error checking subscription status:', error);
-    throw error;
   }
 });
 
 /**
- * Function to create user profile on sign up
+ * Function to create user profile on sign up (Eventarc trigger)
  * Automatically creates user profile with default role and permissions
  */
-export const createUserProfile = ((functions as any).auth as any).user().onCreate(async (user: any) => {
+export const createUserProfile = onMessagePublished('google.firebase.auth.user.v1.created', async (event) => {
   try {
-    // Check if user profile already exists
+    const user = event.data.message.json;
+    if (!user || !user.uid) {
+        console.log('User data not available in event.');
+        return;
+    }
+    
     const userDoc = await db.collection('users').doc(user.uid).get();
     
     if (userDoc.exists) {
       console.log(`User profile already exists for ${user.email}`);
-      return null;
+      return;
     }
 
-    // Create default user profile
     const userProfile = {
       uid: user.uid,
       displayName: user.displayName || user.email?.split('@')[0] || 'User',
@@ -224,28 +218,26 @@ export const createUserProfile = ((functions as any).auth as any).user().onCreat
 
     await db.collection('users').doc(user.uid).set(userProfile);
     console.log(`Created user profile for ${user.email}`);
-    
-    return userProfile;
   } catch (error) {
     console.error('Error creating user profile:', error);
-    throw error;
   }
 });
 
 /**
- * Function to delete user profile on account deletion
+ * Function to delete user profile on account deletion (Eventarc trigger)
  * Cleans up user data when account is deleted
  */
-export const deleteUserProfile = ((functions as any).auth as any).user().onDelete(async (user: any) => {
+export const deleteUserProfile = onMessagePublished('google.firebase.auth.user.v1.deleted', async (event) => {
   try {
-    // Delete user profile from Firestore
+    const user = event.data.message.json;
+    if (!user || !user.uid) {
+        console.log('User data not available in event.');
+        return;
+    }
     await db.collection('users').doc(user.uid).delete();
     console.log(`Deleted user profile for ${user.email}`);
-    
-    return { success: true };
   } catch (error) {
     console.error('Error deleting user profile:', error);
-    throw error;
   }
 });
 
@@ -253,20 +245,18 @@ export const deleteUserProfile = ((functions as any).auth as any).user().onDelet
  * Function to get user statistics (admin only)
  * Returns user counts by role and subscription status
  */
-export const getUserStats = functions.https.onCall(async (data: any, context: any) => {
-  // Check if user is authenticated and is admin
-  if (!context?.auth) {
-    throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated');
+export const getUserStats = onCall(async (request) => {
+  if (!request.auth) {
+    throw new HttpsError('unauthenticated', 'User must be authenticated');
   }
 
   try {
-    const adminUser = await db.collection('users').doc(context?.auth?.uid).get();
+    const adminUser = await db.collection('users').doc(request.auth.uid).get();
     
-    if (!adminUser.exists || adminUser.data()?.role !== 'admin') {
-      throw new functions.https.HttpsError('permission-denied', 'Only admins can view user stats');
+    if (!adminUser.exists || adminUser.data()?.role !== UserRole.ADMIN) {
+      throw new HttpsError('permission-denied', 'Only admins can view user stats');
     }
 
-    // Get all users
     const usersSnapshot = await db.collection('users').get();
     
     const stats: {
@@ -287,15 +277,12 @@ export const getUserStats = functions.https.onCall(async (data: any, context: an
     usersSnapshot.forEach(doc => {
       const userData = doc.data();
       
-      // Count by role
       const role = userData.role || 'unknown';
       stats.byRole[role] = (stats.byRole[role] || 0) + 1;
       
-      // Count by subscription
       const subscriptionStatus = userData.subscription?.status || 'no_subscription';
       stats.bySubscription[subscriptionStatus] = (stats.bySubscription[subscriptionStatus] || 0) + 1;
       
-      // Count recent signups
       if (new Date(userData.createdAt) > oneWeekAgo) {
         stats.recentSignups++;
       }
@@ -304,34 +291,34 @@ export const getUserStats = functions.https.onCall(async (data: any, context: an
     return stats;
   } catch (error) {
     console.error('Error getting user stats:', error);
-    throw new functions.https.HttpsError('internal', 'Failed to get user stats');
+    if (error instanceof HttpsError) throw error;
+    throw new HttpsError('internal', 'Failed to get user stats');
   }
 }); 
 
 /**
  * Creates a new user in Auth and Firestore (admin only)
- * Callable as 'createUser'
  */
-export const createUser = functions.https.onCall(async (data: any, context: any) => {
-  if (!context?.auth) {
-    throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated');
+export const createUser = onCall(async (request) => {
+  if (!request.auth) {
+    throw new HttpsError('unauthenticated', 'User must be authenticated');
   }
-  // Check if the requesting user is an admin
-  const adminUser = await db.collection('users').doc(context?.auth?.uid).get();
-  if (!adminUser.exists || adminUser.data()?.role !== 'admin') {
-    throw new functions.https.HttpsError('permission-denied', 'Only admins can create users');
+
+  const adminUser = await db.collection('users').doc(request.auth.uid).get();
+  if (!adminUser.exists || adminUser.data()?.role !== UserRole.ADMIN) {
+    throw new HttpsError('permission-denied', 'Only admins can create users');
   }
-  const { email, password, displayName, role } = data;
+
+  const { email, password, displayName, role } = request.data;
   if (!email || !password || !displayName || !role) {
-    throw new functions.https.HttpsError('invalid-argument', 'Missing required fields');
+    throw new HttpsError('invalid-argument', 'Missing required fields');
   }
+
   try {
-    // Create user in Auth
     const userRecord = await admin.auth().createUser({ email, password, displayName });
-    // Set default permissions based on role
     let permissions = FREE_USER_PERMISSIONS;
     if (role === UserRole.ADMIN) permissions = ADMIN_PERMISSIONS;
-    // Add user profile to Firestore
+
     await db.collection('users').doc(userRecord.uid).set({
       uid: userRecord.uid,
       displayName,
@@ -341,47 +328,42 @@ export const createUser = functions.https.onCall(async (data: any, context: any)
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
     });
+
     return { success: true, uid: userRecord.uid };
   } catch (error: any) {
     console.error('Error creating user:', error);
-    throw new functions.https.HttpsError('internal', error.message || 'Failed to create user');
+    throw new HttpsError('internal', error.message || 'Failed to create user');
   }
 });
 
 /**
  * Updates an existing user in Auth and Firestore (admin only)
- * Callable as 'updateUser'
  */
-export const updateUser = functions.https.onCall(async (data: any, context: any) => {
-  if (!context?.auth) {
-    throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated');
+export const updateUser = onCall(async (request) => {
+  if (!request.auth) {
+    throw new HttpsError('unauthenticated', 'User must be authenticated');
   }
   
-  // Check if the requesting user is an admin
-  const adminUser = await db.collection('users').doc(context?.auth?.uid).get();
+  const adminUser = await db.collection('users').doc(request.auth.uid).get();
   if (!adminUser.exists || adminUser.data()?.role !== UserRole.ADMIN) {
-    throw new functions.https.HttpsError('permission-denied', 'Only admins can update users');
+    throw new HttpsError('permission-denied', 'Only admins can update users');
   }
   
-  const { uid, displayName, role } = data;
+  const { uid, displayName, role } = request.data;
   if (!uid || !displayName || !role) {
-    throw new functions.https.HttpsError('invalid-argument', 'Missing required fields');
+    throw new HttpsError('invalid-argument', 'Missing required fields');
   }
   
-  // Prevent admins from changing their own role
-  if (uid === context.auth.uid) {
-    throw new functions.https.HttpsError('permission-denied', 'Cannot modify your own role');
+  if (uid === request.auth.uid) {
+    throw new HttpsError('permission-denied', 'Cannot modify your own role');
   }
   
   try {
-    // Set default permissions based on role
     let permissions = FREE_USER_PERMISSIONS;
     if (role === UserRole.ADMIN) permissions = ADMIN_PERMISSIONS;
     
-    // Update user in Auth
     await admin.auth().updateUser(uid, { displayName });
     
-    // Update user profile in Firestore
     await db.collection('users').doc(uid).update({
       displayName,
       role,
@@ -389,143 +371,117 @@ export const updateUser = functions.https.onCall(async (data: any, context: any)
       updatedAt: new Date().toISOString()
     });
     
-    // Update custom claims for admin role
-    if (role === 'admin') {
-      await admin.auth().setCustomUserClaims(uid, {
-        admin: true,
-        role: 'admin'
-      });
+    if (role === UserRole.ADMIN) {
+      await admin.auth().setCustomUserClaims(uid, { admin: true, role: UserRole.ADMIN });
     } else {
-      await admin.auth().setCustomUserClaims(uid, {
-        admin: false,
-        role: role
-      });
+      await admin.auth().setCustomUserClaims(uid, { admin: false, role: role });
     }
     
     return { success: true, message: 'User updated successfully' };
   } catch (error: any) {
     console.error('Error updating user:', error);
-    throw new functions.https.HttpsError('internal', error.message || 'Failed to update user');
+    throw new HttpsError('internal', error.message || 'Failed to update user');
   }
 });
 
 /**
  * Deletes a user from Auth and Firestore (admin only)
- * Callable as 'deleteUser'
  */
-export const deleteUser = functions.https.onCall(async (data: any, context: any) => {
-  if (!context?.auth) {
-    throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated');
+export const deleteUser = onCall(async (request) => {
+  if (!request.auth) {
+    throw new HttpsError('unauthenticated', 'User must be authenticated');
   }
   
-  // Check if the requesting user is an admin
-  const adminUser = await db.collection('users').doc(context?.auth?.uid).get();
-  if (!adminUser.exists || adminUser.data()?.role !== 'admin') {
-    throw new functions.https.HttpsError('permission-denied', 'Only admins can delete users');
+  const adminUser = await db.collection('users').doc(request.auth.uid).get();
+  if (!adminUser.exists || adminUser.data()?.role !== UserRole.ADMIN) {
+    throw new HttpsError('permission-denied', 'Only admins can delete users');
   }
   
-  const { uid } = data;
+  const { uid } = request.data;
   if (!uid) {
-    throw new functions.https.HttpsError('invalid-argument', 'User UID is required');
+    throw new HttpsError('invalid-argument', 'User UID is required');
   }
   
-  // Prevent admins from deleting themselves
-  if (uid === context.auth.uid) {
-    throw new functions.https.HttpsError('permission-denied', 'Cannot delete your own account');
+  if (uid === request.auth.uid) {
+    throw new HttpsError('permission-denied', 'Cannot delete your own account');
   }
   
   try {
-    // Delete user from Auth
     await admin.auth().deleteUser(uid);
-    
-    // Delete user profile from Firestore
     await db.collection('users').doc(uid).delete();
-    
     return { success: true, message: 'User deleted successfully' };
   } catch (error: any) {
     console.error('Error deleting user:', error);
-    throw new functions.https.HttpsError('internal', error.message || 'Failed to delete user');
+    throw new HttpsError('internal', error.message || 'Failed to delete user');
   }
 });
 
 /**
  * Sends password reset email to user (admin only)
- * Callable as 'resetUserPassword'
  */
-export const resetUserPassword = functions.https.onCall(async (data: any, context: any) => {
-  if (!context?.auth) {
-    throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated');
+export const resetUserPassword = onCall(async (request) => {
+  if (!request.auth) {
+    throw new HttpsError('unauthenticated', 'User must be authenticated');
   }
   
-  // Check if the requesting user is an admin
-  const adminUser = await db.collection('users').doc(context?.auth?.uid).get();
-  if (!adminUser.exists || adminUser.data()?.role !== 'admin') {
-    throw new functions.https.HttpsError('permission-denied', 'Only admins can reset user passwords');
+  const adminUser = await db.collection('users').doc(request.auth.uid).get();
+  if (!adminUser.exists || adminUser.data()?.role !== UserRole.ADMIN) {
+    throw new HttpsError('permission-denied', 'Only admins can reset user passwords');
   }
   
-  const { email } = data;
+  const { email } = request.data;
   if (!email) {
-    throw new functions.https.HttpsError('invalid-argument', 'Email is required');
+    throw new HttpsError('invalid-argument', 'Email is required');
   }
   
   try {
-    // Generate password reset link
     const resetLink = await admin.auth().generatePasswordResetLink(email);
-    
-    // TODO: Send email with reset link (you can use a service like SendGrid)
-    // For now, we'll just return the reset link
     console.log(`Password reset link for ${email}: ${resetLink}`);
     
     return { 
       success: true, 
       message: 'Password reset email sent successfully',
-      resetLink // Remove this in production, just for testing
+      resetLink
     };
   } catch (error: any) {
     console.error('Error resetting password:', error);
-    throw new functions.https.HttpsError('internal', error.message || 'Failed to reset password');
+    throw new HttpsError('internal', error.message || 'Failed to reset password');
   }
 });
 
 /**
  * Allows users to delete their own profile (self-deletion)
- * Callable as 'deleteOwnProfile'
  */
-export const deleteOwnProfile = functions.https.onCall(async (data: any, context: any) => {
-  if (!context?.auth) {
-    throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated');
+export const deleteOwnProfile = onCall(async (request) => {
+  if (!request.auth) {
+    throw new HttpsError('unauthenticated', 'User must be authenticated');
   }
   
-  const { password } = data;
+  const { password } = request.data;
   if (!password) {
-    throw new functions.https.HttpsError('invalid-argument', 'Password is required for account deletion');
+    throw new HttpsError('invalid-argument', 'Password is required for account deletion');
   }
   
   try {
-    const uid = context.auth.uid;
-    
-    // Get user profile from Firestore
+    const uid = request.auth.uid;
     const userDoc = await db.collection('users').doc(uid).get();
     if (!userDoc.exists) {
-      throw new functions.https.HttpsError('not-found', 'User profile not found');
+      throw new HttpsError('not-found', 'User profile not found');
     }
     
     const userData = userDoc.data();
     if (!userData?.email) {
-      throw new functions.https.HttpsError('invalid-argument', 'User email not found');
+      throw new HttpsError('invalid-argument', 'User email not found');
     }
     
-    // Verify password by attempting to sign in
     try {
       await admin.auth().getUserByEmail(userData.email);
     } catch (error) {
-      throw new functions.https.HttpsError('unauthenticated', 'Invalid password');
+      throw new HttpsError('unauthenticated', 'Invalid password');
     }
     
-    // Delete avatar image from storage if it exists
     if (userData.avatarUrl && userData.avatarUrl.startsWith('https://firebasestorage.googleapis.com/')) {
       try {
-        // Extract the file path from the URL
         const urlParts = userData.avatarUrl.split('/');
         const oPathIndex = urlParts.indexOf('o');
         if (oPathIndex !== -1 && urlParts[oPathIndex + 1]) {
@@ -536,14 +492,10 @@ export const deleteOwnProfile = functions.https.onCall(async (data: any, context
         }
       } catch (storageError) {
         console.warn('Failed to delete avatar image from storage:', storageError);
-        // Continue with user deletion even if avatar deletion fails
       }
     }
     
-    // Delete user profile from Firestore
     await db.collection('users').doc(uid).delete();
-    
-    // Delete user from Auth
     await admin.auth().deleteUser(uid);
     
     console.log(`User ${uid} (${userData.email}) deleted their own profile`);
@@ -554,83 +506,50 @@ export const deleteOwnProfile = functions.https.onCall(async (data: any, context
     };
   } catch (error: any) {
     console.error('Error deleting own profile:', error);
-    throw new functions.https.HttpsError('internal', error.message || 'Failed to delete profile');
+    if (error instanceof HttpsError) throw error;
+    throw new HttpsError('internal', error.message || 'Failed to delete profile');
   }
 });
 
 /**
- * Content visibility levels
- */
-
-
-/**
  * Helper function to check if user can access content based on role and visibility
- * @param userRole - User's role
- * @param visibility - Content visibility level
- * @param isPremium - Whether content is premium
- * @returns boolean indicating if user can access the content
  */
 function canAccessContent(userRole: string | null, visibility: ContentVisibilityType, isPremium: boolean): boolean {
-  // Public content is accessible to everyone
-  if (visibility === ContentVisibility.PUBLIC) {
-    return true;
-  }
-
-  // Admin can access everything
-  if (userRole === 'admin') {
-    return true;
-  }
-
-  // Subscriber content requires subscriber or trial role
-  if (visibility === ContentVisibility.SUBSCRIBER) {
-    return userRole === 'subscriber' || userRole === 'trial';
-  }
-
-  // Admin content requires admin role
-  if (visibility === ContentVisibility.ADMIN) {
-    return userRole === 'admin';
-  }
-
+  if (visibility === ContentVisibility.PUBLIC) return true;
+  if (userRole === UserRole.ADMIN) return true;
+  if (visibility === ContentVisibility.SUBSCRIBER) return userRole === 'subscriber' || userRole === 'trial';
+  if (visibility === ContentVisibility.ADMIN) return userRole === UserRole.ADMIN;
   return false;
 }
 
 /**
  * Get filtered activities based on user role and content visibility
- * Callable as 'getFilteredActivities'
  */
-export const getFilteredActivities = functions.https.onCall(async (data: any, context: any) => {
-  if (!context?.auth) {
-    throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated');
+export const getFilteredActivities = onCall(async (request) => {
+  if (!request.auth) {
+    throw new HttpsError('unauthenticated', 'User must be authenticated');
   }
 
-  const { language = 'en' } = data;
+  const { language = 'en' } = request.data;
   
   try {
-    const uid = context.auth.uid;
-    
-    // Get user profile to determine role
+    const uid = request.auth.uid;
     const userDoc = await db.collection('users').doc(uid).get();
     const userRole = userDoc.exists ? userDoc.data()?.role : null;
     
     console.log(`User ${uid} with role ${userRole} requesting activities in ${language}`);
     
-    // Get activities from the specified language collection
     const activitiesSnapshot = await db.collection(`activities_${language}`).get();
     
     if (activitiesSnapshot.empty) {
       return { activities: [] };
     }
     
-    const activities = activitiesSnapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    })) as any[];
+    const activities = activitiesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as any[];
     
-    // Filter activities based on user role and content visibility
     const filteredActivities = activities.filter(activity => {
       const visibility = activity.visibility || ContentVisibility.PUBLIC;
       const isPremium = activity.isPremium || false;
-      
       return canAccessContent(userRole, visibility, isPremium);
     });
     
@@ -644,48 +563,38 @@ export const getFilteredActivities = functions.https.onCall(async (data: any, co
     };
   } catch (error: any) {
     console.error('Error getting filtered activities:', error);
-    throw new functions.https.HttpsError('internal', error.message || 'Failed to get activities');
+    throw new HttpsError('internal', error.message || 'Failed to get activities');
   }
 });
 
-
 /**
  * Get filtered blog posts based on user role and content visibility
- * Callable as 'getFilteredBlogPosts'
  */
-export const getFilteredBlogPosts = functions.https.onCall(async (data: any, context: any) => {
-  if (!context?.auth) {
-    throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated');
+export const getFilteredBlogPosts = onCall(async (request) => {
+  if (!request.auth) {
+    throw new HttpsError('unauthenticated', 'User must be authenticated');
   }
 
-  const { language = 'en' } = data;
+  const { language = 'en' } = request.data;
   
   try {
-    const uid = context.auth.uid;
-    
-    // Get user profile to determine role
+    const uid = request.auth.uid;
     const userDoc = await db.collection('users').doc(uid).get();
     const userRole = userDoc.exists ? userDoc.data()?.role : null;
     
     console.log(`User ${uid} with role ${userRole} requesting blog posts in ${language}`);
     
-    // Get blog posts from the specified language collection
     const blogPostsSnapshot = await db.collection(`blog_${language}`).get();
     
     if (blogPostsSnapshot.empty) {
       return { blogPosts: [] };
     }
     
-    const blogPosts = blogPostsSnapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    })) as any[];
+    const blogPosts = blogPostsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as any[];
     
-    // Filter blog posts based on user role and content visibility
     const filteredBlogPosts = blogPosts.filter(blogPost => {
       const visibility = blogPost.visibility || ContentVisibility.PUBLIC;
       const isPremium = blogPost.isPremium || false;
-      
       return canAccessContent(userRole, visibility, isPremium);
     });
     
@@ -699,26 +608,23 @@ export const getFilteredBlogPosts = functions.https.onCall(async (data: any, con
     };
   } catch (error: any) {
     console.error('Error getting filtered blog posts:', error);
-    throw new functions.https.HttpsError('internal', error.message || 'Failed to get blog posts');
+    throw new HttpsError('internal', error.message || 'Failed to get blog posts');
   }
 });
 
-
 /**
  * Get public content for non-authenticated users
- * Callable as 'getPublicContent'
  */
-export const getPublicContent = functions.https.onCall(async (data: any, context: any) => {
-  const { contentType, language = 'en' } = data;
+export const getPublicContent = onCall(async (request) => {
+  const { contentType, language = 'en' } = request.data;
   
   if (!contentType || !['activities', 'blog'].includes(contentType)) {
-    throw new functions.https.HttpsError('invalid-argument', 'contentType must be "activities" or "blog"');
+    throw new HttpsError('invalid-argument', 'contentType must be "activities" or "blog"');
   }
   
   try {
     console.log(`Anonymous user requesting public ${contentType} in ${language}`);
     
-    // Get content from the specified language collection
     const collectionName = contentType === 'activities' ? `activities_${language}` : `blog_${language}`;
     const contentSnapshot = await db.collection(collectionName).get();
     
@@ -726,16 +632,11 @@ export const getPublicContent = functions.https.onCall(async (data: any, context
       return { content: [] };
     }
     
-    const content = contentSnapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    })) as any[];
+    const content = contentSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as any[];
     
-    // Filter to only public, non-premium content
     const publicContent = content.filter(item => {
       const visibility = item.visibility || ContentVisibility.PUBLIC;
       const isPremium = item.isPremium || false;
-      
       return visibility === ContentVisibility.PUBLIC && !isPremium;
     });
     
@@ -749,6 +650,6 @@ export const getPublicContent = functions.https.onCall(async (data: any, context
     };
   } catch (error: any) {
     console.error(`Error getting public ${contentType}:`, error);
-    throw new functions.https.HttpsError('internal', error.message || `Failed to get ${contentType}`);
+    throw new HttpsError('internal', error.message || `Failed to get ${contentType}`);
   }
 }); 
