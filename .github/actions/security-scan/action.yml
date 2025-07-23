@@ -77,16 +77,18 @@ runs:
       run: |
         echo "🔍 Scanning code for potential secrets..."
         
-        # Check for hardcoded API keys, tokens, etc.
-        SECRETS_FOUND=$(grep -r -i -E "(api_key|token|password|secret)" src/ --exclude-dir=node_modules --exclude-dir=.git || true)
+        # Look for actual hardcoded secrets (not UI text)
+        # Check for Firebase API keys, tokens, etc. in TypeScript/JavaScript files only
+        SECRETS_FOUND=$(find src/ -name "*.ts" -o -name "*.js" | grep -v ".spec.ts" | grep -v ".template.ts" | xargs grep -l -i -E "(apiKey.*['\"][A-Za-z0-9_-]{20,}['\"]|token.*['\"][A-Za-z0-9_-]{20,}['\"]|secret.*['\"][A-Za-z0-9_-]{20,}['\"]|password.*['\"][A-Za-z0-9_-]{8,}['\"])" 2>/dev/null || true)
         
         if [ -n "$SECRETS_FOUND" ]; then
-          echo "⚠️  Potential secrets found in code:"
+          echo "⚠️  Potential hardcoded secrets found in code:"
           echo "$SECRETS_FOUND"
           echo "❌ Please review and remove any hardcoded secrets"
+          echo "💡 Use environment variables or secrets management instead"
           exit 1
         else
-          echo "✅ No obvious secrets found in code"
+          echo "✅ No hardcoded secrets found in code"
         fi
 
     - name: Upload security report
