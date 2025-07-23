@@ -15,6 +15,25 @@ inputs:
   firebase-token:
     description: 'Firebase token for authentication'
     required: true
+  firebase-api-key:
+    description: 'Firebase API key'
+    required: true
+  firebase-auth-domain:
+    description: 'Firebase auth domain'
+    required: true
+  firebase-storage-bucket:
+    description: 'Firebase storage bucket'
+    required: true
+  firebase-messaging-sender-id:
+    description: 'Firebase messaging sender ID'
+    required: true
+  firebase-app-id:
+    description: 'Firebase app ID'
+    required: true
+  firebase-measurement-id:
+    description: 'Firebase measurement ID'
+    required: false
+    default: ''
 
 runs:
   using: 'composite'
@@ -26,7 +45,7 @@ runs:
         npm install -g firebase-tools
         firebase --version
 
-    - name: Create environment.ts from secrets
+    - name: Create environment.ts from inputs
       shell: bash
       working-directory: ${{ inputs.working-directory }}
       run: |
@@ -34,13 +53,13 @@ runs:
         export const environment = {
           production: ${{ inputs.environment == 'production' }},
           firebase: {
-            apiKey: "${{ secrets.FIREBASE_API_KEY }}",
-            authDomain: "${{ secrets.FIREBASE_AUTH_DOMAIN }}",
-            projectId: "${{ secrets.FIREBASE_PROJECT_ID }}",
-            storageBucket: "${{ secrets.FIREBASE_STORAGE_BUCKET }}",
-            messagingSenderId: "${{ secrets.FIREBASE_MESSAGING_SENDER_ID }}",
-            appId: "${{ secrets.FIREBASE_APP_ID }}",
-            measurementId: "${{ secrets.FIREBASE_MEASUREMENT_ID }}"
+            apiKey: "${{ inputs.firebase-api-key }}",
+            authDomain: "${{ inputs.firebase-auth-domain }}",
+            projectId: "${{ inputs.firebase-project }}",
+            storageBucket: "${{ inputs.firebase-storage-bucket }}",
+            messagingSenderId: "${{ inputs.firebase-messaging-sender-id }}",
+            appId: "${{ inputs.firebase-app-id }}",
+            measurementId: "${{ inputs.firebase-measurement-id }}"
           }
         }
         EOF
