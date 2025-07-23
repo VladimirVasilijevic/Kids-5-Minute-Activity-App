@@ -1,10 +1,7 @@
-name: 'Setup Firebase Environment'
-description: 'Setup Firebase CLI and create environment configuration'
+name: 'Setup Firebase CLI'
+description: 'Setup Firebase CLI for deployment operations'
 
 inputs:
-  environment:
-    description: 'Environment type (development/production)'
-    required: true
   working-directory:
     description: 'Working directory for operations'
     required: false
@@ -15,25 +12,6 @@ inputs:
   firebase-token:
     description: 'Firebase token for authentication'
     required: true
-  firebase-api-key:
-    description: 'Firebase API key'
-    required: true
-  firebase-auth-domain:
-    description: 'Firebase auth domain'
-    required: true
-  firebase-storage-bucket:
-    description: 'Firebase storage bucket'
-    required: true
-  firebase-messaging-sender-id:
-    description: 'Firebase messaging sender ID'
-    required: true
-  firebase-app-id:
-    description: 'Firebase app ID'
-    required: true
-  firebase-measurement-id:
-    description: 'Firebase measurement ID'
-    required: false
-    default: ''
 
 runs:
   using: 'composite'
@@ -45,30 +23,11 @@ runs:
         npm install -g firebase-tools
         firebase --version
 
-    - name: Create environment.ts from inputs
-      shell: bash
-      working-directory: ${{ inputs.working-directory }}
-      run: |
-        cat <<EOF > src/environments/environment.ts
-        export const environment = {
-          production: ${{ inputs.environment == 'production' }},
-          firebase: {
-            apiKey: "${{ inputs.firebase-api-key }}",
-            authDomain: "${{ inputs.firebase-auth-domain }}",
-            projectId: "${{ inputs.firebase-project }}",
-            storageBucket: "${{ inputs.firebase-storage-bucket }}",
-            messagingSenderId: "${{ inputs.firebase-messaging-sender-id }}",
-            appId: "${{ inputs.firebase-app-id }}",
-            measurementId: "${{ inputs.firebase-measurement-id }}"
-          }
-        }
-        EOF
-        echo "✅ Environment created for ${{ inputs.environment }}"
-
     - name: Setup Firebase project
       shell: bash
       working-directory: ${{ inputs.working-directory }}
       run: |
-        firebase use ${{ inputs.firebase-project }}
-        firebase auth:export --project ${{ inputs.firebase-project }} --token "${{ inputs.firebase-token }}" || echo "Auth export not needed"
-        echo "✅ Firebase authentication configured" 
+        # Set the project with token authentication
+        firebase use ${{ inputs.firebase-project }} --token "${{ inputs.firebase-token }}"
+        
+        echo "✅ Firebase CLI configured for ${{ inputs.firebase-project }}" 
