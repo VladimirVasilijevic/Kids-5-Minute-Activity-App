@@ -10,6 +10,7 @@ import { AngularFireModule } from '@angular/fire/compat';
 import { AngularFirestoreModule } from '@angular/fire/compat/firestore';
 import { AngularFireAuthModule } from '@angular/fire/compat/auth';
 import { AngularFireStorageModule } from '@angular/fire/compat/storage';
+import { AngularFireFunctionsModule } from '@angular/fire/compat/functions';
 
 // Angular Material imports
 import { MatToolbarModule } from '@angular/material/toolbar';
@@ -140,6 +141,7 @@ export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
     AngularFirestoreModule,
     AngularFireAuthModule,
     AngularFireStorageModule,
+    AngularFireFunctionsModule,
     // Angular Material modules
     MatToolbarModule,
     MatButtonModule,

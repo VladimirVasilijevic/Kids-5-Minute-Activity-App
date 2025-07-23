@@ -86,9 +86,15 @@ jobs:
 
     - name: Build Angular app (Production)
       working-directory: vaspitac-app
+      timeout-minutes: 10
       run: |
         echo "🏗️ Building production version..."
-        npm run build -- --configuration production --base-href /Kids-5-Minute-Activity-App/
+        npm run build -- --configuration production --base-href /Kids-5-Minute-Activity-App/ || {
+          echo "❌ Build failed. Checking for budget issues..."
+          echo "📊 Current bundle sizes:"
+          ls -la dist/vaspitac-app/ 2>/dev/null || echo "No dist folder found"
+          exit 1
+        }
         echo "✅ Production build completed"
 
     - name: Verify build output
