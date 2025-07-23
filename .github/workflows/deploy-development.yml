@@ -1,10 +1,8 @@
-name: Deploy Development for Testing
+name: Deploy Development to GitHub Pages
 
 on:
   push:
     branches: [develop]
-  pull_request:
-    branches: [main, develop]
   workflow_dispatch:
 
 jobs:
@@ -13,11 +11,13 @@ jobs:
     environment: development
     concurrency:
       group: "development-deployment"
-      cancel-in-progress: true
+      cancel-in-progress: false
 
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
 
     - name: Setup Node.js
       uses: actions/setup-node@v4
@@ -63,32 +63,36 @@ jobs:
     - name: Verify development environment secrets
       working-directory: vaspitac-app
       run: |
-        # Verify development Firebase secrets are set
-        if [ -z "${{ secrets.FIREBASE_API_KEY_DEV }}" ]; then
-          echo "❌ FIREBASE_API_KEY_DEV is not set"
+        # Verify all required Firebase secrets are set
+        if [ -z "${{ secrets.FIREBASE_API_KEY }}" ]; then
+          echo "❌ FIREBASE_API_KEY is not set"
           exit 1
         fi
-        if [ -z "${{ secrets.FIREBASE_PROJECT_ID_DEV }}" ]; then
-          echo "❌ FIREBASE_PROJECT_ID_DEV is not set"
+        if [ -z "${{ secrets.FIREBASE_PROJECT_ID }}" ]; then
+          echo "❌ FIREBASE_PROJECT_ID is not set"
           exit 1
         fi
-        echo "✅ All required development Firebase secrets are configured"
+        echo "✅ All required Firebase secrets are configured"
 
     - name: Create development environment
       working-directory: vaspitac-app
       run: |
-        # 🔧 DEVELOPMENT: Using development Firebase project
+        # ⚠️ SECURITY WARNING: Firebase API key will be visible in compiled JS
+        # Ensure proper restrictions are configured in Firebase Console:
+        # - HTTP referrers: your-domain.com, *.your-domain.com
+        # - App package names: com.vaspitac.app (for Android)
+        # - IP addresses: GitHub Pages IP ranges
         cat <<EOF > src/environments/environment.ts
         export const environment = {
           production: false,
           firebase: {
-            apiKey: "${{ secrets.FIREBASE_API_KEY_DEV }}",
-            authDomain: "${{ secrets.FIREBASE_AUTH_DOMAIN_DEV }}",
-            projectId: "${{ secrets.FIREBASE_PROJECT_ID_DEV }}",
-            storageBucket: "${{ secrets.FIREBASE_STORAGE_BUCKET_DEV }}",
-            messagingSenderId: "${{ secrets.FIREBASE_MESSAGING_SENDER_ID_DEV }}",
-            appId: "${{ secrets.FIREBASE_APP_ID_DEV }}",
-            measurementId: "${{ secrets.FIREBASE_MEASUREMENT_ID_DEV }}"
+            apiKey: "${{ secrets.FIREBASE_API_KEY }}",
+            authDomain: "${{ secrets.FIREBASE_AUTH_DOMAIN }}",
+            projectId: "${{ secrets.FIREBASE_PROJECT_ID }}",
+            storageBucket: "${{ secrets.FIREBASE_STORAGE_BUCKET }}",
+            messagingSenderId: "${{ secrets.FIREBASE_MESSAGING_SENDER_ID }}",
+            appId: "${{ secrets.FIREBASE_APP_ID }}",
+            measurementId: "${{ secrets.FIREBASE_MEASUREMENT_ID }}"
           }
         }
         EOF
@@ -109,21 +113,30 @@ jobs:
         npm run build -- --configuration development --base-href /Kids-5-Minute-Activity-App/
         echo "✅ Development build completed"
 
-    - name: Upload development build artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: development-build
-        path: vaspitac-app/dist/vaspitac-app
-        retention-days: 7
-
-    - name: Verify development build
+    - name: Verify build output
       working-directory: vaspitac-app
       run: |
         if [ ! -d "dist/vaspitac-app" ]; then
-          echo "❌ Development build output directory not found"
+          echo "❌ Build output directory not found"
           exit 1
         fi
-        echo "📁 Development build output size:"
+        echo "📁 Build output size:"
         du -sh dist/vaspitac-app
-        echo "✅ Development build verification passed"
-        echo "🔧 Development build ready for testing" 
+        echo "✅ Build verification passed"
+
+    - name: Deploy to GitHub Pages (Development)
+      uses: peaceiris/actions-gh-pages@v4
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: vaspitac-app/dist/vaspitac-app
+        publish_branch: gh-pages-dev
+        force_orphan: true
+        user_name: 'github-actions[bot]'
+        user_email: 'github-actions[bot]@users.noreply.github.com'
+        commit_message: 'Deploy development build to GitHub Pages'
+
+    - name: Verify deployment
+      run: |
+        echo "🚀 Development deployment completed successfully!"
+        echo "📱 Development site: https://vladimirvasilijevic.github.io/Kids-5-Minute-Activity-App/"
+        echo "⚠️  Remember to configure Firebase API key restrictions for this domain"
