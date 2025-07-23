@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed, waitForAsync, fakeAsync, tick, flush, discardPeriodicTasks } from '@angular/core/testing';
 import { Router } from '@angular/router';
-import { of } from 'rxjs';
+import { of, throwError, timer } from 'rxjs';
+import { map, switchMap } from 'rxjs/operators';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideRouter } from '@angular/router';
@@ -14,6 +15,7 @@ import { AdminActivity } from '../../models/admin-activity.model';
 import { mockAdminUser, mockSubscriber } from '../../../test-utils/mock-user-profiles';
 import { mockActivities } from '../../../test-utils/mock-activities';
 import { ImageUploadService } from '../../services/image-upload.service';
+import { ContentVisibility } from '../../models/content-visibility.model';
 
 describe('AdminActivitiesComponent', (): void => {
   let component: AdminActivitiesComponent;
@@ -33,10 +35,7 @@ describe('AdminActivitiesComponent', (): void => {
     createdAt: '2024-01-01T00:00:00Z'
   }));
 
-  const mockImageUploadService = {
-    isValidImage: (): boolean => true,
-    uploadImage: (): any => of('mock-url')
-  };
+  let mockImageUploadService: jasmine.SpyObj<ImageUploadService>;
 
   beforeEach(waitForAsync(async (): Promise<void> => {
     const authSpy = jasmine.createSpyObj('AuthService', [], {
@@ -49,6 +48,9 @@ describe('AdminActivitiesComponent', (): void => {
       'updateActivity',
       'deleteActivity'
     ]);
+    mockImageUploadService = jasmine.createSpyObj('ImageUploadService', ['isValidImage', 'uploadImage']);
+    mockImageUploadService.isValidImage.and.returnValue(true);
+    mockImageUploadService.uploadImage.and.returnValue(of('mock-url'));
     activitySpy.getActivities.and.returnValue(of(mockActivities));
     // Ensure these return resolved promises immediately
     activitySpy.createActivity.and.returnValue(Promise.resolve());
@@ -145,7 +147,10 @@ describe('AdminActivitiesComponent', (): void => {
       image: 'new-activity.jpg', // Provide image to pass validation
       video: '',
       category: 'creative',
-      language: 'en'
+      language: 'en',
+      materials: '',
+      visibility: ContentVisibility.PUBLIC,
+      isPremium: false
     };
     
     component.handleSubmit(event);
@@ -179,7 +184,10 @@ describe('AdminActivitiesComponent', (): void => {
       image: 'updated-activity.jpg', // Provide image to pass validation
       video: '',
       category: 'educational',
-      language: 'en'
+      language: 'en',
+      materials: '',
+      visibility: ContentVisibility.PUBLIC,
+      isPremium: false
     };
     
     component.handleSubmit(event);
@@ -259,7 +267,10 @@ describe('AdminActivitiesComponent', (): void => {
       image: 'test.jpg',
       video: '',
       category: 'creative',
-      language: 'en'
+      language: 'en',
+      materials: '',
+      visibility: ContentVisibility.PUBLIC,
+      isPremium: false
     };
     component.editingActivity = mockAdminActivities[0];
     component.showForm = true;
@@ -297,7 +308,10 @@ describe('AdminActivitiesComponent', (): void => {
       image: 'test.jpg', // Provide image to pass validation
       video: '',
       category: 'creative',
-      language: 'en'
+      language: 'en',
+      materials: '',
+      visibility: ContentVisibility.PUBLIC,
+      isPremium: false
     };
     
     const event = new globalThis.Event('submit');
@@ -353,7 +367,10 @@ describe('AdminActivitiesComponent', (): void => {
       image: 'test.jpg', // Provide image to pass validation
       video: '',
       category: 'creative',
-      language: 'en'
+      language: 'en',
+      materials: '',
+      visibility: ContentVisibility.PUBLIC,
+      isPremium: false
     };
     
     const event = new globalThis.Event('submit');
@@ -383,7 +400,10 @@ describe('AdminActivitiesComponent', (): void => {
       image: 'test.jpg',
       video: '',
       category: 'creative',
-      language: 'en'
+      language: 'en',
+      materials: '',
+      visibility: ContentVisibility.PUBLIC,
+      isPremium: false
     };
     
     // Access the private method for testing
@@ -403,7 +423,10 @@ describe('AdminActivitiesComponent', (): void => {
       image: '',
       video: 'test-video.mp4', // Provide video instead of image to pass validation
       category: 'creative',
-      language: 'en'
+      language: 'en',
+      materials: '',
+      visibility: ContentVisibility.PUBLIC,
+      isPremium: false
     };
     
     const event = new globalThis.Event('submit');
@@ -434,7 +457,10 @@ describe('AdminActivitiesComponent', (): void => {
       image: 'test.jpg',
       video: '',
       category: 'creative',
-      language: 'en'
+      language: 'en',
+      materials: '',
+      visibility: ContentVisibility.PUBLIC,
+      isPremium: false
     };
     
     // Access the private method for testing
@@ -457,7 +483,10 @@ describe('AdminActivitiesComponent', (): void => {
       image: 'new-activity.jpg',
       video: '',
       category: 'creative',
-      language: 'en'
+      language: 'en',
+      materials: '',
+      visibility: ContentVisibility.PUBLIC,
+      isPremium: false
     };
     
     component.handleSubmit(event);
@@ -469,4 +498,213 @@ describe('AdminActivitiesComponent', (): void => {
     
     discardPeriodicTasks();
   }));
+
+  describe('Image Upload Functionality', () => {
+    let mockFile: File;
+    let mockImageEvent: any;
+    let mockDragEvent: any;
+    let imageUploadService: jasmine.SpyObj<ImageUploadService>;
+
+    beforeEach(() => {
+      // Use the mock service that's already configured
+      imageUploadService = mockImageUploadService;
+      
+      // Mock a File object
+      mockFile = new File(['dummy content'], 'test-image.png', { type: 'image/png' });
+      Object.defineProperty(mockFile, 'size', { value: 1024 * 1024 }); // 1MB
+
+      // Mock an Event object for file input
+      mockImageEvent = {
+        target: {
+          files: [mockFile]
+        }
+      };
+
+      // Mock a DragEvent object for drag and drop
+      mockDragEvent = {
+        preventDefault: jasmine.createSpy('preventDefault'),
+        stopPropagation: jasmine.createSpy('stopPropagation'),
+        dataTransfer: {
+          files: [mockFile]
+        }
+      };
+
+      // Spy on private methods
+      spyOn<any>(component, 'showError').and.callThrough();
+      spyOn<any>(component, 'showSuccess').and.callThrough();
+    });
+
+    describe('onImageSelected', () => {
+      it('should process a valid image file and call upload service', () => {
+        imageUploadService.isValidImage.and.returnValue(true);
+        
+        component.onImageSelected(mockImageEvent);
+        
+        expect(imageUploadService.isValidImage).toHaveBeenCalledWith(mockFile);
+        expect(imageUploadService.uploadImage).toHaveBeenCalledWith(mockFile, 'activity-images/');
+      });
+
+      it('should not process if no file is selected', () => {
+        const emptyEvent = { target: { files: [] } };
+        
+        component.onImageSelected(emptyEvent as any);
+        
+        expect(imageUploadService.isValidImage).not.toHaveBeenCalled();
+        expect(imageUploadService.uploadImage).not.toHaveBeenCalled();
+      });
+
+      it('should show error for invalid image file', () => {
+        imageUploadService.isValidImage.and.returnValue(false);
+        
+        component.onImageSelected(mockImageEvent);
+        
+        expect(imageUploadService.isValidImage).toHaveBeenCalledWith(mockFile);
+        expect(imageUploadService.uploadImage).not.toHaveBeenCalled();
+        expect(component['showError']).toHaveBeenCalledWith(
+          'Invalid Image',
+          'Please select a valid image file (JPEG, PNG, GIF, WebP) under 5MB.'
+        );
+      });
+    });
+
+    describe('uploadImage', () => {
+      it('should upload image successfully and update form data', fakeAsync(() => {
+        const downloadUrl = 'http://example.com/test-image.png';
+        // Use timer to simulate async upload
+        imageUploadService.uploadImage.and.returnValue(timer(100).pipe(map(() => downloadUrl)));
+        
+        // Call the public method that triggers upload
+        component.onImageSelected(mockImageEvent);
+        
+        expect(component.isUploadingImage).toBeTrue();
+        expect(imageUploadService.uploadImage).toHaveBeenCalledWith(mockFile, 'activity-images/');
+        
+        tick(100); // Wait for the timer to complete
+        
+        expect(component.formData.image).toBe(downloadUrl);
+        expect(component.imagePreview).toBe(downloadUrl);
+        expect(component.isUploadingImage).toBeFalse();
+      }));
+
+      it('should handle upload error', fakeAsync(() => {
+        const error = new Error('Upload failed');
+        // Use timer to simulate async upload that fails
+        imageUploadService.uploadImage.and.returnValue(timer(100).pipe(switchMap(() => throwError(() => error))));
+        
+        // Call the public method that triggers upload
+        component.onImageSelected(mockImageEvent);
+        
+        expect(component.isUploadingImage).toBeTrue();
+        expect(imageUploadService.uploadImage).toHaveBeenCalledWith(mockFile, 'activity-images/');
+        
+        tick(100); // Wait for the timer to complete
+        
+        expect(component.isUploadingImage).toBeFalse();
+        expect(component['showError']).toHaveBeenCalledWith('Upload Error', 'Upload failed');
+      }));
+
+      it('should handle upload error with generic message when error has no message', fakeAsync(() => {
+        const error = new Error();
+        error.message = '';
+        // Use timer to simulate async upload that fails
+        imageUploadService.uploadImage.and.returnValue(timer(100).pipe(switchMap(() => throwError(() => error))));
+        
+        // Call the public method that triggers upload
+        component.onImageSelected(mockImageEvent);
+        
+        expect(component.isUploadingImage).toBeTrue();
+        expect(imageUploadService.uploadImage).toHaveBeenCalledWith(mockFile, 'activity-images/');
+        
+        tick(100); // Wait for the timer to complete
+        
+        expect(component.isUploadingImage).toBeFalse();
+        expect(component['showError']).toHaveBeenCalledWith(
+          'Upload Error',
+          'Failed to upload image. Please try again.'
+        );
+      }));
+    });
+
+    describe('onDragOver', () => {
+      it('should prevent default behavior and stop propagation', () => {
+        component.onDragOver(mockDragEvent);
+        
+        expect(mockDragEvent.preventDefault).toHaveBeenCalled();
+        expect(mockDragEvent.stopPropagation).toHaveBeenCalled();
+      });
+    });
+
+    describe('onDrop', () => {
+      it('should process a valid dropped file and call upload service', () => {
+        imageUploadService.isValidImage.and.returnValue(true);
+        
+        component.onDrop(mockDragEvent);
+        
+        expect(mockDragEvent.preventDefault).toHaveBeenCalled();
+        expect(mockDragEvent.stopPropagation).toHaveBeenCalled();
+        expect(imageUploadService.isValidImage).toHaveBeenCalledWith(mockFile);
+        expect(imageUploadService.uploadImage).toHaveBeenCalledWith(mockFile, 'activity-images/');
+      });
+
+      it('should not process if no files are dropped', () => {
+        const emptyDragEvent = {
+          preventDefault: jasmine.createSpy('preventDefault'),
+          stopPropagation: jasmine.createSpy('stopPropagation'),
+          dataTransfer: { files: [] }
+        };
+        
+        component.onDrop(emptyDragEvent as any);
+        
+        expect(emptyDragEvent.preventDefault).toHaveBeenCalled();
+        expect(emptyDragEvent.stopPropagation).toHaveBeenCalled();
+        expect(imageUploadService.isValidImage).not.toHaveBeenCalled();
+        expect(imageUploadService.uploadImage).not.toHaveBeenCalled();
+      });
+
+      it('should show error for invalid dropped file', () => {
+        imageUploadService.isValidImage.and.returnValue(false);
+        
+        component.onDrop(mockDragEvent);
+        
+        expect(mockDragEvent.preventDefault).toHaveBeenCalled();
+        expect(mockDragEvent.stopPropagation).toHaveBeenCalled();
+        expect(imageUploadService.isValidImage).toHaveBeenCalledWith(mockFile);
+        expect(imageUploadService.uploadImage).not.toHaveBeenCalled();
+        expect(component['showError']).toHaveBeenCalledWith(
+          'Invalid Image',
+          'Please select a valid image file (JPEG, PNG, GIF, WebP) under 5MB.'
+        );
+      });
+    });
+
+    describe('removeImage', () => {
+      it('should clear image data and video data', () => {
+        component.formData.image = 'http://example.com/image.jpg';
+        component.imagePreview = 'http://example.com/image.jpg';
+        component.formData.video = 'http://example.com/video.mp4';
+        component.videoPreview = 'http://example.com/video.mp4';
+        
+        component.removeImage();
+        
+        expect(component.formData.image).toBe('');
+        expect(component.imagePreview).toBeNull();
+        expect(component.formData.video).toBe('');
+        expect(component.videoPreview).toBeNull();
+      });
+
+      it('should clear image data when no video exists', () => {
+        component.formData.image = 'http://example.com/image.jpg';
+        component.imagePreview = 'http://example.com/image.jpg';
+        component.formData.video = '';
+        component.videoPreview = null;
+        
+        component.removeImage();
+        
+        expect(component.formData.image).toBe('');
+        expect(component.imagePreview).toBeNull();
+        expect(component.formData.video).toBe('');
+        expect(component.videoPreview).toBeNull();
+      });
+    });
+  });
 }); 

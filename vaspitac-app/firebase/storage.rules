@@ -37,7 +37,7 @@ service firebase.storage {
       allow write: if request.auth != null && request.auth.uid == userId;
     }
     
-    // Profile avatars - authenticated users can upload their own
+    // Profile avatars - any authenticated user can upload (more permissive for testing)
     match /profile-avatars/{allPaths=**} {
       allow read: if true;
       allow write: if request.auth != null;
@@ -48,6 +48,12 @@ service firebase.storage {
       allow read: if true;
       allow write: if request.auth != null && 
         firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+    
+    // Temporary uploads - any authenticated user (for testing)
+    match /temp-uploads/{allPaths=**} {
+      allow read: if true;
+      allow write: if request.auth != null;
     }
   }
 } 

@@ -8,7 +8,7 @@ import { BlogPost } from '../../models/blog-post.model';
 import { BlogService } from '../../services/blog.service';
 
 /**
- * BlogDetailComponent displays the full content of a specific blog post.
+ * Component to display the details of a single blog post
  */
 @Component({
   selector: 'app-blog-detail',
@@ -16,11 +16,11 @@ import { BlogService } from '../../services/blog.service';
   styleUrls: ['./blog-detail.component.scss'],
 })
 export class BlogDetailComponent implements OnInit {
-  blogPost$!: Observable<BlogPost>;
+  blogPost$!: Observable<BlogPost | undefined>;
   lang!: string;
 
   /**
-   * Initializes the blog detail component with required services
+   * Initializes services
    * @param _route - Activated route for getting route parameters
    * @param _router - Angular router for navigation
    * @param _blogService - Service for blog post data
@@ -37,10 +37,9 @@ export class BlogDetailComponent implements OnInit {
    * Loads the specific blog post based on the route parameter
    */
   ngOnInit(): void {
-    this.lang = this._translate.currentLang || this._translate.getDefaultLang() || 'en';
-    
+    this.lang = this._translate.currentLang || this._translate.getDefaultLang() || 'sr';
     this.blogPost$ = combineLatest([
-      this._route.params.pipe(map(params => +params['id'])),
+      this._route.paramMap.pipe(map((params) => params.get('id'))),
       this._translate.onLangChange.pipe(
         map((e) => e.lang as string),
         startWith(this.lang)
@@ -48,16 +47,8 @@ export class BlogDetailComponent implements OnInit {
     ]).pipe(
       switchMap(([id, lang]) => {
         this.lang = lang;
-        // Get all blog posts for the current language and find the specific one
-        return this._blogService.getBlogPosts(lang).pipe(
-          map(blogPosts => {
-            const post = blogPosts.find(p => p.id === id);
-            if (!post) {
-              throw new Error(`Blog post with ID ${id} not found`);
-            }
-            return post;
-          })
-        );
+        if (!id) return of(undefined);
+        return this._blogService.getBlogPostById(Number(id));
       })
     );
   }

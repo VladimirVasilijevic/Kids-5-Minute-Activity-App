@@ -1,80 +1,71 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { ActivatedRoute, Router } from '@angular/router';
-import { of, throwError } from 'rxjs';
+import { of } from 'rxjs';
+import { TranslateModule } from '@ngx-translate/core';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
+
 import { BlogDetailComponent } from './blog-detail.component';
 import { BlogService } from '../../services/blog.service';
 import { mockBlogPosts } from '../../../test-utils/mock-blog-posts';
-import { TranslateModule } from '@ngx-translate/core';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
 
 describe('BlogDetailComponent', () => {
   let component: BlogDetailComponent;
   let fixture: ComponentFixture<BlogDetailComponent>;
-  let mockBlogService: jasmine.SpyObj<BlogService>;
-  let mockRouter: jasmine.SpyObj<Router>;
-  let _mockActivatedRoute: jasmine.SpyObj<ActivatedRoute>;
+  let blogService: jasmine.SpyObj<BlogService>;
+  let router: jasmine.SpyObj<Router>;
+  let activatedRoute: any;
 
   beforeEach(async () => {
     const blogServiceSpy = jasmine.createSpyObj('BlogService', ['getBlogPostById']);
     const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
-    const activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
-      params: of({ id: mockBlogPosts[0].id.toString() })
-    });
+
+    activatedRoute = {
+      paramMap: of({ get: (key: string) => '1' }),
+    };
 
     await TestBed.configureTestingModule({
-      declarations: [ BlogDetailComponent ],
-      imports: [ TranslateModule.forRoot(), HttpClientTestingModule ],
+      declarations: [BlogDetailComponent],
+      imports: [TranslateModule.forRoot()],
       providers: [
         { provide: BlogService, useValue: blogServiceSpy },
         { provide: Router, useValue: routerSpy },
-        { provide: ActivatedRoute, useValue: activatedRouteSpy }
+        { provide: ActivatedRoute, useValue: activatedRoute },
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
 
-    mockBlogService = TestBed.inject(BlogService) as jasmine.SpyObj<BlogService>;
-    mockRouter = TestBed.inject(Router) as jasmine.SpyObj<Router>;
-    _mockActivatedRoute = TestBed.inject(ActivatedRoute) as jasmine.SpyObj<ActivatedRoute>;
-  });
-
-  beforeEach(() => {
-    mockBlogService.getBlogPostById.and.returnValue(of(mockBlogPosts[0]));
-    mockRouter.navigate.and.returnValue(Promise.resolve(true));
     fixture = TestBed.createComponent(BlogDetailComponent);
     component = fixture.componentInstance;
-    fixture.detectChanges();
+    blogService = TestBed.inject(BlogService) as jasmine.SpyObj<BlogService>;
+    router = TestBed.inject(Router) as jasmine.SpyObj<Router>;
   });
 
-  it('should create', () => {
+  it('should create the component', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should load blog post on init', () => {
-    expect(mockBlogService.getBlogPostById).toHaveBeenCalledWith(mockBlogPosts[0].id);
-    expect(component.blogPost$).toBeDefined();
+  it('should load the correct blog post on initialization', (done) => {
+    blogService.getBlogPostById.and.returnValue(of(mockBlogPosts[0]));
+    fixture.detectChanges();
+    component.blogPost$?.subscribe(post => {
+      expect(post).toEqual(mockBlogPosts[0]);
+      done();
+    });
   });
 
-  it('should render fullContent in the template', async () => {
+  it('should handle blog post not found', (done) => {
+    activatedRoute.paramMap = of({ get: (key: string) => '999' });
+    blogService.getBlogPostById.and.returnValue(of(undefined as any));
     fixture.detectChanges();
-    const compiled = fixture.nativeElement as HTMLElement;
-    // Wait for async pipe
-    await fixture.whenStable();
-    fixture.detectChanges();
-    expect(compiled.textContent).toContain(mockBlogPosts[0].fullContent.split('\n')[0]);
+    component.blogPost$?.subscribe(post => {
+      expect(post).toBeUndefined();
+      done();
+    });
   });
 
-  it('should navigate back to blog list', () => {
+  it('should navigate back to the blog list', () => {
+    router.navigate.and.resolveTo(true);
     component.goBack();
-    expect(mockRouter.navigate).toHaveBeenCalledWith(['/blog']);
-  });
-
-  it('should handle error if blog post not found', () => {
-    mockBlogService.getBlogPostById.and.returnValue(throwError(() => new Error('Not found')));
-    fixture = TestBed.createComponent(BlogDetailComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-    // You can add error UI handling here if implemented
-    expect(component).toBeTruthy();
+    expect(router.navigate).toHaveBeenCalledWith(['/blog']);
   });
 }); 

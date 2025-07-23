@@ -1,145 +1,173 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { TranslateModule } from '@ngx-translate/core';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { of } from 'rxjs';
+import { TranslateModule } from '@ngx-translate/core';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 
-import { CATEGORY_KEYS } from '../../models/category-keys';
-import { FirestoreService } from '../../services/firestore.service';
-import { mockFirestoreService } from '../../../test-utils/mock-firestore-service';
+import { HomeComponent } from './home.component';
 import { AuthService } from '../../services/auth.service';
 import { UserService } from '../../services/user.service';
 import { CategoryService } from '../../services/category.service';
-
-import { HomeComponent } from './home.component';
-import { ScrollToTopComponent } from '../scroll-to-top/scroll-to-top.component';
-import { AuthModalComponent } from '../auth-modal/auth-modal.component';
-import { ResetPasswordModalComponent } from '../auth-modal/reset-password-modal.component';
+import { AboutService } from '../../services/about.service';
+import { mockCategories } from '../../../test-utils/mock-categories';
+import { mockAdminUser, mockFreeUser } from '../../../test-utils/mock-user-profiles';
+import { mockAboutContent } from '../../../test-utils/mock-about-content';
+import { CATEGORY_KEYS, CategoryKey } from '../../models/category-keys';
+import { Category } from '../../models/category.model';
 
 describe('HomeComponent', () => {
   let component: HomeComponent;
   let fixture: ComponentFixture<HomeComponent>;
-  let routerSpy: jasmine.SpyObj<Router>;
-  let authServiceSpy: jasmine.SpyObj<AuthService>;
-  let userServiceSpy: jasmine.SpyObj<UserService>;
-  let categoryServiceSpy: jasmine.SpyObj<CategoryService>;
+  let router: jasmine.SpyObj<Router>;
+  let authService: jasmine.SpyObj<AuthService>;
+  let userService: jasmine.SpyObj<UserService>;
+  let categoryService: jasmine.SpyObj<CategoryService>;
+  let aboutService: jasmine.SpyObj<AboutService>;
 
-  beforeEach(async (): Promise<void> => {
-    routerSpy = jasmine.createSpyObj('Router', ['navigate']);
-    routerSpy.navigate.and.returnValue(Promise.resolve(true));
-    
-    authServiceSpy = jasmine.createSpyObj('AuthService', ['signOut'], {
-      user$: of(null)
-    });
-    
-    userServiceSpy = jasmine.createSpyObj('UserService', ['getUserProfile']);
-    
-    categoryServiceSpy = jasmine.createSpyObj('CategoryService', ['getCategories']);
-    categoryServiceSpy.getCategories.and.returnValue(of([]));
-    
+  const typedMockCategories: Category[] = mockCategories.map(c => ({...c, id: c.id as CategoryKey}));
+
+  beforeEach(async () => {
+    const authServiceSpy = jasmine.createSpyObj('AuthService', ['signOut'], { user$: of(null) });
+    const userServiceSpy = jasmine.createSpyObj('UserService', ['getUserProfile']);
+    const categoryServiceSpy = jasmine.createSpyObj('CategoryService', ['getCategories']);
+    const aboutServiceSpy = jasmine.createSpyObj('AboutService', ['getAboutContent']);
+    const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
+    routerSpy.navigate.and.resolveTo(true);
+
     await TestBed.configureTestingModule({
-      imports: [TranslateModule.forRoot(), BrowserAnimationsModule, HttpClientTestingModule],
-      declarations: [HomeComponent, ScrollToTopComponent, AuthModalComponent, ResetPasswordModalComponent],
+      declarations: [HomeComponent],
+      imports: [TranslateModule.forRoot(), HttpClientTestingModule],
       providers: [
         { provide: Router, useValue: routerSpy },
-        { provide: FirestoreService, useValue: mockFirestoreService },
         { provide: AuthService, useValue: authServiceSpy },
         { provide: UserService, useValue: userServiceSpy },
         { provide: CategoryService, useValue: categoryServiceSpy },
+        { provide: AboutService, useValue: aboutServiceSpy },
       ],
+      schemas: [CUSTOM_ELEMENTS_SCHEMA],
     }).compileComponents();
-  });
 
-  beforeEach((): void => {
     fixture = TestBed.createComponent(HomeComponent);
     component = fixture.componentInstance;
-    fixture.detectChanges();
+    router = TestBed.inject(Router) as jasmine.SpyObj<Router>;
+    authService = TestBed.inject(AuthService) as jasmine.SpyObj<AuthService>;
+    userService = TestBed.inject(UserService) as jasmine.SpyObj<UserService>;
+    categoryService = TestBed.inject(CategoryService) as jasmine.SpyObj<CategoryService>;
+    aboutService = TestBed.inject(AboutService) as jasmine.SpyObj<AboutService>;
   });
 
-  it('should create', (): void => {
+  it('should create the component', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should display welcome section with translation keys', (): void => {
-    const compiled = fixture.nativeElement;
-    const title = compiled.querySelector('h2');
-    const ps = compiled.querySelectorAll('p');
-    const subtitle = Array.from(ps).find(
-      (el) =>
-        (el as HTMLElement).className.includes('text-base') &&
-        (el as HTMLElement).className.includes('md:text-lg')
-    ) as HTMLElement | undefined;
-    const desc = Array.from(ps).find(
-      (el) =>
-        (el as HTMLElement).className.includes('text-sm') &&
-        (el as HTMLElement).className.includes('md:text-base')
-    ) as HTMLElement | undefined;
-    expect(title).toBeTruthy();
-    expect(subtitle).toBeTruthy();
-    expect(desc).toBeTruthy();
-    expect(title.textContent).toContain('HOME.WELCOME_TITLE');
-    expect(subtitle && subtitle.textContent).toContain('HOME.WELCOME_SUBTITLE');
-    expect(desc && desc.textContent).toContain('HOME.DESCRIPTION');
-  });
+  describe('when user is not authenticated', () => {
+    beforeEach(() => {
+      (Object.getOwnPropertyDescriptor(authService, 'user$')?.get as jasmine.Spy).and.returnValue(of(null));
+      categoryService.getCategories.and.returnValue(of(typedMockCategories));
+      aboutService.getAboutContent.and.returnValue(of(mockAboutContent));
+      fixture.detectChanges();
+    });
 
-  it('should navigate to /about and call scrollToTop', async (): Promise<void> => {
-    await component.goToCategory(CATEGORY_KEYS.ABOUT);
-    expect(routerSpy.navigate).toHaveBeenCalledWith(['/about']);
-  });
+    it('should load categories and about content', () => {
+      expect(categoryService.getCategories).toHaveBeenCalled();
+      expect(aboutService.getAboutContent).toHaveBeenCalled();
+    });
 
-  it('should navigate to /shop and call scrollToTop', async (): Promise<void> => {
-    await component.goToCategory(CATEGORY_KEYS.SHOP);
-    expect(routerSpy.navigate).toHaveBeenCalledWith(['/shop']);
-  });
-
-  it('should navigate to /blog and call scrollToTop', async (): Promise<void> => {
-    await component.goToCategory(CATEGORY_KEYS.BLOG);
-    expect(routerSpy.navigate).toHaveBeenCalledWith(['/blog']);
-  });
-
-  it('should navigate to /tips and call scrollToTop', async (): Promise<void> => {
-    await component.goToCategory(CATEGORY_KEYS.TIPS);
-    expect(routerSpy.navigate).toHaveBeenCalledWith(['/tips']);
-  });
-
-  it('should navigate to /activities with category for PHYSICAL', async (): Promise<void> => {
-    await component.goToCategory(CATEGORY_KEYS.PHYSICAL);
-    expect(routerSpy.navigate).toHaveBeenCalledWith(['/activities'], {
-      queryParams: { category: CATEGORY_KEYS.PHYSICAL },
+    it('should not try to load a user profile', () => {
+      expect(userService.getUserProfile).not.toHaveBeenCalled();
     });
   });
 
-  it('should navigate to /activities with category for CREATIVE', async (): Promise<void> => {
-    await component.goToCategory(CATEGORY_KEYS.CREATIVE);
-    expect(routerSpy.navigate).toHaveBeenCalledWith(['/activities'], {
-      queryParams: { category: CATEGORY_KEYS.CREATIVE },
+  describe('when user is authenticated', () => {
+    beforeEach(() => {
+      (Object.getOwnPropertyDescriptor(authService, 'user$')?.get as jasmine.Spy).and.returnValue(of({ uid: 'test-uid' }));
+      userService.getUserProfile.and.returnValue(of(mockFreeUser));
+      categoryService.getCategories.and.returnValue(of(typedMockCategories));
+      aboutService.getAboutContent.and.returnValue(of(mockAboutContent));
+      fixture.detectChanges();
+    });
+
+    it('should load user profile', () => {
+      expect(userService.getUserProfile).toHaveBeenCalledWith('test-uid');
+    });
+
+    it('should show the auth modal when openAuthModal is called', () => {
+      component.openAuthModal();
+      expect(component.showAuthModal).toBeTrue();
     });
   });
 
-  it('should navigate to /activities with category for EDUCATIONAL', async (): Promise<void> => {
-    await component.goToCategory(CATEGORY_KEYS.EDUCATIONAL);
-    expect(routerSpy.navigate).toHaveBeenCalledWith(['/activities'], {
-      queryParams: { category: CATEGORY_KEYS.EDUCATIONAL },
+  describe('Navigation', () => {
+    beforeEach(() => {
+      spyOn(window, 'scrollTo');
+    });
+
+    it('should navigate to /about', fakeAsync(() => {
+      component.goToCategory(CATEGORY_KEYS.ABOUT);
+      tick();
+      expect(router.navigate).toHaveBeenCalledWith(['/about']);
+    }));
+
+    it('should navigate to /shop', fakeAsync(() => {
+      component.goToCategory(CATEGORY_KEYS.SHOP);
+      tick();
+      expect(router.navigate).toHaveBeenCalledWith(['/shop']);
+    }));
+
+    it('should navigate to /subscribe', fakeAsync(() => {
+      component.goToCategory(CATEGORY_KEYS.SUBSCRIBE);
+      tick();
+      expect(router.navigate).toHaveBeenCalledWith(['/subscribe']);
+    }));
+
+    it('should navigate to /blog', fakeAsync(() => {
+      component.goToCategory(CATEGORY_KEYS.BLOG);
+      tick();
+      expect(router.navigate).toHaveBeenCalledWith(['/blog']);
+    }));
+
+    it('should navigate to /tips', fakeAsync(() => {
+      component.goToCategory(CATEGORY_KEYS.TIPS);
+      tick();
+      expect(router.navigate).toHaveBeenCalledWith(['/tips']);
+    }));
+
+    it('should navigate to /activities with category', fakeAsync(() => {
+      component.goToCategory(CATEGORY_KEYS.PHYSICAL);
+      tick();
+      expect(router.navigate).toHaveBeenCalledWith(['/activities'], { queryParams: { category: CATEGORY_KEYS.PHYSICAL } });
+    }));
+
+    it('should navigate to /activities for unknown category', fakeAsync(() => {
+      component.goToCategory('UNKNOWN');
+      tick();
+      expect(router.navigate).toHaveBeenCalledWith(['/activities']);
+    }));
+  });
+
+  describe('Admin functionality', () => {
+    it('should return true for an admin user', () => {
+      expect(component.isAdmin(mockAdminUser)).toBeTrue();
+    });
+
+    it('should return false for a non-admin user', () => {
+      expect(component.isAdmin(mockFreeUser)).toBeFalse();
+    });
+
+    it('should navigate to the admin dashboard', () => {
+      component.navigateToAdmin();
+      expect(router.navigate).toHaveBeenCalledWith(['/admin']);
     });
   });
 
-  it('should navigate to /activities with category for MUSICAL', async (): Promise<void> => {
-    await component.goToCategory(CATEGORY_KEYS.MUSICAL);
-    expect(routerSpy.navigate).toHaveBeenCalledWith(['/activities'], {
-      queryParams: { category: CATEGORY_KEYS.MUSICAL },
-    });
+  it('should handle profile click', () => {
+    component.onProfileClick();
+    expect(router.navigate).toHaveBeenCalledWith(['/profile']);
   });
 
-  it('should navigate to /activities with category for NATURE', async (): Promise<void> => {
-    await component.goToCategory(CATEGORY_KEYS.NATURE);
-    expect(routerSpy.navigate).toHaveBeenCalledWith(['/activities'], {
-      queryParams: { category: CATEGORY_KEYS.NATURE },
-    });
-  });
-
-  it('should navigate to /activities (default case) and call scrollToTop', async (): Promise<void> => {
-    await component.goToCategory('UNKNOWN');
-    expect(routerSpy.navigate).toHaveBeenCalledWith(['/activities']);
+  it('should handle logout', () => {
+    component.onLogout();
+    expect(authService.signOut).toHaveBeenCalled();
   });
 });

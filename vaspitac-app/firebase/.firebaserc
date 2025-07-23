@@ -1,7 +1,7 @@
 {
   "projects": {
-    "default": "ana-vaspitac",
-    "development": "ana-vaspitac",
-    "production": "ana-vaspitac-prod"
+    "default": "ana-vaspitac-dev",
+    "development": "ana-vaspitac-dev",
+    "production": "ana-vaspitac-prod-e7ee4"
   }
 }

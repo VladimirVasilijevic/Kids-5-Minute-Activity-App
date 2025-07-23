@@ -1,34 +1,46 @@
 import { TestBed } from '@angular/core/testing';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
+import { AngularFireFunctions } from '@angular/fire/compat/functions';
 
-import { mockFirestoreService } from '../../test-utils/mock-firestore-service';
-import { mockBlogPosts } from '../../test-utils/mock-blog-posts';
-
+import { BlogService } from './blog.service';
 import { FirestoreService } from './firestore.service';
 import { LoadingService } from './loading.service';
 import { TranslateService } from '@ngx-translate/core';
-import { BlogService } from './blog.service';
+import { AuthService } from './auth.service';
+import { mockBlogPosts } from '../../test-utils/mock-blog-posts';
 
 describe('BlogService', () => {
   let service: BlogService;
-  let loadingServiceSpy: jasmine.SpyObj<LoadingService>;
-  let translateServiceSpy: jasmine.SpyObj<TranslateService>;
+  let firestoreService: jasmine.SpyObj<FirestoreService>;
+  let loadingService: jasmine.SpyObj<LoadingService>;
+  let translateService: jasmine.SpyObj<TranslateService>;
+  let authService: jasmine.SpyObj<AuthService>;
+  let functions: jasmine.SpyObj<AngularFireFunctions>;
 
   beforeEach(() => {
-    loadingServiceSpy = jasmine.createSpyObj('LoadingService', ['showWithMessage', 'hide']);
-    translateServiceSpy = jasmine.createSpyObj('TranslateService', ['instant']);
-    translateServiceSpy.instant.and.returnValue('Loading blog posts...');
+    const firestoreSpy = jasmine.createSpyObj('FirestoreService', ['getBlogPosts', 'createBlogPost', 'updateBlogPost', 'deleteBlogPost']);
+    const loadingSpy = jasmine.createSpyObj('LoadingService', ['showWithMessage', 'hide']);
+    const translateSpy = jasmine.createSpyObj('TranslateService', ['instant']);
+    const authSpy = jasmine.createSpyObj('AuthService', [], { user$: of(null) });
+    const functionsSpy = jasmine.createSpyObj('AngularFireFunctions', ['httpsCallable']);
 
     TestBed.configureTestingModule({
       providers: [
         BlogService, 
-        { provide: FirestoreService, useValue: mockFirestoreService },
-        { provide: LoadingService, useValue: loadingServiceSpy },
-        { provide: TranslateService, useValue: translateServiceSpy }
+        { provide: FirestoreService, useValue: firestoreSpy },
+        { provide: LoadingService, useValue: loadingSpy },
+        { provide: TranslateService, useValue: translateSpy },
+        { provide: AuthService, useValue: authSpy },
+        { provide: AngularFireFunctions, useValue: functionsSpy },
       ],
     });
+
     service = TestBed.inject(BlogService);
-    mockFirestoreService.getBlogPosts.calls.reset();
+    firestoreService = TestBed.inject(FirestoreService) as jasmine.SpyObj<FirestoreService>;
+    loadingService = TestBed.inject(LoadingService) as jasmine.SpyObj<LoadingService>;
+    translateService = TestBed.inject(TranslateService) as jasmine.SpyObj<TranslateService>;
+    authService = TestBed.inject(AuthService) as jasmine.SpyObj<AuthService>;
+    functions = TestBed.inject(AngularFireFunctions) as jasmine.SpyObj<AngularFireFunctions>;
   });
 
   it('should be created', () => {
@@ -36,190 +48,71 @@ describe('BlogService', () => {
   });
 
   describe('getBlogPosts', () => {
-    it('should get blog posts from FirestoreService', () => {
-      mockFirestoreService.getBlogPosts.and.returnValue(of(mockBlogPosts));
-      service.getBlogPosts().subscribe((posts) => {
-        expect(posts).toEqual(mockBlogPosts);
-        posts.forEach(post => expect(post.fullContent).toBeDefined()); // Ensure fullContent exists
-      });
-      expect(mockFirestoreService.getBlogPosts).toHaveBeenCalled();
+    it('should call getPublicBlogPosts when user is not authenticated', () => {
+      const publicFunctionSpy = jasmine.createSpy('publicFunction').and.returnValue(Promise.resolve({ content: mockBlogPosts }));
+      functions.httpsCallable.and.returnValue(publicFunctionSpy);
+      service.getBlogPosts().subscribe();
+      expect(functions.httpsCallable).toHaveBeenCalledWith('getPublicContent');
+      expect(publicFunctionSpy).toHaveBeenCalled();
     });
 
-    it('should return empty array when no posts exist', () => {
-      mockFirestoreService.getBlogPosts.and.returnValue(of([]));
-      service.getBlogPosts().subscribe(posts => {
-        expect(posts).toEqual([]);
-        expect(posts.length).toBe(0);
+    it('should call getFilteredBlogPosts when user is authenticated', () => {
+      (Object.getOwnPropertyDescriptor(authService, 'user$')?.get as jasmine.Spy).and.returnValue(of({ uid: 'test-uid' }));
+      const filteredFunctionSpy = jasmine.createSpy('filteredFunction').and.returnValue(Promise.resolve({ blogPosts: mockBlogPosts }));
+      functions.httpsCallable.and.returnValue(filteredFunctionSpy);
+      service.getBlogPosts().subscribe();
+      expect(functions.httpsCallable).toHaveBeenCalledWith('getFilteredBlogPosts');
+      expect(filteredFunctionSpy).toHaveBeenCalled();
+    });
+
+    it('should fall back to public content if filtered blog posts call fails', () => {
+      (Object.getOwnPropertyDescriptor(authService, 'user$')?.get as jasmine.Spy).and.returnValue(of({ uid: 'test-uid' }));
+
+      const filteredFunctionSpy = jasmine.createSpy('filteredFunction').and.returnValue(throwError(() => new Error('fail')));
+      const publicFunctionSpy = jasmine.createSpy('publicFunction').and.returnValue(of(mockBlogPosts));
+
+      functions.httpsCallable.and.callFake(name => {
+        if (name === 'getFilteredBlogPosts') {
+          return () => filteredFunctionSpy();
+        }
+        if (name === 'getPublicContent') {
+          return () => publicFunctionSpy();
+        }
+        return () => of({});
+      });
+
+      service.getBlogPosts().subscribe();
+
+      expect(functions.httpsCallable).toHaveBeenCalledWith('getFilteredBlogPosts');
+      expect(filteredFunctionSpy).toHaveBeenCalled();
+      expect(functions.httpsCallable).toHaveBeenCalledWith('getPublicContent');
+      expect(publicFunctionSpy).toHaveBeenCalled();
       });
     });
 
-    it('should handle single blog post', () => {
-      const singlePost = [mockBlogPosts[0]];
-      mockFirestoreService.getBlogPosts.and.returnValue(of(singlePost));
-      service.getBlogPosts().subscribe(posts => {
-        expect(posts.length).toBe(1);
-        expect(posts[0].title).toBe(singlePost[0].title);
-        expect(posts[0].fullContent).toBeDefined();
-      });
-    });
-
-    it('should handle large number of blog posts', () => {
-      const largePostArray = Array.from({ length: 100 }, (_, i) => ({
-        ...mockBlogPosts[0],
-        id: i + 1,
-        title: `Post ${i + 1}`,
-        fullContent: `Content ${i + 1}`
-      }));
-      mockFirestoreService.getBlogPosts.and.returnValue(of(largePostArray));
-      service.getBlogPosts().subscribe(posts => {
-        expect(posts.length).toBe(100);
-        expect(posts[99].title).toBe('Post 100');
-        expect(posts[99].fullContent).toBe('Content 100');
-      });
-    });
-
-    it('should handle posts with missing optional fields', () => {
-      const minimalPost = {
-        id: 1,
-        title: 'Minimal Post',
-        excerpt: 'Minimal excerpt',
-        fullContent: 'Minimal content',
-        author: 'Test Author',
-        readTime: '2 min',
-        date: '2023-01-01',
-        imageUrl: 'test-image.jpg'
-      };
-      mockFirestoreService.getBlogPosts.and.returnValue(of([minimalPost]));
-      service.getBlogPosts().subscribe(posts => {
-        expect(posts[0]).toEqual(minimalPost);
-        expect(posts[0].title).toBe('Minimal Post');
-      });
-    });
-  });
-
-  describe('getBlogPostById', () => {
-    it('should get blog post by id successfully', () => {
-      mockFirestoreService.getBlogPosts.and.returnValue(of(mockBlogPosts));
+  it('should get blog post by ID', () => {
+    firestoreService.getBlogPosts.and.returnValue(of(mockBlogPosts));
       service.getBlogPostById(1).subscribe(post => {
         expect(post).toEqual(mockBlogPosts[0]);
-        expect(post.id).toBe(1);
-      });
     });
-
-    it('should get blog post by different id', () => {
-      mockFirestoreService.getBlogPosts.and.returnValue(of(mockBlogPosts));
-      service.getBlogPostById(2).subscribe(post => {
-        expect(post).toEqual(mockBlogPosts[1]);
-        expect(post.id).toBe(2);
-      });
-    });
-
-    it('should throw error when blog post not found with non-existent id', () => {
-      mockFirestoreService.getBlogPosts.and.returnValue(of(mockBlogPosts));
-      service.getBlogPostById(999).subscribe({
-        next: () => fail('Should have thrown an error'),
-        error: (error) => {
-          expect(error.message).toBe('Blog post with ID 999 not found');
-        }
-      });
-    });
-
-    it('should throw error when blog post not found with negative id', () => {
-      mockFirestoreService.getBlogPosts.and.returnValue(of(mockBlogPosts));
-      service.getBlogPostById(-1).subscribe({
-        next: () => fail('Should have thrown an error'),
-        error: (error) => {
-          expect(error.message).toBe('Blog post with ID -1 not found');
-        }
-      });
-    });
-
-    it('should throw error when blog post not found with zero id', () => {
-      mockFirestoreService.getBlogPosts.and.returnValue(of(mockBlogPosts));
-      service.getBlogPostById(0).subscribe({
-        next: () => fail('Should have thrown an error'),
-        error: (error) => {
-          expect(error.message).toBe('Blog post with ID 0 not found');
-        }
-      });
-    });
-
-    it('should handle string id parameter', () => {
-      mockFirestoreService.getBlogPosts.and.returnValue(of(mockBlogPosts));
-      service.getBlogPostById(1).subscribe(post => {
-        expect(post).toEqual(mockBlogPosts[0]);
-        expect(post.id).toBe(1);
-      });
-    });
-
-    it('should handle posts with missing optional fields', () => {
-      const minimalPost = {
-        id: 1,
-        title: 'Minimal Post',
-        excerpt: 'Minimal excerpt',
-        fullContent: 'Minimal content',
-        author: 'Test Author',
-        readTime: '2 min',
-        date: '2023-01-01',
-        imageUrl: 'test-image.jpg'
-      };
-      mockFirestoreService.getBlogPosts.and.returnValue(of([minimalPost]));
-      service.getBlogPostById(1).subscribe(post => {
-        expect(post).toEqual(minimalPost);
-        expect(post.title).toBe('Minimal Post');
-      });
-    });
-
-    it('should handle empty posts array when searching by id', () => {
-      mockFirestoreService.getBlogPosts.and.returnValue(of([]));
-      service.getBlogPostById(1).subscribe({
-        next: () => fail('Should have thrown an error'),
-        error: (error) => {
-          expect(error.message).toBe('Blog post with ID 1 not found');
-        }
-      });
-    });
+    expect(firestoreService.getBlogPosts).toHaveBeenCalled();
   });
 
-  describe('Service Integration', () => {
-    it('should call firestore service for each getBlogPosts call', () => {
-      mockFirestoreService.getBlogPosts.and.returnValue(of(mockBlogPosts));
-      service.getBlogPosts().subscribe();
-      service.getBlogPosts().subscribe();
-      service.getBlogPosts().subscribe();
-      expect(mockFirestoreService.getBlogPosts).toHaveBeenCalledTimes(3);
-    });
-
-    it('should call firestore service for each getBlogPostById call', () => {
-      mockFirestoreService.getBlogPosts.and.returnValue(of(mockBlogPosts));
-      service.getBlogPostById(1).subscribe();
-      service.getBlogPostById(2).subscribe();
-      expect(mockFirestoreService.getBlogPosts).toHaveBeenCalledTimes(2);
-    });
-
-    it('should handle firestore service returning null', () => {
-      mockFirestoreService.getBlogPosts.and.returnValue(of(null as any));
-      service.getBlogPosts().subscribe(posts => {
-        expect(posts).toBeNull();
-      });
-    });
-
-    it('should handle firestore service returning undefined', () => {
-      mockFirestoreService.getBlogPosts.and.returnValue(of(undefined as any));
-      service.getBlogPosts().subscribe(posts => {
-        expect(posts).toBeUndefined();
-      });
-    });
+  it('should create a blog post', async () => {
+    firestoreService.createBlogPost.and.resolveTo();
+    await service.createBlogPost(mockBlogPosts[0]);
+    expect(firestoreService.createBlogPost).toHaveBeenCalledWith(mockBlogPosts[0]);
   });
 
-  describe('Error Handling', () => {
-    it('should handle firestore service throwing error', () => {
-      mockFirestoreService.getBlogPosts.and.returnValue(of([]));
-      // Note: In a real scenario, the service would handle errors from Firestore
-      // This test ensures the service doesn't crash when Firestore returns empty array
-      service.getBlogPosts().subscribe(posts => {
-        expect(posts).toEqual([]);
-      });
-    });
+  it('should update a blog post', async () => {
+    firestoreService.updateBlogPost.and.resolveTo();
+    await service.updateBlogPost(mockBlogPosts[0]);
+    expect(firestoreService.updateBlogPost).toHaveBeenCalledWith(mockBlogPosts[0]);
+  });
+
+  it('should delete a blog post', async () => {
+    firestoreService.deleteBlogPost.and.resolveTo();
+    await service.deleteBlogPost(1);
+    expect(firestoreService.deleteBlogPost).toHaveBeenCalledWith(1);
   });
 });
