@@ -88,21 +88,30 @@ jobs:
         uses: ./.github/actions/setup-firebase
         with:
           firebase-project: ${{ secrets.FIREBASE_PROJECT_ID }}
-          firebase-token: ${{ secrets.FIREBASE_TOKEN }}
+          environment: 'production'
 
       - name: Deploy Firebase services
         working-directory: vaspitac-app/firebase
         run: |
+          # Create service account key file
+          echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT_KEY }}' > serviceAccountKey-prod.json
+          
+          # Set environment variable for authentication
+          export GOOGLE_APPLICATION_CREDENTIALS="$(pwd)/serviceAccountKey-prod.json"
+          
           # Deploy Firestore rules and indexes
-          firebase deploy --only firestore:rules,firestore:indexes --config firebase.prod.json --token "${{ secrets.FIREBASE_TOKEN }}"
+          firebase deploy --only firestore:rules,firestore:indexes --config firebase.prod.json
           
           # Deploy Storage rules
-          firebase deploy --only storage --config firebase.prod.json --token "${{ secrets.FIREBASE_TOKEN }}"
+          firebase deploy --only storage --config firebase.prod.json
           
           # Deploy Functions if they exist
           if [ -d "functions" ]; then
-            firebase deploy --only functions --config firebase.prod.json --token "${{ secrets.FIREBASE_TOKEN }}"
+            firebase deploy --only functions --config firebase.prod.json
           fi
+          
+          # Clean up service account key
+          rm -f serviceAccountKey-prod.json
 
   # Final verification job
   verify-deployment:
