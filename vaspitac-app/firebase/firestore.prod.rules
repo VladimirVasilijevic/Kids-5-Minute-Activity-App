@@ -1,51 +1,71 @@
 rules_version = '2';
+
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Production environment - secure rules for live users
-    
-    // User profiles - users can only access their own data
+    // Helper function to get user role
+    function userRole() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
+    }
+
+    // User profiles - users can read/write their own profile
     match /users/{userId} {
       allow read, write: if request.auth != null && request.auth.uid == userId;
-      allow read: if request.auth != null && request.auth.token.admin == true;
+      // Admins can read all user profiles
+      allow read: if request.auth != null && userRole() == 'admin';
     }
     
-    // Activities - public read, admin write
-    match /activities/{activityId} {
+    // Activities collections (en, sr, etc.)
+    match /activities_en/{docId} {
+      allow read: if resource.data.visibility == 'public'
+        || (request.auth != null && resource.data.visibility == 'subscriber' && userRole() in ['subscriber', 'admin'])
+        || (request.auth != null && resource.data.visibility == 'admin' && userRole() == 'admin');
+      allow write: if request.auth != null && userRole() == 'admin';
+    }
+    match /activities_sr/{docId} {
+      allow read: if resource.data.visibility == 'public'
+        || (request.auth != null && resource.data.visibility == 'subscriber' && userRole() in ['subscriber', 'admin'])
+        || (request.auth != null && resource.data.visibility == 'admin' && userRole() == 'admin');
+      allow write: if request.auth != null && userRole() == 'admin';
+    }
+    // Blog collections
+    match /blog_en/{docId} {
+      allow read: if resource.data.visibility == 'public'
+        || (request.auth != null && resource.data.visibility == 'subscriber' && userRole() in ['subscriber', 'admin'])
+        || (request.auth != null && resource.data.visibility == 'admin' && userRole() == 'admin');
+      allow write: if request.auth != null && userRole() == 'admin';
+    }
+    match /blog_sr/{docId} {
+      allow read: if resource.data.visibility == 'public'
+        || (request.auth != null && resource.data.visibility == 'subscriber' && userRole() in ['subscriber', 'admin'])
+        || (request.auth != null && resource.data.visibility == 'admin' && userRole() == 'admin');
+      allow write: if request.auth != null && userRole() == 'admin';
+    }
+    // Categories collections
+    match /categories_en/{docId} {
       allow read: if true;
-      allow write: if request.auth != null && request.auth.token.admin == true;
+      allow write: if request.auth != null && userRole() == 'admin';
     }
-    
-    // Categories - public read, admin write
-    match /categories/{categoryId} {
+    match /categories_sr/{docId} {
       allow read: if true;
-      allow write: if request.auth != null && request.auth.token.admin == true;
+      allow write: if request.auth != null && userRole() == 'admin';
     }
-    
-    // Blog posts - public read, admin write
-    match /blog-posts/{postId} {
+    // Tips collections
+    match /tips_en/{docId} {
       allow read: if true;
-      allow write: if request.auth != null && request.auth.token.admin == true;
+      allow write: if request.auth != null && userRole() == 'admin';
     }
-    
-    // Subscriptions - users can only access their own
-    match /subscriptions/{subscriptionId} {
-      allow read, write: if request.auth != null && request.auth.uid == subscriptionId;
-      allow read: if request.auth != null && request.auth.token.admin == true;
+    match /tips_sr/{docId} {
+      allow read: if true;
+      allow write: if request.auth != null && userRole() == 'admin';
     }
-    
-    // Admin operations - only admins
-    match /admin/{document=**} {
-      allow read, write: if request.auth != null && request.auth.token.admin == true;
+    // About content collections
+    match /about_en/{docId} {
+      allow read: if true;
+      allow write: if request.auth != null && userRole() == 'admin';
     }
-    
-    // Analytics and logs - admin only
-    match /analytics/{document=**} {
-      allow read, write: if request.auth != null && request.auth.token.admin == true;
-    }
-    
-    // Default deny
-    match /{document=**} {
-      allow read, write: if false;
+    match /about_sr/{docId} {
+      allow read: if true;
+      allow write: if request.auth != null && userRole() == 'admin';
     }
   }
 } 
