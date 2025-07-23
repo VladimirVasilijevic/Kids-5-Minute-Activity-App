@@ -4,7 +4,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { FormsModule } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
 import { EventEmitter } from '@angular/core';
-import { of } from 'rxjs';
+import { of, Observable } from 'rxjs';
 
 import { SearchOverlayComponent } from './search-overlay.component';
 import { mockActivities } from '../../../test-utils/mock-activities';
@@ -15,11 +15,11 @@ describe('SearchOverlayComponent', () => {
   let fixture: ComponentFixture<SearchOverlayComponent>;
   let mockRouter: jasmine.SpyObj<Router>;
 
-  beforeEach(async () => {
+  beforeEach(async (): Promise<void> => {
     const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
     const translateSpy = {
-      instant: (key: string) => key,
-      get: (key: string) => of(key),
+      instant: (key: string): string => key,
+      get: (key: string): Observable<string> => of(key),
       onLangChange: new EventEmitter(),
       onTranslationChange: new EventEmitter(),
       onDefaultLangChange: new EventEmitter(),
@@ -38,7 +38,7 @@ describe('SearchOverlayComponent', () => {
     mockRouter = TestBed.inject(Router) as jasmine.SpyObj<Router>;
   });
 
-  beforeEach(() => {
+  beforeEach((): void => {
     fixture = TestBed.createComponent(SearchOverlayComponent);
     component = fixture.componentInstance;
     component.activities = mockActivities;

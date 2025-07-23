@@ -1,9 +1,23 @@
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
-import { catchError, map, switchMap } from 'rxjs/operators';
+import { catchError, map } from 'rxjs/operators';
 import { SubscriptionPlan } from '../models/subscription-plan.model';
 import { UserRole } from '../models/user-profile.model';
 import { TranslateService } from '@ngx-translate/core';
+
+interface SubscriptionTranslation {
+  NAME: string;
+  PRICE: string;
+  DESCRIPTION: string;
+  FEATURES?: string[];
+  LIMITATIONS?: string[];
+  BUTTON: string;
+}
+
+interface SubscriptionTranslations {
+  FREE?: SubscriptionTranslation;
+  PREMIUM?: SubscriptionTranslation;
+}
 
 /**
  * Service for managing subscription plans data
@@ -14,7 +28,7 @@ import { TranslateService } from '@ngx-translate/core';
 export class SubscriptionPlansService {
 
   constructor(
-    private translate: TranslateService
+    private _translate: TranslateService
   ) {}
 
   /**
@@ -22,7 +36,7 @@ export class SubscriptionPlansService {
    * @returns Observable of subscription plans array
    */
   getSubscriptionPlans(): Observable<SubscriptionPlan[]> {
-    return this.translate.get('SUBSCRIBE').pipe(
+    return this._translate.get('SUBSCRIBE').pipe(
       map(translations => this.buildSubscriptionPlans(translations)),
       catchError(error => {
         console.error('Error loading subscription plans:', error);
@@ -37,7 +51,7 @@ export class SubscriptionPlansService {
    * @returns Observable of subscription plans array
    */
   getSubscriptionPlansByLanguage(language: string): Observable<SubscriptionPlan[]> {
-    return this.translate.getTranslation(language).pipe(
+    return this._translate.getTranslation(language).pipe(
       map(translations => this.buildSubscriptionPlans(translations['SUBSCRIBE'])),
       catchError(error => {
         console.error(`Error loading subscription plans for ${language}:`, error);
@@ -62,7 +76,7 @@ export class SubscriptionPlansService {
    * @param translations - The SUBSCRIBE section from translations
    * @returns Array of subscription plans
    */
-  private buildSubscriptionPlans(translations: any): SubscriptionPlan[] {
+  private buildSubscriptionPlans(translations: SubscriptionTranslations): SubscriptionPlan[] {
     const plans: SubscriptionPlan[] = [];
 
     // Build Free plan

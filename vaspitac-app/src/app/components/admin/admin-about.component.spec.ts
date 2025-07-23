@@ -207,7 +207,30 @@ describe('AdminAboutComponent', () => {
       mockImageUploadService.isValidImage.and.returnValue(true);
       mockImageUploadService.uploadImage.and.returnValue(of('http://example.com/new.jpg'));
       const file = new File([''], 'test.jpg', { type: 'image/jpeg' });
-      const event = { target: { files: [file] } };
+      const event = {
+        target: { files: [file] },
+        bubbles: false,
+        cancelBubble: false,
+        cancelable: false,
+        composed: false,
+        currentTarget: null,
+        defaultPrevented: false,
+        eventPhase: 0,
+        isTrusted: false,
+        returnValue: true,
+        srcElement: null,
+        timeStamp: 0,
+        type: 'change',
+        AT_TARGET: 2,
+        BUBBLING_PHASE: 3,
+        CAPTURING_PHASE: 1,
+        NONE: 0,
+        preventDefault: () => {},
+        stopImmediatePropagation: () => {},
+        stopPropagation: () => {},
+        composedPath: () => [],
+        initEvent: () => {}
+      } as unknown as Event;
 
       component.onImageSelected(event);
 
@@ -220,7 +243,30 @@ describe('AdminAboutComponent', () => {
       mockImageUploadService.isValidImage.and.returnValue(false);
       spyOn(component, 'showError');
       const file = new File([''], 'test.txt', { type: 'text/plain' });
-      const event = { target: { files: [file] } };
+      const event = {
+        target: { files: [file] },
+        bubbles: false,
+        cancelBubble: false,
+        cancelable: false,
+        composed: false,
+        currentTarget: null,
+        defaultPrevented: false,
+        eventPhase: 0,
+        isTrusted: false,
+        returnValue: true,
+        srcElement: null,
+        timeStamp: 0,
+        type: 'change',
+        AT_TARGET: 2,
+        BUBBLING_PHASE: 3,
+        CAPTURING_PHASE: 1,
+        NONE: 0,
+        preventDefault: () => {},
+        stopImmediatePropagation: () => {},
+        stopPropagation: () => {},
+        composedPath: () => [],
+        initEvent: () => {}
+      } as unknown as Event;
 
       component.onImageSelected(event);
 
@@ -233,7 +279,30 @@ describe('AdminAboutComponent', () => {
         mockImageUploadService.uploadImage.and.returnValue(throwError(() => new Error('Upload failed')));
         spyOn(component, 'showError');
         const file = new File([''], 'test.jpg', { type: 'image/jpeg' });
-        const event = { target: { files: [file] } };
+        const event = {
+          target: { files: [file] },
+          bubbles: false,
+          cancelBubble: false,
+          cancelable: false,
+          composed: false,
+          currentTarget: null,
+          defaultPrevented: false,
+          eventPhase: 0,
+          isTrusted: false,
+          returnValue: true,
+          srcElement: null,
+          timeStamp: 0,
+          type: 'change',
+          AT_TARGET: 2,
+          BUBBLING_PHASE: 3,
+          CAPTURING_PHASE: 1,
+          NONE: 0,
+          preventDefault: () => {},
+          stopImmediatePropagation: () => {},
+          stopPropagation: () => {},
+          composedPath: () => [],
+          initEvent: () => {}
+        } as unknown as Event;
     
         component.onImageSelected(event);
     

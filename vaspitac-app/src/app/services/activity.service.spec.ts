@@ -12,12 +12,12 @@ import { mockActivities } from '../../test-utils/mock-activities';
 describe('ActivityService', () => {
   let service: ActivityService;
   let firestoreService: jasmine.SpyObj<FirestoreService>;
-  let loadingService: jasmine.SpyObj<LoadingService>;
-  let translateService: jasmine.SpyObj<TranslateService>;
+  let _loadingService: jasmine.SpyObj<LoadingService>;
+  let _translateService: jasmine.SpyObj<TranslateService>;
   let authService: jasmine.SpyObj<AuthService>;
   let functions: jasmine.SpyObj<AngularFireFunctions>;
 
-  beforeEach(() => {
+  beforeEach((): void => {
     const firestoreSpy = jasmine.createSpyObj('FirestoreService', ['getActivities', 'getActivityById', 'createActivity', 'updateActivity', 'deleteActivity']);
     const loadingSpy = jasmine.createSpyObj('LoadingService', ['showWithMessage', 'hide']);
     const translateSpy = jasmine.createSpyObj('TranslateService', ['instant']);
@@ -37,8 +37,8 @@ describe('ActivityService', () => {
 
     service = TestBed.inject(ActivityService);
     firestoreService = TestBed.inject(FirestoreService) as jasmine.SpyObj<FirestoreService>;
-    loadingService = TestBed.inject(LoadingService) as jasmine.SpyObj<LoadingService>;
-    translateService = TestBed.inject(TranslateService) as jasmine.SpyObj<TranslateService>;
+    _loadingService = TestBed.inject(LoadingService) as jasmine.SpyObj<LoadingService>;
+    _translateService = TestBed.inject(TranslateService) as jasmine.SpyObj<TranslateService>;
     authService = TestBed.inject(AuthService) as jasmine.SpyObj<AuthService>;
     functions = TestBed.inject(AngularFireFunctions) as jasmine.SpyObj<AngularFireFunctions>;
   });
@@ -71,14 +71,14 @@ describe('ActivityService', () => {
       const filteredFunctionSpy = jasmine.createSpy('filteredFunction').and.returnValue(throwError(() => new Error('fail')));
       const publicFunctionSpy = jasmine.createSpy('publicFunction').and.returnValue(of(mockActivities));
 
-      functions.httpsCallable.and.callFake(name => {
+      functions.httpsCallable.and.callFake((name: string): any => {
         if (name === 'getFilteredActivities') {
-          return () => filteredFunctionSpy();
+          return (): any => filteredFunctionSpy();
         }
         if (name === 'getPublicContent') {
-          return () => publicFunctionSpy();
+          return (): any => publicFunctionSpy();
         }
-        return () => of({});
+        return (): any => of({});
       });
 
       service.getActivities().subscribe();

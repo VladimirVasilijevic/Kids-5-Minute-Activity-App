@@ -49,7 +49,7 @@ export class SplashDemoComponent {
    * Show loading while executing async operation
    */
   async showLoadingWhileAsync(): Promise<void> {
-    const result = await this._loadingService.showWhile(
+    const _result = await this._loadingService.showWhile(
       async () => {
         // Simulate async operation
         await new Promise(resolve => setTimeout(resolve, 2000));
@@ -58,7 +58,7 @@ export class SplashDemoComponent {
       'Processing async operation...'
     );
     
-    console.log('Async operation result:', result);
+    // Async operation completed
   }
 
   /**
@@ -66,7 +66,7 @@ export class SplashDemoComponent {
    */
   async simulateNetworkCall(): Promise<void> {
     try {
-      const result = await this._loadingService.showWhile(
+      const _result = await this._loadingService.showWhile(
         async () => {
           // Simulate network delay
           await new Promise(resolve => setTimeout(resolve, 1500));
@@ -81,7 +81,7 @@ export class SplashDemoComponent {
         'Fetching data from server...'
       );
       
-      console.log('Network call result:', result);
+      // Network call completed
     } catch (error) {
       console.error('Network call failed:', error);
     }

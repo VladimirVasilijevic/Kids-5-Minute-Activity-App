@@ -1,4 +1,4 @@
-import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router, NavigationEnd } from '@angular/router';
 import { Location } from '@angular/common';
 import { of, Subject } from 'rxjs';
@@ -25,13 +25,13 @@ describe('AppComponent', () => {
   let activityService: jasmine.SpyObj<ActivityService>;
   let blogService: jasmine.SpyObj<BlogService>;
   let languageService: jasmine.SpyObj<LanguageService>;
-  let loadingService: jasmine.SpyObj<LoadingService>;
+  let _loadingService: jasmine.SpyObj<LoadingService>;
   let router: Router;
-  let location: jasmine.SpyObj<Location>;
+  let _location: jasmine.SpyObj<Location>;
   let translate: TranslateService;
   let routerEvents: Subject<NavigationEnd>;
-  let backButtonCallback: (data: { canGoBack: boolean }) => void;
-  let addListenerSpy: jasmine.Spy;
+      let _backButtonCallback: (_data: { canGoBack: boolean }) => void;
+  let _addListenerSpy: jasmine.Spy;
 
   beforeEach(async () => {
     routerEvents = new Subject<NavigationEnd>();
@@ -52,9 +52,9 @@ describe('AppComponent', () => {
       onDefaultLangChange: new EventEmitter(),
     };
 
-    addListenerSpy = spyOn(CapacitorApp, 'addListener').and.callFake((eventName, callback) => {
+    _addListenerSpy = spyOn(CapacitorApp, 'addListener').and.callFake((eventName, _callback) => {
         if (eventName === 'backButton') {
-            backButtonCallback = callback as any;
+            _backButtonCallback = _callback as any;
         }
         return Promise.resolve({ remove: () => Promise.resolve() } as any);
     });
@@ -82,9 +82,9 @@ describe('AppComponent', () => {
     activityService = TestBed.inject(ActivityService) as jasmine.SpyObj<ActivityService>;
     blogService = TestBed.inject(BlogService) as jasmine.SpyObj<BlogService>;
     languageService = TestBed.inject(LanguageService) as jasmine.SpyObj<LanguageService>;
-    loadingService = TestBed.inject(LoadingService) as jasmine.SpyObj<LoadingService>;
+    _loadingService = TestBed.inject(LoadingService) as jasmine.SpyObj<LoadingService>;
     router = TestBed.inject(Router);
-    location = TestBed.inject(Location) as jasmine.SpyObj<Location>;
+    _location = TestBed.inject(Location) as jasmine.SpyObj<Location>;
     translate = TestBed.inject(TranslateService);
 
     activityService.getActivities.and.returnValue(of(mockActivities));

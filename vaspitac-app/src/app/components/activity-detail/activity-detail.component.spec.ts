@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute, Router } from '@angular/router';
 import { of } from 'rxjs';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { TranslateModule } from '@ngx-translate/core';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 
 import { ActivityDetailComponent } from './activity-detail.component';
@@ -15,13 +15,13 @@ describe('ActivityDetailComponent', () => {
   let router: jasmine.SpyObj<Router>;
   let activatedRoute: any;
 
-  beforeEach(async () => {
+  beforeEach(async (): Promise<void> => {
     const activityServiceSpy = jasmine.createSpyObj('ActivityService', ['getActivities']);
     const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
 
     activatedRoute = {
-      paramMap: of({ get: (key: string) => '001' }),
-      snapshot: { queryParamMap: { get: (key: string) => null } },
+      paramMap: of({ get: (_key: string): string => '001' }),
+      snapshot: { queryParamMap: { get: (_key: string): string | null => null } },
     };
 
     await TestBed.configureTestingModule({
@@ -45,7 +45,7 @@ describe('ActivityDetailComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should load the correct activity on initialization', (done) => {
+  it('should load the correct activity on initialization', (done: any): void => {
     activityService.getActivities.and.returnValue(of(mockActivities));
     fixture.detectChanges();
     component.activity$?.subscribe(activity => {
@@ -54,8 +54,8 @@ describe('ActivityDetailComponent', () => {
     });
   });
 
-  it('should handle activity not found', (done) => {
-    activatedRoute.paramMap = of({ get: (key: string) => '999' });
+  it('should handle activity not found', (done: any): void => {
+    activatedRoute.paramMap = of({ get: (_key: string) => '999' });
     activityService.getActivities.and.returnValue(of(mockActivities));
     fixture.detectChanges();
     component.activity$?.subscribe(activity => {
@@ -73,7 +73,7 @@ describe('ActivityDetailComponent', () => {
 
   it('should navigate back with a category if it exists in the query params', () => {
     spyOn(window, 'scrollTo');
-    activatedRoute.snapshot.queryParamMap.get = (key: string) => 'physical';
+    activatedRoute.snapshot.queryParamMap.get = (_key: string): string => 'physical';
     router.navigate.and.resolveTo(true);
     component.goBack();
     expect(router.navigate).toHaveBeenCalledWith(['/activities'], { queryParams: { category: 'physical' } });

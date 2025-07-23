@@ -308,7 +308,7 @@ export class ProfileComponent implements OnInit {
       if (currentUser) {
         // Check if avatar URL is too long for Firebase Auth (limit is ~2048 characters)
         let photoURL: string | null = null;
-        let avatarUrlTooLong = false;
+        let _avatarUrlTooLong = false;
         
         if (profileData.avatarUrl) {
           if (profileData.avatarUrl.length < 2000) {
@@ -316,7 +316,7 @@ export class ProfileComponent implements OnInit {
           } else {
             // If URL is too long, we'll store it in Firestore but not in Firebase Auth
             console.warn('Avatar URL too long for Firebase Auth, storing only in Firestore');
-            avatarUrlTooLong = true;
+            _avatarUrlTooLong = true;
           }
         }
         

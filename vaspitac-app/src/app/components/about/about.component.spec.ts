@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { Router } from '@angular/router';
-import { of, throwError } from 'rxjs';
+import { of, throwError, Observable } from 'rxjs';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { CUSTOM_ELEMENTS_SCHEMA, EventEmitter } from '@angular/core';
@@ -17,7 +17,7 @@ describe('AboutComponent', () => {
   let router: jasmine.SpyObj<Router>;
   let httpMock: HttpTestingController;
 
-  beforeEach(async () => {
+  beforeEach(async (): Promise<void> => {
     const aboutServiceSpy = jasmine.createSpyObj('AboutService', ['getAboutContent']);
     const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
     routerSpy.navigate.and.returnValue(Promise.resolve(true));
@@ -32,7 +32,7 @@ describe('AboutComponent', () => {
           provide: TranslateService,
           useValue: {
             currentLang: 'en',
-            get: (key: string) => of(key),
+            get: (key: string): Observable<string> => of(key),
             onLangChange: new EventEmitter(),
             onTranslationChange: new EventEmitter(),
             onDefaultLangChange: new EventEmitter(),
@@ -54,7 +54,7 @@ describe('AboutComponent', () => {
     // Handle any HTTP requests that might have been made during initialization
     try {
       httpMock.verify();
-    } catch (e) {
+    } catch {
       // If there are pending requests, flush them
       const requests = httpMock.match('assets/about_en.json');
       requests.forEach(req => req.flush({ data: mockAboutContent }));
@@ -167,7 +167,7 @@ describe('AboutComponent', () => {
       // Flush any remaining requests to avoid errors
       try {
         httpMock.verify();
-      } catch (e) {
+      } catch {
         // If there are pending requests, flush them
         const allRequests = httpMock.match('assets/about_en.json');
         allRequests.forEach(req => {
@@ -187,7 +187,6 @@ describe('AboutComponent', () => {
       
       // Create a new component with the updated language
       const newFixture = TestBed.createComponent(AboutComponent);
-      const newComponent = newFixture.componentInstance;
       newFixture.detectChanges();
       
       tick();
@@ -218,7 +217,7 @@ describe('AboutComponent', () => {
       // Flush any remaining requests to avoid errors
       try {
         httpMock.verify();
-      } catch (e) {
+      } catch {
         // If there are pending requests, flush them
         const allRequests = httpMock.match('assets/about_en.json');
         allRequests.forEach(req => {
@@ -287,7 +286,7 @@ describe('AboutComponent', () => {
       // Flush any remaining requests to avoid errors
       try {
         httpMock.verify();
-      } catch (e) {
+      } catch {
         // If there are pending requests, flush them
         const allRequests = httpMock.match('assets/about_en.json');
         allRequests.forEach(req => {
@@ -359,7 +358,7 @@ describe('AboutComponent', () => {
       // Flush any remaining requests to avoid errors
       try {
         httpMock.verify();
-      } catch (e) {
+      } catch {
         // If there are pending requests, flush them with malformed data
         const allRequests = httpMock.match('assets/about_en.json');
         allRequests.forEach(req => {
@@ -377,7 +376,7 @@ describe('AboutComponent', () => {
       
       // Create a new component with successful service
       const successFixture = TestBed.createComponent(AboutComponent);
-      const successComponent = successFixture.componentInstance;
+      const _successComponent = successFixture.componentInstance;
       successFixture.detectChanges();
       
       tick();

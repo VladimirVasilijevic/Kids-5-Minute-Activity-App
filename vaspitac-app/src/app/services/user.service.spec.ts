@@ -12,8 +12,8 @@ describe('UserService', () => {
   let service: UserService;
   let firestore: jasmine.SpyObj<AngularFirestore>;
   let functions: jasmine.SpyObj<AngularFireFunctions>;
-  let loadingService: jasmine.SpyObj<LoadingService>;
-  let translateService: jasmine.SpyObj<TranslateService>;
+  let _loadingService: jasmine.SpyObj<LoadingService>;
+  let _translateService: jasmine.SpyObj<TranslateService>;
 
   beforeEach(() => {
     const firestoreSpy = jasmine.createSpyObj('AngularFirestore', ['doc', 'collection']);
@@ -34,8 +34,8 @@ describe('UserService', () => {
     service = TestBed.inject(UserService);
     firestore = TestBed.inject(AngularFirestore) as jasmine.SpyObj<AngularFirestore>;
     functions = TestBed.inject(AngularFireFunctions) as jasmine.SpyObj<AngularFireFunctions>;
-    loadingService = TestBed.inject(LoadingService) as jasmine.SpyObj<LoadingService>;
-    translateService = TestBed.inject(TranslateService) as jasmine.SpyObj<TranslateService>;
+    _loadingService = TestBed.inject(LoadingService) as jasmine.SpyObj<LoadingService>;
+    _translateService = TestBed.inject(TranslateService) as jasmine.SpyObj<TranslateService>;
   });
 
   it('should be created', () => {
