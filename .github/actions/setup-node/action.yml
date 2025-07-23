@@ -1,0 +1,55 @@
+name: 'Setup Node.js Environment'
+description: 'Setup Node.js with enhanced caching and dependency installation'
+
+inputs:
+  node-version:
+    description: 'Node.js version to use'
+    required: false
+    default: '18'
+  working-directory:
+    description: 'Working directory for npm operations'
+    required: false
+    default: 'vaspitac-app'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ inputs.node-version }}
+        cache: 'npm'
+        cache-dependency-path: ${{ inputs.working-directory }}/package-lock.json
+
+    - name: Cache npm dependencies
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      run: |
+        # Create cache key based on package-lock.json hash
+        CACHE_KEY="npm-deps-${{ hashFiles('package-lock.json') }}"
+        
+        # Check if cache exists and restore if available
+        if [ -f "node_modules/.cache-key" ] && [ "$(cat node_modules/.cache-key)" = "$CACHE_KEY" ]; then
+          echo "✅ Using cached dependencies"
+        else
+          echo "🔄 Installing fresh dependencies"
+          # Try npm ci first, fallback to npm install if lock file is out of sync
+          if ! npm ci --prefer-offline --no-audit; then
+            echo "⚠️ npm ci failed, trying npm install to sync package-lock.json..."
+            npm install
+            echo "✅ Dependencies installed successfully"
+          else
+            echo "✅ Dependencies installed with npm ci"
+          fi
+          
+          # Save cache key
+          echo "$CACHE_KEY" > node_modules/.cache-key
+        fi
+
+    - name: Cache Angular build artifacts
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      run: |
+        # Cache Angular CLI cache
+        mkdir -p .angular/cache
+        echo "✅ Angular cache directory created" 

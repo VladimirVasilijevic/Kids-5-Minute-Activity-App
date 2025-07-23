@@ -1,4 +1,4 @@
-name: Deploy Production to GitHub Pages
+name: Optimized Deploy Production
 
 on:
   push:
@@ -6,121 +6,121 @@ on:
   workflow_dispatch:
 
 jobs:
-  deploy-production:
+  # Security scan job (runs first)
+  security-scan:
     runs-on: ubuntu-latest
     environment: production
-    concurrency:
-      group: "production-deployment"
-      cancel-in-progress: false
-
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '18'
-        cache: 'npm'
-        cache-dependency-path: 'vaspitac-app/package-lock.json'
+      - name: Setup Node.js and dependencies
+        uses: ./.github/actions/setup-node
+        with:
+          node-version: '18'
 
-    - name: Install dependencies
-      working-directory: vaspitac-app
-      run: |
-        # Try npm ci first, fallback to npm install if lock file is out of sync
-        if ! npm ci --prefer-offline --no-audit; then
-          echo "⚠️ npm ci failed, trying npm install to sync package-lock.json..."
-          npm install
-          echo "✅ Dependencies installed successfully"
-        else
-          echo "✅ Dependencies installed with npm ci"
-        fi
+      - name: Run security scan
+        uses: ./.github/actions/security-scan
+        with:
+          scan-dependencies: 'true'
+          scan-code: 'true'
 
-    - name: Verify environment secrets
-      working-directory: vaspitac-app
-      run: |
-        # Verify all required Firebase secrets are set
-        if [ -z "${{ secrets.FIREBASE_API_KEY }}" ]; then
-          echo "❌ FIREBASE_API_KEY is not set"
-          exit 1
-        fi
-        if [ -z "${{ secrets.FIREBASE_PROJECT_ID }}" ]; then
-          echo "❌ FIREBASE_PROJECT_ID is not set"
-          exit 1
-        fi
-        echo "✅ All required Firebase secrets are configured"
+  # Parallel jobs for better performance
+  setup-and-build:
+    runs-on: ubuntu-latest
+    environment: production
+    needs: security-scan
+    outputs:
+      web-build-available: ${{ steps.build.outputs.available }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-    - name: Create production environment
-      working-directory: vaspitac-app
-      run: |
-        # ⚠️ SECURITY WARNING: Firebase API key will be visible in compiled JS
-        # Ensure proper restrictions are configured in Firebase Console:
-        # - HTTP referrers: your-domain.com, *.your-domain.com
-        # - App package names: com.vaspitac.app (for Android)
-        # - IP addresses: GitHub Pages IP ranges
-        cat <<EOF > src/environments/environment.ts
-        export const environment = {
-          production: true,
-          firebase: {
-            apiKey: "${{ secrets.FIREBASE_API_KEY }}",
-            authDomain: "${{ secrets.FIREBASE_AUTH_DOMAIN }}",
-            projectId: "${{ secrets.FIREBASE_PROJECT_ID }}",
-            storageBucket: "${{ secrets.FIREBASE_STORAGE_BUCKET }}",
-            messagingSenderId: "${{ secrets.FIREBASE_MESSAGING_SENDER_ID }}",
-            appId: "${{ secrets.FIREBASE_APP_ID }}",
-            measurementId: "${{ secrets.FIREBASE_MEASUREMENT_ID }}"
-          }
-        }
-        EOF
-        echo "✅ Production environment created"
+      - name: Setup Node.js and dependencies
+        uses: ./.github/actions/setup-node
+        with:
+          node-version: '18'
 
-    - name: Lint code
-      working-directory: vaspitac-app
-      run: npm run lint
+      - name: Setup Firebase
+        uses: ./.github/actions/setup-firebase
+        with:
+          environment: 'production'
+          firebase-project: ${{ secrets.FIREBASE_PROJECT_ID }}
+          firebase-token: ${{ secrets.FIREBASE_TOKEN }}
 
-    - name: Run tests
-      working-directory: vaspitac-app
-      run: npm run test -- --watch=false --browsers=ChromeHeadless --code-coverage
+      - name: Build web application
+        id: build
+        uses: ./.github/actions/build-web
+        with:
+          configuration: 'production'
+          upload-artifact: 'true'
 
-    - name: Build Angular app (Production)
-      working-directory: vaspitac-app
-      timeout-minutes: 10
-      run: |
-        echo "🏗️ Building production version..."
-        npm run build -- --configuration production --base-href /Kids-5-Minute-Activity-App/ || {
-          echo "❌ Build failed. Checking for budget issues..."
-          echo "📊 Current bundle sizes:"
-          ls -la dist/vaspitac-app/ 2>/dev/null || echo "No dist folder found"
-          exit 1
-        }
-        echo "✅ Production build completed"
+  # Parallel deployment jobs
+  deploy-web:
+    runs-on: ubuntu-latest
+    needs: setup-and-build
+    if: needs.setup-and-build.outputs.web-build-available == 'true'
+    steps:
+      - name: Download web build
+        uses: actions/download-artifact@v4
+        with:
+          name: web-build-production
+          path: web-build
 
-    - name: Verify build output
-      working-directory: vaspitac-app
-      run: |
-        if [ ! -d "dist/vaspitac-app" ]; then
-          echo "❌ Build output directory not found"
-          exit 1
-        fi
-        echo "📁 Build output size:"
-        du -sh dist/vaspitac-app
-        echo "✅ Build verification passed"
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: web-build
+          publish_branch: gh-pages
+          force_orphan: true
+          user_name: 'github-actions[bot]'
+          user_email: 'github-actions[bot]@users.noreply.github.com'
+          commit_message: 'Deploy production build to GitHub Pages'
 
-    - name: Deploy to GitHub Pages
-      uses: peaceiris/actions-gh-pages@v4
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: vaspitac-app/dist/vaspitac-app
-        publish_branch: gh-pages
-        force_orphan: true
-        user_name: 'github-actions[bot]'
-        user_email: 'github-actions[bot]@users.noreply.github.com'
-        commit_message: 'Deploy production build to GitHub Pages'
+  deploy-firebase:
+    runs-on: ubuntu-latest
+    needs: setup-and-build
+    environment: production
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Verify deployment
-      run: |
-        echo "🚀 Deployment completed successfully!"
-        echo "📱 Production site: https://vladimirvasilijevic.github.io/Kids-5-Minute-Activity-App/"
-        echo "⚠️  Remember to configure Firebase API key restrictions for this domain" 
+      - name: Setup Node.js and dependencies
+        uses: ./.github/actions/setup-node
+        with:
+          node-version: '18'
+
+      - name: Setup Firebase
+        uses: ./.github/actions/setup-firebase
+        with:
+          environment: 'production'
+          firebase-project: ${{ secrets.FIREBASE_PROJECT_ID }}
+          firebase-token: ${{ secrets.FIREBASE_TOKEN }}
+
+      - name: Deploy Firebase services
+        working-directory: vaspitac-app/firebase
+        run: |
+          # Deploy Firestore rules and indexes
+          firebase deploy --only firestore:rules,firestore:indexes --config firebase.prod.json --token "${{ secrets.FIREBASE_TOKEN }}"
+          
+          # Deploy Storage rules
+          firebase deploy --only storage --config firebase.prod.json --token "${{ secrets.FIREBASE_TOKEN }}"
+          
+          # Deploy Functions if they exist
+          if [ -d "functions" ]; then
+            firebase deploy --only functions --config firebase.prod.json --token "${{ secrets.FIREBASE_TOKEN }}"
+          fi
+
+  # Final verification job
+  verify-deployment:
+    runs-on: ubuntu-latest
+    needs: [deploy-web, deploy-firebase]
+    steps:
+      - name: Verify deployment
+        run: |
+          echo "🚀 Production deployment completed successfully!"
+          echo "📱 Production site: https://vladimirvasilijevic.github.io/Kids-5-Minute-Activity-App/"
+          echo "⚠️  Remember to configure Firebase API key restrictions for this domain" 

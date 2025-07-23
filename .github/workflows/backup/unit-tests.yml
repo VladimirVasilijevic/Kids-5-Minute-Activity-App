@@ -1,0 +1,62 @@
+name: Unit Tests
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: ["**"]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    environment: development
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Use Node.js LTS
+        uses: actions/setup-node@v4
+        with:
+          node-version: 'lts/*'
+          cache: 'npm'
+          cache-dependency-path: vaspitac-app/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+        working-directory: vaspitac-app
+
+      - name: Create environment.ts
+        working-directory: vaspitac-app
+        run: |
+          cat <<EOF > src/environments/environment.ts
+          export const environment = {
+            production: false,
+            firebase: {
+              apiKey: "${{ secrets.FIREBASE_API_KEY }}",
+              authDomain: "${{ secrets.FIREBASE_AUTH_DOMAIN }}",
+              projectId: "${{ secrets.FIREBASE_PROJECT_ID }}",
+              storageBucket: "${{ secrets.FIREBASE_STORAGE_BUCKET }}",
+              messagingSenderId: "${{ secrets.FIREBASE_MESSAGING_SENDER_ID }}",
+              appId: "${{ secrets.FIREBASE_APP_ID }}",
+              measurementId: "${{ secrets.FIREBASE_MEASUREMENT_ID }}"
+            }
+          }
+          EOF
+
+      - name: Build Angular app
+        run: npm run build --if-present
+        working-directory: vaspitac-app
+
+      - name: Run unit tests with coverage
+        run: npx ng test --browsers=ChromeHeadless --watch=false --code-coverage
+        working-directory: vaspitac-app
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: vaspitac-app/coverage/
+
+      - name: Fail if tests failed
+        if: failure()
+        run: exit 1 

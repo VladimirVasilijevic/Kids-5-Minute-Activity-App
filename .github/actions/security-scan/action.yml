@@ -1,0 +1,71 @@
+name: 'Security Scan'
+description: 'Run security scans on dependencies and code'
+
+inputs:
+  working-directory:
+    description: 'Working directory for scans'
+    required: false
+    default: 'vaspitac-app'
+  scan-dependencies:
+    description: 'Whether to scan npm dependencies'
+    required: false
+    default: 'true'
+  scan-code:
+    description: 'Whether to scan code for vulnerabilities'
+    required: false
+    default: 'true'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Install security tools
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      run: |
+        # Install npm audit for dependency scanning
+        if [ "${{ inputs.scan-dependencies }}" = "true" ]; then
+          echo "🔍 Installing security scanning tools..."
+          npm install -g npm-audit-resolver
+        fi
+
+    - name: Scan npm dependencies
+      if: ${{ inputs.scan-dependencies == 'true' }}
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      run: |
+        echo "🔍 Scanning npm dependencies for vulnerabilities..."
+        npm audit --audit-level=moderate || {
+          echo "⚠️  Security vulnerabilities found in dependencies"
+          echo "📋 Running detailed audit report..."
+          npm audit --json > security-audit-report.json
+          echo "📄 Audit report saved to security-audit-report.json"
+          exit 1
+        }
+        echo "✅ No critical security vulnerabilities found in dependencies"
+
+    - name: Scan for secrets in code
+      if: ${{ inputs.scan-code == 'true' }}
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      run: |
+        echo "🔍 Scanning code for potential secrets..."
+        
+        # Check for hardcoded API keys, tokens, etc.
+        SECRETS_FOUND=$(grep -r -i -E "(api_key|token|password|secret)" src/ --exclude-dir=node_modules --exclude-dir=.git || true)
+        
+        if [ -n "$SECRETS_FOUND" ]; then
+          echo "⚠️  Potential secrets found in code:"
+          echo "$SECRETS_FOUND"
+          echo "❌ Please review and remove any hardcoded secrets"
+          exit 1
+        else
+          echo "✅ No obvious secrets found in code"
+        fi
+
+    - name: Upload security report
+      if: ${{ inputs.scan-dependencies == 'true' }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: security-audit-report
+        path: ${{ inputs.working-directory }}/security-audit-report.json
+        retention-days: 30 

@@ -1,0 +1,60 @@
+name: 'Build Web Application'
+description: 'Build Angular web application with caching and artifacts'
+
+inputs:
+  configuration:
+    description: 'Build configuration (development/production)'
+    required: true
+  base-href:
+    description: 'Base href for the application'
+    required: false
+    default: '/Kids-5-Minute-Activity-App/'
+  working-directory:
+    description: 'Working directory for build'
+    required: false
+    default: 'vaspitac-app'
+  upload-artifact:
+    description: 'Whether to upload build artifact'
+    required: false
+    default: 'true'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Lint code
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      run: npm run lint
+
+    - name: Run tests
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      run: npm run test -- --watch=false --browsers=ChromeHeadless --code-coverage
+
+    - name: Build Angular app
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      run: |
+        echo "🏗️ Building ${{ inputs.configuration }} version..."
+        npm run build -- --configuration ${{ inputs.configuration }} --base-href ${{ inputs.base-href }}
+        echo "✅ ${{ inputs.configuration }} build completed"
+
+    - name: Verify build output
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      run: |
+        if [ ! -d "dist/vaspitac-app" ]; then
+          echo "❌ Build output directory not found"
+          exit 1
+        fi
+        echo "📁 Build output size:"
+        du -sh dist/vaspitac-app
+        echo "✅ Build verification passed"
+
+    - name: Upload web build artifact
+      if: ${{ inputs.upload-artifact == 'true' }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: web-build-${{ inputs.configuration }}
+        path: ${{ inputs.working-directory }}/dist/vaspitac-app
+        retention-days: 7 
