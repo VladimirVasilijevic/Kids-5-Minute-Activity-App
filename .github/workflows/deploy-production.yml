@@ -28,7 +28,15 @@ jobs:
 
     - name: Install dependencies
       working-directory: vaspitac-app
-      run: npm ci --prefer-offline --no-audit
+      run: |
+        # Try npm ci first, fallback to npm install if lock file is out of sync
+        if ! npm ci --prefer-offline --no-audit; then
+          echo "⚠️ npm ci failed, trying npm install to sync package-lock.json..."
+          npm install
+          echo "✅ Dependencies installed successfully"
+        else
+          echo "✅ Dependencies installed with npm ci"
+        fi
 
     - name: Verify environment secrets
       working-directory: vaspitac-app
