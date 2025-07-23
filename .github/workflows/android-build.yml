@@ -203,19 +203,26 @@ jobs:
         path: vaspitac-app/android/app/build/outputs/apk/production/debug/app-production-debug.apk
         retention-days: 30 
 
+    - name: Create service account key file
+      working-directory: vaspitac-app/firebase
+      run: |
+        # Create service account key file from GitHub secret
+        echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT_KEY_PROD }}' > serviceAccountKey-prod.json
+        echo "✅ Service account key file created"
+
     - name: Deploy Firebase to Production
       working-directory: vaspitac-app/firebase
       env:
-        GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+        GOOGLE_APPLICATION_CREDENTIALS: serviceAccountKey-prod.json
       run: |
-        # Create service account key file
-        echo '${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}' > service-account-key.json
-        
         # Install Firebase CLI
         npm install -g firebase-tools
         
         # Set Firebase project to production
         firebase use production
+        
+        # Authenticate with Firebase using service account
+        firebase auth:export --project ${{ secrets.FIREBASE_PROJECT_ID }} --token "${{ secrets.FIREBASE_TOKEN }}" || echo "Auth export not needed"
         
         # Build functions if they exist
         if [ -d "functions" ]; then
