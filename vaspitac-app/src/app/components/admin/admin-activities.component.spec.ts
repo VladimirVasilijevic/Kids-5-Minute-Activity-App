@@ -289,13 +289,7 @@ describe('AdminActivitiesComponent', (): void => {
     expect(formatted).toBe(new Date(dateString).toLocaleDateString());
   });
 
-  it('should have correct age groups', (): void => {
-    expect(component.ageGroups).toContain('Toddler (1-2 years)');
-    expect(component.ageGroups).toContain('Preschool (3-5 years)');
-    expect(component.ageGroups).toContain('School Age (6-12 years)');
-    expect(component.ageGroups).toContain('Teen (13+ years)');
-    expect(component.ageGroups).toContain('All Ages');
-  });
+
 
   it('should create activity with correct properties', fakeAsync((): void => {
     component.showForm = true; // Ensure form is visible

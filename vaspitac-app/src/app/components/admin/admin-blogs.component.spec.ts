@@ -286,11 +286,11 @@ describe('AdminBlogsComponent', (): void => {
 
   describe('Image Handling', (): void => {
     let localMockImageUploadService: jasmine.SpyObj<ImageUploadService>;
-    let localComponent: AdminBlogsComponent;
+    let _localComponent: AdminBlogsComponent;
 
     beforeEach((): void => {
       localMockImageUploadService = TestBed.inject(ImageUploadService) as jasmine.SpyObj<ImageUploadService>;
-      localComponent = TestBed.createComponent(AdminBlogsComponent).componentInstance;
+      _localComponent = TestBed.createComponent(AdminBlogsComponent).componentInstance;
       // Reset spy calls before each test
       localMockImageUploadService.isValidImage.calls.reset();
       localMockImageUploadService.uploadImage.calls.reset();

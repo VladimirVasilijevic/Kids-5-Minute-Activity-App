@@ -46,9 +46,9 @@ export class BlogService {
         if (user) {
           // User is authenticated - use filtered function
           return from(this._functions.httpsCallable('getFilteredBlogPosts')({ language })).pipe(
-            map((result: any) => {
+            map((result: { blogPosts?: BlogPost[] }) => {
               const blogPosts = result.blogPosts || [];
-              return blogPosts.map((blogPost: any) => ({
+              return blogPosts.map((blogPost: BlogPost) => ({
                 ...blogPost,
                 visibility: blogPost.visibility || ContentVisibility.PUBLIC,
                 isPremium: blogPost.isPremium || false
@@ -82,9 +82,9 @@ export class BlogService {
       contentType: 'blog', 
       language 
     })).pipe(
-      map((result: any) => {
+      map((result: { content?: BlogPost[] }) => {
         const blogPosts = result.content || [];
-        return blogPosts.map((blogPost: any) => ({
+        return blogPosts.map((blogPost: BlogPost) => ({
           ...blogPost,
           visibility: blogPost.visibility || ContentVisibility.PUBLIC,
           isPremium: blogPost.isPremium || false

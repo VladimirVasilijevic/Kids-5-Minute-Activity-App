@@ -38,7 +38,29 @@ jobs:
           echo "✅ Dependencies installed with npm ci"
         fi
 
-    - name: Verify environment secrets
+    - name: Install Firebase CLI
+      working-directory: vaspitac-app
+      run: |
+        npm install -g firebase-tools
+        firebase --version
+
+    - name: Create service account key file
+      working-directory: vaspitac-app
+      run: |
+        # Create service account key file from GitHub secret
+        echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT_KEY_DEV }}' > firebase/serviceAccountKey-dev.json
+        echo "✅ Service account key file created"
+
+    - name: Authenticate with Firebase
+      working-directory: vaspitac-app
+      run: |
+        # Use the development project
+        firebase use development
+        # Authenticate using service account key
+        firebase auth:export --project ${{ secrets.FIREBASE_PROJECT_ID_DEV }} --token "${{ secrets.FIREBASE_TOKEN }}" || echo "Auth export not needed"
+        echo "✅ Firebase authentication configured"
+
+    - name: Verify development environment secrets
       working-directory: vaspitac-app
       run: |
         # Verify all required Firebase secrets are set

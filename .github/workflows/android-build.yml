@@ -89,39 +89,6 @@ jobs:
         path: vaspitac-app/android/app/build/outputs/apk/development/debug/app-development-debug.apk
         retention-days: 30
 
-    - name: Deploy Firebase to Development
-      working-directory: vaspitac-app/firebase
-      env:
-        GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
-      run: |
-        # Create service account key file
-        echo '${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}' > service-account-key.json
-        
-        # Install Firebase CLI
-        npm install -g firebase-tools
-        
-        # Set Firebase project to development
-        firebase use development
-        
-        # Build functions if they exist
-        if [ -d "functions" ]; then
-          cd functions
-          npm install
-          npm run build
-          cd ..
-        fi
-        
-        # Deploy Firestore rules and indexes
-        firebase deploy --only firestore:rules,firestore:indexes --config firebase.dev.json --token "${{ secrets.FIREBASE_TOKEN }}"
-        
-        # Deploy Storage rules
-        firebase deploy --only storage --config firebase.dev.json --token "${{ secrets.FIREBASE_TOKEN }}"
-        
-        # Deploy Functions if they exist
-        if [ -d "functions" ]; then
-          firebase deploy --only functions --config firebase.dev.json --token "${{ secrets.FIREBASE_TOKEN }}"
-        fi
-
   build-android-prod:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
@@ -202,36 +169,3 @@ jobs:
         name: vaspitac-app-debug-prod
         path: vaspitac-app/android/app/build/outputs/apk/production/debug/app-production-debug.apk
         retention-days: 30 
-
-    - name: Deploy Firebase to Production
-      working-directory: vaspitac-app/firebase
-      env:
-        GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
-      run: |
-        # Create service account key file
-        echo '${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}' > service-account-key.json
-        
-        # Install Firebase CLI
-        npm install -g firebase-tools
-        
-        # Set Firebase project to production
-        firebase use production
-        
-        # Build functions if they exist
-        if [ -d "functions" ]; then
-          cd functions
-          npm install
-          npm run build
-          cd ..
-        fi
-        
-        # Deploy Firestore rules and indexes
-        firebase deploy --only firestore:rules,firestore:indexes --config firebase.prod.json --token "${{ secrets.FIREBASE_TOKEN }}"
-        
-        # Deploy Storage rules
-        firebase deploy --only storage --config firebase.prod.json --token "${{ secrets.FIREBASE_TOKEN }}"
-        
-        # Deploy Functions if they exist
-        if [ -d "functions" ]; then
-          firebase deploy --only functions --config firebase.prod.json --token "${{ secrets.FIREBASE_TOKEN }}"
-        fi 

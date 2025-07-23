@@ -181,8 +181,9 @@ export class AdminAboutComponent implements OnInit {
    * Handles image selection and upload
    * @param event - File input change event
    */
-  onImageSelected(event: any): void {
-    const file = event.target.files[0];
+  onImageSelected(event: Event): void {
+    const target = event.target as HTMLInputElement;
+    const file = target.files?.[0];
     if (!file) return;
 
     if (!this._imageUploadService.isValidImage(file)) {

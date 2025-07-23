@@ -42,7 +42,7 @@ export class FirestoreService {
           .pipe(
             catchError(() => {
               // Fallback to JSON if Firestore fails
-              console.log(`Falling back to JSON for activities_${lang}`);
+              // Fallback to JSON for activities
               return this._http.get<Activity[]>(`assets/activities_${lang}.json`);
             })
           );
@@ -65,7 +65,7 @@ export class FirestoreService {
           .pipe(
             catchError(() => {
               // Fallback to JSON if Firestore fails
-              console.log(`Falling back to JSON for activity ${id}`);
+              // Fallback to JSON for activity
               return this._http
                 .get<Activity[]>(`assets/activities_${lang}.json`)
                 .pipe(
@@ -88,11 +88,11 @@ export class FirestoreService {
           .collection<Category>(`categories_${lang}`)
           .valueChanges()
           .pipe(
-            catchError((error) => {
-              console.log(`Falling back to JSON for categories_${lang}`, error);
+            catchError((_error) => {
+              // Fallback to JSON for categories
               return this._http.get<Category[]>(`assets/categories_${lang}.json`).pipe(
-                tap((categories) => {
-                  console.log(`FirestoreService: Loaded ${categories.length} categories from JSON for ${lang}:`, categories);
+                tap((_categories) => {
+                  // Loaded categories from JSON
                 })
               );
             })
@@ -112,8 +112,8 @@ export class FirestoreService {
           .collection<BlogPost>(`blog_${lang}`)
           .valueChanges()
           .pipe(
-            catchError((error: unknown) => {
-              console.log(`Falling back to JSON for blog_${lang}`, error);
+            catchError((_error: unknown) => {
+              // Fallback to JSON for blog
               return this._http.get<BlogPost[]>(`assets/blog-posts_${lang}.json`);
             })
           );
@@ -133,7 +133,7 @@ export class FirestoreService {
           .valueChanges()
           .pipe(
             catchError(() => {
-              console.log(`Falling back to JSON for tips_${lang}`);
+              // Fallback to JSON for tips
               return this._http.get<Tip[]>(`assets/tips_${lang}.json`);
             })
           );
@@ -159,7 +159,7 @@ export class FirestoreService {
               return content;
             }),
             catchError(() => {
-              console.log(`Falling back to JSON for about_${lang}`);
+              // Fallback to JSON for about
               return this._http.get<AboutContentData>(`assets/about_${lang}.json`).pipe(
                 map((response: AboutContentData) => response.data)
               );
@@ -201,7 +201,7 @@ export class FirestoreService {
           lastUpdated: data?.lastUpdated ? new Date(data.lastUpdated) : new Date()
         })),
         catchError(() => {
-          console.log('Falling back to default version');
+          // Fallback to default version
           return of<{ version: string; lastUpdated: Date }>({ 
             version: '1.0.0', 
             lastUpdated: new Date() 

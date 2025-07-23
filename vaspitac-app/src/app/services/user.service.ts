@@ -10,6 +10,21 @@ import { TranslateService } from '@ngx-translate/core';
 import { LoadingService } from './loading.service';
 import { AngularFireFunctions } from '@angular/fire/compat/functions';
 
+/**
+ * Interface for API response with success status and optional message
+ */
+interface ApiResponse {
+  success: boolean;
+  message?: string;
+}
+
+/**
+ * Interface for password reset response
+ */
+interface PasswordResetResponse extends ApiResponse {
+  resetLink?: string;
+}
+
 @Injectable({ providedIn: 'root' })
 export class UserService {
   constructor(
@@ -62,7 +77,7 @@ export class UserService {
    * @param data - { email, password, displayName, role }
    * @returns Observable from the callable function
    */
-  createUser(data: { email: string; password: string; displayName: string; role: string }) {
+  createUser(data: { email: string; password: string; displayName: string; role: string }): Observable<ApiResponse> {
     this._loadingService.showWithMessage(this._translateService.instant('COMMON.SAVING'));
     return from(this._functions.httpsCallable('createUser')(data)).pipe(
       tap({
@@ -77,7 +92,7 @@ export class UserService {
    * @param data - { uid, displayName, role }
    * @returns Observable from the callable function
    */
-  updateUser(data: { uid: string; displayName: string; role: string }) {
+  updateUser(data: { uid: string; displayName: string; role: string }): Observable<ApiResponse> {
     this._loadingService.showWithMessage(this._translateService.instant('COMMON.SAVING'));
     return from(this._functions.httpsCallable('updateUser')(data)).pipe(
       tap({
@@ -92,7 +107,7 @@ export class UserService {
    * @param data - { uid }
    * @returns Observable from the callable function
    */
-  deleteUser(data: { uid: string }) {
+  deleteUser(data: { uid: string }): Observable<ApiResponse> {
     this._loadingService.showWithMessage(this._translateService.instant('COMMON.DELETING'));
     return from(this._functions.httpsCallable('deleteUser')(data)).pipe(
       tap({
@@ -107,7 +122,7 @@ export class UserService {
    * @param data - { email }
    * @returns Observable from the callable function
    */
-  resetUserPassword(data: { email: string }) {
+  resetUserPassword(data: { email: string }): Observable<PasswordResetResponse> {
     this._loadingService.showWithMessage(this._translateService.instant('COMMON.SENDING'));
     return from(this._functions.httpsCallable('resetUserPassword')(data)).pipe(
       tap({
@@ -122,7 +137,7 @@ export class UserService {
    * @param data - { password }
    * @returns Observable from the callable function
    */
-  deleteOwnProfile(data: { password: string }) {
+  deleteOwnProfile(data: { password: string }): Observable<ApiResponse> {
     this._loadingService.showWithMessage(this._translateService.instant('COMMON.DELETING'));
     return from(this._functions.httpsCallable('deleteOwnProfile')(data)).pipe(
       tap({

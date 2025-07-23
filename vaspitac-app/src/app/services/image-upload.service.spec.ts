@@ -1,7 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { AngularFireStorage } from '@angular/fire/compat/storage';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
-import { of, throwError } from 'rxjs';
 
 import { ImageUploadService } from './image-upload.service';
 

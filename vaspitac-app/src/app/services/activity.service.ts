@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable, map, from, of, switchMap } from 'rxjs';
+import { Observable, map, from, switchMap } from 'rxjs';
 import { tap, catchError } from 'rxjs/operators';
 import { TranslateService } from '@ngx-translate/core';
 import { AngularFireFunctions } from '@angular/fire/compat/functions';
@@ -47,9 +47,9 @@ export class ActivityService {
         if (user) {
           // User is authenticated - use filtered function
           return from(this._functions.httpsCallable('getFilteredActivities')({ language })).pipe(
-            map((result: any) => {
+            map((result: { activities?: Activity[] }) => {
               const activities = result.activities || [];
-              return activities.map((activity: any) => ({
+              return activities.map((activity: Activity) => ({
                 ...activity,
                 visibility: activity.visibility || ContentVisibility.PUBLIC,
                 isPremium: activity.isPremium || false
@@ -83,9 +83,9 @@ export class ActivityService {
       contentType: 'activities', 
       language 
     })).pipe(
-      map((result: any) => {
+      map((result: { content?: Activity[] }) => {
         const activities = result.content || [];
-        return activities.map((activity: any) => ({
+        return activities.map((activity: Activity) => ({
           ...activity,
           visibility: activity.visibility || ContentVisibility.PUBLIC,
           isPremium: activity.isPremium || false

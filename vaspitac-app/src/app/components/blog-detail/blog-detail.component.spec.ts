@@ -1,4 +1,4 @@
-import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute, Router } from '@angular/router';
 import { of } from 'rxjs';
 import { TranslateModule } from '@ngx-translate/core';
@@ -15,12 +15,12 @@ describe('BlogDetailComponent', () => {
   let router: jasmine.SpyObj<Router>;
   let activatedRoute: any;
 
-  beforeEach(async () => {
+  beforeEach(async (): Promise<void> => {
     const blogServiceSpy = jasmine.createSpyObj('BlogService', ['getBlogPostById']);
     const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
 
     activatedRoute = {
-      paramMap: of({ get: (key: string) => '1' }),
+      paramMap: of({ get: (_key: string) => '1' }),
     };
 
     await TestBed.configureTestingModule({
@@ -44,7 +44,7 @@ describe('BlogDetailComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should load the correct blog post on initialization', (done) => {
+  it('should load the correct blog post on initialization', (done: any): void => {
     blogService.getBlogPostById.and.returnValue(of(mockBlogPosts[0]));
     fixture.detectChanges();
     component.blogPost$?.subscribe(post => {
@@ -53,8 +53,8 @@ describe('BlogDetailComponent', () => {
     });
   });
 
-  it('should handle blog post not found', (done) => {
-    activatedRoute.paramMap = of({ get: (key: string) => '999' });
+  it('should handle blog post not found', (done: any): void => {
+    activatedRoute.paramMap = of({ get: (_key: string) => '999' });
     blogService.getBlogPostById.and.returnValue(of(undefined as any));
     fixture.detectChanges();
     component.blogPost$?.subscribe(post => {

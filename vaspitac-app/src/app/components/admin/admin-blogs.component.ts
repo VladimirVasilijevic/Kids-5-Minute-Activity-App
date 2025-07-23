@@ -251,7 +251,7 @@ export class AdminBlogsComponent implements OnInit {
    * @param message - Success message
    */
   private showSuccess(message: string): void {
-    console.log('Showing success message:', message); // Debug log
+            // Showing success message
     this.successMessage = message;
     this.showSuccessMessage = true;
     
@@ -423,13 +423,13 @@ export class AdminBlogsComponent implements OnInit {
 
     // Update blog post in service
     this._blogService.updateBlogPost(updatedBlog).then(() => {
-      console.log('Blog update successful, showing success message'); // Debug log
-      console.log('Updated blog data:', updatedBlog); // Debug log for visibility and premium fields
+              // Blog update successful
+              // Updated blog data
       // Update local array after successful update
       const index = this.blogs.findIndex(b => b.id === this.editingBlog?.id);
       if (index !== -1) {
         this.blogs[index] = { ...updatedBlog, isEditing: false, isDeleting: false };
-        console.log('Local array updated at index:', index, 'with data:', this.blogs[index]); // Debug log
+        // Local array updated
       }
       this.initializeInfiniteScroll();
       this.resetForm();

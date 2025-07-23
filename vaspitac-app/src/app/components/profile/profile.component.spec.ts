@@ -351,7 +351,7 @@ describe('ProfileComponent', () => {
       currentUserSpy = jasmine.createSpyObj('currentUser', ['updateProfile']);
       currentUserSpy.updateProfile.and.resolveTo();
       authServiceSpy.getCurrentUser.and.resolveTo(currentUserSpy);
-      userServiceSpy.deleteOwnProfile.and.returnValue(of({}));
+      userServiceSpy.deleteOwnProfile.and.returnValue(of({ success: true }));
       authServiceSpy.signIn.and.resolveTo(currentUserSpy);
       spyOn(component, 'showError').and.callThrough();
     });
