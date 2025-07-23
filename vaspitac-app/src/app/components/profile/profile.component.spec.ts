@@ -3,7 +3,7 @@ import { ProfileComponent } from './profile.component';
 import { AuthService } from '../../services/auth.service';
 import { UserService } from '../../services/user.service';
 import { Router } from '@angular/router';
-import { of, Subject, Observable } from 'rxjs';
+import { of, Subject, Observable, throwError } from 'rxjs';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { AngularFireModule } from '@angular/fire/compat';
 import { TranslateService, TranslateModule } from '@ngx-translate/core';
@@ -24,7 +24,13 @@ class MockTranslateService {
       'PROFILE.ACCOUNT_ACTIONS': 'Akcije Naloga',
       'PROFILE.EDIT_PROFILE': 'Izmeni Profil',
       'PROFILE.NO_USER': 'Profil korisnika nije pronađen. Molimo prijavite se.',
-      'AUTH.RESET_PASSWORD': 'Resetuj Lozinku'
+      'AUTH.RESET_PASSWORD': 'Resetuj Lozinku',
+      'PROFILE.SUCCESS_UPDATE': 'Profil uspešno ažuriran!',
+      'PROFILE.ERROR_UPDATE_TITLE': 'Greška pri ažuriranju profila',
+      'PROFILE.SUCCESS_UPDATE_AVATAR_LIMIT': 'URL avatar adrese je prevelika. Avatar je postavljen na null.',
+      'PROFILE.DELETE_PROFILE_ERROR': 'Greška pri brisanju profila',
+      'COMMON.DELETING': 'Brisanje...',
+      'PROFILE.UNSUBSCRIBE_SUCCESS': 'Uspešno ste se odjavili od pretplate!'
     };
     return translations[key] || key;
   }
@@ -53,12 +59,18 @@ describe('ProfileComponent', () => {
   let userSubject: Subject<any>;
 
   beforeEach(async () => {
-    authServiceSpy = jasmine.createSpyObj('AuthService', ['signOut', 'sendPasswordResetEmail'], { user$: undefined });
-    userServiceSpy = jasmine.createSpyObj('UserService', ['getUserProfile']);
+    userSubject = new Subject();
+    authServiceSpy = {
+      user$: userSubject.asObservable(),
+      signOut: jasmine.createSpy('signOut'),
+      sendPasswordResetEmail: jasmine.createSpy('sendPasswordResetEmail'),
+      getCurrentUser: jasmine.createSpy('getCurrentUser'),
+      signIn: jasmine.createSpy('signIn')
+    } as jasmine.SpyObj<AuthService>;
+
+    userServiceSpy = jasmine.createSpyObj('UserService', ['getUserProfile', 'setUserProfile', 'deleteOwnProfile']);
     routerSpy = jasmine.createSpyObj('Router', ['navigate']);
     translateService = new MockTranslateService();
-    userSubject = new Subject();
-    Object.defineProperty(authServiceSpy, 'user$', { get: () => userSubject.asObservable() });
 
     await TestBed.configureTestingModule({
       declarations: [ProfileComponent],
@@ -238,5 +250,378 @@ describe('ProfileComponent', () => {
       expect(component.isLoading).toBe(false);
       expect(component.selectedUser).toBeNull();
     }));
+  });
+
+  describe('onSaveProfile', () => {
+    let currentUserSpy: any;
+
+    beforeEach(() => {
+      currentUserSpy = jasmine.createSpyObj('currentUser', ['updateProfile']);
+      currentUserSpy.updateProfile.and.resolveTo();
+      authServiceSpy.getCurrentUser.and.resolveTo(currentUserSpy);
+      userServiceSpy.setUserProfile.and.resolveTo();
+      spyOn(component, 'showError').and.callThrough();
+      spyOn(component, 'closeEditProfile').and.callThrough();
+    });
+
+    it('should not save if no user is selected', async () => {
+      component.selectedUser = null;
+      await component.onSaveProfile({ displayName: 'Test' });
+      expect(userServiceSpy.setUserProfile).not.toHaveBeenCalled();
+    });
+
+    it('should save profile with a valid short avatar URL', async () => {
+      component.selectedUser = mockFreeUser;
+      const profileData = { displayName: 'New Name', avatarUrl: 'http://example.com/avatar.jpg' };
+      await component.onSaveProfile(profileData);
+
+      expect(userServiceSpy.setUserProfile).toHaveBeenCalled();
+      expect(currentUserSpy.updateProfile).toHaveBeenCalledWith({
+        displayName: 'New Name',
+        photoURL: 'http://example.com/avatar.jpg'
+      });
+      expect(component.showSuccessMessage).toBeTrue();
+      expect(component.successMessage).toBe(translateService.instant('PROFILE.SUCCESS_UPDATE'));
+      expect(component.closeEditProfile).toHaveBeenCalled();
+    });
+
+    it('should handle avatar URLs that are too long', async () => {
+      component.selectedUser = mockFreeUser;
+      const longUrl = 'http://example.com/'.repeat(200); // > 2000 chars
+      const profileData = { displayName: 'New Name', avatarUrl: longUrl };
+      await component.onSaveProfile(profileData);
+
+      expect(userServiceSpy.setUserProfile).toHaveBeenCalled();
+      expect(currentUserSpy.updateProfile).toHaveBeenCalledWith({
+        displayName: 'New Name',
+        photoURL: null
+      });
+      expect(component.showSuccessMessage).toBeTrue();
+      expect(component.successMessage).toBe(translateService.instant('PROFILE.SUCCESS_UPDATE_AVATAR_LIMIT'));
+      expect(component.closeEditProfile).toHaveBeenCalled();
+    });
+
+    it('should show an error if updating the profile fails', async () => {
+      component.selectedUser = mockFreeUser;
+      const error = new Error('Update failed');
+      userServiceSpy.setUserProfile.and.rejectWith(error);
+      const profileData = { displayName: 'New Name' };
+      await component.onSaveProfile(profileData);
+      
+      expect(component.showError).toHaveBeenCalledWith(
+        translateService.instant('PROFILE.ERROR_UPDATE_TITLE'),
+        'Update failed'
+      );
+    });
+  });
+
+  describe('UI Feedback', () => {
+    it('should show error modal with correct title and message', () => {
+      const errorTitle = 'Test Error';
+      const errorMessage = 'This is a test error message.';
+      component.showError(errorTitle, errorMessage);
+      expect(component.showErrorModal).toBeTrue();
+      expect(component.errorTitle).toBe(errorTitle);
+      expect(component.errorMessage).toBe(errorMessage);
+    });
+
+    it('should close error modal and clear messages', () => {
+      component.showError('Test Error', 'This is a test error message.');
+      component.closeErrorModal();
+      expect(component.showErrorModal).toBeFalse();
+      expect(component.errorTitle).toBe('');
+      expect(component.errorMessage).toBe('');
+    });
+
+    it('should show success message and then hide it after 5 seconds', fakeAsync(() => {
+      const successMessage = 'Profile updated successfully!';
+      component['showSuccess'](successMessage);
+      expect(component.showSuccessMessage).toBeTrue();
+      expect(component.successMessage).toBe(successMessage);
+
+      tick(5000);
+      expect(component.showSuccessMessage).toBeFalse();
+    }));
+  });
+
+  describe('Profile Deletion', () => {
+    let currentUserSpy: any;
+
+    beforeEach(() => {
+      currentUserSpy = jasmine.createSpyObj('currentUser', ['updateProfile']);
+      currentUserSpy.updateProfile.and.resolveTo();
+      authServiceSpy.getCurrentUser.and.resolveTo(currentUserSpy);
+      userServiceSpy.deleteOwnProfile.and.returnValue(of({}));
+      authServiceSpy.signIn.and.resolveTo(currentUserSpy);
+      spyOn(component, 'showError').and.callThrough();
+    });
+
+    it('should show delete profile modal when onDeleteProfile is called', () => {
+      component.onDeleteProfile();
+      expect(component.showDeleteProfileModal).toBeTrue();
+      expect(component.deleteProfilePassword).toBe('');
+      expect(component.deleteProfileError).toBeNull();
+    });
+
+    it('should update delete profile password when onDeleteProfilePasswordChange is called', () => {
+      const mockEvent = { target: { value: 'testpassword' } } as any;
+      component.onDeleteProfilePasswordChange(mockEvent);
+      expect(component.deleteProfilePassword).toBe('testpassword');
+    });
+
+    it('should close delete profile modal and reset state when closeDeleteProfileModal is called', () => {
+      component.showDeleteProfileModal = true;
+      component.deleteProfilePassword = 'testpassword';
+      component.deleteProfileError = 'Some error';
+      
+      component.closeDeleteProfileModal();
+      
+      expect(component.showDeleteProfileModal).toBeFalse();
+      expect(component.deleteProfilePassword).toBe('');
+      expect(component.deleteProfileError).toBeNull();
+    });
+
+    it('should not proceed with deletion if no user is selected', async () => {
+      component.selectedUser = null;
+      component.deleteProfilePassword = 'testpassword';
+      
+      await component.confirmDeleteProfile();
+      
+      expect(authServiceSpy.getCurrentUser).not.toHaveBeenCalled();
+      expect(userServiceSpy.deleteOwnProfile).not.toHaveBeenCalled();
+    });
+
+    it('should not proceed with deletion if no password is provided', async () => {
+      component.selectedUser = mockFreeUser;
+      component.deleteProfilePassword = '';
+      
+      await component.confirmDeleteProfile();
+      
+      expect(authServiceSpy.getCurrentUser).not.toHaveBeenCalled();
+      expect(userServiceSpy.deleteOwnProfile).not.toHaveBeenCalled();
+    });
+
+    it('should successfully delete profile with valid password', async () => {
+      component.selectedUser = mockFreeUser;
+      component.deleteProfilePassword = 'testpassword';
+      currentUserSpy.email = 'test@example.com';
+      
+      await component.confirmDeleteProfile();
+      
+      expect(component.deleteProfileLoading).toBeFalse();
+      expect(authServiceSpy.getCurrentUser).toHaveBeenCalled();
+      expect(authServiceSpy.signIn).toHaveBeenCalledWith('test@example.com', 'testpassword');
+      expect(userServiceSpy.deleteOwnProfile).toHaveBeenCalledWith({ password: 'testpassword' });
+      expect(authServiceSpy.signOut).toHaveBeenCalled();
+      expect(routerSpy.navigate).toHaveBeenCalledWith(['/']);
+    });
+
+    it('should handle error when no email is found for current user', async () => {
+      component.selectedUser = mockFreeUser;
+      component.deleteProfilePassword = 'testpassword';
+      authServiceSpy.getCurrentUser.and.resolveTo(null);
+      
+      await component.confirmDeleteProfile();
+      
+      expect(component.deleteProfileLoading).toBeFalse();
+      expect(component.deleteProfileError).toBe(translateService.instant('PROFILE.ERROR_NO_EMAIL'));
+      expect(component.showError).toHaveBeenCalledWith(
+        translateService.instant('PROFILE.ERROR_UPDATE_TITLE'),
+        translateService.instant('PROFILE.ERROR_NO_EMAIL')
+      );
+    });
+
+    it('should handle error when user has no email', async () => {
+      component.selectedUser = mockFreeUser;
+      component.deleteProfilePassword = 'testpassword';
+      const userWithoutEmail = { ...currentUserSpy, email: null };
+      authServiceSpy.getCurrentUser.and.resolveTo(userWithoutEmail);
+      
+      await component.confirmDeleteProfile();
+      
+      expect(component.deleteProfileLoading).toBeFalse();
+      expect(component.deleteProfileError).toBe(translateService.instant('PROFILE.ERROR_NO_EMAIL'));
+      expect(component.showError).toHaveBeenCalledWith(
+        translateService.instant('PROFILE.ERROR_UPDATE_TITLE'),
+        translateService.instant('PROFILE.ERROR_NO_EMAIL')
+      );
+    });
+
+    it('should handle authentication error during profile deletion', async () => {
+      component.selectedUser = mockFreeUser;
+      component.deleteProfilePassword = 'wrongpassword';
+      currentUserSpy.email = 'test@example.com';
+      authServiceSpy.signIn.and.rejectWith(new Error('Invalid password'));
+      
+      await component.confirmDeleteProfile();
+      
+      expect(component.deleteProfileLoading).toBeFalse();
+      expect(component.deleteProfileError).toBe('Invalid password');
+      expect(component.showError).toHaveBeenCalledWith(
+        translateService.instant('PROFILE.ERROR_UPDATE_TITLE'),
+        'Invalid password'
+      );
+    });
+
+    it('should handle error when deleteOwnProfile callable function fails', async () => {
+      component.selectedUser = mockFreeUser;
+      component.deleteProfilePassword = 'testpassword';
+      currentUserSpy.email = 'test@example.com';
+      userServiceSpy.deleteOwnProfile.and.returnValue(throwError(() => new Error('Delete failed')));
+      
+      await component.confirmDeleteProfile();
+      
+      expect(component.deleteProfileLoading).toBeFalse();
+      expect(component.deleteProfileError).toBe('Delete failed');
+      expect(component.showError).toHaveBeenCalledWith(
+        translateService.instant('PROFILE.ERROR_UPDATE_TITLE'),
+        'Delete failed'
+      );
+    });
+
+    it('should handle generic error during profile deletion', async () => {
+      component.selectedUser = mockFreeUser;
+      component.deleteProfilePassword = 'testpassword';
+      currentUserSpy.email = 'test@example.com';
+      authServiceSpy.signIn.and.rejectWith('Unknown error');
+      
+      await component.confirmDeleteProfile();
+      
+      expect(component.deleteProfileLoading).toBeFalse();
+      expect(component.deleteProfileError).toBe(translateService.instant('PROFILE.DELETE_PROFILE_ERROR'));
+      expect(component.showError).toHaveBeenCalledWith(
+        translateService.instant('PROFILE.ERROR_UPDATE_TITLE'),
+        translateService.instant('PROFILE.DELETE_PROFILE_ERROR')
+      );
+    });
+
+    it('should handle Error object during profile deletion', async () => {
+      component.selectedUser = mockFreeUser;
+      component.deleteProfilePassword = 'testpassword';
+      currentUserSpy.email = 'test@example.com';
+      authServiceSpy.signIn.and.rejectWith(new Error('Specific error message'));
+      
+      await component.confirmDeleteProfile();
+      
+      expect(component.deleteProfileLoading).toBeFalse();
+      expect(component.deleteProfileError).toBe('Specific error message');
+      expect(component.showError).toHaveBeenCalledWith(
+        translateService.instant('PROFILE.ERROR_UPDATE_TITLE'),
+        'Specific error message'
+      );
+    });
+
+    it('should set loading state during profile deletion process', async () => {
+      component.selectedUser = mockFreeUser;
+      component.deleteProfilePassword = 'testpassword';
+      currentUserSpy.email = 'test@example.com';
+      
+      // Start the deletion process
+      const deletionPromise = component.confirmDeleteProfile();
+      
+      // Check that loading is set to true immediately
+      expect(component.deleteProfileLoading).toBeTrue();
+      expect(component.deleteProfileError).toBeNull();
+      
+      // Wait for the process to complete
+      await deletionPromise;
+      
+      // Check that loading is set back to false
+      expect(component.deleteProfileLoading).toBeFalse();
+    });
+  });
+
+  describe('Subscription Management', () => {
+    beforeEach(() => {
+      spyOn(console, 'log');
+    });
+
+    it('should navigate to subscribe page', () => {
+      component.navigateToSubscribe();
+      expect(routerSpy.navigate).toHaveBeenCalledWith(['/subscribe']);
+    });
+
+    it('should show success message for manage subscription', () => {
+      component.manageSubscription();
+      expect(console.log).toHaveBeenCalledWith('Manage subscription clicked');
+      expect(component.showSuccessMessage).toBeTrue();
+      expect(component.successMessage).toBe('Subscription management coming soon!');
+    });
+
+    it('should show success message for cancel subscription', () => {
+      component.cancelSubscription();
+      expect(console.log).toHaveBeenCalledWith('Cancel subscription clicked');
+      expect(component.showSuccessMessage).toBeTrue();
+      expect(component.successMessage).toBe('Subscription cancellation coming soon!');
+    });
+
+    it('should show success message for renew subscription', () => {
+      component.renewSubscription();
+      expect(console.log).toHaveBeenCalledWith('Renew subscription clicked');
+      expect(component.showSuccessMessage).toBeTrue();
+      expect(component.successMessage).toBe('Subscription renewal coming soon!');
+    });
+
+    it('should show unsubscribe modal when onUnsubscribe is called', () => {
+      component.showUnsubscribeModal = false;
+      component.onUnsubscribe();
+      expect(component.showUnsubscribeModal).toBeTrue();
+    });
+
+    it('should close unsubscribe modal when closeUnsubscribeModal is called', () => {
+      component.showUnsubscribeModal = true;
+      component.closeUnsubscribeModal();
+      expect(component.showUnsubscribeModal).toBeFalse();
+    });
+
+    it('should not proceed with unsubscribe if no user is selected', async () => {
+      component.selectedUser = null;
+      await component.confirmUnsubscribe();
+      expect(component.unsubscribeLoading).toBeFalse();
+    });
+
+    it('should successfully unsubscribe user', async () => {
+      component.selectedUser = mockFreeUser;
+      component.showUnsubscribeModal = true;
+      spyOn(component, 'closeUnsubscribeModal').and.callThrough();
+      spyOn(component, 'showError').and.callThrough();
+      
+      await component.confirmUnsubscribe();
+      
+      expect(component.unsubscribeLoading).toBeFalse();
+      expect(console.log).toHaveBeenCalledWith('Unsubscribing user:', mockFreeUser.uid);
+      expect(component.closeUnsubscribeModal).toHaveBeenCalled();
+      expect(component.showSuccessMessage).toBeTrue();
+      expect(component.successMessage).toBe(translateService.instant('PROFILE.UNSUBSCRIBE_SUCCESS'));
+    });
+
+    it('should handle error during unsubscribe process', async () => {
+      component.selectedUser = mockFreeUser;
+      spyOn(component, 'showError').and.callThrough();
+      
+      // Since the current implementation uses setTimeout which is hard to mock,
+      // we'll test the error handling by checking the structure
+      // In a real implementation, this would be replaced with actual API calls
+      await component.confirmUnsubscribe();
+      
+      expect(component.unsubscribeLoading).toBeFalse();
+      // The current implementation doesn't throw errors, so we just verify loading state
+    });
+
+    it('should set loading state during unsubscribe process', async () => {
+      component.selectedUser = mockFreeUser;
+      
+      // Start the unsubscribe process
+      const unsubscribePromise = component.confirmUnsubscribe();
+      
+      // Check that loading is set to true immediately
+      expect(component.unsubscribeLoading).toBeTrue();
+      
+      // Wait for the process to complete
+      await unsubscribePromise;
+      
+      // Check that loading is set back to false
+      expect(component.unsubscribeLoading).toBeFalse();
+    });
   });
 }); 

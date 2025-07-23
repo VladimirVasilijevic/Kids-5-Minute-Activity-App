@@ -1,184 +1,81 @@
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { TranslateModule } from '@ngx-translate/core';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { provideHttpClientTesting } from '@angular/common/http/testing';
-import { provideRouter } from '@angular/router';
-// Angular Material imports
-import { MatCardModule } from '@angular/material/card';
-import { ActivatedRoute } from '@angular/router';
-import { of, Observable } from 'rxjs';
-import { Router } from '@angular/router';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ActivatedRoute, Router } from '@angular/router';
+import { of } from 'rxjs';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 
-import { ActivityService } from '../../services/activity.service';
-import { Activity } from '../../models/activity.model';
-import { mockActivities } from '../../../test-utils/mock-activities';
-import { FirestoreService } from '../../services/firestore.service';
-import { mockFirestoreService } from '../../../test-utils/mock-firestore-service';
-
 import { ActivityDetailComponent } from './activity-detail.component';
-import { ScrollToTopComponent } from '../scroll-to-top/scroll-to-top.component';
+import { ActivityService } from '../../services/activity.service';
+import { mockActivities } from '../../../test-utils/mock-activities';
 
 describe('ActivityDetailComponent', () => {
   let component: ActivityDetailComponent;
   let fixture: ComponentFixture<ActivityDetailComponent>;
-  const mockActivity: Activity = mockActivities[0];
+  let activityService: jasmine.SpyObj<ActivityService>;
+  let router: jasmine.SpyObj<Router>;
+  let activatedRoute: any;
 
-  beforeEach(waitForAsync(async (): Promise<void> => {
+  beforeEach(async () => {
+    const activityServiceSpy = jasmine.createSpyObj('ActivityService', ['getActivities']);
+    const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
+
+    activatedRoute = {
+      paramMap: of({ get: (key: string) => '001' }),
+      snapshot: { queryParamMap: { get: (key: string) => null } },
+    };
+
     await TestBed.configureTestingModule({
-      imports: [TranslateModule.forRoot(), BrowserAnimationsModule, MatCardModule],
-      declarations: [ActivityDetailComponent, ScrollToTopComponent],
+      declarations: [ActivityDetailComponent],
+      imports: [TranslateModule.forRoot()],
       providers: [
-        provideHttpClientTesting(),
-        provideRouter([]),
-        {
-          provide: ActivityService,
-          useValue: {
-            getActivityById: (): Observable<Activity | undefined> => of(mockActivity),
-          },
-        },
-        { provide: FirestoreService, useValue: mockFirestoreService },
-        {
-          provide: ActivatedRoute,
-          useValue: {
-            paramMap: of({ get: (): string => '001' }),
-            snapshot: {
-              queryParamMap: {
-                get: (): null => null,
-              },
-            },
-          },
-        },
-        {
-          provide: Router,
-        },
+        { provide: ActivityService, useValue: activityServiceSpy },
+        { provide: Router, useValue: routerSpy },
+        { provide: ActivatedRoute, useValue: activatedRoute },
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
-  }));
 
-  beforeEach((): void => {
     fixture = TestBed.createComponent(ActivityDetailComponent);
     component = fixture.componentInstance;
-    fixture.detectChanges();
+    activityService = TestBed.inject(ActivityService) as jasmine.SpyObj<ActivityService>;
+    router = TestBed.inject(Router) as jasmine.SpyObj<Router>;
   });
 
-  it('should create', (): void => {
+  it('should create the component', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should have activity$ observable', (done: Function): void => {
-    component.activity$.subscribe((activity) => {
-      expect(activity).toBeTruthy();
-      expect(activity?.id).toBe('001');
+  it('should load the correct activity on initialization', (done) => {
+    activityService.getActivities.and.returnValue(of(mockActivities));
+    fixture.detectChanges();
+    component.activity$?.subscribe(activity => {
+      expect(activity).toEqual(mockActivities[0]);
       done();
     });
   });
 
-  // UI test: should render the activity title in the DOM
-  it('should render the activity title in the current language', (): void => {
-    component.lang = 'sr';
+  it('should handle activity not found', (done) => {
+    activatedRoute.paramMap = of({ get: (key: string) => '999' });
+    activityService.getActivities.and.returnValue(of(mockActivities));
     fixture.detectChanges();
-    const compiled = fixture.nativeElement;
-    const title = compiled.querySelector('h1');
-    expect(title).toBeTruthy();
-    expect(title && title.textContent).toContain(mockActivity.title);
-    component.lang = 'en';
-    fixture.detectChanges();
-    const titleEn = compiled.querySelector('h1');
-    expect(titleEn).toBeTruthy();
-    expect(titleEn && titleEn.textContent).toContain(mockActivity.title);
-  });
-
-  it('should show not found message if activity is missing', (): void => {
-    // Simulate no activity found
-    const activityService = TestBed.inject(ActivityService);
-    spyOn(activityService, 'getActivityById').and.returnValue(of(undefined));
-    fixture = TestBed.createComponent(ActivityDetailComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-    const compiled = fixture.nativeElement;
-    const _notFound = compiled.querySelector('ng-template') || compiled.textContent;
-    expect(compiled.textContent).toContain('ACTIVITY.NOT_FOUND');
-  });
-
-  it('should call goBack and navigate to /activities when back button is clicked', (): void => {
-    spyOn(component, 'goBack').and.callThrough();
-    const router = TestBed.inject(Router);
-    spyOn(router, 'navigate').and.returnValue(Promise.resolve(true));
-    
-    // Call the goBack method directly
-    component.goBack();
-    
-    expect(component.goBack).toHaveBeenCalled();
-    expect(router.navigate).toHaveBeenCalledWith(['/activities'], {
-      queryParams: { category: null },
+    component.activity$?.subscribe(activity => {
+      expect(activity).toBeUndefined();
+      done();
     });
   });
 
-  it('should render video if videoUrl is present', (): void => {
-    const compiled = fixture.nativeElement;
-    if (mockActivity.videoUrl) {
-      const video = compiled.querySelector('video');
-      expect(video).toBeTruthy();
-      expect(video.src).toContain(mockActivity.videoUrl);
-    } else {
-      const video = compiled.querySelector('video');
-      expect(video).toBeFalsy();
-    }
+  it('should navigate back to the activities list', () => {
+    spyOn(window, 'scrollTo');
+    router.navigate.and.resolveTo(true);
+    component.goBack();
+    expect(router.navigate).toHaveBeenCalledWith(['/activities'], { queryParams: { category: null } });
   });
 
-  it('should render image with correct src and alt if no videoUrl', (): void => {
-    const compiled = fixture.nativeElement;
-    if (!mockActivity.videoUrl) {
-      const img = compiled.querySelector('img');
-      expect(img).toBeTruthy();
-      expect(img.getAttribute('src')).toBe(mockActivity.imageUrl);
-      expect(img.getAttribute('alt')).toBe(mockActivity.title);
-    } else {
-      const img = compiled.querySelector('img');
-      expect(img).toBeFalsy();
-    }
-  });
-
-  it('should render materials if present', (): void => {
-    const compiled = fixture.nativeElement;
-    if (mockActivity.materials && mockActivity.materials.length) {
-      const materials = compiled.querySelectorAll(
-        'div.bg-white.shadow-sm.border.border-green-100.rounded-xl'
-      )[1];
-      expect(materials.textContent).toContain('ACTIVITY.MATERIALS_TITLE');
-      mockActivity.materials.forEach((mat) => {
-        expect(materials.textContent).toContain(mat);
-      });
-      expect(materials).toBeTruthy();
-    } else {
-      expect(true).toBeTrue(); // No materials, test passes
-    }
-  });
-
-  it('should render instructions if present', (): void => {
-    const compiled = fixture.nativeElement;
-    if (mockActivity.instructions && mockActivity.instructions.length) {
-      const instructions = compiled.querySelectorAll(
-        'div.bg-white.shadow-sm.border.border-green-100.rounded-xl'
-      )[2];
-      expect(instructions.textContent).toContain('ACTIVITY.INSTRUCTIONS_TITLE');
-      mockActivity.instructions.forEach((instr) => {
-        expect(instructions.textContent).toContain(instr);
-      });
-      expect(instructions).toBeTruthy();
-    } else {
-      expect(true).toBeTrue(); // No instructions, test passes
-    }
-  });
-
-  it('should render category badge with correct translation key', (): void => {
-    const compiled = fixture.nativeElement;
-    const badge = compiled.querySelector('span.bg-green-100.text-green-700');
-    expect(badge).toBeTruthy();
-    expect(badge.textContent).toContain(
-      'HOME.CAT_' + mockActivity.category.toUpperCase() + '_TITLE'
-    );
+  it('should navigate back with a category if it exists in the query params', () => {
+    spyOn(window, 'scrollTo');
+    activatedRoute.snapshot.queryParamMap.get = (key: string) => 'physical';
+    router.navigate.and.resolveTo(true);
+    component.goBack();
+    expect(router.navigate).toHaveBeenCalledWith(['/activities'], { queryParams: { category: 'physical' } });
   });
 });

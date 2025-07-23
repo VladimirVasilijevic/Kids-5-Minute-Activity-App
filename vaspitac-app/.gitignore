@@ -56,9 +56,12 @@ pglite-debug.log
 .env.*
 
 # Firebase service account keys
-**/scripts/serviceAccountKey.json
-**/scripts/serviceAccountKey-prod.json
+**/scripts/shared/serviceAccountKey-prod.json
+**/scripts/shared/serviceAccountKey-dev.json
 **/scripts/node_modules
+**/firebase/serviceAccountKey-prod.json
+**/firebase/serviceAccountKey-dev.json
+**/firebase/serviceAccountKey-*.json
 
 **/firebase/functions/node_modules
 **/firebase/functions/lib

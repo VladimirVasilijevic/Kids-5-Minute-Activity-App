@@ -4,7 +4,7 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { UserProfile } from '../models/user-profile.model';
-import { Observable, tap } from 'rxjs';
+import { Observable, tap, from } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { TranslateService } from '@ngx-translate/core';
 import { LoadingService } from './loading.service';
@@ -64,7 +64,7 @@ export class UserService {
    */
   createUser(data: { email: string; password: string; displayName: string; role: string }) {
     this._loadingService.showWithMessage(this._translateService.instant('COMMON.SAVING'));
-    return this._functions.httpsCallable('createUser')(data).pipe(
+    return from(this._functions.httpsCallable('createUser')(data)).pipe(
       tap({
         next: () => this._loadingService.hide(),
         error: () => this._loadingService.hide()
@@ -79,7 +79,7 @@ export class UserService {
    */
   updateUser(data: { uid: string; displayName: string; role: string }) {
     this._loadingService.showWithMessage(this._translateService.instant('COMMON.SAVING'));
-    return this._functions.httpsCallable('updateUser')(data).pipe(
+    return from(this._functions.httpsCallable('updateUser')(data)).pipe(
       tap({
         next: () => this._loadingService.hide(),
         error: () => this._loadingService.hide()
@@ -94,7 +94,7 @@ export class UserService {
    */
   deleteUser(data: { uid: string }) {
     this._loadingService.showWithMessage(this._translateService.instant('COMMON.DELETING'));
-    return this._functions.httpsCallable('deleteUser')(data).pipe(
+    return from(this._functions.httpsCallable('deleteUser')(data)).pipe(
       tap({
         next: () => this._loadingService.hide(),
         error: () => this._loadingService.hide()
@@ -109,7 +109,7 @@ export class UserService {
    */
   resetUserPassword(data: { email: string }) {
     this._loadingService.showWithMessage(this._translateService.instant('COMMON.SENDING'));
-    return this._functions.httpsCallable('resetUserPassword')(data).pipe(
+    return from(this._functions.httpsCallable('resetUserPassword')(data)).pipe(
       tap({
         next: () => this._loadingService.hide(),
         error: () => this._loadingService.hide()
@@ -124,7 +124,7 @@ export class UserService {
    */
   deleteOwnProfile(data: { password: string }) {
     this._loadingService.showWithMessage(this._translateService.instant('COMMON.DELETING'));
-    return this._functions.httpsCallable('deleteOwnProfile')(data).pipe(
+    return from(this._functions.httpsCallable('deleteOwnProfile')(data)).pipe(
       tap({
         next: () => this._loadingService.hide(),
         error: () => this._loadingService.hide()
