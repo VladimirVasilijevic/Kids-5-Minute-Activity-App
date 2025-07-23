@@ -25,13 +25,11 @@ jobs:
           scan-dependencies: 'true'
           scan-code: 'true'
 
-  # Parallel jobs for better performance
-  setup-and-build:
+  # Build and deploy web application
+  build-and-deploy-web:
     runs-on: ubuntu-latest
     environment: production
     needs: security-scan
-    outputs:
-      web-build-available: ${{ steps.build.outputs.available }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -51,38 +49,26 @@ jobs:
           firebase-token: ${{ secrets.FIREBASE_TOKEN }}
 
       - name: Build web application
-        id: build
         uses: ./.github/actions/build-web
         with:
           configuration: 'production'
-          upload-artifact: 'true'
-
-  # Parallel deployment jobs
-  deploy-web:
-    runs-on: ubuntu-latest
-    needs: setup-and-build
-    if: needs.setup-and-build.outputs.web-build-available == 'true'
-    steps:
-      - name: Download web build
-        uses: actions/download-artifact@v4
-        with:
-          name: web-build-production
-          path: web-build
+          upload-artifact: 'false'
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: web-build
+          publish_dir: vaspitac-app/dist/vaspitac-app
           publish_branch: gh-pages
           force_orphan: true
           user_name: 'github-actions[bot]'
           user_email: 'github-actions[bot]@users.noreply.github.com'
           commit_message: 'Deploy production build to GitHub Pages'
 
+  # Deploy Firebase services
   deploy-firebase:
     runs-on: ubuntu-latest
-    needs: setup-and-build
+    needs: security-scan
     environment: production
     steps:
       - name: Checkout code
@@ -117,7 +103,7 @@ jobs:
   # Final verification job
   verify-deployment:
     runs-on: ubuntu-latest
-    needs: [deploy-web, deploy-firebase]
+    needs: [build-and-deploy-web, deploy-firebase]
     steps:
       - name: Verify deployment
         run: |

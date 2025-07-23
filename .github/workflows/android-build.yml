@@ -12,50 +12,15 @@ on:
   workflow_dispatch:
 
 jobs:
-  # Shared web build job
-  build-web:
-    runs-on: ubuntu-latest
-    outputs:
-      web-build-available: ${{ steps.build.outputs.available }}
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js and dependencies
-        uses: ./.github/actions/setup-node
-        with:
-          node-version: '18'
-
-      - name: Setup Firebase
-        uses: ./.github/actions/setup-firebase
-        with:
-          environment: ${{ github.ref == 'refs/heads/main' && 'production' || 'development' }}
-          firebase-project: ${{ github.ref == 'refs/heads/main' && secrets.FIREBASE_PROJECT_ID || secrets.FIREBASE_PROJECT_ID_DEV }}
-          firebase-token: ${{ secrets.FIREBASE_TOKEN }}
-
-      - name: Build web application
-        id: build
-        uses: ./.github/actions/build-web
-        with:
-          configuration: ${{ github.ref == 'refs/heads/main' && 'production' || 'development' }}
-          upload-artifact: 'true'
-
   # Android build jobs (parallel for different flavors)
   build-android-dev:
     runs-on: ubuntu-latest
-    needs: build-web
-    if: github.ref == 'refs/heads/develop' && needs.build-web.outputs.web-build-available == 'true'
+    if: github.ref == 'refs/heads/develop'
     environment: development
     
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Download web build
-        uses: actions/download-artifact@v4
-        with:
-          name: web-build-development
-          path: vaspitac-app/dist/vaspitac-app
 
       - name: Setup Node.js and dependencies
         uses: ./.github/actions/setup-node
@@ -68,6 +33,12 @@ jobs:
           environment: 'development'
           firebase-project: ${{ secrets.FIREBASE_PROJECT_ID_DEV }}
           firebase-token: ${{ secrets.FIREBASE_TOKEN }}
+
+      - name: Build web application
+        uses: ./.github/actions/build-web
+        with:
+          configuration: 'development'
+          upload-artifact: 'false'
 
       - name: Setup Java and Android SDK
         uses: actions/setup-java@v4
@@ -104,19 +75,12 @@ jobs:
 
   build-android-prod:
     runs-on: ubuntu-latest
-    needs: build-web
-    if: github.ref == 'refs/heads/main' && needs.build-web.outputs.web-build-available == 'true'
+    if: github.ref == 'refs/heads/main'
     environment: production
     
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Download web build
-        uses: actions/download-artifact@v4
-        with:
-          name: web-build-production
-          path: vaspitac-app/dist/vaspitac-app
 
       - name: Setup Node.js and dependencies
         uses: ./.github/actions/setup-node
@@ -129,6 +93,12 @@ jobs:
           environment: 'production'
           firebase-project: ${{ secrets.FIREBASE_PROJECT_ID }}
           firebase-token: ${{ secrets.FIREBASE_TOKEN }}
+
+      - name: Build web application
+        uses: ./.github/actions/build-web
+        with:
+          configuration: 'production'
+          upload-artifact: 'false'
 
       - name: Setup Java and Android SDK
         uses: actions/setup-java@v4
