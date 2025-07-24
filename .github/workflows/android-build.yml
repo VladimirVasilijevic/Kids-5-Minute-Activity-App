@@ -51,6 +51,13 @@ jobs:
           distribution: 'zulu'
           java-version: '17'
 
+      - name: Setup Node.js 20 for Firebase Functions
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: vaspitac-app/firebase/functions/package-lock.json
+
       - name: Deploy Firebase to Development
         working-directory: vaspitac-app/firebase
         run: |
@@ -69,6 +76,7 @@ jobs:
           # Build functions if they exist
           if [ -d "functions" ]; then
             cd functions
+            # Use npm install instead of npm ci to resolve lock file issues
             npm install
             npm run build
             cd ..
@@ -152,6 +160,13 @@ jobs:
           distribution: 'zulu'
           java-version: '17'
 
+      - name: Setup Node.js 20 for Firebase Functions
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: vaspitac-app/firebase/functions/package-lock.json
+
       - name: Deploy Firebase to Production
         working-directory: vaspitac-app/firebase
         run: |
@@ -170,6 +185,7 @@ jobs:
           # Build functions if they exist
           if [ -d "functions" ]; then
             cd functions
+            # Use npm install instead of npm ci to resolve lock file issues
             npm install
             npm run build
             cd ..
