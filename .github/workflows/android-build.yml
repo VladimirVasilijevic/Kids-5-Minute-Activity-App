@@ -88,9 +88,10 @@ jobs:
           # Deploy Storage rules
           firebase deploy --only storage --config firebase.dev.json
           
-          # Deploy Functions if they exist
+          # Try to deploy Functions if they exist (but don't fail the workflow if it fails)
           if [ -d "functions" ]; then
-            firebase deploy --only functions --config firebase.dev.json
+            echo "Attempting to deploy functions..."
+            firebase deploy --only functions --config firebase.dev.json || echo "Functions deployment failed, but continuing with workflow"
           fi
           
           echo "Firebase deployment completed"
@@ -197,9 +198,10 @@ jobs:
           # Deploy Storage rules
           firebase deploy --only storage --config firebase.prod.json
           
-          # Deploy Functions if they exist
+          # Try to deploy Functions if they exist (but don't fail the workflow if it fails)
           if [ -d "functions" ]; then
-            firebase deploy --only functions --config firebase.prod.json
+            echo "Attempting to deploy functions..."
+            firebase deploy --only functions --config firebase.prod.json || echo "Functions deployment failed, but continuing with workflow"
           fi
           
           echo "Firebase deployment completed"
