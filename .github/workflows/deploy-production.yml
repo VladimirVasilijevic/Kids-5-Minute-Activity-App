@@ -96,11 +96,26 @@ jobs:
           # Create service account key file
           echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT_KEY }}' > serviceAccountKey-production.json
           
+          # Debug: Check if service account key was created properly
+          echo "🔍 Checking service account key file..."
+          ls -la serviceAccountKey-production.json
+          echo "📄 Service account key content (first few lines):"
+          head -5 serviceAccountKey-production.json
+          
           # Set environment variable for authentication
           export GOOGLE_APPLICATION_CREDENTIALS="$(pwd)/serviceAccountKey-production.json"
           
+          # Debug: Verify environment variable
+          echo "🔍 GOOGLE_APPLICATION_CREDENTIALS: $GOOGLE_APPLICATION_CREDENTIALS"
+          
           # Set the Firebase project with authentication
           firebase use ${{ secrets.FIREBASE_PROJECT_ID }}
+          
+          # Debug: Check Firebase project and authentication
+          echo "🔍 Current Firebase project:"
+          firebase projects:list
+          echo "🔍 Firebase auth status:"
+          firebase auth:export --help || echo "Auth export not available"
           
           # Deploy Firestore rules and indexes
           firebase deploy --only firestore:rules,firestore:indexes --config firebase.prod.json
