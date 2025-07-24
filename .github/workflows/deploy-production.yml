@@ -99,6 +99,9 @@ jobs:
           # Set environment variable for authentication
           export GOOGLE_APPLICATION_CREDENTIALS="$(pwd)/serviceAccountKey-production.json"
           
+          # Set the Firebase project with authentication
+          firebase use ${{ secrets.FIREBASE_PROJECT_ID }}
+          
           # Deploy Firestore rules and indexes
           firebase deploy --only firestore:rules,firestore:indexes --config firebase.prod.json
           

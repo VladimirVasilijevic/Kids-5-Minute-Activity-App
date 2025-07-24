@@ -23,11 +23,10 @@ runs:
         npm install -g firebase-tools
         firebase --version
 
-    - name: Setup Firebase project
+    - name: Verify Firebase CLI installation
       shell: bash
       working-directory: ${{ inputs.working-directory }}/firebase
       run: |
-        # Set the project (authentication will be handled in deployment step)
-        firebase use ${{ inputs.firebase-project }}
-        
-        echo "✅ Firebase CLI configured for ${{ inputs.firebase-project }}" 
+        echo "✅ Firebase CLI installed and ready for ${{ inputs.firebase-project }}"
+        echo "📁 Working directory: $(pwd)"
+        echo "🔧 Project will be set during deployment with authentication" 
