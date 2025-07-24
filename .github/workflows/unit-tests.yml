@@ -1,61 +1,74 @@
-name: Unit Tests
+name: Optimized Unit Tests
 
 on:
   push:
     branches: ["**"]
+    paths:
+      - 'vaspitac-app/src/**'
+      - 'vaspitac-app/package.json'
+      - 'vaspitac-app/package-lock.json'
   pull_request:
     branches: ["**"]
+    paths:
+      - 'vaspitac-app/src/**'
+      - 'vaspitac-app/package.json'
+      - 'vaspitac-app/package-lock.json'
 
 jobs:
-  test:
+  # Security scan job
+  security-scan:
     runs-on: ubuntu-latest
     environment: development
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Use Node.js LTS
-        uses: actions/setup-node@v4
+      - name: Setup Node.js and dependencies
+        uses: ./.github/actions/setup-node
         with:
-          node-version: 'lts/*'
-          cache: 'npm'
-          cache-dependency-path: vaspitac-app/package-lock.json
+          node-version: '18'
 
-      - name: Install dependencies
-        run: npm ci
-        working-directory: vaspitac-app
+      - name: Run security scan
+        uses: ./.github/actions/security-scan
+        with:
+          scan-dependencies: 'true'
+          scan-code: 'true'
 
-      - name: Create environment.ts
-        working-directory: vaspitac-app
-        run: |
-          cat <<EOF > src/environments/environment.ts
-          export const environment = {
-            production: false,
-            firebase: {
-              apiKey: "${{ secrets.FIREBASE_API_KEY }}",
-              authDomain: "${{ secrets.FIREBASE_AUTH_DOMAIN }}",
-              projectId: "${{ secrets.FIREBASE_PROJECT_ID }}",
-              storageBucket: "${{ secrets.FIREBASE_STORAGE_BUCKET }}",
-              messagingSenderId: "${{ secrets.FIREBASE_MESSAGING_SENDER_ID }}",
-              appId: "${{ secrets.FIREBASE_APP_ID }}",
-              measurementId: "${{ secrets.FIREBASE_MEASUREMENT_ID }}"
-            }
-          }
-          EOF
+  test:
+    runs-on: ubuntu-latest
+    environment: development
+    needs: security-scan
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      - name: Build Angular app
-        run: npm run build --if-present
-        working-directory: vaspitac-app
+      - name: Setup Node.js and dependencies
+        uses: ./.github/actions/setup-node
+        with:
+          node-version: '18'
+
+      - name: Create environment configuration
+        uses: ./.github/actions/create-environment
+        with:
+          environment: 'development'
+          firebase-project: ${{ secrets.FIREBASE_PROJECT_ID_DEV }}
+          firebase-api-key: ${{ secrets.FIREBASE_API_KEY }}
+          firebase-auth-domain: ${{ secrets.FIREBASE_AUTH_DOMAIN }}
+          firebase-storage-bucket: ${{ secrets.FIREBASE_STORAGE_BUCKET }}
+          firebase-messaging-sender-id: ${{ secrets.FIREBASE_MESSAGING_SENDER_ID }}
+          firebase-app-id: ${{ secrets.FIREBASE_APP_ID }}
+          firebase-measurement-id: ${{ secrets.FIREBASE_MEASUREMENT_ID }}
 
       - name: Run unit tests with coverage
-        run: npx ng test --browsers=ChromeHeadless --watch=false --code-coverage
         working-directory: vaspitac-app
+        run: npx ng test --browsers=ChromeHeadless --watch=false --code-coverage
 
       - name: Upload coverage report
         uses: actions/upload-artifact@v4
         with:
           name: coverage-report
           path: vaspitac-app/coverage/
+          retention-days: 30
 
       - name: Fail if tests failed
         if: failure()

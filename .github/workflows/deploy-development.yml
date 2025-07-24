@@ -1,0 +1,173 @@
+name: Optimized Deploy Development
+
+on:
+  push:
+    branches: [develop]
+  workflow_dispatch:
+
+jobs:
+  # Security scan job (runs first)
+  security-scan:
+    runs-on: ubuntu-latest
+    environment: development
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js and dependencies
+        uses: ./.github/actions/setup-node
+        with:
+          node-version: '18'
+
+      - name: Run security scan
+        uses: ./.github/actions/security-scan
+        with:
+          scan-dependencies: 'true'
+          scan-code: 'true'
+
+  # Build and deploy web application
+  build-and-deploy-web:
+    runs-on: ubuntu-latest
+    environment: development
+    needs: security-scan
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js and dependencies
+        uses: ./.github/actions/setup-node
+        with:
+          node-version: '18'
+
+      - name: Create environment configuration
+        uses: ./.github/actions/create-environment
+        with:
+          environment: 'development'
+          firebase-project: ${{ secrets.FIREBASE_PROJECT_ID }}
+          firebase-api-key: ${{ secrets.FIREBASE_API_KEY }}
+          firebase-auth-domain: ${{ secrets.FIREBASE_AUTH_DOMAIN }}
+          firebase-storage-bucket: ${{ secrets.FIREBASE_STORAGE_BUCKET }}
+          firebase-messaging-sender-id: ${{ secrets.FIREBASE_MESSAGING_SENDER_ID }}
+          firebase-app-id: ${{ secrets.FIREBASE_APP_ID }}
+          firebase-measurement-id: ${{ secrets.FIREBASE_MEASUREMENT_ID }}
+
+      - name: Build web application
+        uses: ./.github/actions/build-web
+        with:
+          configuration: 'development'
+          upload-artifact: 'false'
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: vaspitac-app/dist/vaspitac-app
+          publish_branch: gh-pages-dev
+          force_orphan: true
+          user_name: 'github-actions[bot]'
+          user_email: 'github-actions[bot]@users.noreply.github.com'
+          commit_message: 'Deploy development build to GitHub Pages'
+
+  # Deploy Firebase services
+  deploy-firebase:
+    runs-on: ubuntu-latest
+    needs: security-scan
+    environment: development
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js and dependencies
+        uses: ./.github/actions/setup-node
+        with:
+          node-version: '18'
+
+      - name: Setup Firebase CLI
+        uses: ./.github/actions/setup-firebase
+        with:
+          firebase-project: ${{ secrets.FIREBASE_PROJECT_ID }}
+          environment: 'development'
+
+      - name: Build Cloud Functions
+        working-directory: vaspitac-app/firebase/functions
+        run: |
+          echo "🔨 Building Cloud Functions..."
+          npm ci
+          npm run build
+          echo "✅ Functions built successfully"
+          echo "📁 Functions lib directory:"
+          ls -la lib/
+
+      - name: Deploy Firebase services
+        working-directory: vaspitac-app/firebase
+        run: |
+          # Create service account key file
+          echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT_KEY }}' > serviceAccountKey-development.json
+          
+          # Debug: Check if service account key was created properly
+          echo "🔍 Checking service account key file..."
+          ls -la serviceAccountKey-development.json
+          echo "📄 Service account key content (first few lines):"
+          head -5 serviceAccountKey-development.json
+          
+          # Debug: Extract and verify service account details
+          echo "🔍 Service account details from key:"
+          CLIENT_EMAIL=$(cat serviceAccountKey-development.json | jq -r '.client_email' 2>/dev/null || echo "Failed to extract")
+          PROJECT_ID=$(cat serviceAccountKey-development.json | jq -r '.project_id' 2>/dev/null || echo "Failed to extract")
+          echo "Client Email: $CLIENT_EMAIL"
+          echo "Project ID: $PROJECT_ID"
+          
+          # Set environment variable for authentication
+          export GOOGLE_APPLICATION_CREDENTIALS="$(pwd)/serviceAccountKey-development.json"
+          
+          # Debug: Verify environment variable
+          echo "🔍 GOOGLE_APPLICATION_CREDENTIALS: $GOOGLE_APPLICATION_CREDENTIALS"
+          
+          # Set the Firebase project with authentication
+          firebase use ${{ secrets.FIREBASE_PROJECT_ID }}
+          
+          # Debug: Check Firebase project and authentication
+          echo "🔍 Current Firebase project:"
+          firebase projects:list
+          echo "🔍 Firebase auth status:"
+          firebase auth:export --help || echo "Auth export not available"
+          
+          # Debug: Test Firebase CLI authentication
+          echo "🔍 Testing Firebase CLI authentication..."
+          firebase --version
+          firebase projects:list --token "$(gcloud auth print-access-token 2>/dev/null || echo 'No gcloud token')" || echo "Token auth failed, continuing with service account"
+          
+          # Try deploying with explicit project specification
+          echo "🚀 Deploying Firestore rules and indexes..."
+          firebase deploy --only firestore:rules,firestore:indexes --config firebase.dev.json --project ${{ secrets.FIREBASE_PROJECT_ID }}
+          
+          echo "🚀 Deploying Storage rules..."
+          firebase deploy --only storage --config firebase.dev.json --project ${{ secrets.FIREBASE_PROJECT_ID }}
+          
+          # Deploy Functions if they exist and are properly built
+          if [ -d "functions" ] && [ -f "functions/lib/index.js" ]; then
+            echo "🚀 Deploying Functions..."
+            echo "🔍 Functions directory structure:"
+            ls -la functions/
+            echo "🔍 Functions lib directory:"
+            ls -la functions/lib/
+            firebase deploy --only functions --config firebase.dev.json --project ${{ secrets.FIREBASE_PROJECT_ID }}
+          else
+            echo "⚠️  Functions directory not found or not built, skipping functions deployment"
+          fi
+          
+          # Clean up service account key
+          rm -f serviceAccountKey-development.json
+
+  # Final verification job
+  verify-deployment:
+    runs-on: ubuntu-latest
+    needs: [build-and-deploy-web, deploy-firebase]
+    steps:
+      - name: Verify deployment
+        run: |
+          echo "🚀 Development deployment completed successfully!"
+          echo "📱 Development site: https://vladimirvasilijevic.github.io/Kids-5-Minute-Activity-App/"
+          echo "⚠️  Remember to configure Firebase API key restrictions for this domain"

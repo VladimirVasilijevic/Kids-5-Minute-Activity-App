@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { Observable, of } from 'rxjs';
+import { Observable } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
-import { catchError, switchMap, map } from 'rxjs/operators';
+import { catchError, map } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
 
 import { AboutService } from '../../services/about.service';
@@ -49,6 +49,7 @@ export class AboutComponent implements OnInit {
     this.aboutContent$ = this._aboutService.getAboutContent().pipe(
       // Fallback to JSON file if service fails
       catchError(() => {
+        // Fallback to JSON file
         console.log(`Falling back to JSON for about_${this.currentLanguage}`);
         return this._http.get<AboutContentData>(`assets/about_${this.currentLanguage}.json`).pipe(
           map((response: AboutContentData) => response.data)

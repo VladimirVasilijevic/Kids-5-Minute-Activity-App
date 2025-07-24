@@ -28,6 +28,11 @@ export default [
         HTMLElement: 'readonly',
         HTMLImageElement: 'readonly',
         setTimeout: 'readonly',
+        File: 'readonly',
+        Blob: 'readonly',
+        Response: 'readonly',
+        Event: 'readonly',
+        HTMLInputElement: 'readonly',
       },
     },
     plugins: {

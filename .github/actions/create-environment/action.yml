@@ -1,0 +1,56 @@
+name: 'Create Environment Configuration'
+description: 'Create environment.ts file with Firebase configuration'
+
+inputs:
+  environment:
+    description: 'Environment type (development/production)'
+    required: true
+  working-directory:
+    description: 'Working directory for operations'
+    required: false
+    default: 'vaspitac-app'
+  firebase-project:
+    description: 'Firebase project ID'
+    required: true
+  firebase-api-key:
+    description: 'Firebase API key'
+    required: true
+  firebase-auth-domain:
+    description: 'Firebase auth domain'
+    required: true
+  firebase-storage-bucket:
+    description: 'Firebase storage bucket'
+    required: true
+  firebase-messaging-sender-id:
+    description: 'Firebase messaging sender ID'
+    required: true
+  firebase-app-id:
+    description: 'Firebase app ID'
+    required: true
+  firebase-measurement-id:
+    description: 'Firebase measurement ID'
+    required: false
+    default: ''
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Create environment.ts
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      run: |
+        cat <<EOF > src/environments/environment.ts
+        export const environment = {
+          production: ${{ inputs.environment == 'production' }},
+          firebase: {
+            apiKey: "${{ inputs.firebase-api-key }}",
+            authDomain: "${{ inputs.firebase-auth-domain }}",
+            projectId: "${{ inputs.firebase-project }}",
+            storageBucket: "${{ inputs.firebase-storage-bucket }}",
+            messagingSenderId: "${{ inputs.firebase-messaging-sender-id }}",
+            appId: "${{ inputs.firebase-app-id }}",
+            measurementId: "${{ inputs.firebase-measurement-id }}"
+          }
+        }
+        EOF
+        echo "✅ Environment created for ${{ inputs.environment }}" 

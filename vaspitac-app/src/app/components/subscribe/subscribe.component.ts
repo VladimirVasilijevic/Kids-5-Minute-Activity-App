@@ -112,11 +112,11 @@ export class SubscribeComponent implements OnInit, OnDestroy {
 
   /**
    * Show success message
-   * @param message - Success message to display
+   * @param _message - Success message to display
    */
-  private showSuccess(message: string): void {
+  private showSuccess(_message: string): void {
     // This would typically use a toast service
-    console.log('Success:', message);
+    // Success
   }
 
   /**

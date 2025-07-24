@@ -1,11 +1,9 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { TranslateService } from '@ngx-translate/core';
-import { AuthService } from '../../services/auth.service';
 import { UserService } from '../../services/user.service';
 import { UserProfile, UserRole } from '../../models/user-profile.model';
-import { Observable, of, Subscription, EMPTY } from 'rxjs';
-import { switchMap, catchError } from 'rxjs/operators';
+import { EMPTY } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 
 @Component({
   selector: 'app-admin-users',
@@ -41,18 +39,18 @@ export class AdminUsersComponent implements OnInit {
 
   constructor(private _router: Router, private _userService: UserService) {}
 
-  ngOnInit() {
+  ngOnInit(): void {
     this._userService.getAllUsers().subscribe(users => {
       this.users = users;
       this.filterUsers();
     });
   }
 
-  onSearchChange() {
+  onSearchChange(): void {
     this.filterUsers();
   }
 
-  filterUsers() {
+  filterUsers(): void {
     const term = this.searchTerm.toLowerCase();
     this.filteredUsers = this.users.filter(user =>
       (user.displayName?.toLowerCase().includes(term) ||
@@ -61,7 +59,7 @@ export class AdminUsersComponent implements OnInit {
     );
   }
 
-  openUserModal(user?: UserProfile) {
+  openUserModal(user?: UserProfile): void {
     this.isUserModalOpen = true;
     if (user) {
       this.selectedUser = user;
@@ -82,22 +80,22 @@ export class AdminUsersComponent implements OnInit {
     }
   }
 
-  closeUserModal() {
+  closeUserModal(): void {
     this.isUserModalOpen = false;
     this.selectedUser = null;
   }
 
-  openDeleteModal(user: UserProfile) {
+  openDeleteModal(user: UserProfile): void {
     this.selectedUser = user;
     this.isDeleteModalOpen = true;
   }
 
-  closeDeleteModal() {
+  closeDeleteModal(): void {
     this.isDeleteModalOpen = false;
     this.selectedUser = null;
   }
 
-  saveUser() {
+  saveUser(): void {
     if (!this.selectedUser) {
       // Add user
       this._userService.createUser({
@@ -142,10 +140,10 @@ export class AdminUsersComponent implements OnInit {
     }
   }
 
-  resetPassword(user: UserProfile) {
+  resetPassword(user: UserProfile): void {
     this.resetConfirmTitle = 'Reset Password';
     this.resetConfirmMessage = `Are you sure you want to send a password reset email to ${user.email}?`;
-    this.resetConfirmAction = () => {
+    this.resetConfirmAction = (): void => {
       this._userService.resetUserPassword({ email: user.email })
         .pipe(
           catchError(err => {
@@ -154,11 +152,11 @@ export class AdminUsersComponent implements OnInit {
           })
         )
         .subscribe({
-          next: (result: any) => {
+          next: (result: { success: boolean; resetLink?: string; message?: string }) => {
             this.showSuccess('Password reset email sent successfully!');
             // For testing, you can log the reset link
-            if (result?.data?.resetLink) {
-              console.log('Password reset link:', result.data.resetLink);
+            if (result?.resetLink) {
+              // Password reset link generated
             }
           }
         });
@@ -166,21 +164,21 @@ export class AdminUsersComponent implements OnInit {
     this.showResetConfirmModal = true;
   }
 
-  closeResetConfirmModal() {
+  closeResetConfirmModal(): void {
     this.showResetConfirmModal = false;
     this.resetConfirmTitle = '';
     this.resetConfirmMessage = '';
     this.resetConfirmAction = null;
   }
 
-  onConfirmResetPassword() {
+  onConfirmResetPassword(): void {
     if (this.resetConfirmAction) {
       this.resetConfirmAction();
     }
     this.closeResetConfirmModal();
   }
 
-  confirmDeleteUser() {
+  confirmDeleteUser(): void {
     if (!this.selectedUser) return;
     
     this._userService.deleteUser({ uid: this.selectedUser.uid })
@@ -199,11 +197,11 @@ export class AdminUsersComponent implements OnInit {
       });
   }
 
-  getAvatarUrl(user: UserProfile) {
+  getAvatarUrl(user: UserProfile): string {
     return user.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.displayName)}&background=22c55e&color=fff`;
   }
 
-  getRoleBadgeClass(role: string) {
+  getRoleBadgeClass(role: string): string {
     switch (role) {
       case UserRole.ADMIN:
         return 'bg-red-100 text-red-800';
@@ -238,23 +236,23 @@ export class AdminUsersComponent implements OnInit {
     }
   }
 
-  navigateToAdmin() {
+  navigateToAdmin(): void {
     this._router.navigate(['/admin']);
   }
 
-  showError(title: string, message: string) {
+  showError(title: string, message: string): void {
     this.errorTitle = title;
     this.errorMessage = message;
     this.showErrorModal = true;
   }
 
-  closeErrorModal() {
+  closeErrorModal(): void {
     this.showErrorModal = false;
     this.errorTitle = '';
     this.errorMessage = '';
   }
 
-  showSuccess(message: string) {
+  showSuccess(message: string): void {
     this.successMessage = message;
     this.showSuccessMessage = true;
     setTimeout(() => {

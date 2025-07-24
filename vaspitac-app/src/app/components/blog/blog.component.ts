@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { Observable, combineLatest } from 'rxjs';
+import { Observable } from 'rxjs';
 import { map, startWith, switchMap } from 'rxjs/operators';
 import { TranslateService } from '@ngx-translate/core';
 

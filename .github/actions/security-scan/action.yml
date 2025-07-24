@@ -1,0 +1,100 @@
+name: 'Security Scan'
+description: 'Run security scans on dependencies and code'
+
+inputs:
+  working-directory:
+    description: 'Working directory for scans'
+    required: false
+    default: 'vaspitac-app'
+  scan-dependencies:
+    description: 'Whether to scan npm dependencies'
+    required: false
+    default: 'true'
+  scan-code:
+    description: 'Whether to scan code for vulnerabilities'
+    required: false
+    default: 'true'
+  fail-on-moderate:
+    description: 'Whether to fail on moderate vulnerabilities'
+    required: false
+    default: 'false'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Install security tools
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      run: |
+        # Install npm audit for dependency scanning
+        if [ "${{ inputs.scan-dependencies }}" = "true" ]; then
+          echo "🔍 Installing security scanning tools..."
+          npm install -g npm-audit-resolver
+        fi
+
+    - name: Scan npm dependencies
+      if: ${{ inputs.scan-dependencies == 'true' }}
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      run: |
+        echo "🔍 Scanning npm dependencies for vulnerabilities..."
+        
+        # Run audit and capture output
+        AUDIT_OUTPUT=$(npm audit --audit-level=high --json 2>/dev/null || true)
+        
+        # Check for high/critical vulnerabilities
+        if echo "$AUDIT_OUTPUT" | grep -q '"severity":"high"\|"severity":"critical"'; then
+          echo "❌ Critical/High security vulnerabilities found in dependencies"
+          echo "📋 Running detailed audit report..."
+          npm audit --audit-level=high
+          echo "📄 Full audit report:"
+          npm audit --json > security-audit-report.json
+          echo "🚨 Build failed due to critical/high vulnerabilities"
+          exit 1
+        elif echo "$AUDIT_OUTPUT" | grep -q '"severity":"moderate"'; then
+          echo "⚠️  Moderate security vulnerabilities found in dependencies"
+          echo "📋 Running detailed audit report..."
+          npm audit --audit-level=moderate
+          echo "📄 Full audit report:"
+          npm audit --json > security-audit-report.json
+          
+          if [ "${{ inputs.fail-on-moderate }}" = "true" ]; then
+            echo "🚨 Build failed due to moderate vulnerabilities"
+            exit 1
+          else
+            echo "✅ Continuing build (moderate vulnerabilities allowed)"
+            echo "💡 To fix vulnerabilities, run: npm audit fix"
+            echo "💡 For breaking changes: npm audit fix --force"
+          fi
+        else
+          echo "✅ No security vulnerabilities found in dependencies"
+        fi
+
+    - name: Scan for secrets in code
+      if: ${{ inputs.scan-code == 'true' }}
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      run: |
+        echo "🔍 Scanning code for potential secrets..."
+        
+        # Look for actual hardcoded secrets (not UI text)
+        # Check for Firebase API keys, tokens, etc. in TypeScript/JavaScript files only
+        SECRETS_FOUND=$(find src/ -name "*.ts" -o -name "*.js" | grep -v ".spec.ts" | grep -v ".template.ts" | xargs grep -l -i -E "(apiKey.*['\"][A-Za-z0-9_-]{20,}['\"]|token.*['\"][A-Za-z0-9_-]{20,}['\"]|secret.*['\"][A-Za-z0-9_-]{20,}['\"]|password.*['\"][A-Za-z0-9_-]{8,}['\"])" 2>/dev/null || true)
+        
+        if [ -n "$SECRETS_FOUND" ]; then
+          echo "⚠️  Potential hardcoded secrets found in code:"
+          echo "$SECRETS_FOUND"
+          echo "❌ Please review and remove any hardcoded secrets"
+          echo "💡 Use environment variables or secrets management instead"
+          exit 1
+        else
+          echo "✅ No hardcoded secrets found in code"
+        fi
+
+    - name: Upload security report
+      if: ${{ inputs.scan-dependencies == 'true' }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: security-audit-report
+        path: ${{ inputs.working-directory }}/security-audit-report.json
+        retention-days: 30 

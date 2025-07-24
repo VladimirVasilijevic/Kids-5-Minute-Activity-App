@@ -10,19 +10,5 @@
   },
   "functions": {
     "source": "functions"
-  },
-  "hosting": {
-    "public": "../dist/vaspitac-app",
-    "ignore": [
-      "firebase.json",
-      "**/.*",
-      "**/node_modules/**"
-    ],
-    "rewrites": [
-      {
-        "source": "**",
-        "destination": "/index.html"
-      }
-    ]
   }
 } 

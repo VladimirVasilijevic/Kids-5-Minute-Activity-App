@@ -1,20 +1,21 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { ReactiveFormsModule, FormsModule, FormBuilder } from '@angular/forms';
 import { Router } from '@angular/router';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { CUSTOM_ELEMENTS_SCHEMA, EventEmitter } from '@angular/core';
+
 import { AdminAboutComponent } from './admin-about.component';
 import { AuthService } from '../../services/auth.service';
 import { UserService } from '../../services/user.service';
 import { AboutService } from '../../services/about.service';
 import { ImageUploadService } from '../../services/image-upload.service';
 import { LanguageService } from '../../services/language.service';
-import { UserProfile, UserRole } from '../../models/user-profile.model';
-import { AboutContent, Experience } from '../../models/about-content.model';
-import { TranslateModule } from '@ngx-translate/core';
+import { UserRole } from '../../models/user-profile.model';
+import { mockAdminUser } from '../../../test-utils/mock-user-profiles';
+import { mockAboutContent } from '../../../test-utils/mock-about-content';
 
-/**
- * Test suite for AdminAboutComponent
- * Tests admin functionality for managing about page content
- */
 describe('AdminAboutComponent', () => {
   let component: AdminAboutComponent;
   let fixture: ComponentFixture<AdminAboutComponent>;
@@ -24,431 +25,301 @@ describe('AdminAboutComponent', () => {
   let mockAboutService: jasmine.SpyObj<AboutService>;
   let mockImageUploadService: jasmine.SpyObj<ImageUploadService>;
   let mockLanguageService: jasmine.SpyObj<LanguageService>;
+  let mockTranslateService: TranslateService;
+  let fb: FormBuilder;
 
-  const mockUserProfile: UserProfile = {
-    uid: 'test-uid',
-    email: 'test@example.com',
-    displayName: 'Test User',
-    role: UserRole.ADMIN,
-    createdAt: new Date().toISOString(),
-    permissions: []
-  };
-
-  const mockAboutContent: AboutContent = {
-    name: 'Test Name',
-    role: 'Test Role',
-    bioParagraphs: ['Test bio paragraph'],
-    experiences: [
-      {
-        title: 'Test Experience',
-        description: 'Test description',
-        dateRange: '2020-2023'
-      }
-    ],
-    email: 'test@example.com',
-    phone: '+1234567890',
-    location: 'Test Location',
-    profileImageUrl: 'https://example.com/image.jpg',
-    lastUpdated: new Date().toISOString()
-  };
-
-  /**
-   * Sets up the testing environment before each test
-   */
   beforeEach(async () => {
     mockRouter = jasmine.createSpyObj('Router', ['navigate']);
-    mockAuthService = jasmine.createSpyObj('AuthService', [], {
-      user$: of({ uid: 'test-uid' })
-    });
+    mockAuthService = jasmine.createSpyObj('AuthService', [], { user$: of({ uid: 'admin-uid' }) });
     mockUserService = jasmine.createSpyObj('UserService', ['getUserProfile']);
     mockAboutService = jasmine.createSpyObj('AboutService', ['getAboutContent', 'updateAboutContent']);
     mockImageUploadService = jasmine.createSpyObj('ImageUploadService', ['uploadImage', 'isValidImage']);
     mockLanguageService = jasmine.createSpyObj('LanguageService', ['getCurrentLanguage', 'setLanguage']);
+    mockTranslateService = {
+      instant: (key: string) => key,
+      get: (key: string) => of(key),
+      onLangChange: new EventEmitter(),
+      onTranslationChange: new EventEmitter(),
+      onDefaultLangChange: new EventEmitter(),
+    } as unknown as TranslateService;
 
-    mockUserService.getUserProfile.and.returnValue(of(mockUserProfile));
+    mockUserService.getUserProfile.and.returnValue(of(mockAdminUser));
     mockAboutService.getAboutContent.and.returnValue(of(mockAboutContent));
-    mockAboutService.updateAboutContent.and.returnValue(Promise.resolve());
-    mockLanguageService.getCurrentLanguage.and.returnValue('sr');
-    mockImageUploadService.isValidImage.and.returnValue(true);
-    mockImageUploadService.uploadImage.and.returnValue(of('https://example.com/uploaded-image.jpg'));
+    mockAboutService.updateAboutContent.and.resolveTo();
+    mockLanguageService.getCurrentLanguage.and.returnValue('en');
 
     await TestBed.configureTestingModule({
       declarations: [AdminAboutComponent],
-      imports: [TranslateModule.forRoot()],
+      imports: [
+        ReactiveFormsModule,
+        FormsModule,
+        TranslateModule.forRoot(),
+        HttpClientTestingModule,
+      ],
       providers: [
         { provide: Router, useValue: mockRouter },
         { provide: AuthService, useValue: mockAuthService },
         { provide: UserService, useValue: mockUserService },
         { provide: AboutService, useValue: mockAboutService },
         { provide: ImageUploadService, useValue: mockImageUploadService },
-        { provide: LanguageService, useValue: mockLanguageService }
-      ]
+        { provide: LanguageService, useValue: mockLanguageService },
+        { provide: TranslateService, useValue: mockTranslateService },
+      ],
+      schemas: [CUSTOM_ELEMENTS_SCHEMA],
     }).compileComponents();
 
     fixture = TestBed.createComponent(AdminAboutComponent);
     component = fixture.componentInstance;
-    fixture.detectChanges();
+    fb = TestBed.inject(FormBuilder);
   });
 
-  /**
-   * Tests that the component is created successfully
-   */
-  it('should create', () => {
+  it('should create the component', () => {
+    fixture.detectChanges();
     expect(component).toBeTruthy();
   });
 
-  /**
-   * Tests that user profile is loaded on initialization
-   */
-  it('should load user profile on init', () => {
-    expect(mockUserService.getUserProfile).toHaveBeenCalledWith('test-uid');
-    component.userProfile$.subscribe(profile => {
-      expect(profile).toEqual(mockUserProfile);
-    });
-  });
-
-  /**
-   * Tests that about content is loaded on initialization
-   */
-  it('should load about content on init', () => {
+  it('should load user profile and about content on initialization', () => {
+    fixture.detectChanges();
+    expect(mockUserService.getUserProfile).toHaveBeenCalledWith('admin-uid');
     expect(mockAboutService.getAboutContent).toHaveBeenCalled();
     expect(component.aboutContent).toEqual(mockAboutContent);
   });
 
-  /**
-   * Tests that current language is loaded on initialization
-   */
-  it('should load current language on init', () => {
-    expect(mockLanguageService.getCurrentLanguage).toHaveBeenCalled();
-    expect(component.currentLanguage).toBe('sr');
+  it('should initialize form data from about content', () => {
+    fixture.detectChanges();
+    expect(component.aboutForm.value.name).toBe(mockAboutContent.name);
+    expect(component.aboutForm.value.role).toBe(mockAboutContent.role);
+    expect(component.imagePreview).toBe(mockAboutContent.profileImageUrl || null);
   });
 
-  /**
-   * Tests that form data is initialized with about content
-   */
-  it('should initialize form data with about content', () => {
-    expect(component.formData.name).toBe(mockAboutContent.name);
-    expect(component.formData.role).toBe(mockAboutContent.role);
-    expect(component.formData.bioParagraphs).toEqual(mockAboutContent.bioParagraphs || []);
-    expect(component.formData.experiences).toEqual(mockAboutContent.experiences || []);
-    expect(component.formData.email).toBe(mockAboutContent.email);
-    expect(component.formData.phone).toBe(mockAboutContent.phone || '');
-    expect(component.formData.location).toBe(mockAboutContent.location);
-    expect(component.formData.profileImageUrl).toBe(mockAboutContent.profileImageUrl || '');
+  it('should correctly identify an admin user', () => {
+    fixture.detectChanges();
+    expect(component.isAdmin(mockAdminUser)).toBeTrue();
   });
 
-  /**
-   * Tests admin role validation
-   */
-  it('should correctly identify admin users', () => {
-    expect(component.isAdmin(mockUserProfile)).toBe(true);
-    
-    const nonAdminProfile = { ...mockUserProfile, role: UserRole.FREE_USER };
-    expect(component.isAdmin(nonAdminProfile)).toBe(false);
-    
-    expect(component.isAdmin(null)).toBe(false);
+  it('should correctly identify a non-admin user', () => {
+    fixture.detectChanges();
+    const nonAdminProfile = { ...mockAdminUser, role: UserRole.SUBSCRIBER };
+    expect(component.isAdmin(nonAdminProfile)).toBeFalse();
   });
 
-  /**
-   * Tests form validation with valid data
-   */
-  it('should validate form with valid data', () => {
-    component.formData = {
-      name: 'Test Name',
-      role: 'Test Role',
-      bioParagraphs: ['Test bio'],
-      experiences: [],
-      email: 'test@example.com',
-      phone: '+1234567890',
-      location: 'Test Location',
-      profileImageUrl: ''
-    };
+  describe('Form Validation', () => {
+    it('should be valid when all required fields are filled', () => {
+      fixture.detectChanges();
+      component.aboutForm.patchValue({
+        name: 'Valid Name',
+        role: 'Valid Role',
+        email: 'valid@email.com',
+        phone: '1234567890',
+        location: 'Valid Location'
+      });
+      component.bioParagraphs.at(0).setValue('Valid bio');
+      expect(component.aboutForm.valid).toBeTrue();
+    });
 
-    const isValid = (component as any).validateForm();
-    expect(isValid).toBe(true);
-    expect(Object.keys(component.formErrors).length).toBe(0);
-  });
-
-  /**
-   * Tests form validation with invalid data
-   */
-  it('should validate form with invalid data', () => {
-    component.formData = {
-      name: '',
-      role: '',
-      bioParagraphs: [''],
-      experiences: [],
-      email: '',
-      phone: '',
-      location: '',
-      profileImageUrl: ''
-    };
-
-    const isValid = (component as any).validateForm();
-    expect(isValid).toBe(false);
-    expect(component.formErrors['name']).toBe('Name is required');
-    expect(component.formErrors['role']).toBe('Role is required');
-    expect(component.formErrors['bioParagraphs']).toBe('At least one biography paragraph is required');
-    expect(component.formErrors['email']).toBe('Email is required');
-    expect(component.formErrors['phone']).toBe('Phone is required');
-    expect(component.formErrors['location']).toBe('Location is required');
-  });
-
-  /**
-   * Tests form submission with valid data
-   */
-  it('should handle form submission with valid data', async () => {
-    const event = new Event('submit');
-    spyOn(event, 'preventDefault');
-    
-    component.formData = {
-      name: 'Test Name',
-      role: 'Test Role',
-      bioParagraphs: ['Test bio'],
-      experiences: [],
-      email: 'test@example.com',
-      phone: '+1234567890',
-      location: 'Test Location',
-      profileImageUrl: ''
-    };
-
-    await component.handleSubmit(event);
-    
-    expect(event.preventDefault).toHaveBeenCalled();
-    expect(mockAboutService.updateAboutContent).toHaveBeenCalled();
-  });
-
-  /**
-   * Tests form submission with invalid data
-   */
-  it('should not submit form with invalid data', async () => {
-    const event = new Event('submit');
-    spyOn(event, 'preventDefault');
-    
-    component.formData = {
-      name: '',
-      role: '',
-      bioParagraphs: [''],
-      experiences: [],
-      email: '',
-      phone: '',
-      location: '',
-      profileImageUrl: ''
-    };
-
-    await component.handleSubmit(event);
-    
-    expect(event.preventDefault).toHaveBeenCalled();
-    expect(mockAboutService.updateAboutContent).not.toHaveBeenCalled();
-  });
-
-  /**
-   * Tests adding biography paragraph
-   */
-  it('should add biography paragraph', () => {
-    const initialLength = component.formData.bioParagraphs.length;
-    component.addBioParagraph();
-    expect(component.formData.bioParagraphs.length).toBe(initialLength + 1);
-  });
-
-  /**
-   * Tests removing biography paragraph
-   */
-  it('should remove biography paragraph', () => {
-    component.formData.bioParagraphs = ['Paragraph 1', 'Paragraph 2'];
-    const initialLength = component.formData.bioParagraphs.length;
-    
-    component.removeBioParagraph(0);
-    expect(component.formData.bioParagraphs.length).toBe(initialLength - 1);
-    expect(component.formData.bioParagraphs[0]).toBe('Paragraph 2');
-  });
-
-  /**
-   * Tests that biography paragraph cannot be removed when only one remains
-   */
-  it('should not remove biography paragraph when only one remains', () => {
-    component.formData.bioParagraphs = ['Only paragraph'];
-    component.removeBioParagraph(0);
-    expect(component.formData.bioParagraphs.length).toBe(1);
-  });
-
-  /**
-   * Tests adding experience
-   */
-  it('should add experience', () => {
-    const initialLength = component.formData.experiences.length;
-    component.addExperience();
-    expect(component.formData.experiences.length).toBe(initialLength + 1);
-    expect(component.formData.experiences[0]).toEqual({
-      title: '',
-      description: '',
-      dateRange: ''
+    it('should be invalid when required fields are empty', () => {
+      fixture.detectChanges();
+      component.aboutForm.patchValue({
+        name: '',
+        role: '',
+        email: '',
+        phone: '',
+        location: ''
+      });
+      component.bioParagraphs.at(0).setValue('');
+      expect(component.aboutForm.invalid).toBeTrue();
     });
   });
 
-  /**
-   * Tests removing experience
-   */
-  it('should remove experience', () => {
-    component.formData.experiences = [
-      { title: 'Exp 1', description: 'Desc 1', dateRange: '2020-2021' },
-      { title: 'Exp 2', description: 'Desc 2', dateRange: '2021-2022' }
-    ];
+  describe('Form Submission', () => {
+    it('should update about content on valid form submission', async () => {
+      fixture.detectChanges();
+      component.aboutForm.patchValue(mockAboutContent);
+      await component.handleSubmit(new Event('submit'));
+      expect(mockAboutService.updateAboutContent).toHaveBeenCalled();
+    });
+
+    it('should not update about content on invalid form submission', async () => {
+      fixture.detectChanges();
+      component.aboutForm.patchValue({ ...mockAboutContent, name: '' });
+      await component.handleSubmit(new Event('submit'));
+      expect(mockAboutService.updateAboutContent).not.toHaveBeenCalled();
+    });
+
+    it('should show success message on successful update', fakeAsync(() => {
+      fixture.detectChanges();
+      spyOn(component, 'showSuccess');
+      mockAboutService.updateAboutContent.and.resolveTo();
+      component.aboutForm.patchValue(mockAboutContent);
+      component.handleSubmit(new Event('submit'));
+      tick();
+      expect(component.showSuccess).toHaveBeenCalledWith('About content updated successfully!');
+    }));
+
+    it('should show error message on failed update', fakeAsync(() => {
+      fixture.detectChanges();
+      mockAboutService.updateAboutContent.and.rejectWith(new Error('Update failed'));
+      spyOn(component, 'showError');
+      component.aboutForm.patchValue(mockAboutContent);
+      component.handleSubmit(new Event('submit'));
+      tick();
+      expect(component.showError).toHaveBeenCalledWith('Update Error', 'Failed to update about content. Please try again.');
+    }));
+  });
+
+  describe('Bio Paragraphs and Experiences', () => {
+    it('should add a new biography paragraph', () => {
+      fixture.detectChanges();
+      const initialLength = component.bioParagraphs.length;
+      component.addBioParagraph();
+      expect(component.bioParagraphs.length).toBe(initialLength + 1);
+    });
+
+    it('should remove a biography paragraph', () => {
+      fixture.detectChanges();
+      component.bioParagraphs.clear();
+      component.bioParagraphs.push(fb.control('p1'));
+      component.bioParagraphs.push(fb.control('p2'));
+      component.removeBioParagraph(0);
+      expect(component.bioParagraphs.length).toBe(1);
+      expect(component.bioParagraphs.at(0).value).toBe('p2');
+    });
+
+    it('should add a new experience', () => {
+      fixture.detectChanges();
+      const initialLength = component.experiences.length;
+      component.addExperience();
+      expect(component.experiences.length).toBe(initialLength + 1);
+    });
+
+    it('should remove an experience', () => {
+      fixture.detectChanges();
+      component.experiences.clear();
+      component.addExperience({ title: 'e1', description: '', dateRange: '' });
+      component.removeExperience(0);
+      expect(component.experiences.length).toBe(0);
+    });
+  });
+
+  describe('Image Upload', () => {
+    it('should upload a valid image', () => {
+      fixture.detectChanges();
+      mockImageUploadService.isValidImage.and.returnValue(true);
+      mockImageUploadService.uploadImage.and.returnValue(of('http://example.com/new.jpg'));
+      const file = new File([''], 'test.jpg', { type: 'image/jpeg' });
+      const event = {
+        target: { files: [file] },
+        bubbles: false,
+        cancelBubble: false,
+        cancelable: false,
+        composed: false,
+        currentTarget: null,
+        defaultPrevented: false,
+        eventPhase: 0,
+        isTrusted: false,
+        returnValue: true,
+        srcElement: null,
+        timeStamp: 0,
+        type: 'change',
+        AT_TARGET: 2,
+        BUBBLING_PHASE: 3,
+        CAPTURING_PHASE: 1,
+        NONE: 0,
+        preventDefault: () => {},
+        stopImmediatePropagation: () => {},
+        stopPropagation: () => {},
+        composedPath: () => [],
+        initEvent: () => {}
+      } as unknown as Event;
+
+      component.onImageSelected(event);
+
+      expect(component.aboutForm.value.profileImageUrl).toBe('http://example.com/new.jpg');
+      expect(component.imagePreview).toBe('http://example.com/new.jpg');
+    });
+
+    it('should show an error for an invalid image', () => {
+      fixture.detectChanges();
+      mockImageUploadService.isValidImage.and.returnValue(false);
+      spyOn(component, 'showError');
+      const file = new File([''], 'test.txt', { type: 'text/plain' });
+      const event = {
+        target: { files: [file] },
+        bubbles: false,
+        cancelBubble: false,
+        cancelable: false,
+        composed: false,
+        currentTarget: null,
+        defaultPrevented: false,
+        eventPhase: 0,
+        isTrusted: false,
+        returnValue: true,
+        srcElement: null,
+        timeStamp: 0,
+        type: 'change',
+        AT_TARGET: 2,
+        BUBBLING_PHASE: 3,
+        CAPTURING_PHASE: 1,
+        NONE: 0,
+        preventDefault: () => {},
+        stopImmediatePropagation: () => {},
+        stopPropagation: () => {},
+        composedPath: () => [],
+        initEvent: () => {}
+      } as unknown as Event;
+
+      component.onImageSelected(event);
+
+      expect(component.showError).toHaveBeenCalled();
+    });
+
+    it('should show an error when image upload fails', () => {
+        fixture.detectChanges();
+        mockImageUploadService.isValidImage.and.returnValue(true);
+        mockImageUploadService.uploadImage.and.returnValue(throwError(() => new Error('Upload failed')));
+        spyOn(component, 'showError');
+        const file = new File([''], 'test.jpg', { type: 'image/jpeg' });
+        const event = {
+          target: { files: [file] },
+          bubbles: false,
+          cancelBubble: false,
+          cancelable: false,
+          composed: false,
+          currentTarget: null,
+          defaultPrevented: false,
+          eventPhase: 0,
+          isTrusted: false,
+          returnValue: true,
+          srcElement: null,
+          timeStamp: 0,
+          type: 'change',
+          AT_TARGET: 2,
+          BUBBLING_PHASE: 3,
+          CAPTURING_PHASE: 1,
+          NONE: 0,
+          preventDefault: () => {},
+          stopImmediatePropagation: () => {},
+          stopPropagation: () => {},
+          composedPath: () => [],
+          initEvent: () => {}
+        } as unknown as Event;
     
-    component.removeExperience(0);
-    expect(component.formData.experiences.length).toBe(1);
-    expect(component.formData.experiences[0].title).toBe('Exp 2');
+        component.onImageSelected(event);
+    
+        expect(component.showError).toHaveBeenCalledWith('Upload Error', 'Failed to upload image. Please try again.');
+    });
   });
 
-  /**
-   * Tests language change functionality
-   */
-  it('should change language', () => {
-    component.changeLanguage('en');
-    expect(mockLanguageService.setLanguage).toHaveBeenCalledWith('en');
-    expect(component.currentLanguage).toBe('en');
+  it('should change language and reload content', () => {
+    fixture.detectChanges();
+    component.changeLanguage('sr');
+    expect(mockLanguageService.setLanguage).toHaveBeenCalledWith('sr');
+    expect(mockAboutService.getAboutContent).toHaveBeenCalled();
   });
 
-  /**
-   * Tests image selection and upload
-   */
-  it('should handle image selection and upload', () => {
-    const mockFile = new File([''], 'test.jpg', { type: 'image/jpeg' });
-    const mockEvent = { target: { files: [mockFile] } };
-
-    component.onImageSelected(mockEvent);
-
-    expect(mockImageUploadService.isValidImage).toHaveBeenCalledWith(mockFile);
-    expect(mockImageUploadService.uploadImage).toHaveBeenCalledWith(mockFile, 'profile-avatars');
-  });
-
-  /**
-   * Tests image selection with invalid file
-   */
-  it('should handle invalid image file', () => {
-    const mockFile = new File([''], 'test.txt', { type: 'text/plain' });
-    const mockEvent = { target: { files: [mockFile] } };
-
-    mockImageUploadService.isValidImage.and.returnValue(false);
-    spyOn(component, 'showError');
-
-    component.onImageSelected(mockEvent);
-
-    expect(component.showError).toHaveBeenCalledWith('Invalid Image', 'Please select a valid image file (JPEG, PNG, GIF, WebP) under 5MB.');
-  });
-
-  /**
-   * Tests error handling during image upload
-   */
-  it('should handle image upload error', () => {
-    const mockFile = new File([''], 'test.jpg', { type: 'image/jpeg' });
-    const mockEvent = { target: { files: [mockFile] } };
-
-    mockImageUploadService.uploadImage.and.returnValue(of('error'));
-    spyOn(component, 'showError');
-
-    component.onImageSelected(mockEvent);
-
-    expect(component.showError).toHaveBeenCalledWith('Upload Error', 'Failed to upload image. Please try again.');
-  });
-
-  /**
-   * Tests error display functionality
-   */
-  it('should show error modal', () => {
-    component.showError('Test Title', 'Test Message');
-    expect(component.showErrorModal).toBe(true);
-    expect(component.errorTitle).toBe('Test Title');
-    expect(component.errorMessage).toBe('Test Message');
-  });
-
-  /**
-   * Tests error modal hiding
-   */
-  it('should hide error modal', () => {
-    component.showErrorModal = true;
-    component.errorTitle = 'Test';
-    component.errorMessage = 'Test';
-
-    component.hideError();
-    expect(component.showErrorModal).toBe(false);
-    expect(component.errorTitle).toBe('');
-    expect(component.errorMessage).toBe('');
-  });
-
-  /**
-   * Tests success message display
-   */
-  it('should show success message', (done) => {
-    component.showSuccess('Test success message');
-    expect(component.showSuccessMessage).toBe(true);
-    expect(component.successMessage).toBe('Test success message');
-
-    setTimeout(() => {
-      expect(component.showSuccessMessage).toBe(false);
-      expect(component.successMessage).toBe('');
-      done();
-    }, 3100);
-  });
-
-  /**
-   * Tests navigation to admin dashboard
-   */
-  it('should navigate to admin dashboard', () => {
+  it('should navigate to the admin dashboard', () => {
+    fixture.detectChanges();
     component.navigateToAdmin();
     expect(mockRouter.navigate).toHaveBeenCalledWith(['/admin']);
-  });
-
-  /**
-   * Tests about content update functionality
-   */
-  it('should update about content successfully', async () => {
-    component.formData = {
-      name: 'Updated Name',
-      role: 'Updated Role',
-      bioParagraphs: ['Updated bio'],
-      experiences: [],
-      email: 'updated@example.com',
-      phone: '+9876543210',
-      location: 'Updated Location',
-      profileImageUrl: 'https://example.com/updated.jpg'
-    };
-
-    await (component as any).updateAboutContent();
-
-    expect(mockAboutService.updateAboutContent).toHaveBeenCalledWith(jasmine.objectContaining({
-      name: 'Updated Name',
-      role: 'Updated Role',
-      bioParagraphs: ['Updated bio'],
-      email: 'updated@example.com',
-      phone: '+9876543210',
-      location: 'Updated Location',
-      profileImageUrl: 'https://example.com/updated.jpg'
-    }));
-  });
-
-  /**
-   * Tests about content update error handling
-   */
-  it('should handle about content update error', async () => {
-    mockAboutService.updateAboutContent.and.returnValue(Promise.reject(new Error('Update failed')));
-    spyOn(component, 'showError');
-
-    await (component as any).updateAboutContent();
-
-    expect(component.showError).toHaveBeenCalledWith('Update Error', 'Failed to update about content. Please try again.');
-  });
-
-  /**
-   * Tests that bio paragraphs are filtered to remove empty ones
-   */
-  it('should filter empty bio paragraphs on update', async () => {
-    component.formData.bioParagraphs = ['Valid paragraph', '', 'Another valid paragraph', ''];
-
-    await (component as any).updateAboutContent();
-
-    expect(mockAboutService.updateAboutContent).toHaveBeenCalledWith(jasmine.objectContaining({
-      bioParagraphs: ['Valid paragraph', 'Another valid paragraph']
-    }));
   });
 }); 

@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed, waitForAsync, fakeAsync, tick, flush, discardPeriodicTasks } from '@angular/core/testing';
 import { Router } from '@angular/router';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideRouter } from '@angular/router';
@@ -14,6 +14,7 @@ import { AdminBlogPost } from '../../models/admin-blog-post.model';
 import { mockAdminUser, mockSubscriber } from '../../../test-utils/mock-user-profiles';
 import { mockBlogPosts } from '../../../test-utils/mock-blog-posts';
 import { ImageUploadService } from '../../services/image-upload.service';
+import { ContentVisibility } from '../../models/content-visibility.model';
 
 describe('AdminBlogsComponent', (): void => {
   let component: AdminBlogsComponent;
@@ -23,6 +24,7 @@ describe('AdminBlogsComponent', (): void => {
   let userService: jasmine.SpyObj<UserService>;
   let blogService: jasmine.SpyObj<BlogService>;
   let _translate: TranslateService;
+  let mockImageUploadService: jasmine.SpyObj<ImageUploadService>;
 
   const mockUserProfile = mockAdminUser;
 
@@ -32,11 +34,6 @@ describe('AdminBlogsComponent', (): void => {
     isDeleting: false,
     status: 'published' as const
   }));
-
-  const mockImageUploadService = {
-    isValidImage: (): boolean => true,
-    uploadImage: (): any => of('mock-url')
-  };
 
   beforeEach(waitForAsync(async (): Promise<void> => {
     const authSpy = jasmine.createSpyObj('AuthService', [], {
@@ -65,7 +62,10 @@ describe('AdminBlogsComponent', (): void => {
         { provide: UserService, useValue: userSpy },
         { provide: BlogService, useValue: blogSpy },
         { provide: Router, useValue: routerSpy },
-        { provide: ImageUploadService, useValue: mockImageUploadService },
+        {
+          provide: ImageUploadService,
+          useValue: jasmine.createSpyObj('ImageUploadService', ['isValidImage', 'uploadImage'])
+        },
         provideHttpClientTesting(),
         provideRouter([])
       ],
@@ -77,6 +77,7 @@ describe('AdminBlogsComponent', (): void => {
     blogService = TestBed.inject(BlogService) as jasmine.SpyObj<BlogService>;
     router = TestBed.inject(Router);
     _translate = TestBed.inject(TranslateService);
+    mockImageUploadService = TestBed.inject(ImageUploadService) as jasmine.SpyObj<ImageUploadService>;
   }));
 
   beforeEach((): void => {
@@ -140,7 +141,9 @@ describe('AdminBlogsComponent', (): void => {
       fullContent: 'New Content',
       author: 'New Author',
       readTime: '10 min',
-      imageUrl: 'new-blog.jpg'
+      imageUrl: 'new-blog.jpg',
+      visibility: ContentVisibility.PUBLIC,
+      isPremium: false
     };
     
     component.handleSubmit(event);
@@ -170,7 +173,9 @@ describe('AdminBlogsComponent', (): void => {
       fullContent: 'Updated Content',
       author: 'Updated Author',
       readTime: '15 min',
-      imageUrl: 'updated-blog.jpg'
+      imageUrl: 'updated-blog.jpg',
+      visibility: ContentVisibility.PUBLIC,
+      isPremium: false
     };
     
     component.handleSubmit(event);
@@ -246,7 +251,9 @@ describe('AdminBlogsComponent', (): void => {
       fullContent: 'Test',
       author: 'Test',
       readTime: '5 min',
-      imageUrl: 'test.jpg'
+      imageUrl: 'test.jpg',
+      visibility: ContentVisibility.PUBLIC,
+      isPremium: false
     };
     component.editingBlog = mockAdminBlogPosts[0];
     component.showForm = true;
@@ -257,8 +264,6 @@ describe('AdminBlogsComponent', (): void => {
     expect(component.editingBlog).toBeNull();
     expect(component.showForm).toBe(false);
   });
-
-
 
   it('should format date correctly', (): void => {
     const dateString = '2024-01-01';
@@ -277,5 +282,331 @@ describe('AdminBlogsComponent', (): void => {
     const compiled = fixture.nativeElement;
     const title = compiled.querySelector('h1');
     expect(title).toBeTruthy();
+  });
+
+  describe('Image Handling', (): void => {
+    let localMockImageUploadService: jasmine.SpyObj<ImageUploadService>;
+    let _localComponent: AdminBlogsComponent;
+
+    beforeEach((): void => {
+      localMockImageUploadService = TestBed.inject(ImageUploadService) as jasmine.SpyObj<ImageUploadService>;
+      _localComponent = TestBed.createComponent(AdminBlogsComponent).componentInstance;
+      // Reset spy calls before each test
+      localMockImageUploadService.isValidImage.calls.reset();
+      localMockImageUploadService.uploadImage.calls.reset();
+    });
+
+    describe('onImageSelected', (): void => {
+      it('should handle valid image selection', fakeAsync((): void => {
+        // Arrange
+        const mockFile = new File(['test'], 'test.jpg', { type: 'image/jpeg' });
+        const mockEvent = {
+          target: {
+            files: [mockFile]
+          }
+        } as any;
+        
+        mockImageUploadService.isValidImage.and.returnValue(true);
+        mockImageUploadService.uploadImage.and.returnValue(of('https://example.com/image.jpg'));
+        
+        // Act
+        component.onImageSelected(mockEvent);
+        tick();
+        
+        // Assert
+        expect(mockImageUploadService.isValidImage).toHaveBeenCalledWith(mockFile);
+        expect(mockImageUploadService.uploadImage).toHaveBeenCalledWith(mockFile, 'blog-images/');
+        expect(component.formData.imageUrl).toBe('https://example.com/image.jpg');
+        expect(component.imagePreview).toBe('https://example.com/image.jpg');
+        expect(component.isUploadingImage).toBe(false);
+      }));
+
+      it('should handle invalid image selection', (): void => {
+        // Arrange
+        const mockFile = new File(['test'], 'test.txt', { type: 'text/plain' });
+        const mockEvent = {
+          target: {
+            files: [mockFile]
+          }
+        } as any;
+        
+        mockImageUploadService.isValidImage.and.returnValue(false);
+        
+        // Act
+        component.onImageSelected(mockEvent);
+        
+        // Assert
+        expect(mockImageUploadService.isValidImage).toHaveBeenCalledWith(mockFile);
+        expect(mockImageUploadService.uploadImage).not.toHaveBeenCalled();
+      });
+
+      it('should handle no file selected', (): void => {
+        // Arrange
+        const mockEvent = {
+          target: {
+            files: []
+          }
+        } as any;
+        
+        // Act
+        component.onImageSelected(mockEvent);
+        
+        // Assert
+        expect(mockImageUploadService.isValidImage).not.toHaveBeenCalled();
+        expect(mockImageUploadService.uploadImage).not.toHaveBeenCalled();
+      });
+
+      it('should handle null files', (): void => {
+        // Arrange
+        const mockEvent = {
+          target: {
+            files: null
+          }
+        } as any;
+        
+        // Act
+        component.onImageSelected(mockEvent);
+        
+        // Assert
+        expect(mockImageUploadService.isValidImage).not.toHaveBeenCalled();
+        expect(mockImageUploadService.uploadImage).not.toHaveBeenCalled();
+      });
+
+      it('should handle upload error', fakeAsync((): void => {
+        // Arrange
+        const mockFile = new File(['test'], 'test.jpg', { type: 'image/jpeg' });
+        const mockEvent = {
+          target: {
+            files: [mockFile]
+          }
+        } as any;
+        const uploadError = new Error('Upload failed');
+        
+        mockImageUploadService.isValidImage.and.returnValue(true);
+        mockImageUploadService.uploadImage.and.returnValue(throwError(() => uploadError));
+        spyOn(console, 'error');
+        
+        // Act
+        component.onImageSelected(mockEvent);
+        tick();
+        
+        // Assert
+        expect(console.error).toHaveBeenCalledWith('Error uploading image:', uploadError);
+        expect(component.isUploadingImage).toBe(false);
+      }));
+
+      it('should handle upload error with generic message', fakeAsync((): void => {
+        // Arrange
+        const mockFile = new File(['test'], 'test.jpg', { type: 'image/jpeg' });
+        const mockEvent = {
+          target: {
+            files: [mockFile]
+          }
+        } as any;
+        const uploadError = new Error();
+        uploadError.message = '';
+        
+        mockImageUploadService.isValidImage.and.returnValue(true);
+        mockImageUploadService.uploadImage.and.returnValue(throwError(() => uploadError));
+        
+        // Act
+        component.onImageSelected(mockEvent);
+        tick();
+        
+        // Assert
+        expect(component.isUploadingImage).toBe(false);
+      }));
+    });
+
+    describe('onDragOver', (): void => {
+      it('should prevent default and stop propagation', (): void => {
+        // Arrange
+        const mockEvent = {
+          preventDefault: jasmine.createSpy('preventDefault'),
+          stopPropagation: jasmine.createSpy('stopPropagation')
+        } as any;
+        
+        // Act
+        component.onDragOver(mockEvent);
+        
+        // Assert
+        expect(mockEvent.preventDefault).toHaveBeenCalled();
+        expect(mockEvent.stopPropagation).toHaveBeenCalled();
+      });
+    });
+
+    describe('onDrop', (): void => {
+      it('should handle valid image drop', fakeAsync((): void => {
+        // Arrange
+        const mockFile = new File(['test'], 'test.jpg', { type: 'image/jpeg' });
+        const mockEvent = {
+          preventDefault: jasmine.createSpy('preventDefault'),
+          stopPropagation: jasmine.createSpy('stopPropagation'),
+          dataTransfer: {
+            files: [mockFile]
+          }
+        } as any;
+        
+        mockImageUploadService.isValidImage.and.returnValue(true);
+        mockImageUploadService.uploadImage.and.returnValue(of('https://example.com/image.jpg'));
+        
+        // Act
+        component.onDrop(mockEvent);
+        tick();
+        
+        // Assert
+        expect(mockEvent.preventDefault).toHaveBeenCalled();
+        expect(mockEvent.stopPropagation).toHaveBeenCalled();
+        expect(mockImageUploadService.isValidImage).toHaveBeenCalledWith(mockFile);
+        expect(mockImageUploadService.uploadImage).toHaveBeenCalledWith(mockFile, 'blog-images/');
+        expect(component.formData.imageUrl).toBe('https://example.com/image.jpg');
+        expect(component.imagePreview).toBe('https://example.com/image.jpg');
+        expect(component.isUploadingImage).toBe(false);
+      }));
+
+      it('should handle invalid image drop', (): void => {
+        // Arrange
+        const mockFile = new File(['test'], 'test.txt', { type: 'text/plain' });
+        const mockEvent = {
+          preventDefault: jasmine.createSpy('preventDefault'),
+          stopPropagation: jasmine.createSpy('stopPropagation'),
+          dataTransfer: {
+            files: [mockFile]
+          }
+        } as any;
+        
+        mockImageUploadService.isValidImage.and.returnValue(false);
+        
+        // Act
+        component.onDrop(mockEvent);
+        
+        // Assert
+        expect(mockEvent.preventDefault).toHaveBeenCalled();
+        expect(mockEvent.stopPropagation).toHaveBeenCalled();
+        expect(mockImageUploadService.isValidImage).toHaveBeenCalledWith(mockFile);
+        expect(mockImageUploadService.uploadImage).not.toHaveBeenCalled();
+      });
+
+      it('should handle drop with no files', (): void => {
+        // Arrange
+        const mockEvent = {
+          preventDefault: jasmine.createSpy('preventDefault'),
+          stopPropagation: jasmine.createSpy('stopPropagation'),
+          dataTransfer: {
+            files: []
+          }
+        } as any;
+        
+        // Act
+        component.onDrop(mockEvent);
+        
+        // Assert
+        expect(mockEvent.preventDefault).toHaveBeenCalled();
+        expect(mockEvent.stopPropagation).toHaveBeenCalled();
+        expect(mockImageUploadService.isValidImage).not.toHaveBeenCalled();
+        expect(mockImageUploadService.uploadImage).not.toHaveBeenCalled();
+      });
+
+      it('should handle drop with null dataTransfer', (): void => {
+        // Arrange
+        const mockEvent = {
+          preventDefault: jasmine.createSpy('preventDefault'),
+          stopPropagation: jasmine.createSpy('stopPropagation'),
+          dataTransfer: null
+        } as any;
+        
+        // Act
+        component.onDrop(mockEvent);
+        
+        // Assert
+        expect(mockEvent.preventDefault).toHaveBeenCalled();
+        expect(mockEvent.stopPropagation).toHaveBeenCalled();
+        expect(mockImageUploadService.isValidImage).not.toHaveBeenCalled();
+        expect(mockImageUploadService.uploadImage).not.toHaveBeenCalled();
+      });
+
+      it('should handle drop with null files', (): void => {
+        // Arrange
+        const mockEvent = {
+          preventDefault: jasmine.createSpy('preventDefault'),
+          stopPropagation: jasmine.createSpy('stopPropagation'),
+          dataTransfer: {
+            files: null
+          }
+        } as any;
+        
+        // Act
+        component.onDrop(mockEvent);
+        
+        // Assert
+        expect(mockEvent.preventDefault).toHaveBeenCalled();
+        expect(mockEvent.stopPropagation).toHaveBeenCalled();
+        expect(mockImageUploadService.isValidImage).not.toHaveBeenCalled();
+        expect(mockImageUploadService.uploadImage).not.toHaveBeenCalled();
+      });
+    });
+
+    describe('removeImage', (): void => {
+      it('should clear image data', (): void => {
+        // Arrange
+        component.formData.imageUrl = 'https://example.com/image.jpg';
+        component.imagePreview = 'https://example.com/image.jpg';
+        
+        // Act
+        component.removeImage();
+        
+        // Assert
+        expect(component.formData.imageUrl).toBe('');
+        expect(component.imagePreview).toBeNull();
+      });
+    });
+
+    describe('uploadImage (private method)', (): void => {
+      it('should set uploading state and handle success', fakeAsync((): void => {
+        // Arrange
+        const mockFile = new File(['test'], 'test.jpg', { type: 'image/jpeg' });
+        mockImageUploadService.uploadImage.and.returnValue(of('https://example.com/image.jpg'));
+        
+        // Act
+        (component as any).uploadImage(mockFile);
+        tick();
+        
+        // Assert
+        expect(component.isUploadingImage).toBe(false);
+        expect(component.formData.imageUrl).toBe('https://example.com/image.jpg');
+        expect(component.imagePreview).toBe('https://example.com/image.jpg');
+      }));
+
+      it('should handle upload error', fakeAsync((): void => {
+        // Arrange
+        const mockFile = new File(['test'], 'test.jpg', { type: 'image/jpeg' });
+        const uploadError = new Error('Upload failed');
+        mockImageUploadService.uploadImage.and.returnValue(throwError(() => uploadError));
+        spyOn(console, 'error');
+        
+        // Act
+        (component as any).uploadImage(mockFile);
+        tick();
+        
+        // Assert
+        expect(component.isUploadingImage).toBe(false);
+        expect(console.error).toHaveBeenCalledWith('Error uploading image:', uploadError);
+      }));
+
+      it('should handle upload error with empty message', fakeAsync((): void => {
+        // Arrange
+        const mockFile = new File(['test'], 'test.jpg', { type: 'image/jpeg' });
+        const uploadError = new Error();
+        uploadError.message = '';
+        mockImageUploadService.uploadImage.and.returnValue(throwError(() => uploadError));
+        
+        // Act
+        (component as any).uploadImage(mockFile);
+        tick();
+        
+        // Assert
+        expect(component.isUploadingImage).toBe(false);
+      }));
+    });
   });
 }); 

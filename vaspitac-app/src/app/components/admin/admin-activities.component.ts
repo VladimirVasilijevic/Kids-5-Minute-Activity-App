@@ -72,14 +72,6 @@ export class AdminActivitiesComponent implements OnInit {
     isPremium: false
   };
 
-  /** Available age groups for activities */
-  ageGroups = [
-    'Toddler (1-2 years)',
-    'Preschool (3-5 years)',
-    'School Age (6-12 years)',
-    'Teen (13+ years)',
-    'All Ages'
-  ];
 
   /** Available categories for activities */
   categories = Object.values(CATEGORY_KEYS);
@@ -272,12 +264,12 @@ export class AdminActivitiesComponent implements OnInit {
 
     // Update activity in service
     this._activityService.updateActivity(updatedActivity).then(() => {
-      console.log('Activity update successful, updated data:', updatedActivity); // Debug log
+              // Activity update successful
       // Update local array after successful update
       const index = this.activities.findIndex(a => a.id === this.editingActivity?.id);
       if (index !== -1) {
         this.activities[index] = updatedActivity;
-        console.log('Local array updated at index:', index, 'with data:', this.activities[index]); // Debug log
+        // Local array updated
       }
       this.resetForm();
       this.showSuccess(this._translate.instant('ADMIN.ACTIVITY_UPDATED_SUCCESS'));

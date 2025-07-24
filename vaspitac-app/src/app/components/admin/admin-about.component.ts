@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Observable, of, switchMap } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
@@ -24,6 +25,7 @@ export class AdminAboutComponent implements OnInit {
   showForm = false;
   currentLanguage = 'sr';
   availableLanguages = ['sr', 'en'];
+  aboutForm!: FormGroup;
 
   // Error handling
   showErrorModal = false;
@@ -34,23 +36,9 @@ export class AdminAboutComponent implements OnInit {
   showSuccessMessage = false;
   successMessage = '';
 
-  // Form validation
-  formErrors: { [key: string]: string } = {};
-
   // Image upload
   isUploadingImage = false;
   imagePreview: string | null = null;
-
-  formData = {
-    name: '',
-    role: '',
-    bioParagraphs: [''],
-    experiences: [] as Experience[],
-    email: '',
-    phone: '',
-    location: '',
-    profileImageUrl: ''
-  };
 
   /**
    * Initializes the admin about component
@@ -62,6 +50,7 @@ export class AdminAboutComponent implements OnInit {
    * @param imageUploadService - Service for image upload functionality
    */
   constructor(
+    private _fb: FormBuilder,
     private _router: Router,
     private _auth: AuthService,
     private _userService: UserService,
@@ -74,9 +63,26 @@ export class AdminAboutComponent implements OnInit {
    * Initializes component data and loads about content
    */
   ngOnInit(): void {
+    this.initializeForm();
     this.loadUserProfile();
     this.loadCurrentLanguage();
     this.loadAboutContent();
+  }
+
+  /**
+   * Initializes the reactive form
+   */
+  private initializeForm(): void {
+    this.aboutForm = this._fb.group({
+      name: ['', Validators.required],
+      role: ['', Validators.required],
+      email: ['', [Validators.required, Validators.email]],
+      phone: ['', Validators.required],
+      location: ['', Validators.required],
+      profileImageUrl: [''],
+      bioParagraphs: this._fb.array([this._fb.control('', Validators.required)]),
+      experiences: this._fb.array([])
+    });
   }
 
   /**
@@ -108,25 +114,30 @@ export class AdminAboutComponent implements OnInit {
   private loadAboutContent(): void {
     this._aboutService.getAboutContent().subscribe(content => {
       this.aboutContent = content;
-      this.initializeFormData();
+      this.patchFormWithData();
     });
   }
 
   /**
-   * Initializes form data with current about content
+   * Patches the form with data from aboutContent
    */
-  private initializeFormData(): void {
+  private patchFormWithData(): void {
     if (this.aboutContent) {
-      this.formData = {
-        name: this.aboutContent.name || '',
-        role: this.aboutContent.role || '',
-        bioParagraphs: [...(this.aboutContent.bioParagraphs || [''])],
-        experiences: [...(this.aboutContent.experiences || [])],
-        email: this.aboutContent.email || '',
-        phone: this.aboutContent.phone || '',
-        location: this.aboutContent.location || '',
-        profileImageUrl: this.aboutContent.profileImageUrl || ''
-      };
+      this.aboutForm.patchValue({
+        name: this.aboutContent.name,
+        role: this.aboutContent.role,
+        email: this.aboutContent.email,
+        phone: this.aboutContent.phone,
+        location: this.aboutContent.location,
+        profileImageUrl: this.aboutContent.profileImageUrl
+      });
+
+      this.bioParagraphs.clear();
+      this.aboutContent.bioParagraphs.forEach(p => this.bioParagraphs.push(this._fb.control(p, Validators.required)));
+
+      this.experiences.clear();
+      this.aboutContent.experiences.forEach(exp => this.addExperience(exp));
+
       this.imagePreview = this.aboutContent.profileImageUrl || null;
     }
   }
@@ -135,64 +146,24 @@ export class AdminAboutComponent implements OnInit {
    * Handles form submission for updating about content
    * @param event - Form submission event
    */
-  handleSubmit(event: globalThis.Event): void {
+  handleSubmit(event: Event): void {
     event.preventDefault();
-    
-    // Validate form before submission
-    if (!this.validateForm()) {
+    this.aboutForm.markAllAsTouched();
+
+    if (this.aboutForm.invalid) {
       return;
     }
-    
-    this.updateAboutContent();
-  }
 
-  /**
-   * Validates the form data
-   * @returns True if form is valid, false otherwise
-   */
-  private validateForm(): boolean {
-    this.formErrors = {};
-    
-    if (!this.formData.name.trim()) {
-      this.formErrors['name'] = 'Name is required';
-    }
-    
-    if (!this.formData.role.trim()) {
-      this.formErrors['role'] = 'Role is required';
-    }
-    
-    if (!this.formData.bioParagraphs.length || !this.formData.bioParagraphs[0].trim()) {
-      this.formErrors['bioParagraphs'] = 'At least one biography paragraph is required';
-    }
-    
-    if (!this.formData.email.trim()) {
-      this.formErrors['email'] = 'Email is required';
-    }
-    
-    if (!this.formData.phone.trim()) {
-      this.formErrors['phone'] = 'Phone is required';
-    }
-    
-    if (!this.formData.location.trim()) {
-      this.formErrors['location'] = 'Location is required';
-    }
-    
-    return Object.keys(this.formErrors).length === 0;
+    this.updateAboutContent();
   }
 
   /**
    * Updates the about content
    */
   private updateAboutContent(): void {
+    const formValue = this.aboutForm.value;
     const updatedContent: AboutContent = {
-      name: this.formData.name,
-      role: this.formData.role,
-      bioParagraphs: this.formData.bioParagraphs.filter(p => p.trim()),
-      experiences: this.formData.experiences,
-      email: this.formData.email,
-      phone: this.formData.phone,
-      location: this.formData.location,
-      profileImageUrl: this.formData.profileImageUrl,
+      ...formValue,
       lastUpdated: new Date().toISOString()
     };
 
@@ -210,8 +181,9 @@ export class AdminAboutComponent implements OnInit {
    * Handles image selection and upload
    * @param event - File input change event
    */
-  onImageSelected(event: any): void {
-    const file = event.target.files[0];
+  onImageSelected(event: Event): void {
+    const target = event.target as HTMLInputElement;
+    const file = target.files?.[0];
     if (!file) return;
 
     if (!this._imageUploadService.isValidImage(file)) {
@@ -222,7 +194,7 @@ export class AdminAboutComponent implements OnInit {
     this.isUploadingImage = true;
     this._imageUploadService.uploadImage(file, 'admin-uploads/about-images/').subscribe({
       next: (url: string) => {
-        this.formData.profileImageUrl = url;
+        this.aboutForm.get('profileImageUrl')?.setValue(url);
         this.imagePreview = url;
         this.isUploadingImage = false;
       },
@@ -235,10 +207,17 @@ export class AdminAboutComponent implements OnInit {
   }
 
   /**
+   * Getter for bioParagraphs FormArray
+   */
+  get bioParagraphs(): FormArray {
+    return this.aboutForm.get('bioParagraphs') as FormArray;
+  }
+
+  /**
    * Adds a new biography paragraph
    */
   addBioParagraph(): void {
-    this.formData.bioParagraphs.push('');
+    this.bioParagraphs.push(this._fb.control('', Validators.required));
   }
 
   /**
@@ -246,20 +225,27 @@ export class AdminAboutComponent implements OnInit {
    * @param index - Index of the paragraph to remove
    */
   removeBioParagraph(index: number): void {
-    if (this.formData.bioParagraphs.length > 1) {
-      this.formData.bioParagraphs.splice(index, 1);
+    if (this.bioParagraphs.length > 1) {
+      this.bioParagraphs.removeAt(index);
     }
+  }
+
+  /**
+   * Getter for experiences FormArray
+   */
+  get experiences(): FormArray {
+    return this.aboutForm.get('experiences') as FormArray;
   }
 
   /**
    * Adds a new experience entry
    */
-  addExperience(): void {
-    this.formData.experiences.push({
-      title: '',
-      description: '',
-      dateRange: ''
-    });
+  addExperience(experience?: Experience): void {
+    this.experiences.push(this._fb.group({
+      title: [experience?.title || '', Validators.required],
+      description: [experience?.description || '', Validators.required],
+      dateRange: [experience?.dateRange || '', Validators.required]
+    }));
   }
 
   /**
@@ -267,7 +253,7 @@ export class AdminAboutComponent implements OnInit {
    * @param index - Index of the experience to remove
    */
   removeExperience(index: number): void {
-    this.formData.experiences.splice(index, 1);
+    this.experiences.removeAt(index);
   }
 
   /**
