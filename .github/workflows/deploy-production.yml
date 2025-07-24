@@ -89,16 +89,13 @@ jobs:
         with:
           firebase-project: ${{ secrets.FIREBASE_PROJECT_ID }}
           environment: 'production'
+          service-account-key: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_KEY }}
 
       - name: Deploy Firebase services
         working-directory: vaspitac-app/firebase
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: vaspitac-app/firebase/serviceAccountKey-production.json
         run: |
-          # Create service account key file
-          echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT_KEY }}' > serviceAccountKey-prod.json
-          
-          # Set environment variable for authentication
-          export GOOGLE_APPLICATION_CREDENTIALS="$(pwd)/serviceAccountKey-prod.json"
-          
           # Deploy Firestore rules and indexes
           firebase deploy --only firestore:rules,firestore:indexes --config firebase.prod.json
           
@@ -111,7 +108,7 @@ jobs:
           fi
           
           # Clean up service account key
-          rm -f serviceAccountKey-prod.json
+          rm -f serviceAccountKey-production.json
 
   # Final verification job
   verify-deployment:
