@@ -12,9 +12,6 @@ inputs:
   environment:
     description: 'Environment type (development/production)'
     required: true
-  service-account-key:
-    description: 'Firebase service account key JSON'
-    required: true
 
 runs:
   using: 'composite'
@@ -30,13 +27,7 @@ runs:
       shell: bash
       working-directory: ${{ inputs.working-directory }}/firebase
       run: |
-        # Create service account key file
-        echo '${{ inputs.service-account-key }}' > serviceAccountKey-${{ inputs.environment }}.json
-        
-        # Set environment variable for authentication
-        export GOOGLE_APPLICATION_CREDENTIALS="$(pwd)/serviceAccountKey-${{ inputs.environment }}.json"
-        
-        # Set the project
+        # Set the project (authentication will be handled in deployment step)
         firebase use ${{ inputs.firebase-project }}
         
         echo "✅ Firebase CLI configured for ${{ inputs.firebase-project }}" 
