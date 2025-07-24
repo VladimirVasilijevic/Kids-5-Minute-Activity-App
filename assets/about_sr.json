@@ -1,0 +1,35 @@
+{
+  "version": "1.0.0",
+  "languages": ["en", "sr"],
+  "data": {
+    "name": "Ana Petrović",
+    "role": "Vaspitač i edukator",
+    "bioParagraphs": [
+      "Zdravo! Ja sam Ana, licencirana vaspitačica sa preko 10 godina iskustva u radu sa decom uzrasta od 2 do 7 godina. Završila sam Visoku školu strukovnih studija za obrazovanje vaspitača u Beogradu i kontinuirano se usavršavam kroz dodatne kurseve i radionice.",
+      "Moja misija je da svakom detetu pružim priliku da kroz igru i kreativne aktivnosti razvije svoje potencijale. Verujem da je najraniji uzrast ključan za formiranje ličnosti i da svako dete zaslužuje pažnju, razumevanje i podršku u svom razvoju.",
+      "Specijalizovana sam za razvoj fine motorike, kreativnost i emocionalni razvoj dece. Kroz godine rada, razvila sam brojne aktivnosti koje pomažu deci da na zabavan način uče i rastu."
+    ],
+    "experiences": [
+      {
+        "title": "Vaspitač u vrtiću 'Sunce'",
+        "description": "Rad sa decom uzrasta 4-6 godina, kreiranje obrazovnih programa, saradnja sa roditeljima",
+        "dateRange": "2018 - sadašnjost"
+      },
+      {
+        "title": "Privatni edukator",
+        "description": "Individualni rad sa decom, kreiranje personalizovanih programa učenja",
+        "dateRange": "2014 - 2018"
+      },
+      {
+        "title": "Privatni edukator",
+        "description": "Individualni rad sa decom, kreiranje personalizovanih programa učenja",
+        "dateRange": "2014 - 2018"
+      }
+    ],
+    "email": "ana.petrovic@vaspitac.rs",
+    "phone": "+381 61 123 4567",
+    "location": "Beograd, Srbija",
+    "profileImageUrl": null,
+    "lastUpdated": "2024-01-15T10:00:00Z"
+  }
+} 

@@ -1,0 +1,32 @@
+[
+  {
+    "id": 1,
+    "title": "How to Motivate Children",
+    "excerpt": "Tips for maintaining children's motivation and engagement.",
+    "fullContent": "Motivation is a key factor in children's development. When children are motivated, they learn more easily, focus better, and achieve better results. Here are some practical tips on how you can motivate your children:\n\n1. Set clear goals - Children need to know what is expected of them\n2. Praise progress - Focus on effort, not just results\n3. Use positive environment - Create a space where children feel safe\n4. Be an example - Your motivation will inspire them\n5. Allow choice - When children have control, they are more motivated\n\nRemember that every child is different and what works for one may not work for another. Be patient and adapt your approach to your child's needs.",
+    "author": "Jovana Petrović",
+    "readTime": "3 min",
+    "date": "2024-01-15",
+    "imageUrl": "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=250&fit=crop"
+  },
+  {
+    "id": 2,
+    "title": "Creative Games for Children",
+    "excerpt": "Fun and creative activities for little ones.",
+    "fullContent": "Creativity is an essential skill in today's world. Here are some fun and creative games you can play with your children:\n\n1. Story in a circle - Everyone adds one sentence to the story\n2. Finger painting - Use fingers instead of brushes\n3. Musical instruments from household items - Make a tambourine from plates\n4. Masquerade - Make masks from paper and decorate them\n5. Nature in art - Use leaves, flowers and stones for collages\n\nThese activities not only develop creativity but also improve motor skills, social skills and self-confidence. Most importantly, have fun together and don't worry about the perfect result - the process is more important than the product.",
+    "author": "Marko Marković",
+    "readTime": "4 min",
+    "date": "2024-01-12",
+    "imageUrl": "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=250&fit=crop"
+  },
+  {
+    "id": 3,
+    "title": "Healthy Habits for Children",
+    "excerpt": "Encouraging healthy routines in everyday life.",
+    "fullContent": "Healthy habits formed in childhood often last a lifetime. Here's how you can help your children develop healthy routines:\n\n1. Regular sleep - Set a consistent bedtime\n2. Healthy diet - Include fruits and vegetables in every meal\n3. Physical activity - At least 60 minutes of activity daily\n4. Hygiene - Regular hand and teeth washing\n5. Screen time limit - Maximum 2 hours daily\n\nThe key is consistency and being a good example. When children see that you also follow healthy habits, they will adopt them more easily. Make these activities fun instead of an obligation.",
+    "author": "Ana Janković",
+    "readTime": "5 min",
+    "date": "2024-01-10",
+    "imageUrl": "https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=400&h=250&fit=crop"
+  }
+]

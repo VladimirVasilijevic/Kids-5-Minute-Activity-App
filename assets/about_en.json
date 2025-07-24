@@ -1,0 +1,30 @@
+{
+  "version": "1.0.0",
+  "languages": ["en", "sr"],
+  "data": {
+    "name": "Ana Petrović",
+    "role": "Educator and Teacher",
+    "bioParagraphs": [
+      "Hello! I'm Ana, a licensed educator with over 10 years of experience working with children aged 2 to 7. I graduated from the Higher School of Professional Studies for Educator Education in Belgrade and continuously improve through additional courses and workshops.",
+      "My mission is to provide every child with the opportunity to develop their potential through play and creative activities. I believe that early childhood is crucial for personality formation and that every child deserves attention, understanding, and support in their development.",
+      "I specialize in fine motor development, creativity, and children's emotional development. Through years of work, I have developed numerous activities that help children learn and grow in a fun way."
+    ],
+    "experiences": [
+      {
+        "title": "Educator at 'Sunce' Kindergarten",
+        "description": "Working with children aged 4-6, creating educational programs, parent collaboration",
+        "dateRange": "2018 - present"
+      },
+      {
+        "title": "Private Educator",
+        "description": "Individual work with children, creating personalized learning programs",
+        "dateRange": "2014 - 2018"
+      }
+    ],
+    "email": "ana.petrovic@vaspitac.rs",
+    "phone": "+381 61 123 4567",
+    "location": "Belgrade, Serbia",
+    "profileImageUrl": null,
+    "lastUpdated": "2024-01-15T10:00:00Z"
+  }
+} 
