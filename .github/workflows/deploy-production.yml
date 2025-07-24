@@ -102,12 +102,22 @@ jobs:
           echo "📄 Service account key content (first few lines):"
           head -5 serviceAccountKey-production.json
           
-          # Debug: Extract project ID from service account key
+          # Debug: Extract project ID from service account key (improved method)
           echo "🔍 Project ID from service account key:"
-          cat serviceAccountKey-production.json | grep -o '"project_id":"[^"]*"' | cut -d'"' -f4
+          PROJECT_ID_FROM_KEY=$(cat serviceAccountKey-production.json | jq -r '.project_id' 2>/dev/null || echo "Failed to extract")
+          echo "Project ID: $PROJECT_ID_FROM_KEY"
           
           # Debug: Show FIREBASE_PROJECT_ID secret
           echo "🔍 FIREBASE_PROJECT_ID secret: ${{ secrets.FIREBASE_PROJECT_ID }}"
+          
+          # Debug: Check if project IDs match
+          if [ "$PROJECT_ID_FROM_KEY" = "${{ secrets.FIREBASE_PROJECT_ID }}" ]; then
+            echo "✅ Project IDs match!"
+          else
+            echo "❌ Project IDs don't match!"
+            echo "Service account key project: $PROJECT_ID_FROM_KEY"
+            echo "GitHub secret project: ${{ secrets.FIREBASE_PROJECT_ID }}"
+          fi
           
           # Set environment variable for authentication
           export GOOGLE_APPLICATION_CREDENTIALS="$(pwd)/serviceAccountKey-production.json"
