@@ -102,6 +102,13 @@ jobs:
           echo "📄 Service account key content (first few lines):"
           head -5 serviceAccountKey-production.json
           
+          # Debug: Extract project ID from service account key
+          echo "🔍 Project ID from service account key:"
+          cat serviceAccountKey-production.json | grep -o '"project_id":"[^"]*"' | cut -d'"' -f4
+          
+          # Debug: Show FIREBASE_PROJECT_ID secret
+          echo "🔍 FIREBASE_PROJECT_ID secret: ${{ secrets.FIREBASE_PROJECT_ID }}"
+          
           # Set environment variable for authentication
           export GOOGLE_APPLICATION_CREDENTIALS="$(pwd)/serviceAccountKey-production.json"
           
