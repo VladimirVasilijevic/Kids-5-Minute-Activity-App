@@ -51,7 +51,7 @@ jobs:
         uses: ./.github/actions/create-environment
         with:
           environment: 'development'
-          firebase-project: ${{ secrets.FIREBASE_PROJECT_ID_DEV }}
+          firebase-project: ${{ secrets.FIREBASE_PROJECT_ID }}
           firebase-api-key: ${{ secrets.FIREBASE_API_KEY }}
           firebase-auth-domain: ${{ secrets.FIREBASE_AUTH_DOMAIN }}
           firebase-storage-bucket: ${{ secrets.FIREBASE_STORAGE_BUCKET }}
