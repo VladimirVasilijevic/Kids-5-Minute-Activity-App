@@ -2,8 +2,8 @@ name: 'Firebase Hosting Setup'
 description: 'Setup Firebase CLI and authenticate for hosting deployment'
 
 inputs:
-  token:
-    description: 'Firebase CI token for authentication'
+  service-account-key:
+    description: 'Firebase service account key JSON'
     required: true
   project:
     description: 'Firebase project ID to use'
@@ -18,11 +18,17 @@ runs:
         echo "🔧 Installing Firebase CLI..."
         npm install -g firebase-tools
         
-    - name: Authenticate with Firebase
+    - name: Setup Firebase Authentication
       shell: bash
       run: |
-        echo "🔐 Authenticating with Firebase..."
-        firebase login:ci --token "${{ inputs.token }}"
+        echo "🔐 Setting up Firebase authentication..."
+        # Create service account key file
+        echo '${{ inputs.service-account-key }}' > serviceAccountKey.json
+        
+        # Set environment variable for authentication
+        export GOOGLE_APPLICATION_CREDENTIALS="$(pwd)/serviceAccountKey.json"
+        
+        echo "✅ Service account key created and environment variable set"
         
     - name: Set Firebase Project
       shell: bash

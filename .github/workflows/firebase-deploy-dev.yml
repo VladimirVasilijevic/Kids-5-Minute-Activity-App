@@ -86,7 +86,7 @@ jobs:
       - name: Setup Firebase Hosting
         uses: ./.github/actions/setup-firebase-hosting
         with:
-          token: ${{ secrets.FIREBASE_TOKEN }}
+          service-account-key: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_KEY }}
           project: ${{ env.FIREBASE_PROJECT }}
 
       - name: Deploy to Firebase Hosting
