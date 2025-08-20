@@ -110,7 +110,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: build-output
-          path: vaspitac-app/
+          path: ./
           
       - name: Debug directory structure
         run: |
@@ -118,10 +118,10 @@ jobs:
           echo "📁 Current directory: $(pwd)"
           echo "📁 Current directory contents:"
           ls -la
-          echo "📁 vaspitac-app directory contents:"
-          ls -la vaspitac-app/
-          echo "📁 vaspitac-app/dist directory contents:"
-          ls -la vaspitac-app/dist/ || echo "dist directory not found"
+          echo "📁 dist directory contents:"
+          ls -la dist/ || echo "dist directory not found"
+          echo "📁 dist/vaspitac-app directory contents:"
+          ls -la dist/vaspitac-app/ || echo "dist/vaspitac-app directory not found"
 
 
       - name: Setup Firebase Hosting
