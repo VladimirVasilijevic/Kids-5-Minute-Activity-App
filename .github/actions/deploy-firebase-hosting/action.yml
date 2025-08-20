@@ -19,8 +19,12 @@ runs:
       run: |
         echo "🚀 Deploying to Firebase Hosting..."
         echo "📁 Working directory: $(pwd)"
+        echo "📦 Current directory contents:"
+        ls -la
+        echo "📦 dist directory contents:"
+        ls -la dist/ || echo "dist directory not found"
         echo "📦 Build output contents:"
-        ls -la dist/vaspitac-app/
+        ls -la dist/vaspitac-app/ || echo "dist/vaspitac-app directory not found"
         
         firebase deploy --only hosting --project ${{ inputs.project-id }}
         

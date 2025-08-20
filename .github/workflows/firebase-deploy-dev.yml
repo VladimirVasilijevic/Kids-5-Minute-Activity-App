@@ -71,14 +71,14 @@ jobs:
         working-directory: vaspitac-app
         run: |
           echo "🔍 Verifying build output..."
-          ls -la dist/vaspitac-app/
+          ls -la dist/
           echo "📦 Build verification complete!"
           
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
           name: build-output
-          path: vaspitac-app/dist/
+          path: dist/
           retention-days: 1
 
   # Firebase hosting deployment job
@@ -95,6 +95,19 @@ jobs:
         with:
           name: build-output
           path: vaspitac-app/
+          
+      - name: Debug directory structure
+        run: |
+          echo "🔍 Debugging directory structure..."
+          echo "📁 Current directory: $(pwd)"
+          echo "📁 Current directory contents:"
+          ls -la
+          echo "📁 vaspitac-app directory contents:"
+          ls -la vaspitac-app/
+          echo "📁 vaspitac-app/dist directory contents:"
+          ls -la vaspitac-app/dist/ || echo "dist directory not found"
+          echo "📁 vaspitac-app/dist/vaspitac-app directory contents:"
+          ls -la vaspitac-app/dist/vaspitac-app/ || echo "dist/vaspac-app directory not found"
 
       - name: Setup Firebase Hosting
         uses: ./.github/actions/setup-firebase-hosting
