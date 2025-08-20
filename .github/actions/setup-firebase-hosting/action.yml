@@ -22,7 +22,7 @@ runs:
       shell: bash
       run: |
         echo "🔐 Authenticating with Firebase..."
-        echo "${{ inputs.token }}" | firebase login --ci
+        echo "${{ inputs.token }}" | firebase login:ci
         
     - name: Set Firebase Project
       shell: bash
