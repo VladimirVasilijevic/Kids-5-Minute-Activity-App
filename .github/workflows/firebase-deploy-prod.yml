@@ -46,6 +46,7 @@ jobs:
       - name: Create environment configuration
         uses: ./.github/actions/create-environment
         with:
+          working-directory: 'vaspitac-app'
           environment: 'production'
           firebase-project: ${{ env.FIREBASE_PROJECT }}
           firebase-api-key: ${{ secrets.FIREBASE_API_KEY }}
@@ -67,6 +68,12 @@ jobs:
         working-directory: vaspitac-app
         run: |
           echo "🔨 Building production application..."
+          echo "📁 Current directory: $(pwd)"
+          echo "📁 Directory contents before build:"
+          ls -la
+          echo "📁 Environment file contents:"
+          cat src/environments/environment.ts || echo "environment.ts not found"
+          echo "🚀 Starting build..."
           npm run build:prod
           echo "✅ Build completed successfully!"
         
