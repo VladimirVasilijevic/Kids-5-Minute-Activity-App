@@ -23,14 +23,18 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
+          cache-dependency-path: 'vaspitac-app/package-lock.json'
           
       - name: Install dependencies
+        working-directory: vaspitac-app
         run: npm ci
         
       - name: Run tests
+        working-directory: vaspitac-app
         run: npm run test
         
       - name: Build application (Production)
+        working-directory: vaspitac-app
         run: npm run build:prod
         
       - name: Firebase Authentication
@@ -42,6 +46,7 @@ jobs:
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
           
       - name: Deploy to Firebase Hosting (Production)
+        working-directory: vaspitac-app
         run: firebase deploy --only hosting
         
       - name: Deployment Success Notification
