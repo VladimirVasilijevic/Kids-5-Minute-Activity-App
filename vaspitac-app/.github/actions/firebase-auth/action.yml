@@ -1,0 +1,33 @@
+name: 'Firebase Authentication'
+description: 'Authenticate with Firebase using CI token'
+
+inputs:
+  token:
+    description: 'Firebase CI token for authentication'
+    required: true
+  project:
+    description: 'Firebase project ID to use'
+    required: true
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Install Firebase CLI
+      shell: bash
+      run: |
+        npm install -g firebase-tools
+        
+    - name: Authenticate with Firebase
+      shell: bash
+      run: |
+        echo "${{ inputs.token }}" | firebase login --ci
+        
+    - name: Set Firebase Project
+      shell: bash
+      run: |
+        firebase use ${{ inputs.project }}
+        
+    - name: Verify Authentication
+      shell: bash
+      run: |
+        firebase projects:list

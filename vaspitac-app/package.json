@@ -16,7 +16,12 @@
     "lint": "eslint src/app/**/*.ts --cache",
     "lint:fix": "eslint src/app/**/*.ts --fix --cache",
     "format": "prettier --write src/**/*.{ts,html,scss,json}",
-    "format:check": "prettier --check src/**/*.{ts,html,scss,json}"
+    "format:check": "prettier --check src/**/*.{ts,html,scss,json}",
+    "deploy:dev": "firebase use dev && npm run build:dev && firebase deploy",
+    "deploy:prod": "firebase use prod && npm run build:prod && firebase deploy",
+    "firebase:dev": "firebase use dev",
+    "firebase:prod": "firebase use prod",
+    "firebase:status": "firebase use"
   },
   "private": true,
   "dependencies": {
