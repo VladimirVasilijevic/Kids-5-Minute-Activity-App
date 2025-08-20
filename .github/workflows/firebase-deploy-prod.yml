@@ -93,6 +93,7 @@ jobs:
         uses: ./.github/actions/deploy-firebase-hosting
         with:
           working-directory: vaspitac-app
+          project-id: ${{ env.FIREBASE_PROJECT }}
 
   # Final verification job
   verify-deployment:

@@ -6,6 +6,9 @@ inputs:
     description: 'Working directory for deployment'
     required: true
     default: 'vaspitac-app'
+  project-id:
+    description: 'Firebase project ID for deployment'
+    required: true
 
 runs:
   using: 'composite'
@@ -19,7 +22,7 @@ runs:
         echo "📦 Build output contents:"
         ls -la dist/vaspitac-app/
         
-        firebase deploy --only hosting
+        firebase deploy --only hosting --project ${{ inputs.project-id }}
         
         echo "✅ Firebase Hosting deployment completed!"
         

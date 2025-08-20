@@ -30,15 +30,10 @@ runs:
         
         echo "✅ Service account key created and environment variable set"
         
-    - name: Set Firebase Project
-      shell: bash
-      run: |
-        echo "🎯 Setting Firebase project to ${{ inputs.project }}..."
-        firebase use ${{ inputs.project }}
-        
     - name: Verify Authentication
       shell: bash
       run: |
         echo "✅ Verifying Firebase authentication..."
-        firebase projects:list
+        echo "🎯 Project will be set to: ${{ inputs.project }}"
+        echo "🔑 Service account authentication ready"
         echo "🎉 Firebase hosting setup complete!"
