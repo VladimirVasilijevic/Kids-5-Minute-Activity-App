@@ -73,6 +73,13 @@ jobs:
           echo "🔍 Verifying build output..."
           ls -la dist/vaspitac-app/
           echo "📦 Build verification complete!"
+          
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-output
+          path: vaspitac-app/dist/
+          retention-days: 1
 
   # Firebase hosting deployment job
   deploy-firebase-hosting:
@@ -82,6 +89,12 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-output
+          path: vaspitac-app/
 
       - name: Setup Firebase Hosting
         uses: ./.github/actions/setup-firebase-hosting
