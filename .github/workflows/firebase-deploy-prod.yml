@@ -94,7 +94,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: build-output
-          path: vaspitac-app/dist/
+          path: dist/
           retention-days: 1
 
   # Firebase hosting deployment job
