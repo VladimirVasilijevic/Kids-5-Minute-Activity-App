@@ -32,4 +32,61 @@ img {
   &:hover {
     transform: scale(1.02);
   }
+}
+
+// Video container styles
+.video-container {
+  position: relative;
+  width: 100%;
+  background: #f3f4f6;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  
+  // Loading state - only show when loading class is present
+  &.loading::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 40px;
+    height: 40px;
+    border: 3px solid #e5e7eb;
+    border-top: 3px solid #10b981;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    z-index: 1;
+  }
+  
+  iframe, video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+    border-radius: 0.5rem;
+    
+    &:hover {
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    }
+  }
+}
+
+// Loading animation
+@keyframes spin {
+  0% { transform: translate(-50%, -50%) rotate(0deg); }
+  100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+// Video title styles
+.video-title {
+  color: #111827;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  
+  &::before {
+    content: '🎥';
+    margin-right: 0.5rem;
+  }
 } 

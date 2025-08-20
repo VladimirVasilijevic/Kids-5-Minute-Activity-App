@@ -58,6 +58,7 @@ import { AdminAboutComponent } from './components/admin/admin-about.component';
 import { AdminUsersComponent } from './components/admin/admin-users.component';
 import { BackButtonComponent } from './components/back-button/back-button.component';
 import { SubscribeComponent } from './components/subscribe/subscribe.component';
+import { SafePipe } from './pipes/safe.pipe';
 
 // AoT requires an exported function for factories
 /**
@@ -102,6 +103,7 @@ export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
     AdminUsersComponent,
     BackButtonComponent,
     SubscribeComponent,
+    SafePipe,
   ],
   imports: [
     BrowserModule,
