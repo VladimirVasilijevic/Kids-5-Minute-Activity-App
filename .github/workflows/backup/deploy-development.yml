@@ -116,19 +116,19 @@ jobs:
     - name: Verify build output
       working-directory: vaspitac-app
       run: |
-        if [ ! -d "dist/vaspitac-app" ]; then
+        if [ ! -d "dist" ]; then
           echo "❌ Build output directory not found"
           exit 1
         fi
         echo "📁 Build output size:"
-        du -sh dist/vaspitac-app
+        du -sh dist
         echo "✅ Build verification passed"
 
     - name: Deploy to GitHub Pages (Development)
       uses: peaceiris/actions-gh-pages@v4
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: vaspitac-app/dist/vaspitac-app
+        publish_dir: vaspitac-app/dist
         publish_branch: gh-pages-dev
         force_orphan: true
         user_name: 'github-actions[bot]'

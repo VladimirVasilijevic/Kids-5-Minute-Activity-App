@@ -43,12 +43,12 @@ runs:
       shell: bash
       working-directory: ${{ inputs.working-directory }}
       run: |
-        if [ ! -d "dist/vaspitac-app" ]; then
+        if [ ! -d "dist" ]; then
           echo "❌ Build output directory not found"
           exit 1
         fi
         echo "📁 Build output size:"
-        du -sh dist/vaspitac-app
+        du -sh dist
         echo "✅ Build verification passed"
 
     - name: Upload web build artifact
@@ -56,5 +56,5 @@ runs:
       uses: actions/upload-artifact@v4
       with:
         name: web-build-${{ inputs.configuration }}
-        path: ${{ inputs.working-directory }}/dist/vaspitac-app
+        path: ${{ inputs.working-directory }}/dist
         retention-days: 7 
