@@ -108,7 +108,14 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: build-output
-          path: vaspitac-app/
+          path: temp-artifacts/
+          
+      - name: Move artifacts to correct location
+        run: |
+          echo "📦 Moving artifacts to correct location..."
+          mkdir -p vaspitac-app/
+          mv temp-artifacts/* vaspitac-app/
+          echo "✅ Artifacts moved successfully"
           
       - name: Debug directory structure
         run: |
@@ -116,10 +123,10 @@ jobs:
           echo "📁 Current directory: $(pwd)"
           echo "📁 Current directory contents:"
           ls -la
-          echo "📁 dist directory contents:"
-          ls -la dist/ || echo "dist directory not found"
-          echo "📁 dist directory contents:"
-          ls -la dist/ || echo "dist directory not found"
+          echo "📁 vaspitac-app directory contents:"
+          ls -la vaspitac-app/ || echo "vaspitac-app directory not found"
+          echo "📁 vaspitac-app/dist directory contents:"
+          ls -la vaspitac-app/dist/ || echo "dist directory not found"
 
       - name: Setup Firebase Hosting
         uses: ./.github/actions/setup-firebase-hosting
