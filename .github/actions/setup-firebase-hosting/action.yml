@@ -38,9 +38,8 @@ runs:
       env:
         GOOGLE_APPLICATION_CREDENTIALS: ${{ github.workspace }}/serviceAccountKey.json
       run: |
-        echo "🎯 Setting Firebase project to ${{ inputs.project }}..."
-        firebase use ${{ inputs.project }}
-        echo "✅ Project set successfully"
+        echo "🎯 Firebase project will be set to: ${{ inputs.project }}"
+        echo "✅ Project will be specified in deploy command"
         
     - name: Verify Authentication
       shell: bash
@@ -48,7 +47,6 @@ runs:
         GOOGLE_APPLICATION_CREDENTIALS: ${{ github.workspace }}/serviceAccountKey.json
       run: |
         echo "✅ Verifying Firebase authentication..."
-        echo "🎯 Current project:"
-        firebase use
+        echo "🎯 Project will be: ${{ inputs.project }}"
         echo "🔑 Service account authentication ready"
         echo "🎉 Firebase hosting setup complete!"
