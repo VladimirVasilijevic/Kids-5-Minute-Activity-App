@@ -1,0 +1,38 @@
+name: 'Firebase Hosting Setup'
+description: 'Setup Firebase CLI and authenticate for hosting deployment'
+
+inputs:
+  token:
+    description: 'Firebase CI token for authentication'
+    required: true
+  project:
+    description: 'Firebase project ID to use'
+    required: true
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Install Firebase CLI
+      shell: bash
+      run: |
+        echo "🔧 Installing Firebase CLI..."
+        npm install -g firebase-tools
+        
+    - name: Authenticate with Firebase
+      shell: bash
+      run: |
+        echo "🔐 Authenticating with Firebase..."
+        echo "${{ inputs.token }}" | firebase login --ci
+        
+    - name: Set Firebase Project
+      shell: bash
+      run: |
+        echo "🎯 Setting Firebase project to ${{ inputs.project }}..."
+        firebase use ${{ inputs.project }}
+        
+    - name: Verify Authentication
+      shell: bash
+      run: |
+        echo "✅ Verifying Firebase authentication..."
+        firebase projects:list
+        echo "🎉 Firebase hosting setup complete!"

@@ -1,0 +1,31 @@
+name: 'Deploy Firebase Hosting'
+description: 'Deploy application to Firebase Hosting'
+
+inputs:
+  working-directory:
+    description: 'Working directory for deployment'
+    required: true
+    default: 'vaspitac-app'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Deploy to Firebase Hosting
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      run: |
+        echo "🚀 Deploying to Firebase Hosting..."
+        echo "📁 Working directory: $(pwd)"
+        echo "📦 Build output contents:"
+        ls -la dist/vaspitac-app/
+        
+        firebase deploy --only hosting
+        
+        echo "✅ Firebase Hosting deployment completed!"
+        
+    - name: Get Deployment URL
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      run: |
+        echo "🌐 Getting deployment URL..."
+        firebase hosting:channel:list --json | jq -r '.result.channels[0].url // "Deployment URL not available"'

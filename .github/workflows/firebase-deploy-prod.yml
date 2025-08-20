@@ -10,53 +10,86 @@ env:
   FIREBASE_PROJECT: ana-vaspitac-prod-e7ee4
 
 jobs:
-  deploy:
+  # Security scan job (runs first)
+  security-scan:
     runs-on: ubuntu-latest
     environment: production
-    
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+
+      - name: Setup Node.js and dependencies
+        uses: ./.github/actions/setup-node
         with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-          cache-dependency-path: 'vaspitac-app/package-lock.json'
-          
+          node-version: '18'
+
+      - name: Run security scan
+        uses: ./.github/actions/security-scan
+        with:
+          scan-dependencies: 'true'
+          scan-code: 'true'
+
+  # Build and test job
+  build-and-test:
+    runs-on: ubuntu-latest
+    environment: production
+    needs: security-scan
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js and dependencies
+        uses: ./.github/actions/setup-node
+        with:
+          node-version: '18'
+
       - name: Install dependencies
         working-directory: vaspitac-app
         run: npm ci
         
       - name: Run tests
         working-directory: vaspitac-app
-        run: npm run test
+        run: npm run test -- --browsers=ChromeHeadless --watch=false
         
       - name: Build application (Production)
         working-directory: vaspitac-app
         run: npm run build:prod
         
-      - name: Firebase Authentication
-        uses: ./.github/actions/firebase-auth
+      - name: Verify build output
+        working-directory: vaspitac-app
+        run: |
+          echo "🔍 Verifying build output..."
+          ls -la dist/vaspitac-app/
+          echo "📦 Build verification complete!"
+
+  # Firebase hosting deployment job
+  deploy-firebase-hosting:
+    runs-on: ubuntu-latest
+    environment: production
+    needs: build-and-test
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Firebase Hosting
+        uses: ./.github/actions/setup-firebase-hosting
         with:
           token: ${{ secrets.FIREBASE_TOKEN }}
           project: ${{ env.FIREBASE_PROJECT }}
-        env:
-          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
-          
-      - name: Deploy to Firebase Hosting (Production)
-        working-directory: vaspitac-app
-        run: firebase deploy --only hosting
-        
-      - name: Deployment Success Notification
-        if: success()
+
+      - name: Deploy to Firebase Hosting
+        uses: ./.github/actions/deploy-firebase-hosting
+        with:
+          working-directory: vaspitac-app
+
+  # Final verification job
+  verify-deployment:
+    runs-on: ubuntu-latest
+    needs: deploy-firebase-hosting
+    environment: production
+    steps:
+      - name: Verify deployment
         run: |
-          echo "✅ Successfully deployed to Firebase Production"
-          echo "🌐 URL: https://${{ env.FIREBASE_PROJECT }}.web.app"
-          
-      - name: Deployment Failure Notification
-        if: failure()
-        run: |
-          echo "❌ Firebase Production deployment failed"
-          echo "Check the logs above for details"
+          echo "🚀 Production deployment completed successfully!"
+          echo "🌐 Production site: https://${{ env.FIREBASE_PROJECT }}.web.app"
+          echo "✅ All checks passed!"

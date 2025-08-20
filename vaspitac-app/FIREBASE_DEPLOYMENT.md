@@ -16,6 +16,20 @@
 - **Workflow**: `.github/workflows/firebase-deploy-prod.yml`
 - **Result**: Auto-deploy to `https://ana-vaspitac-prod-e7ee4.web.app`
 
+### **Workflow Structure**
+Both workflows now follow a professional CI/CD pattern:
+
+1. **Security Scan** - Runs security checks first
+2. **Build & Test** - Builds app and runs tests
+3. **Firebase Deployment** - Deploys to Firebase Hosting
+4. **Verification** - Confirms successful deployment
+
+### **Reusable Actions**
+- **`setup-firebase-hosting`** - Firebase CLI setup and authentication
+- **`deploy-firebase-hosting`** - Firebase hosting deployment
+- **`setup-node`** - Node.js and dependency setup
+- **`security-scan`** - Security vulnerability scanning
+
 ## **🔑 Setup Required**
 
 ### **1. Generate Firebase CI Tokens**
