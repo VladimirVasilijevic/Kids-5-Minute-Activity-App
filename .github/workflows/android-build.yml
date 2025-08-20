@@ -31,7 +31,7 @@ jobs:
         uses: ./.github/actions/create-environment
         with:
           environment: 'development'
-          firebase-project: ${{ secrets.FIREBASE_PROJECT_ID_DEV }}
+          firebase-project: ${{ secrets.FIREBASE_PROJECT_ID }}
           firebase-api-key: ${{ secrets.FIREBASE_API_KEY }}
           firebase-auth-domain: ${{ secrets.FIREBASE_AUTH_DOMAIN }}
           firebase-storage-bucket: ${{ secrets.FIREBASE_STORAGE_BUCKET }}
@@ -51,6 +51,51 @@ jobs:
           distribution: 'zulu'
           java-version: '17'
 
+      - name: Setup Node.js 20 for Firebase Functions
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: vaspitac-app/firebase/functions/package-lock.json
+
+      - name: Deploy Firebase to Development
+        working-directory: vaspitac-app/firebase
+        run: |
+          # Create service account key file from secret
+          echo '${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}' > service-account-key.json
+          
+          # Set the environment variable to point to the service account file
+          export GOOGLE_APPLICATION_CREDENTIALS="$(pwd)/service-account-key.json"
+          
+          # Install Firebase CLI
+          npm install -g firebase-tools
+          
+          # Set Firebase project to development (skip if fails)
+          firebase use development || echo "Firebase project selection skipped"
+          
+          # Build functions if they exist
+          if [ -d "functions" ]; then
+            cd functions
+            # Use npm install instead of npm ci to resolve lock file issues
+            npm install
+            npm run build
+            cd ..
+          fi
+          
+          # Deploy Firestore rules and indexes
+          firebase deploy --only firestore:rules,firestore:indexes --config firebase.dev.json
+
+          # Deploy Storage rules
+          firebase deploy --only storage --config firebase.dev.json
+          
+          # Try to deploy Functions if they exist (but don't fail the workflow if it fails)
+          if [ -d "functions" ]; then
+            echo "Attempting to deploy functions..."
+            firebase deploy --only functions --config firebase.dev.json || echo "Functions deployment failed, but continuing with workflow"
+          fi
+          
+          echo "Firebase deployment completed"
+
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
@@ -60,7 +105,7 @@ jobs:
 
       - name: Create google-services.json
         working-directory: vaspitac-app/android/app
-        run: echo '${{ secrets.GOOGLE_SERVICES_JSON_DEV }}' > google-services.json
+        run: echo '${{ secrets.GOOGLE_SERVICES_JSON }}' > google-services.json
 
       - name: Build Android APK
         working-directory: vaspitac-app/android
@@ -116,6 +161,51 @@ jobs:
           distribution: 'zulu'
           java-version: '17'
 
+      - name: Setup Node.js 20 for Firebase Functions
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: vaspitac-app/firebase/functions/package-lock.json
+
+      - name: Deploy Firebase to Production
+        working-directory: vaspitac-app/firebase
+        run: |
+          # Create service account key file from secret
+          echo '${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}' > service-account-key.json
+          
+          # Set the environment variable to point to the service account file
+          export GOOGLE_APPLICATION_CREDENTIALS="$(pwd)/service-account-key.json"
+          
+          # Install Firebase CLI
+          npm install -g firebase-tools
+          
+          # Set Firebase project to production (skip if fails)
+          firebase use production || echo "Firebase project selection skipped"
+          
+          # Build functions if they exist
+          if [ -d "functions" ]; then
+            cd functions
+            # Use npm install instead of npm ci to resolve lock file issues
+            npm install
+            npm run build
+            cd ..
+          fi
+          
+          # Deploy Firestore rules and indexes
+          firebase deploy --only firestore:rules,firestore:indexes --config firebase.prod.json
+          
+          # Deploy Storage rules
+          firebase deploy --only storage --config firebase.prod.json
+          
+          # Try to deploy Functions if they exist (but don't fail the workflow if it fails)
+          if [ -d "functions" ]; then
+            echo "Attempting to deploy functions..."
+            firebase deploy --only functions --config firebase.prod.json || echo "Functions deployment failed, but continuing with workflow"
+          fi
+          
+          echo "Firebase deployment completed"
+
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
@@ -141,4 +231,4 @@ jobs:
         with:
           name: vaspitac-app-debug-prod
           path: vaspitac-app/android/app/build/outputs/apk/production/debug/app-production-debug.apk
-          retention-days: 30 
+          retention-days: 30

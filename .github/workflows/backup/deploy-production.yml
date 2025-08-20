@@ -92,7 +92,7 @@ jobs:
         npm run build -- --configuration production --base-href /Kids-5-Minute-Activity-App/ || {
           echo "❌ Build failed. Checking for budget issues..."
           echo "📊 Current bundle sizes:"
-          ls -la dist/vaspitac-app/ 2>/dev/null || echo "No dist folder found"
+          ls -la dist/ 2>/dev/null || echo "No dist folder found"
           exit 1
         }
         echo "✅ Production build completed"
@@ -100,19 +100,19 @@ jobs:
     - name: Verify build output
       working-directory: vaspitac-app
       run: |
-        if [ ! -d "dist/vaspitac-app" ]; then
+        if [ ! -d "dist" ]; then
           echo "❌ Build output directory not found"
           exit 1
         fi
         echo "📁 Build output size:"
-        du -sh dist/vaspitac-app
+        du -sh dist
         echo "✅ Build verification passed"
 
     - name: Deploy to GitHub Pages
       uses: peaceiris/actions-gh-pages@v4
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: vaspitac-app/dist/vaspitac-app
+        publish_dir: vaspitac-app/dist
         publish_branch: gh-pages
         force_orphan: true
         user_name: 'github-actions[bot]'

@@ -20,20 +20,33 @@ runs:
         
     - name: Setup Firebase Authentication
       shell: bash
+      env:
+        GOOGLE_APPLICATION_CREDENTIALS: ${{ github.workspace }}/serviceAccountKey.json
       run: |
         echo "🔐 Setting up Firebase authentication..."
         # Create service account key file
         echo '${{ inputs.service-account-key }}' > serviceAccountKey.json
         
-        # Set environment variable for authentication
-        export GOOGLE_APPLICATION_CREDENTIALS="$(pwd)/serviceAccountKey.json"
+        # Verify the service account key file was created
+        echo "📁 Service account key file created:"
+        ls -la serviceAccountKey.json
         
         echo "✅ Service account key created and environment variable set"
         
+    - name: Set Firebase Project
+      shell: bash
+      env:
+        GOOGLE_APPLICATION_CREDENTIALS: ${{ github.workspace }}/serviceAccountKey.json
+      run: |
+        echo "🎯 Firebase project will be set to: ${{ inputs.project }}"
+        echo "✅ Project will be specified in deploy command"
+        
     - name: Verify Authentication
       shell: bash
+      env:
+        GOOGLE_APPLICATION_CREDENTIALS: ${{ github.workspace }}/serviceAccountKey.json
       run: |
         echo "✅ Verifying Firebase authentication..."
-        echo "🎯 Project will be set to: ${{ inputs.project }}"
+        echo "🎯 Project will be: ${{ inputs.project }}"
         echo "🔑 Service account authentication ready"
         echo "🎉 Firebase hosting setup complete!"
