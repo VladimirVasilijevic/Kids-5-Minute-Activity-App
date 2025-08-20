@@ -97,4 +97,5 @@ runs:
       with:
         name: security-audit-report
         path: ${{ inputs.working-directory }}/security-audit-report.json
-        retention-days: 30 
+        retention-days: 30
+        if-no-files-found: warn 

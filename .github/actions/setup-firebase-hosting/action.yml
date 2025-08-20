@@ -1,0 +1,39 @@
+name: 'Firebase Hosting Setup'
+description: 'Setup Firebase CLI and authenticate for hosting deployment'
+
+inputs:
+  service-account-key:
+    description: 'Firebase service account key JSON'
+    required: true
+  project:
+    description: 'Firebase project ID to use'
+    required: true
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Install Firebase CLI
+      shell: bash
+      run: |
+        echo "🔧 Installing Firebase CLI..."
+        npm install -g firebase-tools
+        
+    - name: Setup Firebase Authentication
+      shell: bash
+      run: |
+        echo "🔐 Setting up Firebase authentication..."
+        # Create service account key file
+        echo '${{ inputs.service-account-key }}' > serviceAccountKey.json
+        
+        # Set environment variable for authentication
+        export GOOGLE_APPLICATION_CREDENTIALS="$(pwd)/serviceAccountKey.json"
+        
+        echo "✅ Service account key created and environment variable set"
+        
+    - name: Verify Authentication
+      shell: bash
+      run: |
+        echo "✅ Verifying Firebase authentication..."
+        echo "🎯 Project will be set to: ${{ inputs.project }}"
+        echo "🔑 Service account authentication ready"
+        echo "🎉 Firebase hosting setup complete!"

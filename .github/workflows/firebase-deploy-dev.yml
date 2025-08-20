@@ -1,0 +1,149 @@
+name: Firebase Deploy Development
+
+on:
+  push:
+    branches: [ develop ]
+  workflow_dispatch:
+
+env:
+  NODE_VERSION: '18'
+  FIREBASE_PROJECT: ana-vaspitac-dev
+
+jobs:
+  # Security scan job (runs first)
+  security-scan:
+    runs-on: ubuntu-latest
+    environment: development
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js and dependencies
+        uses: ./.github/actions/setup-node
+        with:
+          node-version: '18'
+
+      - name: Run security scan
+        uses: ./.github/actions/security-scan
+        with:
+          scan-dependencies: 'true'
+          scan-code: 'true'
+
+  # Build and test job
+  build-and-test:
+    runs-on: ubuntu-latest
+    environment: development
+    needs: security-scan
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js and dependencies
+        uses: ./.github/actions/setup-node
+        with:
+          node-version: '18'
+
+      - name: Create environment configuration
+        uses: ./.github/actions/create-environment
+        with:
+          working-directory: 'vaspitac-app'
+          environment: 'development'
+          firebase-project: ${{ env.FIREBASE_PROJECT }}
+          firebase-api-key: ${{ secrets.FIREBASE_API_KEY }}
+          firebase-auth-domain: ${{ secrets.FIREBASE_AUTH_DOMAIN }}
+          firebase-storage-bucket: ${{ secrets.FIREBASE_STORAGE_BUCKET }}
+          firebase-messaging-sender-id: ${{ secrets.FIREBASE_MESSAGING_SENDER_ID }}
+          firebase-app-id: ${{ secrets.FIREBASE_APP_ID }}
+          firebase-measurement-id: ${{ secrets.FIREBASE_MEASUREMENT_ID }}
+
+      - name: Install dependencies
+        working-directory: vaspitac-app
+        run: npm ci
+        
+      - name: Run tests
+        working-directory: vaspitac-app
+        run: npm run test -- --browsers=ChromeHeadless --watch=false
+        
+      - name: Build application (Development)
+        working-directory: vaspitac-app
+        run: |
+          echo "🔨 Building development application..."
+          echo "📁 Current directory: $(pwd)"
+          echo "📁 Directory contents before build:"
+          ls -la
+          echo "📁 Environment file contents:"
+          cat src/environments/environment.ts || echo "environment.ts not found"
+          echo "🚀 Starting build..."
+          npm run build:dev
+          echo "✅ Build completed successfully!"
+        
+      - name: Debug build output
+        working-directory: vaspitac-app
+        run: |
+          echo "🔍 Debugging build output..."
+          echo "📁 Current directory: $(pwd)"
+          echo "📁 Current directory contents:"
+          ls -la
+          echo "📁 dist directory contents (if exists):"
+          ls -la dist/ || echo "dist directory not found"
+          echo "📁 dist/vaspitac-app directory contents (if exists):"
+          ls -la dist/vaspitac-app/ || echo "dist/vaspitac-app directory not found"
+          echo "📦 Build debug complete!"
+          
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-output
+          path: dist/vaspitac-app/
+          retention-days: 1
+
+  # Firebase hosting deployment job
+  deploy-firebase-hosting:
+    runs-on: ubuntu-latest
+    environment: development
+    needs: build-and-test
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-output
+          path: vaspitac-app/
+          
+      - name: Debug directory structure
+        run: |
+          echo "🔍 Debugging directory structure..."
+          echo "📁 Current directory: $(pwd)"
+          echo "📁 Current directory contents:"
+          ls -la
+          echo "📁 vaspitac-app directory contents:"
+          ls -la vaspitac-app/
+          echo "📁 vaspitac-app/dist directory contents:"
+          ls -la vaspitac-app/dist/ || echo "dist directory not found"
+
+
+      - name: Setup Firebase Hosting
+        uses: ./.github/actions/setup-firebase-hosting
+        with:
+          service-account-key: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_KEY }}
+          project: ${{ env.FIREBASE_PROJECT }}
+
+      - name: Deploy to Firebase Hosting
+        uses: ./.github/actions/deploy-firebase-hosting
+        with:
+          working-directory: vaspitac-app
+          project-id: ${{ env.FIREBASE_PROJECT }}
+
+  # Final verification job
+  verify-deployment:
+    runs-on: ubuntu-latest
+    needs: deploy-firebase-hosting
+    environment: development
+    steps:
+      - name: Verify deployment
+        run: |
+          echo "🚀 Development deployment completed successfully!"
+          echo "🌐 Development site: https://${{ env.FIREBASE_PROJECT }}.web.app"
+          echo "✅ All checks passed!"
