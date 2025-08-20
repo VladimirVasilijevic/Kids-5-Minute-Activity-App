@@ -89,12 +89,12 @@ jobs:
           echo "📁 dist/vaspitac-app directory contents (if exists):"
           ls -la dist/vaspitac-app/ || echo "dist/vaspitac-app directory not found"
           echo "📦 Build debug complete!"
-          
+           
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
           name: build-output
-          path: vaspitac-app/dist/vaspitac-app/
+          path: vaspitac-app/dist/
           retention-days: 1
 
   # Firebase hosting deployment job
@@ -110,7 +110,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: build-output
-          path: ./
+          path: vaspitac-app/
           
       - name: Debug directory structure
         run: |
