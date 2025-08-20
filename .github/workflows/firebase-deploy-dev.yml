@@ -65,14 +65,23 @@ jobs:
         
       - name: Build application (Development)
         working-directory: vaspitac-app
-        run: npm run build:dev
+        run: |
+          echo "🔨 Building development application..."
+          npm run build:dev
+          echo "✅ Build completed successfully!"
         
-      - name: Verify build output
+      - name: Debug build output
         working-directory: vaspitac-app
         run: |
-          echo "🔍 Verifying build output..."
-          ls -la dist/
-          echo "📦 Build verification complete!"
+          echo "🔍 Debugging build output..."
+          echo "📁 Current directory: $(pwd)"
+          echo "📁 Current directory contents:"
+          ls -la
+          echo "📁 dist directory contents (if exists):"
+          ls -la dist/ || echo "dist directory not found"
+          echo "📁 dist/vaspitac-app directory contents (if exists):"
+          ls -la dist/vaspitac-app/ || echo "dist/vaspitac-app directory not found"
+          echo "📦 Build debug complete!"
           
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
