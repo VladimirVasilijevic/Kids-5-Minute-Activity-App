@@ -24,7 +24,7 @@ runs:
         echo "📦 dist directory contents:"
         ls -la dist/ || echo "dist directory not found"
         echo "📦 Build output contents:"
-        ls -la dist/vaspitac-app/ || echo "dist/vaspitac-app directory not found"
+        ls -la dist/ || echo "dist directory not found"
         
         firebase deploy --only hosting --project ${{ inputs.project-id }}
         

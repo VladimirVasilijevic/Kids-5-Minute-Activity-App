@@ -78,7 +78,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: build-output
-          path: dist/
+          path: dist/vaspitac-app/
           retention-days: 1
 
   # Firebase hosting deployment job
@@ -106,8 +106,7 @@ jobs:
           ls -la vaspitac-app/
           echo "📁 vaspitac-app/dist directory contents:"
           ls -la vaspitac-app/dist/ || echo "dist directory not found"
-          echo "📁 vaspitac-app/dist/vaspitac-app directory contents:"
-          ls -la vaspitac-app/dist/vaspitac-app/ || echo "dist/vaspac-app directory not found"
+
 
       - name: Setup Firebase Hosting
         uses: ./.github/actions/setup-firebase-hosting
