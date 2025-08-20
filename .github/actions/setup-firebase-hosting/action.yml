@@ -20,13 +20,12 @@ runs:
         
     - name: Setup Firebase Authentication
       shell: bash
+      env:
+        GOOGLE_APPLICATION_CREDENTIALS: ${{ github.workspace }}/serviceAccountKey.json
       run: |
         echo "🔐 Setting up Firebase authentication..."
         # Create service account key file
         echo '${{ inputs.service-account-key }}' > serviceAccountKey.json
-        
-        # Set environment variable for authentication
-        export GOOGLE_APPLICATION_CREDENTIALS="$(pwd)/serviceAccountKey.json"
         
         # Verify the service account key file was created
         echo "📁 Service account key file created:"
@@ -36,6 +35,8 @@ runs:
         
     - name: Set Firebase Project
       shell: bash
+      env:
+        GOOGLE_APPLICATION_CREDENTIALS: ${{ github.workspace }}/serviceAccountKey.json
       run: |
         echo "🎯 Setting Firebase project to ${{ inputs.project }}..."
         firebase use ${{ inputs.project }}
@@ -43,6 +44,8 @@ runs:
         
     - name: Verify Authentication
       shell: bash
+      env:
+        GOOGLE_APPLICATION_CREDENTIALS: ${{ github.workspace }}/serviceAccountKey.json
       run: |
         echo "✅ Verifying Firebase authentication..."
         echo "🎯 Current project:"
