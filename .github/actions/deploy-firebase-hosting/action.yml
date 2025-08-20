@@ -15,7 +15,7 @@ runs:
   steps:
     - name: Deploy to Firebase Hosting
       shell: bash
-      working-directory: ${{ github.workspace }}
+      working-directory: ${{ github.workspace }}/vaspitac-app
       env:
         GOOGLE_APPLICATION_CREDENTIALS: ${{ github.workspace }}/serviceAccountKey.json
       run: |
@@ -34,7 +34,7 @@ runs:
         
     - name: Get Deployment URL
       shell: bash
-      working-directory: ${{ github.workspace }}
+      working-directory: ${{ github.workspace }}/vaspitac-app
       env:
         GOOGLE_APPLICATION_CREDENTIALS: ${{ github.workspace }}/serviceAccountKey.json
       run: |
