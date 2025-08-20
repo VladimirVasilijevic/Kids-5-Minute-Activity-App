@@ -94,7 +94,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: build-output
-          path: vaspitac-app/
+          path: ./
 
       - name: Setup Firebase Hosting
         uses: ./.github/actions/setup-firebase-hosting
