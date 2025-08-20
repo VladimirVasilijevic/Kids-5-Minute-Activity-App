@@ -28,12 +28,24 @@ runs:
         # Set environment variable for authentication
         export GOOGLE_APPLICATION_CREDENTIALS="$(pwd)/serviceAccountKey.json"
         
+        # Verify the service account key file was created
+        echo "📁 Service account key file created:"
+        ls -la serviceAccountKey.json
+        
         echo "✅ Service account key created and environment variable set"
+        
+    - name: Set Firebase Project
+      shell: bash
+      run: |
+        echo "🎯 Setting Firebase project to ${{ inputs.project }}..."
+        firebase use ${{ inputs.project }}
+        echo "✅ Project set successfully"
         
     - name: Verify Authentication
       shell: bash
       run: |
         echo "✅ Verifying Firebase authentication..."
-        echo "🎯 Project will be set to: ${{ inputs.project }}"
+        echo "🎯 Current project:"
+        firebase use
         echo "🔑 Service account authentication ready"
         echo "🎉 Firebase hosting setup complete!"
