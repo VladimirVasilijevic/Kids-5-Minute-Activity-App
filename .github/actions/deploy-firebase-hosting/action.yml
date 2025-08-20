@@ -25,8 +25,6 @@ runs:
         ls -la
         echo "📦 dist directory contents:"
         ls -la dist/ || echo "dist directory not found"
-        echo "📦 dist directory contents:"
-        ls -la dist/ || echo "dist directory not found"
         
         firebase deploy --only hosting --project ${{ inputs.project-id }}
         
@@ -39,4 +37,5 @@ runs:
         GOOGLE_APPLICATION_CREDENTIALS: ${{ github.workspace }}/serviceAccountKey.json
       run: |
         echo "🌐 Getting deployment URL..."
-        firebase hosting:channel:list --json | jq -r '.result.channels[0].url // "Deployment URL not available"'
+        echo "Production site deployed to: https://${{ inputs.project-id }}.web.app"
+        echo "Firebase Console: https://console.firebase.google.com/project/${{ inputs.project-id }}/hosting"
