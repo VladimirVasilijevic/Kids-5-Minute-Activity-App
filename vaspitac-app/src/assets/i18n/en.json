@@ -125,7 +125,7 @@
     "LOADING": "Loading about content..."
   },
   "BLOG": {
-    "BACK": "Back to home",
+    "BACK": "Back to blog",
     "TITLE": "Blog",
     "SUBTITLE": "Articles about parenting and child development",
     "POST1_TITLE": "5 ways to encourage creativity in children",
@@ -139,7 +139,12 @@
     "POST3_AUTHOR": "Jelena Stojanovic",
     "LOADING": "Loading blog posts...",
     "LOADING_SINGLE": "Loading blog post...",
-    "EMPTY": "No blog posts available."
+    "EMPTY": "No blog posts available.",
+    "VIDEO": "Video",
+    "VIDEO_NOT_SUPPORTED": "Your browser does not support the video tag.",
+    "VIDEO_UNAVAILABLE": "Video unavailable",
+    "WATCH_ON_PLATFORM": "Watch on platform",
+    "VIDEO_INDICATOR": "Video"
   },
   "TIPS": {
     "BACK": "Back to home",
@@ -499,7 +504,27 @@
     "ACTIVITY_DELETED_SUCCESS": "Activity deleted successfully!",
     "BLOG_CREATED_SUCCESS": "Blog post created successfully!",
     "BLOG_UPDATED_SUCCESS": "Blog post updated successfully!",
-        "BLOG_DELETED_SUCCESS": "Blog post deleted successfully!"
+    "BLOG_DELETED_SUCCESS": "Blog post deleted successfully!",
+    "VIDEO_URL": "Video URL",
+    "VIDEO_URL_HELP": "Add a video to your blog post (optional)",
+    "ENTER_VIDEO_URL": "https://youtube.com/watch?v=... or direct video URL",
+    "VIDEO_PREVIEW": "Video Preview",
+    "VIDEO_URL_FORMATS": "Supports: YouTube, Vimeo, Dailymotion, Facebook, Instagram, TikTok, and direct video files (MP4, WebM, etc.)",
+    "VIDEO_COVER_IMAGE": "Video Cover Image",
+    "VIDEO_COVER_IMAGE_HELP": "Add a cover image for your video (required when adding video)",
+    "ENTER_VIDEO_COVER_IMAGE": "https://example.com/video-cover.jpg",
+    "VIDEO_COVER_IMAGE_PREVIEW": "Video Cover Image Preview",
+    "REMOVE_VIDEO_COVER_IMAGE": "Remove",
+    "VIDEO_COVER_IMAGE_FORMATS": "Supports: PNG, JPG, GIF, WebP up to 5MB",
+    "IMAGE_OR_VIDEO_REQUIRED": "Either a cover image or video is required",
+    "ENTER_CONTENT_MARKDOWN": "Write your blog content using markdown...",
+    "MARKDOWN_HELP_TITLE": "Markdown Help",
+    "MARKDOWN_BASICS": "Basic Formatting",
+    "MARKDOWN_ADVANCED": "Advanced Features",
+    "SHOW_PREVIEW": "Show Preview",
+    "HIDE_PREVIEW": "Hide Preview",
+    "PREVIEW": "Preview",
+    "MARKDOWN_SUPPORTED": "Markdown formatting supported"
   },
   "SUBSCRIBE": {
     "TITLE": "Choose your plan",

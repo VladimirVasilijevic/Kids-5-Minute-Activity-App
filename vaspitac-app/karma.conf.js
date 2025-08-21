@@ -41,9 +41,12 @@ module.exports = function (config) {
         flags: [
           '--no-sandbox',
           '--disable-gpu',
-          '--disable-dev-shm-usage'
+          '--disable-dev-shm-usage',
+          '--disable-web-security',
+          '--disable-features=VizDisplayCompositor'
         ]
-      }
+      },
+
     },
     singleRun: false,
     restartOnFileChange: true

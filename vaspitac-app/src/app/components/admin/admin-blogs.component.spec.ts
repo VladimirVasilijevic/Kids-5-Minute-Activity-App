@@ -142,6 +142,8 @@ describe('AdminBlogsComponent', (): void => {
       author: 'New Author',
       readTime: '10 min',
       imageUrl: 'new-blog.jpg',
+      videoUrl: '',
+      videoImage: '',
       visibility: ContentVisibility.PUBLIC,
       isPremium: false
     };
@@ -174,6 +176,8 @@ describe('AdminBlogsComponent', (): void => {
       author: 'Updated Author',
       readTime: '15 min',
       imageUrl: 'updated-blog.jpg',
+      videoUrl: '',
+      videoImage: '',
       visibility: ContentVisibility.PUBLIC,
       isPremium: false
     };
@@ -252,6 +256,8 @@ describe('AdminBlogsComponent', (): void => {
       author: 'Test',
       readTime: '5 min',
       imageUrl: 'test.jpg',
+      videoUrl: '',
+      videoImage: '',
       visibility: ContentVisibility.PUBLIC,
       isPremium: false
     };

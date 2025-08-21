@@ -18,10 +18,10 @@ export interface Activity {
   duration: string;
   /** Target age group (optional) */
   ageGroup?: string;
-  /** List of materials needed (optional) */
-  materials?: string[];
-  /** Step-by-step instructions (optional) */
-  instructions?: string[];
+  /** Markdown content for materials needed (optional) */
+  materials?: string;
+  /** Markdown content for step-by-step instructions (optional) */
+  instructions?: string;
   /** URL to video demonstration (optional) */
   videoUrl?: string;
   /** Content visibility level - who can access this content */

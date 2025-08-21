@@ -78,4 +78,13 @@ export class BlogComponent implements OnInit {
       }
     });
   }
+
+  /**
+   * Handles image loading errors by setting a default image
+   * @param event - The error event from the image element
+   */
+  onImageError(event: Event): void {
+    const img = event.target as HTMLImageElement;
+    img.src = 'assets/images/default-blog-image.svg';
+  }
 }

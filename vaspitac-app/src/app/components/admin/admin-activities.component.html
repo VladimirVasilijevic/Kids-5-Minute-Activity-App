@@ -49,26 +49,62 @@
 
               <div>
                 <label class="block text-xs sm:text-sm font-medium mb-2">{{ 'ADMIN.DESCRIPTION' | translate }}</label>
-                <textarea
-                  [(ngModel)]="formData.description"
-                  name="description"
-                  rows="3"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 text-sm"
-                  [placeholder]="'ADMIN.ENTER_DESCRIPTION' | translate"
-                  required
-                ></textarea>
+                <div class="space-y-2">
+                  <div class="flex justify-between items-center">
+                    <span class="text-xs text-gray-500">{{ 'ADMIN.MARKDOWN_SUPPORTED' | translate }}</span>
+                    <button
+                      type="button"
+                      (click)="toggleDescriptionPreview()"
+                      class="text-xs text-green-600 hover:text-green-700 font-medium"
+                    >
+                      {{ showDescriptionPreview ? ('ADMIN.HIDE_PREVIEW' | translate) : ('ADMIN.SHOW_PREVIEW' | translate) }}
+                    </button>
+                  </div>
+                  <textarea
+                    [(ngModel)]="formData.description"
+                    name="description"
+                    rows="3"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 text-sm"
+                    [placeholder]="'ADMIN.ENTER_DESCRIPTION' | translate"
+                    required
+                  ></textarea>
+                  <div *ngIf="showDescriptionPreview" class="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                    <div class="text-xs text-gray-500 mb-2">{{ 'ADMIN.PREVIEW' | translate }}:</div>
+                    <div class="prose prose-sm max-w-none">
+                      <markdown [data]="formData.description"></markdown>
+                    </div>
+                  </div>
+                </div>
                 <div *ngIf="formErrors['description']" class="text-red-500 text-xs mt-1">{{ formErrors['description'] }}</div>
               </div>
 
               <div>
                 <label class="block text-xs sm:text-sm font-medium mb-2">{{ 'ADMIN.MATERIALS' | translate }}</label>
-                <textarea
-                  [(ngModel)]="formData.materials"
-                  name="materials"
-                  rows="3"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 text-sm"
-                  [placeholder]="'ADMIN.ENTER_MATERIALS' | translate"
-                ></textarea>
+                <div class="space-y-2">
+                  <div class="flex justify-between items-center">
+                    <span class="text-xs text-gray-500">{{ 'ADMIN.MARKDOWN_SUPPORTED' | translate }}</span>
+                    <button
+                      type="button"
+                      (click)="toggleMaterialsPreview()"
+                      class="text-xs text-green-600 hover:text-green-700 font-medium"
+                    >
+                      {{ showMaterialsPreview ? ('ADMIN.HIDE_PREVIEW' | translate) : ('ADMIN.SHOW_PREVIEW' | translate) }}
+                    </button>
+                  </div>
+                  <textarea
+                    [(ngModel)]="formData.materials"
+                    name="materials"
+                    rows="3"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 text-sm"
+                    [placeholder]="'ADMIN.ENTER_MATERIALS' | translate"
+                  ></textarea>
+                  <div *ngIf="showMaterialsPreview" class="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                    <div class="text-xs text-gray-500 mb-2">{{ 'ADMIN.PREVIEW' | translate }}:</div>
+                    <div class="prose prose-sm max-w-none">
+                      <markdown [data]="formData.materials"></markdown>
+                    </div>
+                  </div>
+                </div>
                 <div *ngIf="formErrors['materials']" class="text-red-500 text-xs mt-1">{{ formErrors['materials'] }}</div>
               </div>
 
@@ -164,14 +200,32 @@
 
               <div>
                 <label class="block text-xs sm:text-sm font-medium mb-2">{{ 'ADMIN.INSTRUCTIONS' | translate }}</label>
-                <textarea
-                  [(ngModel)]="formData.instructions"
-                  name="instructions"
-                  rows="8"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 text-sm"
-                  [placeholder]="'ADMIN.ENTER_INSTRUCTIONS' | translate"
-                  required
-                ></textarea>
+                <div class="space-y-2">
+                  <div class="flex justify-between items-center">
+                    <span class="text-xs text-gray-500">{{ 'ADMIN.MARKDOWN_SUPPORTED' | translate }}</span>
+                    <button
+                      type="button"
+                      (click)="toggleInstructionsPreview()"
+                      class="text-xs text-green-600 hover:text-green-700 font-medium"
+                    >
+                      {{ showInstructionsPreview ? ('ADMIN.HIDE_PREVIEW' | translate) : ('ADMIN.SHOW_PREVIEW' | translate) }}
+                    </button>
+                  </div>
+                  <textarea
+                    [(ngModel)]="formData.instructions"
+                    name="instructions"
+                    rows="8"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 text-sm"
+                    [placeholder]="'ADMIN.ENTER_INSTRUCTIONS' | translate"
+                    required
+                  ></textarea>
+                  <div *ngIf="showInstructionsPreview" class="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                    <div class="text-xs text-gray-500 mb-2">{{ 'ADMIN.PREVIEW' | translate }}:</div>
+                    <div class="prose prose-sm max-w-none">
+                      <markdown [data]="formData.instructions"></markdown>
+                    </div>
+                  </div>
+                </div>
                 <div *ngIf="formErrors['instructions']" class="text-red-500 text-xs mt-1">{{ formErrors['instructions'] }}</div>
               </div>
 

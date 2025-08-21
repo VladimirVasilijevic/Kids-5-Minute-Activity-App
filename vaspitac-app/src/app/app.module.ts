@@ -27,6 +27,9 @@ import { MatInputModule } from '@angular/material/input';
 import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 
+// Markdown imports
+import { MarkdownModule } from 'ngx-markdown';
+
 import { environment } from '../environments/environment';
 
 // Components
@@ -58,6 +61,7 @@ import { AdminAboutComponent } from './components/admin/admin-about.component';
 import { AdminUsersComponent } from './components/admin/admin-users.component';
 import { BackButtonComponent } from './components/back-button/back-button.component';
 import { SubscribeComponent } from './components/subscribe/subscribe.component';
+import { SafePipe } from './pipes/safe.pipe';
 
 // AoT requires an exported function for factories
 /**
@@ -102,6 +106,7 @@ export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
     AdminUsersComponent,
     BackButtonComponent,
     SubscribeComponent,
+    SafePipe,
   ],
   imports: [
     BrowserModule,
@@ -136,6 +141,8 @@ export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
         deps: [HttpClient],
       },
     }),
+    // Markdown module with configuration
+    MarkdownModule.forRoot(),
     // Firebase modules
     AngularFireModule.initializeApp(environment.firebase),
     AngularFirestoreModule,

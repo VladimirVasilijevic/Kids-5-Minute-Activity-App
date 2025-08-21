@@ -125,7 +125,7 @@
     "LOADING": "Učitavanje sadržaja o meni..."
   },
   "BLOG": {
-    "BACK": "Nazad na početnu",
+    "BACK": "Nazad na blog",
     "TITLE": "Blog",
     "SUBTITLE": "Članci o roditeljstvu i razvoju dece",
     "POST1_TITLE": "5 načina da podstaknete kreativnost kod deteta",
@@ -139,7 +139,12 @@
     "POST3_AUTHOR": "Jelena Stojanović",
     "LOADING": "Učitavanje blog članaka...",
     "LOADING_SINGLE": "Učitavanje blog članka...",
-    "EMPTY": "Nema dostupnih blog članaka."
+    "EMPTY": "Nema dostupnih blog članaka.",
+    "VIDEO": "Video",
+    "VIDEO_NOT_SUPPORTED": "Vaš browser ne podržava video tag.",
+    "VIDEO_UNAVAILABLE": "Video nije dostupan",
+    "WATCH_ON_PLATFORM": "Pogledaj na platformi",
+    "VIDEO_INDICATOR": "Video"
   },
   "TIPS": {
     "BACK": "Nazad na početnu",
@@ -499,7 +504,27 @@
     "ACTIVITY_DELETED_SUCCESS": "Aktivnost je uspešno obrisana!",
     "BLOG_CREATED_SUCCESS": "Blog članak je uspešno kreiran!",
     "BLOG_UPDATED_SUCCESS": "Blog članak je uspešno ažuriran!",
-        "BLOG_DELETED_SUCCESS": "Blog članak je uspešno obrisan!"
+    "BLOG_DELETED_SUCCESS": "Blog članak je uspešno obrisan!",
+    "VIDEO_URL": "URL videa",
+    "VIDEO_URL_HELP": "Dodajte video u vaš blog post (opciono)",
+    "ENTER_VIDEO_URL": "https://youtube.com/watch?v=... ili direktan URL videa",
+    "VIDEO_PREVIEW": "Pregled videa",
+    "VIDEO_URL_FORMATS": "Podržava: YouTube, Vimeo, Dailymotion, Facebook, Instagram, TikTok i direktne video fajlove (MP4, WebM, itd.)",
+    "VIDEO_COVER_IMAGE": "Naslovna slika videa",
+    "VIDEO_COVER_IMAGE_HELP": "Dodajte naslovnu sliku za vaš video (obavezno kada dodajete video)",
+    "ENTER_VIDEO_COVER_IMAGE": "https://example.com/video-cover.jpg",
+    "VIDEO_COVER_IMAGE_PREVIEW": "Pregled naslovne slike videa",
+    "REMOVE_VIDEO_COVER_IMAGE": "Ukloni",
+    "VIDEO_COVER_IMAGE_FORMATS": "Podržava: PNG, JPG, GIF, WebP do 5MB",
+    "IMAGE_OR_VIDEO_REQUIRED": "Potrebna je ili naslovna slika ili video",
+    "ENTER_CONTENT_MARKDOWN": "Napišite sadržaj bloga koristeći markdown...",
+    "MARKDOWN_HELP_TITLE": "Markdown Pomoć",
+    "MARKDOWN_BASICS": "Osnovno formatiranje",
+    "MARKDOWN_ADVANCED": "Napredne funkcionalnosti",
+    "SHOW_PREVIEW": "Prikaži pregled",
+    "HIDE_PREVIEW": "Sakrij pregled",
+    "PREVIEW": "Pregled",
+    "MARKDOWN_SUPPORTED": "Markdown formatiranje podržano"
   },
   "SUBSCRIBE": {
     "TITLE": "Izaberite svoj plan",

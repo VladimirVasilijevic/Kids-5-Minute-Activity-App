@@ -61,6 +61,9 @@ export class AdminBlogsComponent implements OnInit {
   isUploadingImage = false;
   imagePreview: string | null = null;
 
+  // Markdown functionality
+  showPreview = false;
+
   formData = {
     title: '',
     excerpt: '',
@@ -68,6 +71,8 @@ export class AdminBlogsComponent implements OnInit {
     author: '',
     readTime: '',
     imageUrl: '',
+    videoUrl: '',
+    videoImage: '',
     visibility: ContentVisibility.PUBLIC,
     isPremium: false
   };
@@ -155,27 +160,52 @@ export class AdminBlogsComponent implements OnInit {
    */
   private validateForm(): boolean {
     this.formErrors = {};
-    
+
+    // Validate title
     if (!this.formData.title.trim()) {
       this.formErrors['title'] = 'Title is required';
     }
-    
+
+    // Validate excerpt
     if (!this.formData.excerpt.trim()) {
       this.formErrors['excerpt'] = 'Excerpt is required';
     }
-    
+
+    // Validate full content
     if (!this.formData.fullContent.trim()) {
       this.formErrors['fullContent'] = 'Content is required';
     }
-    
+
+    // Validate author
     if (!this.formData.author.trim()) {
       this.formErrors['author'] = 'Author is required';
     }
-    
+
+    // Validate read time
     if (!this.formData.readTime.trim()) {
       this.formErrors['readTime'] = 'Read time is required';
     }
+
+        // Validate image URL - only required if no video is provided
+    if (!this.formData.imageUrl.trim() && !this.formData.videoUrl.trim()) {
+      this.formErrors['imageUrl'] = 'Either Image URL or Video URL is required';
+    }
     
+    // Validate video URL if provided
+    if (this.formData.videoUrl.trim() && !this.isValidVideoUrl(this.formData.videoUrl)) {
+      this.formErrors['videoUrl'] = 'Please enter a valid video URL';
+    }
+    
+    // Validate video image if video URL is provided
+    if (this.formData.videoUrl.trim() && !this.formData.videoImage.trim()) {
+      this.formErrors['videoImage'] = 'Video cover image is required when adding a video';
+    }
+
+    // Warning for video image without video URL
+    if (this.formData.videoImage.trim() && !this.formData.videoUrl.trim()) {
+      console.warn('Video cover image provided without video URL');
+    }
+
     return Object.keys(this.formErrors).length === 0;
   }
 
@@ -384,6 +414,8 @@ export class AdminBlogsComponent implements OnInit {
       readTime: this.formData.readTime,
       date: new Date().toISOString(),
       imageUrl: this.formData.imageUrl,
+      videoUrl: this.formData.videoUrl,
+      videoImage: this.formData.videoImage,
       visibility: this.formData.visibility,
       isPremium: this.formData.isPremium,
       isEditing: false,
@@ -417,6 +449,8 @@ export class AdminBlogsComponent implements OnInit {
       author: this.formData.author,
       readTime: this.formData.readTime,
       imageUrl: this.formData.imageUrl,
+      videoUrl: this.formData.videoUrl,
+      videoImage: this.formData.videoImage,
       visibility: this.formData.visibility,
       isPremium: this.formData.isPremium
     };
@@ -451,6 +485,8 @@ export class AdminBlogsComponent implements OnInit {
       author: '',
       readTime: '',
       imageUrl: '',
+      videoUrl: '',
+      videoImage: '',
       visibility: ContentVisibility.PUBLIC,
       isPremium: false
     };
@@ -472,6 +508,8 @@ export class AdminBlogsComponent implements OnInit {
       author: blog.author,
       readTime: blog.readTime,
       imageUrl: blog.imageUrl,
+      videoUrl: blog.videoUrl || '',
+      videoImage: blog.videoImage || '',
       visibility: blog.visibility || ContentVisibility.PUBLIC,
       isPremium: blog.isPremium || false
     };
@@ -518,6 +556,30 @@ export class AdminBlogsComponent implements OnInit {
   }
 
   /**
+   * Validates if the provided URL is a valid video URL
+   * @param url - The URL to validate
+   * @returns True if URL is valid, false otherwise
+   */
+  private isValidVideoUrl(url: string): boolean {
+    try {
+      const urlObj = new URL(url);
+      // Allow common video hosting platforms and direct video files
+      const validDomains = [
+        'youtube.com', 'youtu.be', 'vimeo.com', 'dailymotion.com',
+        'facebook.com', 'instagram.com', 'tiktok.com'
+      ];
+      
+      // Check if it's a valid domain or direct video file
+      const isValidDomain = validDomains.some(domain => urlObj.hostname.includes(domain));
+      const isDirectVideo = /\.(mp4|webm|ogg|mov|avi|wmv|flv|mkv)$/i.test(urlObj.pathname);
+      
+      return isValidDomain || isDirectVideo;
+    } catch {
+      return false;
+    }
+  }
+
+  /**
    * Formats the publication date for display
    * @param dateString - The date string to format
    * @returns Formatted date string
@@ -526,5 +588,11 @@ export class AdminBlogsComponent implements OnInit {
     return new Date(dateString).toLocaleDateString();
   }
 
+  /**
+   * Toggles the markdown preview panel
+   */
+  togglePreview(): void {
+    this.showPreview = !this.showPreview;
+  }
 
 } 

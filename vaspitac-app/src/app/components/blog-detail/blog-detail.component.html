@@ -17,12 +17,64 @@
   <!-- Blog post content -->
   <article class="max-w-4xl mx-auto px-4 py-6" *ngIf="blogPost$ | async as blog">
     <div class="mb-6">
-      <!-- Featured image -->
+      <!-- Featured image (only if exists) -->
       <img
+        *ngIf="blog.imageUrl"
         [src]="blog.imageUrl"
         [alt]="blog.title | translate"
         class="w-full h-64 object-cover rounded-lg mb-6"
       />
+      
+      <!-- Video at top (only if no image exists) -->
+      <div *ngIf="!blog.imageUrl && blog.videoUrl" class="mb-6">
+        <h3 class="video-title">{{ 'BLOG.VIDEO' | translate }}</h3>
+        <div class="video-container loading" style="padding-bottom: 56.25%;">
+          <iframe
+            *ngIf="isVideoEmbeddable(blog.videoUrl)"
+            [src]="getVideoEmbedUrl(blog.videoUrl) | safe:'resourceUrl'"
+            class="absolute top-0 left-0 w-full h-full rounded-lg"
+            frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen
+            loading="lazy"
+            (load)="onIframeLoad($event)"
+            (error)="onIframeError($event)"
+          ></iframe>
+          <video
+            *ngIf="!isVideoEmbeddable(blog.videoUrl) && isVideoPlayable(blog.videoUrl)"
+            [src]="blog.videoUrl"
+            class="absolute top-0 left-0 w-full h-full rounded-lg"
+            controls
+            preload="metadata"
+            loading="lazy"
+            (loadstart)="onVideoLoadStart($event)"
+            (canplay)="onVideoCanPlay($event)"
+            (error)="onVideoError($event)"
+          >
+            {{ 'BLOG.VIDEO_NOT_SUPPORTED' | translate }}
+          </video>
+          <div
+            *ngIf="!isVideoPlayable(blog.videoUrl)"
+            class="absolute top-0 left-0 w-full h-full flex items-center justify-center bg-gray-100 rounded-lg"
+          >
+            <div class="text-center p-6">
+              <svg class="mx-auto h-12 w-12 text-gray-400 mb-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+              </svg>
+              <p class="text-gray-600 text-sm">{{ 'BLOG.VIDEO_UNAVAILABLE' | translate }}</p>
+              <a
+                *ngIf="isVideoEmbeddable(blog.videoUrl)"
+                [href]="blog.videoUrl"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="inline-block mt-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm"
+              >
+                {{ 'BLOG.WATCH_ON_PLATFORM' | translate }}
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
       
       <!-- Title -->
       <h1 class="text-3xl font-bold text-gray-900 mb-4">
@@ -50,9 +102,58 @@
     </div>
 
     <!-- Full content -->
-    <div class="prose max-w-none">
-      <div class="text-gray-700 leading-relaxed whitespace-pre-line text-base">
-        {{ blog.fullContent }}
+    <div class="prose max-w-none p-6 bg-gray-50 rounded-lg">
+      <markdown [data]="blog.fullContent"></markdown>
+    </div>
+
+    <!-- Video section below text (only when both image and video exist) -->
+    <div *ngIf="blog.imageUrl && blog.videoUrl" class="mt-8">
+      <h3 class="video-title">{{ 'BLOG.VIDEO' | translate }}</h3>
+      <div class="video-container loading" style="padding-bottom: 56.25%;">
+        <iframe
+          *ngIf="isVideoEmbeddable(blog.videoUrl)"
+          [src]="getVideoEmbedUrl(blog.videoUrl) | safe:'resourceUrl'"
+          class="absolute top-0 left-0 w-full h-full rounded-lg"
+          frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen
+          loading="lazy"
+          (load)="onIframeLoad($event)"
+          (error)="onIframeError($event)"
+        ></iframe>
+        <video
+          *ngIf="!isVideoEmbeddable(blog.videoUrl) && isVideoPlayable(blog.videoUrl)"
+          [src]="blog.videoUrl"
+          class="absolute top-0 left-0 w-full h-full rounded-lg"
+          controls
+          preload="metadata"
+          loading="lazy"
+          (loadstart)="onVideoLoadStart($event)"
+          (canplay)="onVideoCanPlay($event)"
+          (error)="onVideoError($event)"
+        >
+          {{ 'BLOG.VIDEO_NOT_SUPPORTED' | translate }}
+        </video>
+        <div
+          *ngIf="!isVideoPlayable(blog.videoUrl)"
+          class="absolute top-0 left-0 w-full h-full flex items-center justify-center bg-gray-100 rounded-lg"
+        >
+          <div class="text-center p-6">
+            <svg class="mx-auto h-12 w-12 text-gray-400 mb-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+            </svg>
+            <p class="text-gray-600 text-sm">{{ 'BLOG.VIDEO_UNAVAILABLE' | translate }}</p>
+            <a
+              *ngIf="isVideoEmbeddable(blog.videoUrl)"
+              [href]="blog.videoUrl"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="inline-block mt-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm"
+            >
+              {{ 'BLOG.WATCH_ON_PLATFORM' | translate }}
+            </a>
+          </div>
+        </div>
       </div>
     </div>
   </article>
