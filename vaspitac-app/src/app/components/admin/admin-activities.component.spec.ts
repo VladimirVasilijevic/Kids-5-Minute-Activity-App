@@ -323,9 +323,9 @@ describe('AdminActivitiesComponent', (): void => {
       expect(newActivity.ageGroup).toBe('Preschool (3-5 years)');
       // Duration should match the format used in the component (e.g., '45 min')
       expect(newActivity.duration).toMatch(/45( min)?/);
-      // Instructions should be an array
-      expect(Array.isArray(newActivity.instructions)).toBeTrue();
-      expect(newActivity.instructions).toEqual(['Step 1', 'Step 2', 'Step 3']);
+      // Instructions should be a string
+      expect(typeof newActivity.instructions).toBe('string');
+      expect(newActivity.instructions).toBe('Step 1\nStep 2\nStep 3');
       // Image URL should match the input
       expect(newActivity.imageUrl).toBe('test.jpg');
       // Category should match the formData
@@ -376,9 +376,9 @@ describe('AdminActivitiesComponent', (): void => {
     const newActivity = component.activities.find(a => a.title === 'Test Activity');
     expect(newActivity).toBeTruthy();
     if (newActivity) {
-      // Should have instructions as an array
-      expect(Array.isArray(newActivity.instructions)).toBeTrue();
-      expect(newActivity.instructions).toEqual(['Test instructions']);
+      // Should have instructions as a string
+      expect(typeof newActivity.instructions).toBe('string');
+      expect(newActivity.instructions).toBe('Test instructions');
     }
     
     discardPeriodicTasks();

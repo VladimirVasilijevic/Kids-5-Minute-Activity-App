@@ -57,6 +57,11 @@ export class AdminActivitiesComponent implements OnInit {
   isUploadingVideo = false;
   videoPreview: string | null = null;
 
+  // Markdown preview toggles
+  showDescriptionPreview = false;
+  showMaterialsPreview = false;
+  showInstructionsPreview = false;
+
   formData = {
     title: '',
     description: '',
@@ -209,12 +214,10 @@ export class AdminActivitiesComponent implements OnInit {
       id: Date.now().toString(),
       title: this.formData.title,
       description: this.formData.description,
-      materials: this.formData.materials ? this.formData.materials.split('\n').filter(line => line.trim() !== '') : [],
+      materials: this.formData.materials || '',
       ageGroup: this.formData.ageGroup,
       duration: this.formData.duration ? `${this.formData.duration} min` : '',
-      instructions: this.formData.instructions
-        ? this.formData.instructions.split(/\r?\n/).filter(line => line.trim() !== '')
-        : [],
+      instructions: this.formData.instructions || '',
       imageUrl: this.formData.image || '',
       videoUrl: this.formData.video || '',
       category: this.formData.category,
@@ -248,12 +251,10 @@ export class AdminActivitiesComponent implements OnInit {
       ...this.editingActivity,
       title: this.formData.title,
       description: this.formData.description,
-      materials: this.formData.materials ? this.formData.materials.split('\n').filter(line => line.trim() !== '') : [],
+      materials: this.formData.materials || '',
       ageGroup: this.formData.ageGroup,
       duration: this.formData.duration ? `${this.formData.duration} min` : '',
-      instructions: this.formData.instructions
-        ? this.formData.instructions.split(/\r?\n/).filter(line => line.trim() !== '')
-        : [],
+      instructions: this.formData.instructions || '',
       imageUrl: this.formData.image || '',
       videoUrl: this.formData.video || '',
       category: this.formData.category,
@@ -492,10 +493,10 @@ export class AdminActivitiesComponent implements OnInit {
     this.formData = {
       title: activity.title,
       description: activity.description,
-      materials: activity.materials ? activity.materials.join('\n') : '',
+      materials: activity.materials || '',
       ageGroup: activity.ageGroup || '',
       duration: activity.duration ? activity.duration.replace(' min', '') : '',
-      instructions: activity.instructions ? activity.instructions.join('\n') : '',
+      instructions: activity.instructions || '',
       image: activity.imageUrl || '',
       video: activity.videoUrl || '',
       category: activity.category || '',
@@ -606,5 +607,26 @@ export class AdminActivitiesComponent implements OnInit {
    */
   formatDate(dateString: string): string {
     return new Date(dateString).toLocaleDateString();
+  }
+
+  /**
+   * Toggles description preview
+   */
+  toggleDescriptionPreview(): void {
+    this.showDescriptionPreview = !this.showDescriptionPreview;
+  }
+
+  /**
+   * Toggles materials preview
+   */
+  toggleMaterialsPreview(): void {
+    this.showMaterialsPreview = !this.showMaterialsPreview;
+  }
+
+  /**
+   * Toggles instructions preview
+   */
+  toggleInstructionsPreview(): void {
+    this.showInstructionsPreview = !this.showInstructionsPreview;
   }
 } 
