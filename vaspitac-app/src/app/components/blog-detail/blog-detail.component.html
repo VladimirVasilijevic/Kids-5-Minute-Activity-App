@@ -102,10 +102,8 @@
     </div>
 
     <!-- Full content -->
-    <div class="prose max-w-none">
-      <div class="text-gray-700 leading-relaxed whitespace-pre-line text-base">
-        {{ blog.fullContent }}
-      </div>
+    <div class="prose max-w-none p-6 bg-gray-50 rounded-lg">
+      <markdown [data]="blog.fullContent"></markdown>
     </div>
 
     <!-- Video section below text (only when both image and video exist) -->

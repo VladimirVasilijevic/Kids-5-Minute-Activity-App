@@ -45,6 +45,8 @@
     "firebase": "^11.10.0",
     "firebase-admin": "^13.4.0",
     "flag-icons": "^7.5.0",
+    "marked": "^12.0.0",
+    "ngx-markdown": "^18.0.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.14.0"

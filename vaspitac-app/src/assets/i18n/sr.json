@@ -516,7 +516,15 @@
     "VIDEO_COVER_IMAGE_PREVIEW": "Pregled naslovne slike videa",
     "REMOVE_VIDEO_COVER_IMAGE": "Ukloni",
     "VIDEO_COVER_IMAGE_FORMATS": "Podržava: PNG, JPG, GIF, WebP do 5MB",
-    "IMAGE_OR_VIDEO_REQUIRED": "Potrebna je ili naslovna slika ili video"
+    "IMAGE_OR_VIDEO_REQUIRED": "Potrebna je ili naslovna slika ili video",
+    "ENTER_CONTENT_MARKDOWN": "Napišite sadržaj bloga koristeći markdown...",
+    "MARKDOWN_HELP_TITLE": "Markdown Pomoć",
+    "MARKDOWN_BASICS": "Osnovno formatiranje",
+    "MARKDOWN_ADVANCED": "Napredne funkcionalnosti",
+    "SHOW_PREVIEW": "Prikaži pregled",
+    "HIDE_PREVIEW": "Sakrij pregled",
+    "PREVIEW": "Pregled",
+    "MARKDOWN_SUPPORTED": "Markdown formatiranje podržano"
   },
   "SUBSCRIBE": {
     "TITLE": "Izaberite svoj plan",

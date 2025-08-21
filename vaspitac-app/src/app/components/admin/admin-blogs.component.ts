@@ -61,6 +61,9 @@ export class AdminBlogsComponent implements OnInit {
   isUploadingImage = false;
   imagePreview: string | null = null;
 
+  // Markdown functionality
+  showPreview = false;
+
   formData = {
     title: '',
     excerpt: '',
@@ -584,6 +587,19 @@ export class AdminBlogsComponent implements OnInit {
   formatDate(dateString: string): string {
     return new Date(dateString).toLocaleDateString();
   }
+
+  /**
+   * Toggles the markdown preview panel
+   */
+  togglePreview(): void {
+    this.showPreview = !this.showPreview;
+  }
+
+
+
+
+
+
 
 
 } 

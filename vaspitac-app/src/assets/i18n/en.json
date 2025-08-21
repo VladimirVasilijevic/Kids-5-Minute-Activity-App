@@ -516,7 +516,15 @@
     "VIDEO_COVER_IMAGE_PREVIEW": "Video Cover Image Preview",
     "REMOVE_VIDEO_COVER_IMAGE": "Remove",
     "VIDEO_COVER_IMAGE_FORMATS": "Supports: PNG, JPG, GIF, WebP up to 5MB",
-    "IMAGE_OR_VIDEO_REQUIRED": "Either a cover image or video is required"
+    "IMAGE_OR_VIDEO_REQUIRED": "Either a cover image or video is required",
+    "ENTER_CONTENT_MARKDOWN": "Write your blog content using markdown...",
+    "MARKDOWN_HELP_TITLE": "Markdown Help",
+    "MARKDOWN_BASICS": "Basic Formatting",
+    "MARKDOWN_ADVANCED": "Advanced Features",
+    "SHOW_PREVIEW": "Show Preview",
+    "HIDE_PREVIEW": "Hide Preview",
+    "PREVIEW": "Preview",
+    "MARKDOWN_SUPPORTED": "Markdown formatting supported"
   },
   "SUBSCRIBE": {
     "TITLE": "Choose your plan",

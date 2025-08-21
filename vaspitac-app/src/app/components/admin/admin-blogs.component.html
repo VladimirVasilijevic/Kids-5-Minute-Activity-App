@@ -69,15 +69,47 @@
 
               <div>
                 <label class="block text-xs sm:text-sm font-medium mb-2">{{ 'ADMIN.CONTENT' | translate }}</label>
-                <textarea
-                  [(ngModel)]="formData.fullContent"
-                  name="fullContent"
-                  rows="8"
-                  class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 text-sm"
-                  [ngClass]="formErrors['fullContent'] ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-green-500'"
-                  [placeholder]="'ADMIN.ENTER_CONTENT' | translate"
-                  required
-                ></textarea>
+                <div class="space-y-3">
+                  <!-- Markdown Editor -->
+                  <div class="relative">
+                    <textarea
+                      [(ngModel)]="formData.fullContent"
+                      name="fullContent"
+                      rows="8"
+                      class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 text-sm font-mono"
+                      [ngClass]="formErrors['fullContent'] ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-green-500'"
+                      [placeholder]="'ADMIN.ENTER_CONTENT_MARKDOWN' | translate"
+                      required
+                    ></textarea>
+                  </div>
+                  <!-- Preview Button and Panel -->
+                  <div class="flex justify-between items-center">
+                    <div class="flex gap-2">
+                      <button
+                        type="button"
+                        (click)="togglePreview()"
+                        class="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-gray-800 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+                      >
+                        <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                          <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                          <path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        </svg>
+                        {{ showPreview ? ('ADMIN.HIDE_PREVIEW' | translate) : ('ADMIN.SHOW_PREVIEW' | translate) }}
+                      </button>
+                    </div>
+                  </div>
+                  
+                  <!-- Preview Panel -->
+                  <div *ngIf="showPreview && formData.fullContent" class="border border-gray-200 rounded-md p-4 bg-white">
+                    <h4 class="font-medium text-gray-900 mb-3">{{ 'ADMIN.PREVIEW' | translate }}:</h4>
+                    
+                     <!-- Markdown Preview -->
+                     <div class="prose max-w-none p-4">
+                       <markdown [data]="formData.fullContent"></markdown>
+                     </div>
+                    
+                  </div>
+                </div>
                 <div *ngIf="formErrors['fullContent']" class="text-red-500 text-xs mt-1">{{ formErrors['fullContent'] }}</div>
               </div>
 

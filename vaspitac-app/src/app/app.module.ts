@@ -27,6 +27,9 @@ import { MatInputModule } from '@angular/material/input';
 import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 
+// Markdown imports
+import { MarkdownModule } from 'ngx-markdown';
+
 import { environment } from '../environments/environment';
 
 // Components
@@ -138,6 +141,8 @@ export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
         deps: [HttpClient],
       },
     }),
+    // Markdown module with configuration
+    MarkdownModule.forRoot(),
     // Firebase modules
     AngularFireModule.initializeApp(environment.firebase),
     AngularFirestoreModule,
