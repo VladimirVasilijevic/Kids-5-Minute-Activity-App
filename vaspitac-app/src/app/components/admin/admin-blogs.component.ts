@@ -595,11 +595,4 @@ export class AdminBlogsComponent implements OnInit {
     this.showPreview = !this.showPreview;
   }
 
-
-
-
-
-
-
-
 } 
