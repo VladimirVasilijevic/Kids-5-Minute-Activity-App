@@ -29,6 +29,43 @@ export class FirestoreService {
   ) {}
 
   /**
+   * Converts a Firestore Timestamp to an ISO string or returns the original value
+   * @param timestamp - Firestore Timestamp, Date, or string
+   * @returns ISO string or original value
+   */
+  private convertTimestamp(timestamp: any): string {
+    if (!timestamp) return '';
+    
+    try {
+      // If it's already a string, return it
+      if (typeof timestamp === 'string') {
+        return timestamp;
+      }
+      
+      // If it's a Date object, convert to ISO string
+      if (timestamp instanceof Date) {
+        return timestamp.toISOString();
+      }
+      
+      // If it's a Firestore Timestamp, convert to Date then to ISO string
+      if (timestamp && typeof timestamp === 'object' && timestamp.seconds !== undefined) {
+        return new Date(timestamp.seconds * 1000).toISOString();
+      }
+      
+      // If it's a number (milliseconds), convert to Date then to ISO string
+      if (typeof timestamp === 'number') {
+        return new Date(timestamp).toISOString();
+      }
+      
+      // Fallback: try to convert to string
+      return String(timestamp);
+    } catch (error) {
+      console.warn('Failed to convert timestamp:', timestamp, error);
+      return '';
+    }
+  }
+
+  /**
    * Get activities from Firestore with JSON fallback
    * @returns {Observable<Activity[]>} Observable of activities array
    */
@@ -112,6 +149,11 @@ export class FirestoreService {
           .collection<BlogPost>(`blog_${lang}`)
           .valueChanges()
           .pipe(
+            map(posts => posts.map(post => ({
+              ...post,
+              // Convert Firestore Timestamps to ISO strings
+              date: this.convertTimestamp(post.date)
+            }))),
             catchError((_error: unknown) => {
               // Fallback to JSON for blog
               return this._http.get<BlogPost[]>(`assets/blog-posts_${lang}.json`);
@@ -156,7 +198,12 @@ export class FirestoreService {
               if (!content) {
                 throw new Error('About content not found in Firestore');
               }
-              return content;
+              
+              // Convert Firestore Timestamps to ISO strings
+              return {
+                ...content,
+                lastUpdated: this.convertTimestamp(content.lastUpdated)
+              };
             }),
             catchError(() => {
               // Fallback to JSON for about
