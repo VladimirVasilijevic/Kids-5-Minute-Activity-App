@@ -8,7 +8,8 @@ import { UserProfile, UserRole } from '../../../models/user-profile.model';
 import { DigitalFile, DigitalFileFormData } from '../../../models/digital-file.model';
 import { LanguageService } from '../../../services/language.service';
 import { ACCESS_LEVELS } from '../../../models/marketplace.constants';
-import { formatFileSize, generateId, validateFileForUpload } from '../../../models/marketplace.utils';
+import { formatFileSize, validateFileForUpload } from '../../../models/marketplace.utils';
+import { DigitalFileService } from '../../../services/digital-file.service';
 
 /**
  * Admin files component for managing digital files
@@ -94,7 +95,8 @@ export class AdminFilesComponent implements OnInit {
     private _auth: AuthService,
     private _userService: UserService,
     private _languageService: LanguageService,
-    private _translate: TranslateService
+    private _translate: TranslateService,
+    private _digitalFileService: DigitalFileService
   ) {}
 
   /**
@@ -131,10 +133,19 @@ export class AdminFilesComponent implements OnInit {
    * Loads all digital files
    */
   private loadFiles(): void {
-    // TODO: Implement file loading from service
-    this.files = [];
-    this.filteredFiles = [...this.files];
-    this.updateDisplayedFiles();
+    this._digitalFileService.getFiles().subscribe({
+      next: (files) => {
+        this.files = files;
+        this.filteredFiles = [...this.files];
+        this.updateDisplayedFiles();
+      },
+      error: (error) => {
+        console.error('Error loading files:', error);
+        this.showErrorModal = true;
+        this.errorTitle = 'Error Loading Files';
+        this.errorMessage = 'Failed to load digital files. Please try again.';
+      }
+    });
   }
 
   /**
@@ -239,11 +250,31 @@ export class AdminFilesComponent implements OnInit {
    * Creates a new file
    */
   private createFile(): void {
-    // TODO: Implement file creation
-    this.showSuccessMessage = true;
-    this.successMessage = 'File created successfully';
-    this.resetForm();
-    this.loadFiles();
+    if (!this.selectedFile) {
+      this.showErrorModal = true;
+      this.errorTitle = 'File Required';
+      this.errorMessage = 'Please select a file to upload.';
+      return;
+    }
+
+    this.isUploadingFile = true;
+    
+    this._digitalFileService.createFile(this.formData, this.selectedFile).subscribe({
+      next: (file) => {
+        this.isUploadingFile = false;
+        this.showSuccessMessage = true;
+        this.successMessage = 'File created successfully';
+        this.resetForm();
+        this.loadFiles();
+      },
+      error: (error) => {
+        this.isUploadingFile = false;
+        console.error('Error creating file:', error);
+        this.showErrorModal = true;
+        this.errorTitle = 'Error Creating File';
+        this.errorMessage = error.message || 'Failed to create file. Please try again.';
+      }
+    });
   }
 
   /**
@@ -252,11 +283,30 @@ export class AdminFilesComponent implements OnInit {
   private updateFile(): void {
     if (!this.editingFile) return;
 
-    // TODO: Implement file update
-    this.showSuccessMessage = true;
-    this.successMessage = 'File updated successfully';
-    this.resetForm();
-    this.loadFiles();
+    const updates: Partial<DigitalFile> = {
+      title: this.formData.title,
+      description: this.formData.description,
+      priceRSD: this.formData.priceRSD,
+      priceEUR: this.formData.priceEUR,
+      accessLevel: this.formData.accessLevel,
+      language: this.formData.language,
+      tags: this.formData.tags || []
+    };
+
+    this._digitalFileService.updateFile(this.editingFile.id, updates).subscribe({
+      next: (file) => {
+        this.showSuccessMessage = true;
+        this.successMessage = 'File updated successfully';
+        this.resetForm();
+        this.loadFiles();
+      },
+      error: (error) => {
+        console.error('Error updating file:', error);
+        this.showErrorModal = true;
+        this.errorTitle = 'Error Updating File';
+        this.errorMessage = error.message || 'Failed to update file. Please try again.';
+      }
+    });
   }
 
   /**
@@ -275,10 +325,19 @@ export class AdminFilesComponent implements OnInit {
    * @param file - The file to delete
    */
   private deleteFile(file: DigitalFile): void {
-    // TODO: Implement file deletion
-    this.showSuccessMessage = true;
-    this.successMessage = 'File deleted successfully';
-    this.loadFiles();
+    this._digitalFileService.deleteFile(file.id).subscribe({
+      next: () => {
+        this.showSuccessMessage = true;
+        this.successMessage = 'File deleted successfully';
+        this.loadFiles();
+      },
+      error: (error) => {
+        console.error('Error deleting file:', error);
+        this.showErrorModal = true;
+        this.errorTitle = 'Error Deleting File';
+        this.errorMessage = error.message || 'Failed to delete file. Please try again.';
+      }
+    });
   }
 
   /**
@@ -299,10 +358,24 @@ export class AdminFilesComponent implements OnInit {
    * @param isActive - New status
    */
   private updateFileStatus(file: DigitalFile, isActive: boolean): void {
-    // TODO: Implement status update
-    file.isActive = isActive;
-    this.showSuccessMessage = true;
-    this.successMessage = `File ${isActive ? 'activated' : 'deactivated'} successfully`;
+    this._digitalFileService.toggleFileStatus(file.id, isActive).subscribe({
+      next: (updatedFile) => {
+        // Update the local file object
+        const index = this.files.findIndex(f => f.id === file.id);
+        if (index !== -1) {
+          this.files[index] = updatedFile;
+          this.filterFiles(); // Refresh filtered list
+        }
+        this.showSuccessMessage = true;
+        this.successMessage = `File ${isActive ? 'activated' : 'deactivated'} successfully`;
+      },
+      error: (error) => {
+        console.error('Error updating file status:', error);
+        this.showErrorModal = true;
+        this.errorTitle = 'Error Updating Status';
+        this.errorMessage = error.message || 'Failed to update file status. Please try again.';
+      }
+    });
   }
 
   /**
@@ -450,7 +523,8 @@ export class AdminFilesComponent implements OnInit {
    * @returns Number of sales
    */
   getFileSalesCount(fileId: string): number {
-    // TODO: Implement sales count retrieval
+    // TODO: Implement sales count retrieval from purchase service
+    // For now, return 0 as placeholder
     return 0;
   }
 }

@@ -455,7 +455,7 @@
 
 <!-- Confirmation Modal -->
 <app-confirmation-modal
-  *ngIf="showConfirmModal"
+  [isOpen]="showConfirmModal"
   [title]="confirmTitle"
   [message]="confirmMessage"
   (confirm)="handleConfirm()"
