@@ -97,7 +97,14 @@ export class AdminDashboardComponent implements OnInit {
    * Navigates to the admin users management page
    */
   navigateToUsers(): void {
-    this._router.navigate(['/admin/users'])
+    this._router.navigate(['/admin/users']);
+  }
+
+  /**
+   * Navigates to the admin digital files management page
+   */
+  navigateToFiles(): void {
+    this._router.navigate(['/admin/files']);
   }
 
   /**

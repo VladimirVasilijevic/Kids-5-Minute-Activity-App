@@ -59,6 +59,7 @@ import { AdminActivitiesComponent } from './components/admin/admin-activities.co
 import { AdminBlogsComponent } from './components/admin/admin-blogs.component';
 import { AdminAboutComponent } from './components/admin/admin-about.component';
 import { AdminUsersComponent } from './components/admin/admin-users.component';
+import { AdminFilesComponent } from './components/admin/admin-files/admin-files.component';
 import { BackButtonComponent } from './components/back-button/back-button.component';
 import { SubscribeComponent } from './components/subscribe/subscribe.component';
 import { SafePipe } from './pipes/safe.pipe';
@@ -104,6 +105,7 @@ export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
     AdminBlogsComponent,
     AdminAboutComponent,
     AdminUsersComponent,
+    AdminFilesComponent,
     BackButtonComponent,
     SubscribeComponent,
     SafePipe,
@@ -130,6 +132,7 @@ export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
       { path: 'admin/blogs', component: AdminBlogsComponent },
       { path: 'admin/about', component: AdminAboutComponent },
       { path: 'admin/users', component: AdminUsersComponent },
+      { path: 'admin/files', component: AdminFilesComponent },
       { path: 'subscribe', component: SubscribeComponent },
       { path: '**', redirectTo: '' },
     ]),

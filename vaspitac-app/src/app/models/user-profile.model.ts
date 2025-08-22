@@ -20,6 +20,15 @@ export interface UserProfile {
   permissions: Permission[];
   /** Date the profile was last updated (ISO string) */
   updatedAt?: string;
+  /** Purchase history for digital files */
+  purchaseHistory?: {
+    purchases: string[]; // Array of purchase IDs
+    totalSpent: {
+      RSD: number;
+      EUR: number;
+    };
+    lastPurchaseDate?: string;
+  };
 }
 
 /**
