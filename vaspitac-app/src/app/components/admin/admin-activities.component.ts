@@ -62,7 +62,20 @@ export class AdminActivitiesComponent implements OnInit {
   showMaterialsPreview = false;
   showInstructionsPreview = false;
 
-  formData = {
+  formData: {
+    title: string;
+    description: string;
+    materials: string;
+    ageGroup: string;
+    duration: string;
+    instructions: string;
+    image: string;
+    video: string;
+    category: string;
+    language: string;
+    visibility: ContentVisibility;
+    isPremium: boolean;
+  } = {
     title: '',
     description: '',
     materials: '',
@@ -129,6 +142,18 @@ export class AdminActivitiesComponent implements OnInit {
     this._activityService.getActivities(this.currentLanguage).subscribe(activities => {
       this.activities = activities.map(activity => ({
         ...activity,
+        // Ensure all string fields are properly handled
+        title: String(activity.title || ''),
+        description: String(activity.description || ''),
+        materials: String(activity.materials || ''),
+        ageGroup: String(activity.ageGroup || ''),
+        duration: String(activity.duration || ''),
+        instructions: String(activity.instructions || ''),
+        imageUrl: String(activity.imageUrl || ''),
+        videoUrl: String(activity.videoUrl || ''),
+        category: String(activity.category || ''),
+        visibility: activity.visibility || ContentVisibility.PUBLIC,
+        isPremium: activity.isPremium || false,
         isEditing: false,
         isDeleting: false
       }));
@@ -152,6 +177,9 @@ export class AdminActivitiesComponent implements OnInit {
   handleSubmit(event: globalThis.Event): void {
     event.preventDefault();
     
+    // Sanitize form data before validation
+    this.sanitizeFormData();
+    
     // Validate form before submission
     if (!this.validateForm()) {
       return;
@@ -165,21 +193,48 @@ export class AdminActivitiesComponent implements OnInit {
   }
 
   /**
+   * Sanitizes form data to ensure all string fields are properly typed
+   */
+  private sanitizeFormData(): void {
+    this.formData.title = String(this.formData.title || '');
+    this.formData.description = String(this.formData.description || '');
+    this.formData.materials = String(this.formData.materials || '');
+    this.formData.ageGroup = String(this.formData.ageGroup || '');
+    this.formData.duration = String(this.formData.duration || '30');
+    this.formData.instructions = String(this.formData.instructions || '');
+    this.formData.image = String(this.formData.image || '');
+    this.formData.video = String(this.formData.video || '');
+    this.formData.category = String(this.formData.category || '');
+    this.formData.language = String(this.formData.language || 'en');
+  }
+
+  /**
    * Validates the form data
    * @returns True if form is valid, false otherwise
    */
   private validateForm(): boolean {
     this.formErrors = {};
     
-    if (!this.formData.title.trim()) {
+    // Sanitize form data first
+    this.sanitizeFormData();
+    
+    // Ensure all string fields are strings before calling trim()
+    const title = String(this.formData.title || '');
+    const description = String(this.formData.description || '');
+    const ageGroup = String(this.formData.ageGroup || '');
+    const instructions = String(this.formData.instructions || '');
+    const category = String(this.formData.category || '');
+    const language = String(this.formData.language || '');
+    
+    if (!title.trim()) {
       this.formErrors['title'] = 'Title is required';
     }
     
-    if (!this.formData.description.trim()) {
+    if (!description.trim()) {
       this.formErrors['description'] = 'Description is required';
     }
     
-    if (!this.formData.ageGroup.trim()) {
+    if (!ageGroup.trim()) {
       this.formErrors['ageGroup'] = 'Age group is required';
     }
     
@@ -188,21 +243,22 @@ export class AdminActivitiesComponent implements OnInit {
       this.formErrors['duration'] = 'Duration is required';
     }
     
-    if (!this.formData.instructions.trim()) {
+    if (!instructions.trim()) {
       this.formErrors['instructions'] = 'Instructions are required';
     }
     
-    if (!this.formData.category.trim()) {
+    if (!category.trim()) {
       this.formErrors['category'] = 'Category is required';
     }
     
-    if (!this.formData.language.trim()) {
+    if (!language.trim()) {
       this.formErrors['language'] = 'Language is required';
     }
     // Require at least one of image or video
     if (!this.formData.image && !this.formData.video) {
       this.formErrors['media'] = 'Either an image or a video is required.';
     }
+    
     return Object.keys(this.formErrors).length === 0;
   }
 
@@ -212,16 +268,16 @@ export class AdminActivitiesComponent implements OnInit {
   private createActivity(): void {
     const newActivity: AdminActivity = {
       id: Date.now().toString(),
-      title: this.formData.title,
-      description: this.formData.description,
-      materials: this.formData.materials || '',
-      ageGroup: this.formData.ageGroup,
+      title: String(this.formData.title || ''),
+      description: String(this.formData.description || ''),
+      materials: String(this.formData.materials || ''),
+      ageGroup: String(this.formData.ageGroup || ''),
       duration: this.formData.duration ? `${this.formData.duration} min` : '',
-      instructions: this.formData.instructions || '',
-      imageUrl: this.formData.image || '',
-      videoUrl: this.formData.video || '',
-      category: this.formData.category,
-      language: this.formData.language,
+      instructions: String(this.formData.instructions || ''),
+      imageUrl: String(this.formData.image || ''),
+      videoUrl: String(this.formData.video || ''),
+      category: String(this.formData.category || ''),
+      language: String(this.formData.language || 'en'),
       visibility: this.formData.visibility,
       isPremium: this.formData.isPremium,
       isEditing: false,
@@ -249,28 +305,26 @@ export class AdminActivitiesComponent implements OnInit {
 
     const updatedActivity: AdminActivity = {
       ...this.editingActivity,
-      title: this.formData.title,
-      description: this.formData.description,
-      materials: this.formData.materials || '',
-      ageGroup: this.formData.ageGroup,
+      title: String(this.formData.title || ''),
+      description: String(this.formData.description || ''),
+      materials: String(this.formData.materials || ''),
+      ageGroup: String(this.formData.ageGroup || ''),
       duration: this.formData.duration ? `${this.formData.duration} min` : '',
-      instructions: this.formData.instructions || '',
-      imageUrl: this.formData.image || '',
-      videoUrl: this.formData.video || '',
-      category: this.formData.category,
-      language: this.formData.language,
+      instructions: String(this.formData.instructions || ''),
+      imageUrl: String(this.formData.image || ''),
+      videoUrl: String(this.formData.video || ''),
+      category: String(this.formData.category || ''),
+      language: String(this.formData.language || 'en'),
       visibility: this.formData.visibility,
       isPremium: this.formData.isPremium
     };
 
     // Update activity in service
     this._activityService.updateActivity(updatedActivity).then(() => {
-              // Activity update successful
       // Update local array after successful update
       const index = this.activities.findIndex(a => a.id === this.editingActivity?.id);
       if (index !== -1) {
         this.activities[index] = updatedActivity;
-        // Local array updated
       }
       this.resetForm();
       this.showSuccess(this._translate.instant('ADMIN.ACTIVITY_UPDATED_SUCCESS'));
@@ -278,6 +332,14 @@ export class AdminActivitiesComponent implements OnInit {
       console.error('Error updating activity:', error);
       this.showError('Update Error', 'Failed to update activity. Please try again.');
     });
+  }
+
+  /**
+   * Shows the form for adding a new activity
+   */
+  showAddForm(): void {
+    this.resetForm();
+    this.showForm = true;
   }
 
   /**
@@ -298,6 +360,7 @@ export class AdminActivitiesComponent implements OnInit {
       visibility: ContentVisibility.PUBLIC,
       isPremium: false
     };
+    
     this.editingActivity = null;
     this.imagePreview = null; // Clear image preview
     this.videoPreview = null; // Clear video preview
@@ -490,20 +553,23 @@ export class AdminActivitiesComponent implements OnInit {
    */
   handleEdit(activity: AdminActivity): void {
     this.editingActivity = activity;
+    
+    // Ensure all fields are properly converted to strings
     this.formData = {
-      title: activity.title,
-      description: activity.description,
-      materials: activity.materials || '',
-      ageGroup: activity.ageGroup || '',
-      duration: activity.duration ? activity.duration.replace(' min', '') : '',
-      instructions: activity.instructions || '',
-      image: activity.imageUrl || '',
-      video: activity.videoUrl || '',
-      category: activity.category || '',
-      language: activity.language || 'en',
+      title: String(activity.title || ''),
+      description: String(activity.description || ''),
+      materials: String(activity.materials || ''),
+      ageGroup: String(activity.ageGroup || ''),
+      duration: activity.duration ? activity.duration.replace(' min', '') : '30',
+      instructions: String(activity.instructions || ''),
+      image: String(activity.imageUrl || ''),
+      video: String(activity.videoUrl || ''),
+      category: String(activity.category || ''),
+      language: String(activity.language || 'en'),
       visibility: activity.visibility || ContentVisibility.PUBLIC,
       isPremium: activity.isPremium || false
     };
+    
     this.imagePreview = activity.imageUrl || null;
     this.videoPreview = activity.videoUrl || null;
     this.showForm = true;

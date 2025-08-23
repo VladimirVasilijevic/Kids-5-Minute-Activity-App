@@ -236,6 +236,8 @@ export class AdminUsersComponent implements OnInit {
     }
   }
 
+
+
   navigateToAdmin(): void {
     this._router.navigate(['/admin']);
   }

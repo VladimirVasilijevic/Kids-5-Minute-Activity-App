@@ -43,7 +43,24 @@ export class UserService {
     this._loadingService.showWithMessage(this._translateService.instant('PROFILE.LOADING'));
     
     return this._afs.doc<UserProfile>(`users/${uid}`).valueChanges().pipe(
-      map(profile => profile ?? null),
+      map(profile => {
+        if (!profile) return null;
+        
+        return {
+          ...profile,
+          // Convert Firestore Timestamps to Date objects
+          createdAt: this.convertTimestamp(profile.createdAt),
+          updatedAt: profile.updatedAt ? this.convertTimestamp(profile.updatedAt) : undefined,
+          // Handle subscription dates if they exist
+          subscription: profile.subscription ? {
+            ...profile.subscription,
+            startDate: this.convertTimestamp(profile.subscription.startDate),
+            endDate: profile.subscription.endDate ? this.convertTimestamp(profile.subscription.endDate) : undefined,
+            lastPaymentDate: profile.subscription.lastPaymentDate ? this.convertTimestamp(profile.subscription.lastPaymentDate) : undefined,
+            nextPaymentDate: profile.subscription.nextPaymentDate ? this.convertTimestamp(profile.subscription.nextPaymentDate) : undefined
+          } : undefined
+        };
+      }),
       tap(() => {
         this._loadingService.hide();
       })
@@ -66,10 +83,61 @@ export class UserService {
   getAllUsers(): Observable<UserProfile[]> {
     this._loadingService.showWithMessage(this._translateService.instant('PROFILE.LOADING'));
     return this._afs.collection<UserProfile>('users').valueChanges().pipe(
+      map(users => users.map(user => ({
+        ...user,
+        // Convert Firestore Timestamps to Date objects
+        createdAt: this.convertTimestamp(user.createdAt),
+        updatedAt: user.updatedAt ? this.convertTimestamp(user.updatedAt) : undefined,
+        // Handle subscription dates if they exist
+        subscription: user.subscription ? {
+          ...user.subscription,
+          startDate: this.convertTimestamp(user.subscription.startDate),
+          endDate: user.subscription.endDate ? this.convertTimestamp(user.subscription.endDate) : undefined,
+          lastPaymentDate: user.subscription.lastPaymentDate ? this.convertTimestamp(user.subscription.lastPaymentDate) : undefined,
+          nextPaymentDate: user.subscription.nextPaymentDate ? this.convertTimestamp(user.subscription.nextPaymentDate) : undefined
+        } : undefined
+      }))),
       tap(() => {
         this._loadingService.hide();
       })
     );
+  }
+
+  /**
+   * Converts a Firestore Timestamp to an ISO string or returns the original value
+   * @param timestamp - Firestore Timestamp, Date, or string
+   * @returns ISO string or original value
+   */
+  private convertTimestamp(timestamp: any): string {
+    if (!timestamp) return '';
+    
+    try {
+      // If it's already a string, return it
+      if (typeof timestamp === 'string') {
+        return timestamp;
+      }
+      
+      // If it's a Date object, convert to ISO string
+      if (timestamp instanceof Date) {
+        return timestamp.toISOString();
+      }
+      
+      // If it's a Firestore Timestamp, convert to Date then to ISO string
+      if (timestamp && typeof timestamp === 'object' && timestamp.seconds !== undefined) {
+        return new Date(timestamp.seconds * 1000).toISOString();
+      }
+      
+      // If it's a number (milliseconds), convert to Date then to ISO string
+      if (typeof timestamp === 'number') {
+        return new Date(timestamp).toISOString();
+      }
+      
+      // Fallback: try to convert to string
+      return String(timestamp);
+    } catch (error) {
+      console.warn('Failed to convert timestamp:', timestamp, error);
+      return '';
+    }
   }
 
   /**
