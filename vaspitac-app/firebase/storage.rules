@@ -55,5 +55,23 @@ service firebase.storage {
       allow read: if true;
       allow write: if request.auth != null;
     }
+    
+    // Digital files - require authentication and access verification
+    match /digital-files/{fileName} {
+      allow read: if request.auth != null && 
+        // Check if user has active access to this file
+        firestore.get(/databases/(default)/documents/user_access/$(request.auth.uid + '_' + fileName)).data.isActive == true;
+      allow write: if request.auth != null && 
+        firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+    
+    // Digital files by ID - alternative access pattern
+    match /digital-files-by-id/{fileId}/{fileName} {
+      allow read: if request.auth != null && 
+        // Check if user has active access to this file ID
+        firestore.get(/databases/(default)/documents/user_access/$(request.auth.uid + '_' + fileId)).data.isActive == true;
+      allow write: if request.auth != null && 
+        firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
   }
 } 

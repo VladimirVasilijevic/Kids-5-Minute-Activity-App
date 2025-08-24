@@ -8,6 +8,9 @@ import { UserService } from '../../services/user.service';
 import { UserProfile } from '../../models/user-profile.model';
 import { DigitalFile } from '../../models/digital-file.model';
 import { DigitalFileService } from '../../services/digital-file.service';
+import { UserAccessService } from '../../services/user-access.service';
+import { PurchaseService } from '../../services/purchase.service';
+import { PurchaseFormData } from '../../models/purchase.model';
 
 import { formatFileSize } from '../../models/marketplace.utils';
 
@@ -52,11 +55,17 @@ export class ShopComponent implements OnInit {
   // Current user email for payment purposes
   currentUserEmail = '';
   
+  // User access tracking
+  userAccessMap: Record<string, boolean> = {};
+  currentUserId: string | null = null;
+  
   constructor(
     private _router: Router,
     private _auth: AuthService,
     private _userService: UserService,
     private _digitalFileService: DigitalFileService,
+    private _userAccessService: UserAccessService,
+    private _purchaseService: PurchaseService,
     private _translate: TranslateService
   ) {
     // Initialize arrays to prevent undefined issues
@@ -75,12 +84,16 @@ export class ShopComponent implements OnInit {
         this.isLoggedIn = false;
         this.showLoginModal = true;
         this.currentUserEmail = '';
+        this.currentUserId = null;
+        this.userAccessMap = {};
         console.log('User not authenticated, showing login modal');
       } else {
         this.isLoggedIn = true;
         this.showLoginModal = false;
         this.currentUserEmail = user.email || '';
+        this.currentUserId = user.uid;
         console.log('User authenticated:', user.uid, 'Email:', user.email);
+        this.loadUserAccess();
       }
     });
   }
@@ -101,25 +114,47 @@ export class ShopComponent implements OnInit {
           return of(null);
         }
       }),
-      catchError(() => {
+      catchError(error => {
+        console.error('Error loading user profile:', error);
         this.isLoggedIn = false;
-        this.showLoginModal = true; // Show modal on error
+        this.showLoginModal = true;
         return of(null);
       })
     );
   }
 
   /**
-   * Loads all active digital files
+   * Loads user access for all displayed files
+   */
+  private loadUserAccess(): void {
+    if (!this.currentUserId || this.files.length === 0) {
+      return;
+    }
+
+    const fileIds = this.files.map(file => file.id);
+    this._userAccessService.hasMultipleAccess(this.currentUserId, fileIds)
+      .subscribe(accessMap => {
+        this.userAccessMap = accessMap;
+        console.log('User access map loaded:', accessMap);
+      });
+  }
+
+  /**
+   * Loads digital files from the service
    */
   private loadFiles(): void {
     this.isLoading = true;
-    
     this._digitalFileService.getActiveFiles().subscribe({
       next: (files) => {
         this.files = files;
-        this.filterFiles();
+        this.displayedFiles = files;
         this.isLoading = false;
+        console.log('Files loaded:', files.length);
+        
+        // Load user access after files are loaded
+        if (this.currentUserId) {
+          this.loadUserAccess();
+        }
       },
       error: (error) => {
         console.error('Error loading files:', error);
@@ -131,75 +166,42 @@ export class ShopComponent implements OnInit {
   }
 
   /**
-   * Sets up language detection for currency display
+   * Sets up language detection for translations
    */
   private setupLanguageDetection(): void {
-    // Language detection is handled in the template via _translate.currentLang
-    // No need for additional subscription
-  }
-  
-  /**
-   * Shows login required modal
-   */
-  showLoginRequiredModal(): void {
-    this.showLoginModal = true;
-  }
-  
-  /**
-   * Closes login required modal
-   */
-  closeLoginModal(): void {
-    this.showLoginModal = false;
-  }
-  
-  /**
-   * Navigates to login page
-   */
-  goToLogin(): void {
-    this.closeLoginModal();
-    this.goBack();
-  }
-
-  /**
-   * Clears all filters and resets to show all files
-   */
-  clearFilters(): void {
-    this.searchTerm = '';
-    this.selectedLanguage = '';
-    this.selectedAccessLevel = '';
-    this.filterFiles();
+    // This will be handled by the translate service
+    // We can add custom logic here if needed
   }
 
   /**
    * Filters files based on search term and selected filters
    */
   filterFiles(): void {
-    let filtered = this.files || [];
+    let filtered = [...this.files];
 
-    // Search filter
+    // Filter by search term
     if (this.searchTerm.trim()) {
-      const search = this.searchTerm.toLowerCase().trim();
+      const searchLower = this.searchTerm.toLowerCase();
       filtered = filtered.filter(file =>
-        file.title.toLowerCase().includes(search) ||
-        file.description.toLowerCase().includes(search) ||
-        (file.tags && file.tags.some(tag => tag.toLowerCase().includes(search)))
+        file.title.toLowerCase().includes(searchLower) ||
+        file.description.toLowerCase().includes(searchLower) ||
+        (file.tags && file.tags.some(tag => tag.toLowerCase().includes(searchLower)))
       );
     }
 
-    // Language filter
-    if (this.selectedLanguage && this.selectedLanguage !== 'all') {
+    // Filter by language
+    if (this.selectedLanguage) {
       filtered = filtered.filter(file => file.language === this.selectedLanguage);
     }
 
-    // Access level filter
-    if (this.selectedAccessLevel && this.selectedAccessLevel !== 'all') {
+    // Filter by access level
+    if (this.selectedAccessLevel) {
       filtered = filtered.filter(file => file.accessLevel === this.selectedAccessLevel);
     }
 
     this.displayedFiles = filtered;
     this.currentPage = 1;
-    this.hasMoreItems = this.displayedFiles.length > this.itemsPerPage;
-    console.log('Filtered:', filtered.length, 'files from', this.files.length, 'total');
+    this.hasMoreItems = filtered.length > this.itemsPerPage;
   }
 
   /**
@@ -208,26 +210,27 @@ export class ShopComponent implements OnInit {
   loadMore(): void {
     if (this.hasMoreItems) {
       this.currentPage++;
-      this.hasMoreItems = this.displayedFiles.length > this.currentPage * this.itemsPerPage;
     }
   }
 
   /**
-   * Gets files for current page
+   * Gets files for the current page
    */
   getCurrentPageFiles(): DigitalFile[] {
-    if (!this.displayedFiles || this.displayedFiles.length === 0) {
-      return [];
-    }
-    const startIndex = 0;
-    const endIndex = this.currentPage * this.itemsPerPage;
+    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+    const endIndex = startIndex + this.itemsPerPage;
     return this.displayedFiles.slice(startIndex, endIndex);
   }
 
   /**
-   * Opens purchase modal for a file
+   * Opens purchase modal for a specific file
    */
   openPurchaseModal(file: DigitalFile): void {
+    if (!this.isLoggedIn) {
+      this.showLoginRequiredModal();
+      return;
+    }
+    
     this.selectedFile = file;
     this.showPurchaseModal = true;
   }
@@ -260,9 +263,72 @@ export class ShopComponent implements OnInit {
    * Checks if user has access to a file
    */
   hasAccess(fileId: string): boolean {
-    // TODO: Implement access check from UserAccess service
-    // For now, always return false to show buy buttons
-    return false;
+    if (!this.isLoggedIn || !this.currentUserId) {
+      return false;
+    }
+    return this.userAccessMap[fileId] || false;
+  }
+
+  /**
+   * Gets the appropriate action button for a file
+   */
+  getActionButton(file: DigitalFile): 'purchase' | 'download' | 'login' {
+    if (!this.isLoggedIn) return 'login';
+    if (this.hasAccess(file.id)) return 'download';
+    return 'purchase';
+  }
+
+  /**
+   * Downloads a file (for users who have access)
+   */
+  downloadFile(file: DigitalFile): void {
+    if (!this.hasAccess(file.id)) {
+      console.error('User does not have access to this file');
+      return;
+    }
+
+    this._digitalFileService.downloadFile(file).subscribe({
+      next: () => {
+        console.log('File download initiated:', file.title);
+        // You can add a success notification here
+      },
+      error: (error) => {
+        console.error('Error downloading file:', error);
+        // You can add an error notification here
+      }
+    });
+  }
+
+  /**
+   * Shows login required modal
+   */
+  showLoginRequiredModal(): void {
+    this.showLoginModal = true;
+  }
+
+  /**
+   * Closes login modal
+   */
+  closeLoginModal(): void {
+    this.showLoginModal = false;
+  }
+
+  /**
+   * Navigates to login page
+   */
+  goToLogin(): void {
+    this.closeLoginModal();
+    this.goBack(); // For now, just go back. You can implement actual login navigation
+  }
+
+  /**
+   * Clears all filters
+   */
+  clearFilters(): void {
+    this.searchTerm = '';
+    this.selectedLanguage = '';
+    this.selectedAccessLevel = '';
+    this.filterFiles();
   }
 
   /**
@@ -275,9 +341,9 @@ export class ShopComponent implements OnInit {
   /**
    * Gets currency symbol based on current language
    */
-  getCurrencySymbol(): string {
+  getCurrencySymbol(): 'RSD' | 'EUR' {
     const currentLang = this._translate.currentLang || 'sr';
-    return currentLang === 'sr' ? 'RSD' : '€';
+    return currentLang === 'sr' ? 'RSD' : 'EUR';
   }
 
   /**
@@ -339,5 +405,30 @@ export class ShopComponent implements OnInit {
     return this.currentUserEmail || 'user@example.com';
   }
 
+  /**
+   * Initiates purchase process for a file
+   */
+  initiatePurchase(file: DigitalFile): void {
+    if (!this.isLoggedIn || !this.currentUserId) {
+      this.showLoginRequiredModal();
+      return;
+    }
 
+    // Create purchase record
+    const purchaseData: PurchaseFormData = {
+      userId: this.currentUserId,
+      fileId: file.id,
+      amount: this.getPrice(file),
+      currency: this.getCurrencySymbol()
+    };
+
+    this._purchaseService.createPurchase(purchaseData).then(purchaseId => {
+      console.log('Purchase created:', purchaseId);
+      // Open payment modal to show instructions
+      this.openPaymentModal();
+    }).catch(error => {
+      console.error('Error creating purchase:', error);
+      // You can add an error notification here
+    });
+  }
 }

@@ -196,7 +196,7 @@ export class AdminFilesComponent implements OnInit {
    * Handles form submission
    * @param event - The form submit event
    */
-  handleSubmit(event: Event): void {
+  async handleSubmit(event: Event): Promise<void> {
     event.preventDefault();
     
     if (!this.validateForm()) {
@@ -204,9 +204,9 @@ export class AdminFilesComponent implements OnInit {
     }
 
     if (this.editingFile) {
-      this.updateFile();
+      await this.updateFile();
     } else {
-      this.createFile();
+      await this.createFile();
     }
   }
 
@@ -249,7 +249,7 @@ export class AdminFilesComponent implements OnInit {
   /**
    * Creates a new file
    */
-  private createFile(): void {
+  private async createFile(): Promise<void> {
     if (!this.selectedFile) {
       this.showErrorModal = true;
       this.errorTitle = 'File Required';
@@ -259,28 +259,26 @@ export class AdminFilesComponent implements OnInit {
 
     this.isUploadingFile = true;
     
-    this._digitalFileService.createFile(this.formData, this.selectedFile).subscribe({
-      next: (file) => {
-        this.isUploadingFile = false;
-        this.showSuccessMessage = true;
-        this.successMessage = 'File created successfully';
-        this.resetForm();
-        this.loadFiles();
-      },
-      error: (error) => {
-        this.isUploadingFile = false;
-        console.error('Error creating file:', error);
-        this.showErrorModal = true;
-        this.errorTitle = 'Error Creating File';
-        this.errorMessage = error.message || 'Failed to create file. Please try again.';
-      }
-    });
+    try {
+      const fileId = await this._digitalFileService.createFile(this.formData, this.selectedFile);
+      this.isUploadingFile = false;
+      this.showSuccessMessage = true;
+      this.successMessage = 'File created successfully';
+      this.resetForm();
+      this.loadFiles();
+    } catch (error: any) {
+      this.isUploadingFile = false;
+      console.error('Error creating file:', error);
+      this.showErrorModal = true;
+      this.errorTitle = 'Error Creating File';
+      this.errorMessage = error.message || 'Failed to create file. Please try again.';
+    }
   }
 
   /**
    * Updates an existing file
    */
-  private updateFile(): void {
+  private async updateFile(): Promise<void> {
     if (!this.editingFile) return;
 
     const updates: Partial<DigitalFile> = {
@@ -293,20 +291,18 @@ export class AdminFilesComponent implements OnInit {
       tags: this.formData.tags || []
     };
 
-    this._digitalFileService.updateFile(this.editingFile.id, updates).subscribe({
-      next: (file) => {
-        this.showSuccessMessage = true;
-        this.successMessage = 'File updated successfully';
-        this.resetForm();
-        this.loadFiles();
-      },
-      error: (error) => {
-        console.error('Error updating file:', error);
-        this.showErrorModal = true;
-        this.errorTitle = 'Error Updating File';
-        this.errorMessage = error.message || 'Failed to update file. Please try again.';
-      }
-    });
+    try {
+      await this._digitalFileService.updateFile(this.editingFile.id, updates);
+      this.showSuccessMessage = true;
+      this.successMessage = 'File updated successfully';
+      this.resetForm();
+      this.loadFiles();
+    } catch (error: any) {
+      console.error('Error updating file:', error);
+      this.showErrorModal = true;
+      this.errorTitle = 'Error Updating File';
+      this.errorMessage = error.message || 'Failed to update file. Please try again.';
+    }
   }
 
   /**
@@ -316,7 +312,7 @@ export class AdminFilesComponent implements OnInit {
   handleDelete(file: DigitalFile): void {
     this.confirmTitle = 'Delete File';
     this.confirmMessage = `Are you sure you want to delete "${file.title}"? This action cannot be undone.`;
-    this.confirmAction = () => this.deleteFile(file);
+    this.confirmAction = async () => await this.deleteFile(file);
     this.showConfirmModal = true;
   }
 
@@ -324,20 +320,18 @@ export class AdminFilesComponent implements OnInit {
    * Deletes a file
    * @param file - The file to delete
    */
-  private deleteFile(file: DigitalFile): void {
-    this._digitalFileService.deleteFile(file.id).subscribe({
-      next: () => {
-        this.showSuccessMessage = true;
-        this.successMessage = 'File deleted successfully';
-        this.loadFiles();
-      },
-      error: (error) => {
-        console.error('Error deleting file:', error);
-        this.showErrorModal = true;
-        this.errorTitle = 'Error Deleting File';
-        this.errorMessage = error.message || 'Failed to delete file. Please try again.';
-      }
-    });
+  private async deleteFile(file: DigitalFile): Promise<void> {
+    try {
+      await this._digitalFileService.deleteFile(file.id);
+      this.showSuccessMessage = true;
+      this.successMessage = 'File deleted successfully';
+      this.loadFiles();
+    } catch (error: any) {
+      console.error('Error deleting file:', error);
+      this.showErrorModal = true;
+      this.errorTitle = 'Error Deleting File';
+      this.errorMessage = error.message || 'Failed to delete file. Please try again.';
+    }
   }
 
   /**
@@ -348,7 +342,7 @@ export class AdminFilesComponent implements OnInit {
     const action = file.isActive ? 'deactivate' : 'activate';
     this.confirmTitle = `${action.charAt(0).toUpperCase() + action.slice(1)} File`;
     this.confirmMessage = `Are you sure you want to ${action} "${file.title}"?`;
-    this.confirmAction = () => this.updateFileStatus(file, !file.isActive);
+    this.confirmAction = async () => await this.updateFileStatus(file, !file.isActive);
     this.showConfirmModal = true;
   }
 
@@ -357,25 +351,23 @@ export class AdminFilesComponent implements OnInit {
    * @param file - The file to update
    * @param isActive - New status
    */
-  private updateFileStatus(file: DigitalFile, isActive: boolean): void {
-    this._digitalFileService.toggleFileStatus(file.id, isActive).subscribe({
-      next: (updatedFile) => {
-        // Update the local file object
-        const index = this.files.findIndex(f => f.id === file.id);
-        if (index !== -1) {
-          this.files[index] = updatedFile;
-          this.filterFiles(); // Refresh filtered list
-        }
-        this.showSuccessMessage = true;
-        this.successMessage = `File ${isActive ? 'activated' : 'deactivated'} successfully`;
-      },
-      error: (error) => {
-        console.error('Error updating file status:', error);
-        this.showErrorModal = true;
-        this.errorTitle = 'Error Updating Status';
-        this.errorMessage = error.message || 'Failed to update file status. Please try again.';
+  private async updateFileStatus(file: DigitalFile, isActive: boolean): Promise<void> {
+    try {
+      await this._digitalFileService.toggleFileStatus(file.id);
+      // Update the local file object
+      const index = this.files.findIndex(f => f.id === file.id);
+      if (index !== -1) {
+        this.files[index] = { ...this.files[index], isActive };
+        this.filterFiles(); // Refresh filtered list
       }
-    });
+      this.showSuccessMessage = true;
+      this.successMessage = `File ${isActive ? 'activated' : 'deactivated'} successfully`;
+    } catch (error: any) {
+      console.error('Error updating file status:', error);
+      this.showErrorModal = true;
+      this.errorTitle = 'Error Updating Status';
+      this.errorMessage = error.message || 'Failed to update file status. Please try again.';
+    }
   }
 
   /**
