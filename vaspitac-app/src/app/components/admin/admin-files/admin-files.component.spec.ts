@@ -2,12 +2,14 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { of } from 'rxjs';
 
 import { AdminFilesComponent } from './admin-files.component';
 import { AuthService } from '../../../services/auth.service';
 import { UserService } from '../../../services/user.service';
 import { LanguageService } from '../../../services/language.service';
+import { DigitalFileService } from '../../../services/digital-file.service';
 import { UserProfile, UserRole } from '../../../models/user-profile.model';
 
 describe('AdminFilesComponent', () => {
@@ -18,6 +20,7 @@ describe('AdminFilesComponent', () => {
   let mockUserService: jasmine.SpyObj<UserService>;
   let mockLanguageService: jasmine.SpyObj<LanguageService>;
   let mockTranslateService: jasmine.SpyObj<TranslateService>;
+  let mockDigitalFileService: jasmine.SpyObj<DigitalFileService>;
 
   const mockAdminUser: UserProfile = {
     uid: 'admin-uid',
@@ -34,6 +37,7 @@ describe('AdminFilesComponent', () => {
     const userSpy = jasmine.createSpyObj('UserService', ['getUserProfile']);
     const languageSpy = jasmine.createSpyObj('LanguageService', ['getCurrentLanguage']);
     const translateSpy = jasmine.createSpyObj('TranslateService', ['get']);
+    const digitalFileSpy = jasmine.createSpyObj('DigitalFileService', ['getFiles', 'getFile', 'createFile', 'updateFile', 'deleteFile', 'getActiveFiles']);
 
     await TestBed.configureTestingModule({
       declarations: [AdminFilesComponent],
@@ -43,8 +47,10 @@ describe('AdminFilesComponent', () => {
         { provide: AuthService, useValue: authSpy },
         { provide: UserService, useValue: userSpy },
         { provide: LanguageService, useValue: languageSpy },
-        { provide: TranslateService, useValue: translateSpy }
-      ]
+        { provide: TranslateService, useValue: translateSpy },
+        { provide: DigitalFileService, useValue: digitalFileSpy }
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
 
     fixture = TestBed.createComponent(AdminFilesComponent);
@@ -54,11 +60,14 @@ describe('AdminFilesComponent', () => {
     mockUserService = TestBed.inject(UserService) as jasmine.SpyObj<UserService>;
     mockLanguageService = TestBed.inject(LanguageService) as jasmine.SpyObj<LanguageService>;
     mockTranslateService = TestBed.inject(TranslateService) as jasmine.SpyObj<TranslateService>;
+    mockDigitalFileService = TestBed.inject(DigitalFileService) as jasmine.SpyObj<DigitalFileService>;
 
     // Setup default mocks
     mockUserService.getUserProfile.and.returnValue(of(mockAdminUser));
     mockLanguageService.getCurrentLanguage.and.returnValue('sr');
     mockTranslateService.get.and.returnValue(of('Translated Text'));
+    mockDigitalFileService.getFiles.and.returnValue(of([]));
+    mockDigitalFileService.getActiveFiles.and.returnValue(of([]));
   });
 
   it('should create', () => {

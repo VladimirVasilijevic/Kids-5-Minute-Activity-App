@@ -12,8 +12,18 @@ export const mockFreeUser: UserProfile = {
   email: 'test@test.com',
   avatarUrl: '',
   createdAt: '2023-01-01',
+  updatedAt: '2023-01-01',
   role: UserRole.FREE_USER,
-  permissions: [Permission.VIEW_PROFILE, Permission.EDIT_PROFILE]
+  permissions: [Permission.VIEW_PROFILE, Permission.EDIT_PROFILE],
+  subscription: {
+    status: SubscriptionStatus.EXPIRED,
+    type: SubscriptionType.MONTHLY,
+    startDate: '2023-01-01T00:00:00.000Z',
+    endDate: '2023-01-31T00:00:00.000Z',
+    autoRenew: false,
+    lastPaymentDate: '2023-01-01T00:00:00.000Z',
+    nextPaymentDate: '2023-01-31T00:00:00.000Z'
+  }
 };
 
 /**
