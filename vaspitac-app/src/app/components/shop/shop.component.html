@@ -1,205 +1,452 @@
-<div class="min-h-screen bg-green-50/30">
-  <div class="px-3 md:px-4 py-4 md:py-6 max-w-4xl mx-auto">
-    <!-- Back Button -->
-    <div class="mb-4 md:mb-6">
-      <app-back-button
-        [label]="'SHOP.BACK' | translate"
-        (back)="goBack()"
-      ></app-back-button>
-    </div>
-
-    <div class="space-y-6 md:space-y-8">
-      <!-- Header -->
+<!-- Digital Marketplace -->
+<div class="min-h-screen bg-gradient-to-br">
+  <!-- Header -->
+  <div class="max-w-7xl mx-auto px-4 py-8">
+    <div class="bg-gradient-to-br from-emerald-600 via-green-600 to-teal-700 text-white py-12 px-6 rounded-3xl shadow-lg relative overflow-hidden  header-margin">
+      <!-- Background Pattern -->
+      <div class="absolute inset-0 opacity-10">
+        <div class="absolute top-0 left-0 w-32 h-32 bg-white rounded-full -translate-x-16 -translate-y-16"></div>
+        <div class="absolute top-1/2 right-0 w-24 h-24 bg-white rounded-full translate-x-12 -translate-y-12"></div>
+        <div class="absolute bottom-0 left-1/3 w-20 h-20 bg-white rounded-full -translate-x-10 translate-y-10"></div>
+      </div>
+      
+      <div class="relative z-10">
+      <!-- Back Button -->
+      <div class="mb-8">
+        <app-back-button
+          [label]="'SHOP.BACK_TO_HOME' | translate"
+          (back)="goBack()"
+          class="text-white hover:text-emerald-100 transition-colors duration-200 [&_button]:text-white [&_button]:hover:text-emerald-100 [&_span]:text-white [&_span]:hover:text-emerald-100"
+        ></app-back-button>
+      </div>
+      
+      <!-- Main Content -->
       <div class="text-center">
-        <h1 class="text-2xl md:text-3xl font-semibold text-gray-900 mb-2">
-          {{ 'SHOP.TITLE' | translate }}
+        <!-- Icon with subtle animation -->
+        <div class="flex justify-center mb-6">
+          <div class="relative">
+            <div class="absolute inset-0 bg-white bg-opacity-20 rounded-full blur-xl animate-pulse"></div>
+            <div class="relative bg-white bg-opacity-10 backdrop-blur-sm rounded-full p-4 border border-white border-opacity-20">
+              <svg class="h-16 w-16 text-white drop-shadow-lg" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                <path d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Title with gradient text effect -->
+        <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold mb-4 bg-gradient-to-r from-white via-emerald-50 to-teal-100 bg-clip-text text-transparent drop-shadow-lg">
+          {{ 'SHOP.MARKETPLACE_TITLE' | translate }}
         </h1>
-        <p class="text-base md:text-lg text-gray-600">{{ 'SHOP.DESCRIPTION' | translate }}</p>
-      </div>
-
-      <!-- Products Overview -->
-      <div class="bg-white shadow-lg border border-green-100 rounded-xl p-4 md:p-6">
-        <h2 class="text-xl md:text-2xl text-gray-900 font-semibold mb-3 md:mb-4">
-          {{ 'SHOP.OFFER_TITLE' | translate }}
-        </h2>
-        <div class="grid gap-4 md:gap-6 md:grid-cols-2">
-          <div class="space-y-2 md:space-y-3">
-            <h3 class="text-base md:text-lg font-semibold text-green-700">
-              {{ 'SHOP.PDF_GUIDES' | translate }}
-            </h3>
-            <ul class="space-y-1 md:space-y-2 text-gray-700 text-sm md:text-base">
-              <li>• {{ 'SHOP.PDF_MONTHLY' | translate }}</li>
-              <li>• {{ 'SHOP.PDF_THEMED' | translate }}</li>
-              <li>• {{ 'SHOP.PDF_MOTOR' | translate }}</li>
-              <li>• {{ 'SHOP.PDF_CREATIVE' | translate }}</li>
-            </ul>
-          </div>
-          <div class="space-y-2 md:space-y-3">
-            <h3 class="text-base md:text-lg font-semibold text-green-700">
-              {{ 'SHOP.VIDEO_MATERIALS' | translate }}
-            </h3>
-            <ul class="space-y-1 md:space-y-2 text-gray-700 text-sm md:text-base">
-              <li>• {{ 'SHOP.VIDEO_DEMO' | translate }}</li>
-              <li>• {{ 'SHOP.VIDEO_TIPS' | translate }}</li>
-              <li>• {{ 'SHOP.VIDEO_CONSULT' | translate }}</li>
-              <li>• {{ 'SHOP.VIDEO_WEBINAR' | translate }}</li>
-            </ul>
-          </div>
+        
+        <!-- Subtitle with improved typography -->
+        <p class="text-lg md:text-xl text-emerald-50 max-w-3xl mx-auto leading-relaxed font-medium">
+          {{ 'SHOP.MARKETPLACE_DESCRIPTION' | translate }}
+        </p>
+        
+        <!-- Decorative line -->
+        <div class="mt-8 flex justify-center">
+          <div class="w-24 h-1 bg-gradient-to-r from-transparent via-white to-transparent rounded-full"></div>
         </div>
       </div>
+    </div>
+  </div>
 
-      <!-- PayPal Payment -->
-      <div class="bg-white shadow-lg border border-green-100 rounded-xl p-4 md:p-6">
-        <div class="flex items-center gap-2 text-xl md:text-2xl text-gray-900 mb-3 md:mb-4">
-          <!-- Lucide CreditCard Icon for payment -->
-          <svg
-            class="h-5 w-5 md:h-6 md:w-6 text-green-600"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            viewBox="0 0 24 24"
-          >
-            <rect x="2" y="5" width="20" height="14" rx="2" />
-            <path d="M2 10h20" />
-          </svg>
-          {{ 'SHOP.PAYPAL_TITLE' | translate }}
-        </div>
-        <div class="space-y-3 md:space-y-4">
-          <p class="text-gray-700 text-sm md:text-base">{{ 'SHOP.PAYPAL_DESC' | translate }}</p>
-          <div class="bg-gray-50 p-3 md:p-4 rounded-lg border">
-            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-              <div class="flex-1 min-w-0">
-                <p class="text-xs md:text-sm text-gray-600 mb-1">
-                  {{ 'SHOP.PAYPAL_EMAIL_LABEL' | translate }}
-                </p>
-                <p class="font-mono text-sm md:text-lg text-gray-900 break-all overflow-hidden">
-                  ana.petrovic.vaspitac&#64;gmail.com
-                </p>
-              </div>
-              <button
-                (click)="copyPayPalEmail()"
-                class="px-3 py-2 border rounded text-green-700 hover:bg-green-100 flex items-center gap-1 text-sm md:text-base self-start sm:self-auto whitespace-nowrap"
+  <!-- Main Content -->
+  <div class="bg-gray-50 min-h-screen">
+    <div class="max-w-7xl mx-auto px-4 py-8">
+      
+      <!-- Search and Filters -->
+      <div class="bg-white rounded-3xl shadow-lg p-6 mb-8">
+                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <!-- Search -->
+          <div class="md:col-span-2">
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+              {{ 'SHOP.SEARCH_MATERIALS' | translate }}
+            </label>
+            <div class="relative">
+              <input
+                [(ngModel)]="searchTerm"
+                (ngModelChange)="filterFiles()"
+                type="text"
+                [placeholder]="'SHOP.SEARCH_PLACEHOLDER' | translate"
+                class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500"
               >
-                <!-- Lucide Copy Icon -->
-                <svg
-                  *ngIf="!copiedPayPal"
-                  class="h-4 w-4"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  viewBox="0 0 24 24"
-                >
-                  <rect x="9" y="9" width="13" height="13" rx="2" />
-                  <path d="M5 15V5a2 2 0 0 1 2-2h10" />
-                </svg>
-                <!-- Lucide CheckCircle Icon -->
-                <svg
-                  *ngIf="copiedPayPal"
-                  class="h-4 w-4 text-green-600"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  viewBox="0 0 24 24"
-                >
-                  <path d="M9 12l2 2l4-4" />
-                  <circle cx="12" cy="12" r="10" />
-                </svg>
-                <span>{{
-                  copiedPayPal ? ('SHOP.COPIED' | translate) : ('SHOP.COPY' | translate)
-                }}</span>
+              <svg class="absolute left-3 top-2.5 h-5 w-5 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+              </svg>
+            </div>
+          </div>
+          
+
+          
+          <!-- Access Level Filter -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+              {{ 'SHOP.ACCESS_LEVEL' | translate }}
+            </label>
+            <select
+              [(ngModel)]="selectedAccessLevel"
+              (ngModelChange)="filterFiles()"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500"
+            >
+              <option value="">{{ 'SHOP.ALL_LEVELS' | translate }}</option>
+              <option value="BASIC">{{ 'SHOP.BASIC' | translate }}</option>
+              <option value="PREMIUM">{{ 'SHOP.PREMIUM' | translate }}</option>
+            </select>
+          </div>
+        </div>
+        
+        <!-- Results Count -->
+        <div class="mt-4 text-sm text-gray-600">
+          {{ 'SHOP.SHOWING_RESULTS' | translate: { count: displayedFiles.length, total: files.length } }}
+        </div>
+      </div>
+
+      <!-- Login Required Modal -->
+      <div *ngIf="!isLoggedIn && showLoginModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+          <div class="mt-3 text-center">
+            <svg class="mx-auto h-12 w-12 text-yellow-400 mb-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"/>
+            </svg>
+            <h3 class="text-lg font-medium text-gray-900 mb-2">
+              {{ 'SHOP.LOGIN_REQUIRED_TITLE' | translate }}
+            </h3>
+            <p class="text-gray-600 mb-6">
+              {{ 'SHOP.LOGIN_REQUIRED_MESSAGE' | translate }}
+            </p>
+            <div class="flex gap-3">
+              <button
+                (click)="closeLoginModal()"
+                class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-700 py-2 px-4 rounded-lg font-medium"
+              >
+                {{ 'SHOP.CANCEL' | translate }}
+              </button>
+              <button
+                (click)="goToLogin()"
+                class="flex-1 bg-yellow-600 hover:bg-yellow-700 text-white py-2 px-4 rounded-lg font-medium"
+              >
+                {{ 'SHOP.GO_TO_LOGIN' | translate }}
               </button>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Bank Transfer -->
-      <div class="bg-white shadow-lg border border-green-100 rounded-xl p-4 md:p-6">
-        <div class="flex items-center gap-2 text-xl md:text-2xl text-gray-900 mb-3 md:mb-4">
-          <!-- Lucide CreditCard Icon for payment -->
-          <svg
-            class="h-5 w-5 md:h-6 md:w-6 text-green-600"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            viewBox="0 0 24 24"
-          >
-            <rect x="2" y="5" width="20" height="14" rx="2" />
-            <path d="M2 10h20" />
+
+
+
+
+      <!-- Loading State -->
+      <div *ngIf="isLoading" class="text-center py-12">
+        <svg class="animate-spin h-12 w-12 text-green-600 mx-auto mb-4" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        <p class="text-gray-600">{{ 'SHOP.LOADING' | translate }}</p>
+      </div>
+
+      <!-- Files Grid -->
+      <div *ngIf="isLoggedIn && displayedFiles.length > 0" class="relative">
+        <!-- Loading overlay -->
+        <div *ngIf="isLoading" class="absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center z-10 rounded-lg">
+          <svg class="animate-spin h-8 w-8 text-green-600" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
           </svg>
-          {{ 'SHOP.BANK_TITLE' | translate }}
         </div>
-        <div class="space-y-4 md:space-y-6">
-          <p class="text-gray-700 text-sm md:text-base">{{ 'SHOP.BANK_DESC' | translate }}</p>
-          <div class="bg-blue-50 border border-blue-200 p-4 md:p-6 rounded-lg">
-            <h2 class="text-xl md:text-2xl font-semibold text-gray-900 mb-3 md:mb-4">
-              {{ 'SHOP.BANK_DETAILS_TITLE' | translate }}
-            </h2>
-            <div class="grid gap-3 md:gap-4 md:grid-cols-2">
-              <div>
-                <p class="text-xs md:text-sm font-medium text-blue-700">
-                  {{ 'SHOP.BANK_RECIPIENT' | translate }}
-                </p>
-                <p class="text-blue-900 text-sm md:text-base">Ana Petrović</p>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div *ngFor="let file of getCurrentPageFiles()" class="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
+          <!-- File Icon and Type -->
+          <div class="p-6 pb-4">
+            <div class="flex items-center justify-between mb-4">
+              <div class="h-12 w-12 rounded-lg bg-green-100 flex items-center justify-center">
+                <svg class="h-8 w-8 text-green-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                </svg>
               </div>
-              <div>
-                <p class="text-xs md:text-sm font-medium text-blue-700">
-                  {{ 'SHOP.BANK_ACCOUNT' | translate }}
-                </p>
-                <p class="font-mono text-blue-900 text-sm md:text-base break-all">
-                  160-123456789-12
-                </p>
-              </div>
-              <div>
-                <p class="text-xs md:text-sm font-medium text-blue-700">
-                  {{ 'SHOP.BANK_BANK' | translate }}
-                </p>
-                <p class="text-blue-900 text-sm md:text-base">Banka Intesa</p>
-              </div>
-              <div>
-                <p class="text-xs md:text-sm font-medium text-blue-700">
-                  {{ 'SHOP.BANK_REFERENCE' | translate }}
-                </p>
-                <p class="text-blue-900 text-sm md:text-base break-all">97 123-456789</p>
-              </div>
+              <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium"
+                    [class]="file.accessLevel === 'PREMIUM' ? 'bg-yellow-100 text-yellow-800' : 'bg-blue-100 text-blue-800'">
+                {{ file.accessLevel }}
+              </span>
             </div>
-          </div>
-          <div class="bg-yellow-50 border border-yellow-200 p-4 md:p-6 rounded-lg">
-            <h3 class="font-semibold text-base md:text-lg text-yellow-900 mb-3 md:mb-4">
-              {{ 'SHOP.BANK_HOWTO_TITLE' | translate }}
+            
+            <!-- File Title -->
+            <h3 class="text-lg font-semibold text-gray-900 mb-2 line-clamp-2">
+              {{ file.title }}
             </h3>
-            <div class="space-y-2 md:space-y-3 text-yellow-800 text-sm md:text-base">
-              <div>
-                <span class="font-medium">1.</span>
-                <span class="font-medium">{{ 'SHOP.BANK_HOWTO_WHO' | translate }}</span>
-                <span>{{ 'SHOP.BANK_HOWTO_WHO_DESC' | translate }}</span>
-              </div>
-              <div>
-                <span class="font-medium">2.</span>
-                <span class="font-medium">{{ 'SHOP.BANK_HOWTO_RECIPIENT' | translate }}</span>
-                <span>{{ 'SHOP.BANK_HOWTO_RECIPIENT_DESC' | translate }}</span>
-              </div>
-              <div>
-                <span class="font-medium">3.</span>
-                <span class="font-medium">{{ 'SHOP.BANK_HOWTO_ACCOUNT' | translate }}</span>
-                <span>{{ 'SHOP.BANK_HOWTO_ACCOUNT_DESC' | translate }}</span>
-              </div>
-              <div>
-                <span class="font-medium">4.</span>
-                <span class="font-medium">{{ 'SHOP.BANK_HOWTO_REFERENCE' | translate }}</span>
-                <span>{{ 'SHOP.BANK_HOWTO_REFERENCE_DESC' | translate }}</span>
-              </div>
+            
+                         <!-- File Details -->
+             <div class="flex items-center gap-4 text-sm text-gray-500 mb-3">
+               <span>{{ getFileExtension(file.fileType) }}</span>
+               <span>{{ formatFileSize(file.fileSize) }}</span>
+             </div>
+            
+                         <!-- Description -->
+             <div class="text-gray-600 text-sm mb-4 line-clamp-3 prose prose-sm max-w-none">
+               <markdown [data]="file.description"></markdown>
+             </div>
+            
+                         <!-- Price -->
+             <div class="text-right mb-4">
+               <div class="text-2xl font-bold text-green-600">
+                 {{ file.priceRSD }} RSD / {{ file.priceEUR }} EUR
+               </div>
+             </div>
+          </div>
+          
+          <!-- Action Buttons -->
+          <div class="px-6 pb-6">
+            <div *ngIf="hasAccess(file.id); else purchaseButtons" class="w-full">
+              <button
+                class="w-full bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg font-medium flex items-center justify-center gap-2"
+              >
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                </svg>
+                {{ 'SHOP.DOWNLOAD_FILE' | translate }}
+              </button>
             </div>
-          </div>
-          <div class="bg-yellow-50 border border-yellow-200 p-4 md:p-6 rounded-lg">
-            <h3 class="font-semibold text-base md:text-lg text-yellow-900 mb-3 md:mb-4">
-              {{ 'SHOP.BANK_NOTE_TITLE' | translate }}
-            </h3>
-            <span class="text-yellow-900 text-sm md:text-base">{{
-              'SHOP.BANK_NOTE_DESC' | translate
-            }}</span>
+            
+            <ng-template #purchaseButtons>
+              <div class="flex gap-2">
+                <button
+                  (click)="openPurchaseModal(file)"
+                  class="flex-1 bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg font-medium"
+                >
+                  {{ 'SHOP.BUY' | translate }}
+                </button>
+              </div>
+            </ng-template>
           </div>
         </div>
+      </div>
+
+      <!-- Empty State -->
+      <div *ngIf="!isLoading && isLoggedIn && files.length === 0" class="text-center py-12">
+        <svg class="mx-auto h-12 w-12 text-gray-400 mb-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+        </svg>
+        <h3 class="text-lg font-medium text-gray-900 mb-2">{{ 'SHOP.NO_FILES_FOUND' | translate }}</h3>
+        <p class="text-gray-500">{{ 'SHOP.NO_FILES_DESCRIPTION' | translate }}</p>
+      </div>
+      
+      <!-- No Results After Filtering -->
+      <div *ngIf="!isLoading && isLoggedIn && files.length > 0 && displayedFiles.length === 0" class="text-center py-12">
+        <svg class="mx-auto h-12 w-12 text-gray-400 mb-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+        </svg>
+        <h3 class="text-lg font-medium text-gray-900 mb-2">No files match your filters</h3>
+        <p class="text-gray-500">Try adjusting your search terms or filters.</p>
+        <button
+          (click)="clearFilters()"
+          class="mt-4 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg"
+        >
+          Clear Filters
+        </button>
+      </div>
+
+      <!-- Load More Button -->
+      <div *ngIf="hasMoreItems && isLoggedIn && !isLoading" class="text-center mt-8">
+        <button
+          (click)="loadMore()"
+          class="bg-white hover:bg-gray-50 text-green-600 border border-green-600 px-6 py-3 rounded-lg font-medium transition-colors"
+        >
+          {{ 'SHOP.LOAD_MORE' | translate }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+ <!-- Purchase Modal -->
+ <div *ngIf="showPurchaseModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+   <div class="relative top-20 mx-auto p-5 border max-w-2xl w-full shadow-lg rounded-md bg-white">
+    <div class="mt-3">
+      <!-- Header -->
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-lg font-medium text-gray-900">{{ 'SHOP.PURCHASE_TITLE' | translate }}</h3>
+        <button
+          (click)="closePurchaseModal()"
+          class="text-gray-400 hover:text-gray-600"
+        >
+          <svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+      
+      <!-- File Details -->
+      <div *ngIf="selectedFile" class="mb-6">
+        <h4 class="font-semibold text-gray-900 mb-2">{{ selectedFile.title }}</h4>
+                 <div class="text-sm text-gray-600 mb-3 prose prose-sm max-w-none">
+           <markdown [data]="selectedFile.description"></markdown>
+         </div>
+                 <div class="flex items-center gap-4 text-sm text-gray-500 mb-3">
+           <span>{{ getFileExtension(selectedFile?.fileType || '') }}</span>
+           <span>{{ formatFileSize(selectedFile?.fileSize || 0) }}</span>
+         </div>
+                 <div class="text-right">
+           <div class="text-2xl font-bold text-green-600">
+             {{ selectedFile?.priceRSD }} RSD / {{ selectedFile?.priceEUR }} EUR
+           </div>
+         </div>
+      </div>
+      
+      <!-- Payment Note -->
+      <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+        <div class="flex items-start gap-3">
+          <svg class="h-5 w-5 text-blue-400 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+          <p class="text-sm text-blue-700">
+            {{ 'SHOP.PAYMENT_NOTE' | translate }}
+          </p>
+        </div>
+      </div>
+      
+      <!-- Action Buttons -->
+      <div class="flex gap-3">
+        <button
+          (click)="closePurchaseModal()"
+          class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-700 py-2 px-4 rounded-lg font-medium"
+        >
+          {{ 'SHOP.CANCEL' | translate }}
+        </button>
+        <button
+          (click)="openPaymentModal()"
+          class="flex-1 bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg font-medium flex items-center justify-center gap-2"
+        >
+          <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
+          </svg>
+          {{ 'SHOP.CONTINUE_PAYMENT' | translate }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Payment Instructions Modal -->
+<div *ngIf="showPaymentModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+  <div class="relative top-20 mx-auto p-5 border max-w-2xl w-full shadow-lg rounded-md bg-white">
+    <div class="mt-3">
+      <!-- Header -->
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-lg font-medium text-gray-900">{{ 'SHOP.PAYMENT_INSTRUCTIONS' | translate }}</h3>
+        <button
+          (click)="closePaymentModal()"
+          class="text-gray-400 hover:text-gray-600"
+        >
+          <svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+      
+             <p class="text-sm text-gray-600 mb-6">
+         {{ 'SHOP.PAYMENT_DESCRIPTION' | translate }} {{ 'SHOP.ACCESS_APPROVAL_TIME' | translate }}
+       </p>
+      
+             <!-- Payment Details -->
+       <div *ngIf="selectedFile" class="bg-gray-50 rounded-lg p-4 mb-6">
+         <h4 class="font-semibold text-gray-900 mb-3">{{ 'SHOP.PAYMENT_DETAILS' | translate }}</h4>
+         <div class="space-y-2 text-sm">
+           <div class="flex justify-between">
+             <span class="text-gray-600">{{ 'SHOP.BANK' | translate }}:</span>
+             <span class="font-medium">Banca Intesa</span>
+           </div>
+           <div class="flex justify-between">
+             <span class="text-gray-600">{{ 'SHOP.ACCOUNT_NUMBER' | translate }}:</span>
+             <span class="font-medium">160-5100101502584-06</span>
+           </div>
+           <div class="flex justify-between">
+             <span class="text-gray-600">{{ 'SHOP.RECIPIENT' | translate }}:</span>
+             <span class="font-medium">Ana Vaspitac</span>
+           </div>
+           <div class="flex justify-between">
+             <span class="text-gray-600">{{ 'SHOP.AMOUNT' | translate }}:</span>
+             <span class="font-medium text-green-600">{{ getPrice(selectedFile) }} {{ getCurrencySymbol() }}</span>
+           </div>
+           <div class="space-y-1">
+             <div class="text-gray-600 font-medium">{{ 'SHOP.PURPOSE' | translate }}:</div>
+             <div class="text-sm text-gray-700 break-words">{{ 'SHOP.PURCHASE' | translate }}: {{ selectedFile.title }} - {{ getUserEmail() }}</div>
+           </div>
+         </div>
+       </div>
+
+       <!-- PayPal Payment Details -->
+       <div class="bg-blue-50 rounded-lg p-4 mb-6">
+         <h4 class="font-semibold text-blue-900 mb-3">{{ 'SHOP.PAYPAL_PAYMENT' | translate }}</h4>
+         <div class="space-y-2 text-sm">
+           <div class="flex justify-between">
+             <span class="text-blue-600">{{ 'SHOP.PAYPAL_LINK' | translate }}:</span>
+             <span class="font-medium">paypal.me/anavaspitac</span>
+           </div>
+                        <div class="flex justify-between">
+               <span class="text-blue-600">{{ 'SHOP.AMOUNT' | translate }}:</span>
+               <span class="font-medium text-green-600">{{ selectedFile?.priceEUR }} €</span>
+             </div>
+             <div class="space-y-1">
+               <div class="text-blue-600 font-medium">{{ 'SHOP.PURPOSE' | translate }}:</div>
+               <div class="text-sm text-gray-700 break-words">{{ 'SHOP.PURCHASE' | translate }}: {{ selectedFile?.title }} - {{ getUserEmail() }}</div>
+             </div>
+         </div>
+         <div class="mt-3">
+           <button
+             (click)="copyPayPalLink()"
+             class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg font-medium flex items-center justify-center gap-2 transition-colors"
+           >
+             <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+               <path d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12l2-2 4-4m-4 4l-4-4m4 4V8"/>
+             </svg>
+             {{ 'SHOP.COPY_PAYPAL_LINK' | translate }}
+           </button>
+         </div>
+       </div>
+      
+      <!-- Steps -->
+      <div class="space-y-3 mb-6">
+        <h4 class="font-semibold text-gray-900">{{ 'SHOP.STEPS' | translate }}</h4>
+        <div class="space-y-2 text-sm text-gray-600">
+          <div class="flex items-start gap-3">
+            <span class="bg-green-100 text-green-800 text-xs font-medium px-2 py-1 rounded-full">1</span>
+            <span>{{ 'SHOP.STEP_1' | translate }}</span>
+          </div>
+          <div class="flex items-start gap-3">
+            <span class="bg-green-100 text-green-800 text-xs font-medium px-2 py-1 rounded-full">2</span>
+            <span>{{ 'SHOP.STEP_2' | translate }}</span>
+          </div>
+          <div class="flex items-start gap-3">
+            <span class="bg-green-100 text-green-800 text-xs font-medium px-2 py-1 rounded-full">3</span>
+            <span>{{ 'SHOP.STEP_3' | translate }}</span>
+          </div>
+          <div class="flex items-start gap-3">
+            <span class="bg-green-100 text-green-800 text-xs font-medium px-2 py-1 rounded-full">4</span>
+            <span>{{ 'SHOP.STEP_4' | translate }}</span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Action Buttons -->
+      <div class="flex gap-3">
+        <button
+          (click)="closePaymentModal()"
+          class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-700 py-2 px-4 rounded-lg font-medium"
+        >
+          {{ 'SHOP.BACK' | translate }}
+        </button>
+        <button
+          (click)="closePaymentModal()"
+          class="flex-1 bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg font-medium flex items-center justify-center gap-2"
+        >
+          <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+          {{ 'SHOP.SENT_PROOF' | translate }}
+        </button>
       </div>
     </div>
   </div>

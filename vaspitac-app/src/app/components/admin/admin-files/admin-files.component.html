@@ -1,0 +1,463 @@
+<!-- Admin Access Check -->
+<ng-container *ngIf="userProfile$ | async as userProfile">
+  <div *ngIf="!isAdmin(userProfile)" class="min-h-screen bg-gray-50 flex items-center justify-center p-4 sm:p-6">
+    <div class="text-center">
+      <h1 class="text-xl sm:text-2xl font-bold text-red-600 mb-4">{{ 'ADMIN.ACCESS_DENIED' | translate }}</h1>
+      <p class="text-gray-600 mb-6">{{ 'ADMIN.ACCESS_DENIED_MESSAGE' | translate }}</p>
+      <button 
+        (click)="navigateToAdmin()"
+        class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg w-full max-w-xs mx-auto"
+      >
+        {{ 'ADMIN.BACK_TO_ADMIN' | translate }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Admin Files Content -->
+  <div *ngIf="isAdmin(userProfile)">
+    
+    <!-- List View (default) -->
+    <div *ngIf="!showForm" class="min-h-screen bg-gray-50 p-2 sm:p-4 md:p-6">
+      <div class="max-w-7xl mx-auto">
+        
+        <!-- Header -->
+        <div class="flex flex-col items-start gap-2 sm:gap-4 mb-6 sm:mb-8">
+          <app-back-button
+            [label]="'ADMIN.BACK_TO_ADMIN' | translate"
+            (back)="navigateToAdmin()"
+          ></app-back-button>
+          <div class="flex justify-between items-center w-full">
+            <div>
+              <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">{{ 'ADMIN.DIGITAL_FILES' | translate }}</h1>
+              <p class="text-gray-600 mt-1 sm:mt-2 text-sm sm:text-base">{{ 'ADMIN.MANAGE_FILES_DESC' | translate }}</p>
+            </div>
+            <button 
+              (click)="showAddForm()"
+              class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium flex items-center gap-2"
+            >
+              <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path d="M12 4v16m8-8H4"/>
+              </svg>
+              {{ 'ADMIN.ADD_NEW_FILE' | translate }}
+            </button>
+          </div>
+        </div>
+
+        <!-- Search and Filters -->
+        <div class="bg-white rounded-lg shadow p-4 sm:p-6 mb-6">
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">{{ 'ADMIN.SEARCH' | translate }}</label>
+              <input
+                [(ngModel)]="searchTerm"
+                (ngModelChange)="filterFiles()"
+                type="text"
+                placeholder="{{ 'ADMIN.SEARCH_FILES' | translate }}"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500"
+              >
+            </div>
+            
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">{{ 'ADMIN.LANGUAGE' | translate }}</label>
+              <select
+                [(ngModel)]="selectedLanguage"
+                (ngModelChange)="filterFiles()"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500"
+              >
+                <option value="">{{ 'ADMIN.ALL_LANGUAGES' | translate }}</option>
+                <option value="sr">{{ 'ADMIN.SERBIAN' | translate }}</option>
+                <option value="en">{{ 'ADMIN.ENGLISH' | translate }}</option>
+              </select>
+            </div>
+            
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">{{ 'ADMIN.ACCESS_LEVEL' | translate }}</label>
+              <select
+                [(ngModel)]="selectedAccessLevel"
+                (ngModelChange)="filterFiles()"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500"
+              >
+                <option value="">{{ 'ADMIN.ALL_LEVELS' | translate }}</option>
+                <option value="BASIC">{{ 'ADMIN.BASIC' | translate }}</option>
+                <option value="PREMIUM">{{ 'ADMIN.PREMIUM' | translate }}</option>
+              </select>
+            </div>
+            
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">{{ 'ADMIN.STATUS' | translate }}</label>
+              <select
+                [(ngModel)]="selectedStatus"
+                (ngModelChange)="filterFiles()"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500"
+              >
+                <option value="">{{ 'ADMIN.ALL_STATUSES' | translate }}</option>
+                <option value="active">{{ 'ADMIN.ACTIVE' | translate }}</option>
+                <option value="inactive">{{ 'ADMIN.INACTIVE' | translate }}</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Files Table -->
+        <div class="bg-white rounded-lg shadow overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    {{ 'ADMIN.FILE' | translate }}
+                  </th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    {{ 'ADMIN.PRICING' | translate }}
+                  </th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    {{ 'ADMIN.STATUS' | translate }}
+                  </th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    {{ 'ADMIN.SALES' | translate }}
+                  </th>
+                  <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    {{ 'ADMIN.ACTIONS' | translate }}
+                  </th>
+                </tr>
+              </thead>
+              <tbody class="bg-white divide-y divide-gray-200">
+                <tr *ngFor="let file of displayedFiles" class="hover:bg-gray-50">
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="flex items-center">
+                      <div class="flex-shrink-0 h-10 w-10">
+                        <div class="h-10 w-10 rounded-lg bg-purple-100 flex items-center justify-center">
+                          <svg class="h-6 w-6 text-purple-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                          </svg>
+                        </div>
+                      </div>
+                      <div class="ml-4">
+                        <div class="text-sm font-medium text-gray-900">{{ file.title }}</div>
+                        <div class="text-sm text-gray-500">
+                          {{ file.fileType }} • {{ formatFileSize(file.fileSize) }} • 
+                          <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium"
+                                [class]="file.accessLevel === 'PREMIUM' ? 'bg-yellow-100 text-yellow-800' : 'bg-blue-100 text-blue-800'">
+                            {{ file.accessLevel }}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm text-gray-900">{{ file.priceRSD }} RSD</div>
+                    <div class="text-sm text-gray-500">€{{ file.priceEUR }}</div>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full"
+                          [class]="file.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'">
+                      {{ file.isActive ? ('ADMIN.ACTIVE' | translate) : ('ADMIN.INACTIVE' | translate) }}
+                    </span>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    {{ getFileSalesCount(file.id) }} {{ 'ADMIN.SALES' | translate | lowercase }}
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                    <div class="flex justify-end gap-2">
+                      <button 
+                        (click)="handleEdit(file)"
+                        class="text-indigo-600 hover:text-indigo-900 px-2 py-1 rounded"
+                        title="{{ 'ADMIN.EDIT' | translate }}"
+                      >
+                        <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                          <path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                        </svg>
+                      </button>
+                      <button 
+                        (click)="toggleFileStatus(file)"
+                        [class]="file.isActive ? 'text-orange-600 hover:text-orange-900' : 'text-green-600 hover:text-green-900'"
+                        class="px-2 py-1 rounded"
+                        [title]="file.isActive ? ('ADMIN.DEACTIVATE' | translate) : ('ADMIN.ACTIVATE' | translate)"
+                      >
+                        <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                          <path *ngIf="file.isActive" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728L5.636 5.636m12.728 12.728L18.364 5.636"/>
+                          <path *ngIf="!file.isActive" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                      </button>
+                      <button 
+                        (click)="handleDelete(file)"
+                        class="text-red-600 hover:text-red-900 px-2 py-1 rounded"
+                        title="{{ 'ADMIN.DELETE' | translate }}"
+                      >
+                        <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                          <path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                        </svg>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          
+          <!-- Empty State -->
+          <div *ngIf="displayedFiles.length === 0" class="text-center py-12">
+            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+            </svg>
+            <h3 class="mt-2 text-sm font-medium text-gray-900">{{ 'ADMIN.NO_FILES' | translate }}</h3>
+            <p class="mt-1 text-sm text-gray-500">{{ 'ADMIN.NO_FILES_DESC' | translate }}</p>
+            <div class="mt-6">
+              <button 
+                (click)="showAddForm()"
+                class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700"
+              >
+                <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path d="M12 4v16m8-8H4"/>
+                </svg>
+                {{ 'ADMIN.ADD_FIRST_FILE' | translate }}
+              </button>
+            </div>
+          </div>
+
+          <!-- Load More Button -->
+          <div *ngIf="hasMoreItems" class="px-6 py-4 border-t border-gray-200">
+            <button 
+              (click)="loadMore()"
+              [disabled]="isLoadingMore"
+              class="w-full text-center px-4 py-2 text-sm font-medium text-green-600 hover:text-green-700 disabled:opacity-50"
+            >
+              <span *ngIf="!isLoadingMore">{{ 'ADMIN.LOAD_MORE' | translate }}</span>
+              <span *ngIf="isLoadingMore">{{ 'ADMIN.LOADING' | translate }}...</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Form View (add/edit) -->
+    <div *ngIf="showForm" class="min-h-screen bg-gray-50 p-2 sm:p-4 md:p-6">
+      <div class="max-w-4xl mx-auto">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 mb-4 sm:mb-6">
+          <app-back-button
+            [label]="'ADMIN.BACK_TO_FILES' | translate"
+            (back)="resetForm()"
+          ></app-back-button>
+          <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">
+            {{ editingFile ? ('ADMIN.EDIT_FILE' | translate) : ('ADMIN.ADD_NEW_FILE' | translate) }}
+          </h1>
+        </div>
+
+        <div class="bg-white rounded-lg shadow">
+          <div class="p-4 sm:p-6 border-b border-gray-200">
+            <h2 class="text-base sm:text-lg font-semibold text-gray-900">{{ 'ADMIN.FILE_DETAILS' | translate }}</h2>
+          </div>
+          <div class="p-4 sm:p-6">
+            <form (submit)="handleSubmit($event)" class="space-y-4 sm:space-y-6">
+              
+              <!-- Basic Info -->
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">{{ 'ADMIN.TITLE' | translate }}</label>
+                  <input
+                    [(ngModel)]="formData.title"
+                    name="title"
+                    type="text"
+                    required
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500"
+                    [placeholder]="'ADMIN.ENTER_TITLE' | translate"
+                  >
+                  <div *ngIf="formErrors['title']" class="text-red-500 text-xs mt-1">{{ formErrors['title'] }}</div>
+                </div>
+                
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">{{ 'ADMIN.LANGUAGE' | translate }}</label>
+                  <select
+                    [(ngModel)]="formData.language"
+                    name="language"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500"
+                  >
+                    <option value="sr">{{ 'ADMIN.SERBIAN' | translate }}</option>
+                    <option value="en">{{ 'ADMIN.ENGLISH' | translate }}</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Description with Markdown -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">{{ 'ADMIN.DESCRIPTION' | translate }}</label>
+                <div class="space-y-2">
+                  <div class="flex justify-between items-center">
+                    <span class="text-xs text-gray-500">{{ 'ADMIN.MARKDOWN_SUPPORTED' | translate }}</span>
+                    <button
+                      type="button"
+                      (click)="toggleDescriptionPreview()"
+                      class="text-xs text-green-600 hover:text-green-700 font-medium"
+                    >
+                      {{ showDescriptionPreview ? ('ADMIN.HIDE_PREVIEW' | translate) : ('ADMIN.SHOW_PREVIEW' | translate) }}
+                    </button>
+                  </div>
+                  <textarea
+                    [(ngModel)]="formData.description"
+                    name="description"
+                    rows="4"
+                    required
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500"
+                    [placeholder]="'ADMIN.ENTER_DESCRIPTION' | translate"
+                  ></textarea>
+                  <div *ngIf="showDescriptionPreview" class="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                    <div class="text-xs text-gray-500 mb-2">{{ 'ADMIN.PREVIEW' | translate }}:</div>
+                    <div class="prose prose-sm max-w-none">
+                      <markdown [data]="formData.description"></markdown>
+                    </div>
+                  </div>
+                </div>
+                <div *ngIf="formErrors['description']" class="text-red-500 text-xs mt-1">{{ formErrors['description'] }}</div>
+              </div>
+
+              <!-- Pricing -->
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">{{ 'ADMIN.PRICE_RSD' | translate }}</label>
+                  <input
+                    [(ngModel)]="formData.priceRSD"
+                    name="priceRSD"
+                    type="number"
+                    min="0"
+                    step="1"
+                    required
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500"
+                    placeholder="500"
+                  >
+                  <div *ngIf="formErrors['priceRSD']" class="text-red-500 text-xs mt-1">{{ formErrors['priceRSD'] }}</div>
+                </div>
+                
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">{{ 'ADMIN.PRICE_EUR' | translate }}</label>
+                  <input
+                    [(ngModel)]="formData.priceEUR"
+                    name="priceEUR"
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    required
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500"
+                    placeholder="5.00"
+                  >
+                  <div *ngIf="formErrors['priceEUR']" class="text-red-500 text-xs mt-1">{{ formErrors['priceEUR'] }}</div>
+                </div>
+                
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">{{ 'ADMIN.ACCESS_LEVEL' | translate }}</label>
+                  <select
+                    [(ngModel)]="formData.accessLevel"
+                    name="accessLevel"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500"
+                  >
+                    <option value="BASIC">{{ 'ADMIN.BASIC' | translate }}</option>
+                    <option value="PREMIUM">{{ 'ADMIN.PREMIUM' | translate }}</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- File Upload -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                  {{ editingFile ? ('ADMIN.REPLACE_FILE' | translate) : ('ADMIN.FILE' | translate) }}
+                  <span *ngIf="!editingFile" class="text-red-500">*</span>
+                </label>
+                <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg hover:border-gray-400 transition-colors">
+                  <div class="space-y-1 text-center">
+                    <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                      <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <div class="flex text-sm text-gray-600">
+                      <label class="relative cursor-pointer bg-white rounded-md font-medium text-green-600 hover:text-green-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-green-500">
+                        <span>{{ 'ADMIN.UPLOAD_FILE' | translate }}</span>
+                        <input 
+                          type="file" 
+                          class="sr-only" 
+                          accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx"
+                          (change)="onFileSelected($event)"
+                        >
+                      </label>
+                      <p class="pl-1">{{ 'ADMIN.OR_DRAG_DROP' | translate }}</p>
+                    </div>
+                    <p class="text-xs text-gray-500">{{ 'ADMIN.FILE_TYPES_SUPPORTED' | translate }}</p>
+                    <div *ngIf="filePreview" class="mt-2 text-sm text-green-600">
+                      📄 {{ filePreview }}
+                    </div>
+                  </div>
+                </div>
+                <div *ngIf="formErrors['file']" class="text-red-500 text-xs mt-1">{{ formErrors['file'] }}</div>
+              </div>
+
+              <!-- Submit Buttons -->
+              <div class="flex flex-col sm:flex-row gap-3 pt-6 border-t">
+                <button
+                  type="submit"
+                  [disabled]="isUploadingFile"
+                  class="flex-1 sm:flex-initial bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white font-medium py-2 px-6 rounded-lg transition-colors"
+                >
+                  <span *ngIf="!isUploadingFile">
+                    {{ editingFile ? ('ADMIN.UPDATE_FILE' | translate) : ('ADMIN.CREATE_FILE' | translate) }}
+                  </span>
+                  <span *ngIf="isUploadingFile">{{ 'ADMIN.UPLOADING' | translate }}...</span>
+                </button>
+                <button
+                  type="button"
+                  (click)="resetForm()"
+                  class="flex-1 sm:flex-initial bg-gray-300 hover:bg-gray-400 text-gray-700 font-medium py-2 px-6 rounded-lg transition-colors"
+                >
+                  {{ 'ADMIN.CANCEL' | translate }}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-container>
+
+<!-- Success Message -->
+<div *ngIf="showSuccessMessage" 
+     class="fixed top-4 right-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded z-50">
+  <div class="flex items-center justify-between">
+    <span>{{ successMessage }}</span>
+    <button (click)="closeSuccessMessage()" class="ml-2 text-green-700 hover:text-green-900">
+      <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path d="M6 18L18 6M6 6l12 12"/>
+      </svg>
+    </button>
+  </div>
+</div>
+
+<!-- Error Modal -->
+<div *ngIf="showErrorModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+  <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+    <div class="mt-3 text-center">
+      <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100">
+        <svg class="h-6 w-6 text-red-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"/>
+        </svg>
+      </div>
+      <h3 class="text-lg font-medium text-gray-900 mt-4">{{ errorTitle }}</h3>
+      <div class="mt-2 px-7 py-3">
+        <p class="text-sm text-gray-500">{{ errorMessage }}</p>
+      </div>
+      <div class="items-center px-4 py-3">
+        <button 
+          (click)="closeErrorModal()"
+          class="px-4 py-2 bg-red-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-red-600"
+        >
+          {{ 'ADMIN.CLOSE' | translate }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Confirmation Modal -->
+<app-confirmation-modal
+  [isOpen]="showConfirmModal"
+  [title]="confirmTitle"
+  [message]="confirmMessage"
+  (confirm)="handleConfirm()"
+  (cancel)="closeConfirmModal()"
+></app-confirmation-modal>
