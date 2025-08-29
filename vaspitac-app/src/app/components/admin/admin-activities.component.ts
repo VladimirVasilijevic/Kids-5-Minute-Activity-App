@@ -71,6 +71,8 @@ export class AdminActivitiesComponent implements OnInit {
     instructions: string;
     image: string;
     video: string;
+    imageUrl: string;
+    videoUrl: string;
     category: string;
     language: string;
     visibility: ContentVisibility;
@@ -84,6 +86,8 @@ export class AdminActivitiesComponent implements OnInit {
     instructions: '',
     image: '',
     video: '',
+    imageUrl: '',
+    videoUrl: '',
     category: '',
     language: 'en',
     visibility: ContentVisibility.PUBLIC,
@@ -254,9 +258,9 @@ export class AdminActivitiesComponent implements OnInit {
     if (!language.trim()) {
       this.formErrors['language'] = 'Language is required';
     }
-    // Require at least one of image or video
-    if (!this.formData.image && !this.formData.video) {
-      this.formErrors['media'] = 'Either an image or a video is required.';
+    // Require at least one of image or video (either URL or file upload)
+    if (!this.formData.image && !this.formData.imageUrl && !this.formData.video && !this.formData.videoUrl) {
+      this.formErrors['media'] = 'Either an image or a video is required (URL or file upload).';
     }
     
     return Object.keys(this.formErrors).length === 0;
@@ -274,8 +278,8 @@ export class AdminActivitiesComponent implements OnInit {
       ageGroup: String(this.formData.ageGroup || ''),
       duration: this.formData.duration ? `${this.formData.duration} min` : '',
       instructions: String(this.formData.instructions || ''),
-      imageUrl: String(this.formData.image || ''),
-      videoUrl: String(this.formData.video || ''),
+      imageUrl: String(this.formData.imageUrl || this.formData.image || ''),
+      videoUrl: String(this.formData.videoUrl || this.formData.video || ''),
       category: String(this.formData.category || ''),
       language: String(this.formData.language || 'en'),
       visibility: this.formData.visibility,
@@ -311,8 +315,8 @@ export class AdminActivitiesComponent implements OnInit {
       ageGroup: String(this.formData.ageGroup || ''),
       duration: this.formData.duration ? `${this.formData.duration} min` : '',
       instructions: String(this.formData.instructions || ''),
-      imageUrl: String(this.formData.image || ''),
-      videoUrl: String(this.formData.video || ''),
+      imageUrl: String(this.formData.imageUrl || this.formData.image || ''),
+      videoUrl: String(this.formData.videoUrl || this.formData.video || ''),
       category: String(this.formData.category || ''),
       language: String(this.formData.language || 'en'),
       visibility: this.formData.visibility,
@@ -355,6 +359,8 @@ export class AdminActivitiesComponent implements OnInit {
       instructions: '',
       image: '',
       video: '',
+      imageUrl: '',
+      videoUrl: '',
       category: '',
       language: 'en',
       visibility: ContentVisibility.PUBLIC,
@@ -447,9 +453,11 @@ export class AdminActivitiesComponent implements OnInit {
    */
   removeImage(): void {
     this.formData.image = '';
+    this.formData.imageUrl = '';
     this.imagePreview = null;
     // Clear video if image is set
     this.formData.video = '';
+    this.formData.videoUrl = '';
     this.videoPreview = null;
   }
 
@@ -544,6 +552,7 @@ export class AdminActivitiesComponent implements OnInit {
    */
   removeVideo(): void {
     this.formData.video = '';
+    this.formData.videoUrl = '';
     this.videoPreview = null;
   }
 
@@ -564,6 +573,8 @@ export class AdminActivitiesComponent implements OnInit {
       instructions: String(activity.instructions || ''),
       image: String(activity.imageUrl || ''),
       video: String(activity.videoUrl || ''),
+      imageUrl: String(activity.imageUrl || ''),
+      videoUrl: String(activity.videoUrl || ''),
       category: String(activity.category || ''),
       language: String(activity.language || 'en'),
       visibility: activity.visibility || ContentVisibility.PUBLIC,

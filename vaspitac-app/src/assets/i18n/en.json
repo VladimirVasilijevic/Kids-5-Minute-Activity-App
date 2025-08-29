@@ -51,7 +51,11 @@
     "DELETING": "Deleting activity..."
   },
   "ACTIVITY": {
+    "VIDEO": "Video",
     "VIDEO_NOT_AVAILABLE": "Video not available",
+    "VIDEO_NOT_SUPPORTED": "Video not supported",
+    "VIDEO_UNAVAILABLE": "Video unavailable",
+    "WATCH_ON_PLATFORM": "Watch on platform",
     "NOT_FOUND": "Activity not found.",
     "PLAY_VIDEO": "Play Video",
     "MATERIALS_TITLE": "Required Materials",
@@ -454,6 +458,7 @@
     "ENTER_DESCRIPTION": "Brief description of the activity",
     "ENTER_INSTRUCTIONS": "Step 1: First do this&#10;Step 2: Then do that&#10;Step 3: Finally...",
     "ENTER_IMAGE_URL": "https://example.com/activity-image.jpg",
+    "OR_UPLOAD_FILE": "Or upload a file",
     "ENTER_BLOG_TITLE": "Enter blog title",
     "ENTER_EXCERPT": "Brief excerpt of the blog post",
     "ENTER_CONTENT": "Write your blog content here...",

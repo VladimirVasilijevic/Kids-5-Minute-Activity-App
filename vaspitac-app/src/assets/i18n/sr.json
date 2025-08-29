@@ -51,7 +51,11 @@
     "DELETING": "Brisanje aktivnosti..."
   },
   "ACTIVITY": {
+    "VIDEO": "Video",
     "VIDEO_NOT_AVAILABLE": "Video nije dostupan",
+    "VIDEO_NOT_SUPPORTED": "Video nije podržan",
+    "VIDEO_UNAVAILABLE": "Video nedostupan",
+    "WATCH_ON_PLATFORM": "Pogledaj na platformi",
     "NOT_FOUND": "Aktivnost nije pronađena.",
     "PLAY_VIDEO": "Pokreni video",
     "MATERIALS_TITLE": "Potreban materijal",
@@ -452,6 +456,7 @@
     "ENTER_DESCRIPTION": "Kratak opis aktivnosti",
     "ENTER_INSTRUCTIONS": "Korak 1: Prvo uradite ovo&#10;Korak 2: Zatim uradite ono&#10;Korak 3: Na kraju...",
     "ENTER_IMAGE_URL": "https://example.com/activity-image.jpg",
+    "OR_UPLOAD_FILE": "Ili učitajte fajl",
     "ENTER_BLOG_TITLE": "Unesite naslov bloga",
     "ENTER_EXCERPT": "Kratak izvod blog članka",
     "ENTER_CONTENT": "Napišite sadržaj bloga ovde...",
