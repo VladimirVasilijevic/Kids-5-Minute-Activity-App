@@ -36,7 +36,8 @@
     "CAT_MUSICAL_DESC": "Music, rhythm and singing",
     "CAT_NATURE_TITLE": "Nature Activities",
     "CAT_NATURE_DESC": "Exploring and learning about nature",
-    "LOGIN_PROMPT": "Log in to access your profile and personalized features."
+    "LOGIN_PROMPT": "Log in to access your profile and personalized features.",
+    "LOCKED_CATEGORY_MESSAGE": "Subscribe to unlock"
   },
   "ACTIVITIES": {
     "TITLE": "Activities",

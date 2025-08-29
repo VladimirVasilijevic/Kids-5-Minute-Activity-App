@@ -36,7 +36,8 @@
     "CAT_MUSICAL_DESC": "Muzika, ritam i pevanje",
     "CAT_NATURE_TITLE": "Priroda",
     "CAT_NATURE_DESC": "Istraživanje i upoznavanje prirode",
-    "LOGIN_PROMPT": "Prijavite se da biste pristupili svom profilu i personalizovanim funkcijama."
+    "LOGIN_PROMPT": "Prijavite se da biste pristupili svom profilu i personalizovanim funkcijama.",
+    "LOCKED_CATEGORY_MESSAGE": "Pretplati se da otključaš"
   },
   "ACTIVITIES": {
     "TITLE": "Aktivnosti",
