@@ -76,12 +76,27 @@
   <!-- Category Cards -->
   <ng-container *ngFor="let cat of categories$ | async">
     <div
-      (click)="goToCategory(cat.id)"
-      class="cursor-pointer transform hover:scale-105 transition-all duration-300 bg-white rounded-xl shadow hover:shadow-lg border border-green-100 p-4 md:p-6 flex flex-col items-center text-center min-h-[140px] md:min-h-[160px]"
+      (click)="onCategoryClick(cat)"
+      class="cursor-pointer transform hover:scale-105 transition-all duration-300 rounded-xl shadow hover:shadow-lg border p-4 md:p-6 flex flex-col items-center text-center min-h-[140px] md:min-h-[160px] relative"
+      [ngClass]="{
+        'bg-white border-green-100': !isCategoryLocked(cat, (userProfile$ | async)),
+        'bg-gray-100 border-gray-300': isCategoryLocked(cat, (userProfile$ | async))
+      }"
     >
+      <!-- Lock Icon for locked categories -->
+      <div 
+        *ngIf="isCategoryLocked(cat, (userProfile$ | async))"
+        class="absolute top-3 right-3 w-6 h-6 text-gray-500"
+        [title]="'HOME.LOCKED_CATEGORY_MESSAGE' | translate"
+      >
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+        </svg>
+      </div>
+
       <div
         class="w-12 h-12 md:w-16 md:h-16 rounded-full flex items-center justify-center shadow-lg mb-3 md:mb-4"
-        [ngClass]="cat.color"
+        [ngClass]="isCategoryLocked(cat, (userProfile$ | async)) ? 'bg-gray-400' : cat.color"
       >
         <ng-container *ngIf="cat.id === 'about'; else otherCategoryIcon">
           <ng-container *ngIf="aboutContent$ | async as aboutContent">
@@ -230,10 +245,24 @@
           </ng-container>
         </ng-template>
       </div>
-      <h3 class="text-base md:text-lg font-semibold text-green-800 mb-1 md:mb-2">
+      <h3 
+        class="text-base md:text-lg font-semibold mb-1 md:mb-2"
+        [ngClass]="{
+          'text-green-800': !isCategoryLocked(cat, (userProfile$ | async)),
+          'text-gray-600': isCategoryLocked(cat, (userProfile$ | async))
+        }"
+      >
         {{ cat.title | translate }}
       </h3>
-      <p class="text-xs md:text-sm text-gray-600 line-clamp-2">{{ cat.description | translate }}</p>
+      <p 
+        class="text-xs md:text-sm line-clamp-2"
+        [ngClass]="{
+          'text-gray-600': !isCategoryLocked(cat, (userProfile$ | async)),
+          'text-gray-500': isCategoryLocked(cat, (userProfile$ | async))
+        }"
+      >
+        {{ cat.description | translate }}
+      </p>
     </div>
   </ng-container>
 </div>
