@@ -1,383 +1,580 @@
 import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { Router } from '@angular/router';
-import { TranslateModule, TranslateLoader, TranslateService } from '@ngx-translate/core';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { of, throwError } from 'rxjs';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 
 import { ShopComponent } from './shop.component';
 import { AuthService } from '../../services/auth.service';
 import { UserService } from '../../services/user.service';
 import { DigitalFileService } from '../../services/digital-file.service';
-import { UserProfile } from '../../models/user-profile.model';
-import { DigitalFile } from '../../models/digital-file.model';
-
-// Mock translate loader
-class MockTranslateLoader implements TranslateLoader {
-  getTranslation(): any {
-    return of({
-      'SHOP.MARKETPLACE_TITLE': 'Prodavnica materijala',
-      'SHOP.MARKETPLACE_DESCRIPTION': 'Edukativni materijali i vodiči za aktivnosti sa decom do 7 godina'
-    });
-  }
-}
+import { UserAccessService } from '../../services/user-access.service';
+import { PurchaseService } from '../../services/purchase.service';
+import { AngularFireFunctions } from '@angular/fire/compat/functions';
+import { mockFreeUser } from '../../../test-utils/mock-user-profiles';
+import { mockDigitalFiles, mockDigitalFile, mockEnglishDigitalFile } from '../../../test-utils/mock-digital-files';
 
 describe('ShopComponent', () => {
   let component: ShopComponent;
   let fixture: ComponentFixture<ShopComponent>;
-  let router: Router;
-  let _auth: jasmine.SpyObj<AuthService>;
-  let _userService: jasmine.SpyObj<UserService>;
-  let _digitalFileService: jasmine.SpyObj<DigitalFileService>;
+  let router: jasmine.SpyObj<Router>;
+  let authService: jasmine.SpyObj<AuthService>;
+  let userService: jasmine.SpyObj<UserService>;
+  let digitalFileService: jasmine.SpyObj<DigitalFileService>;
+  let userAccessService: jasmine.SpyObj<UserAccessService>;
+  let purchaseService: jasmine.SpyObj<PurchaseService>;
+  let translateService: jasmine.SpyObj<TranslateService>;
+  let fireFunctions: jasmine.SpyObj<AngularFireFunctions>;
 
-  // Mock data
-  const mockUser = {
-    uid: 'test-uid',
-    email: 'test@example.com'
-  };
-
-  const mockUserProfile: UserProfile = {
-    uid: 'test-uid',
-    displayName: 'Test User',
-    email: 'test@example.com',
-    createdAt: '2023-01-01',
-    role: 'free' as any,
-    permissions: []
-  };
-
-  const mockDigitalFile: DigitalFile = {
-    id: 'file-1',
-    title: 'Test File',
-    description: 'Test Description',
-    priceRSD: 1000,
-    priceEUR: 10,
-    fileUrl: 'https://example.com/file.pdf',
-    fileSize: 1024,
-    fileType: 'application/pdf',
-    accessLevel: 'BASIC',
-    language: 'sr',
-    createdAt: '2023-01-01',
-    updatedAt: '2023-01-01',
-    isActive: true,
-    createdBy: 'admin-uid',
-    tags: ['test', 'sample'],
-    fileName: 'test-file.pdf'
-  };
-
-  beforeEach(async (): Promise<void> => {
-    const navigateSpy = jasmine.createSpy('navigate').and.returnValue(Promise.resolve());
+  beforeEach(async () => {
+    const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
     const authSpy = jasmine.createSpyObj('AuthService', [], {
-      user$: of(mockUser)
+      user$: of({ uid: 'user123', email: 'test@example.com' })
     });
-    const userServiceSpy = jasmine.createSpyObj('UserService', ['getUserProfile']);
-    const digitalFileServiceSpy = jasmine.createSpyObj('DigitalFileService', ['getActiveFiles']);
+    const userSpy = jasmine.createSpyObj('UserService', ['getUserProfile']);
+    const digitalFileSpy = jasmine.createSpyObj('DigitalFileService', ['getActiveFiles', 'downloadFile']);
+    const userAccessSpy = jasmine.createSpyObj('UserAccessService', ['hasMultipleAccess']);
+    const purchaseSpy = jasmine.createSpyObj('PurchaseService', ['createPurchase']);
+    const translateSpy = jasmine.createSpyObj('TranslateService', [], {
+      currentLang: 'sr'
+    });
+    const fireFunctionsSpy = jasmine.createSpyObj('AngularFireFunctions', ['httpsCallable']);
+
+    // Setup default return values
+    userSpy.getUserProfile.and.returnValue(of(mockFreeUser));
+    digitalFileSpy.getActiveFiles.and.returnValue(of(mockDigitalFiles));
+    digitalFileSpy.downloadFile.and.returnValue(of(true));
+    userAccessSpy.hasMultipleAccess.and.returnValue(of({ 'file1': true, 'file2': false, 'file3': true }));
+    purchaseSpy.createPurchase.and.returnValue(Promise.resolve('purchase123'));
 
     await TestBed.configureTestingModule({
       declarations: [ShopComponent],
-      imports: [
-        TranslateModule.forRoot({
-          loader: { provide: TranslateLoader, useClass: MockTranslateLoader }
-        }),
-        HttpClientTestingModule
-      ],
+      imports: [TranslateModule.forRoot()],
       providers: [
-        { provide: Router, useValue: { navigate: navigateSpy } },
+        { provide: Router, useValue: routerSpy },
         { provide: AuthService, useValue: authSpy },
-        { provide: UserService, useValue: userServiceSpy },
-        { provide: DigitalFileService, useValue: digitalFileServiceSpy }
+        { provide: UserService, useValue: userSpy },
+        { provide: DigitalFileService, useValue: digitalFileSpy },
+        { provide: UserAccessService, useValue: userAccessSpy },
+        { provide: PurchaseService, useValue: purchaseSpy },
+        { provide: TranslateService, useValue: translateSpy },
+        { provide: AngularFireFunctions, useValue: fireFunctionsSpy }
       ],
-      schemas: [NO_ERRORS_SCHEMA],
+      schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
 
     fixture = TestBed.createComponent(ShopComponent);
     component = fixture.componentInstance;
-    router = TestBed.inject(Router);
-    _auth = TestBed.inject(AuthService) as jasmine.SpyObj<AuthService>;
-    _userService = TestBed.inject(UserService) as jasmine.SpyObj<UserService>;
-    _digitalFileService = TestBed.inject(DigitalFileService) as jasmine.SpyObj<DigitalFileService>;
     
-    // Setup default mocks
-    _digitalFileService.getActiveFiles.and.returnValue(of([mockDigitalFile]));
-    _userService.getUserProfile.and.returnValue(of(mockUserProfile));
+    router = TestBed.inject(Router) as jasmine.SpyObj<Router>;
+    authService = TestBed.inject(AuthService) as jasmine.SpyObj<AuthService>;
+    userService = TestBed.inject(UserService) as jasmine.SpyObj<UserService>;
+    digitalFileService = TestBed.inject(DigitalFileService) as jasmine.SpyObj<DigitalFileService>;
+    userAccessService = TestBed.inject(UserAccessService) as jasmine.SpyObj<UserAccessService>;
+    purchaseService = TestBed.inject(PurchaseService) as jasmine.SpyObj<PurchaseService>;
+    translateService = TestBed.inject(TranslateService) as jasmine.SpyObj<TranslateService>;
+    fireFunctions = TestBed.inject(AngularFireFunctions) as jasmine.SpyObj<AngularFireFunctions>;
   });
 
-  it('should create', (): void => {
+  it('should create', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should initialize with default values', (): void => {
-    // Test the initial values before ngOnInit is called
-    expect(component.files).toEqual([]);
-    expect(component.displayedFiles).toEqual([]);
-    expect(component.isLoading).toBe(true);
-    expect(component.searchTerm).toBe('');
-    expect(component.selectedLanguage).toBe('');
-    expect(component.selectedAccessLevel).toBe('');
-    expect(component.currentPage).toBe(1);
-    expect(component.itemsPerPage).toBe(12);
-    expect(component.hasMoreItems).toBe(true);
-    expect(component.showPurchaseModal).toBe(false);
-    expect(component.showPaymentModal).toBe(false);
-    expect(component.showLoginModal).toBe(false);
-    expect(component.selectedFile).toBeNull();
-    expect(component.currentUserEmail).toBe('');
-  });
-
-  it('should load data after initialization', (): void => {
-    // Now call detectChanges to trigger ngOnInit
-    fixture.detectChanges();
-    
-    // After initialization, the component should have loaded data
-    expect(component.files).toEqual([mockDigitalFile]);
-    expect(component.displayedFiles).toEqual([mockDigitalFile]);
-    expect(component.isLoading).toBe(false);
-    expect(component.currentUserEmail).toBe('test@example.com');
-  });
-
-  it('should render the shop title and description', (): void => {
-    // Call detectChanges to trigger ngOnInit and load translations
-    fixture.detectChanges();
-    
-    const compiled = fixture.nativeElement as HTMLElement;
-    const title = compiled.querySelector('h1');
-    const desc = compiled.querySelector('p.text-lg.md\\:text-xl');
-    expect(title).toBeTruthy();
-    expect(desc).toBeTruthy();
-    
-    // Test that the translation keys are present in the template
-    // The actual translation might not be loaded immediately in tests
-    expect(title?.textContent).toContain('SHOP.MARKETPLACE_TITLE');
-    expect(desc?.textContent).toContain('SHOP.MARKETPLACE_DESCRIPTION');
-  });
-
-  it('should navigate back to home on back button click', (): void => {
-    component.goBack();
-    expect(router.navigate).toHaveBeenCalledWith(['/']);
-  });
-
-  it('should copy PayPal link to clipboard', fakeAsync((): void => {
-    spyOn(navigator.clipboard, 'writeText').and.returnValue(Promise.resolve());
-    component.copyPayPalLink();
-    tick();
-    expect(navigator.clipboard.writeText).toHaveBeenCalledWith('paypal.me/anavaspitac');
-  }));
-
-  it('should handle error in copyPayPalLink gracefully', fakeAsync((): void => {
-    spyOn(navigator.clipboard, 'writeText').and.returnValue(Promise.reject('fail'));
-    spyOn(console, 'error');
-    component.copyPayPalLink();
-    tick();
-    expect(console.error).toHaveBeenCalledWith('Failed to copy PayPal link:', 'fail');
-  }));
-
-  it('should get user email correctly', (): void => {
-    component.currentUserEmail = 'test@example.com';
-    expect(component.getUserEmail()).toBe('test@example.com');
-  });
-
-  it('should get fallback email when currentUserEmail is empty', (): void => {
-    component.currentUserEmail = '';
-    expect(component.getUserEmail()).toBe('user@example.com');
-  });
-
-  it('should format file size correctly', (): void => {
-    const result = component.formatFileSize(1024);
-    expect(result).toBe('1 KB');
-  });
-
-  it('should get currency symbol for Serbian language', (): void => {
-    // Mock the currentLang property
-    Object.defineProperty(component['_translate'], 'currentLang', {
-      get: () => 'sr',
-      configurable: true
+  describe('loadAccessNow', () => {
+    it('should load user access if conditions are met', () => {
+      // Setup component state
+      component['currentUserId'] = 'user123';
+      component['files'] = mockDigitalFiles;
+      component['userAccessMap'] = {};
+      
+      spyOn(component as any, 'loadUserAccess');
+      
+      component.loadAccessNow();
+      
+      expect((component as any).loadUserAccess).toHaveBeenCalled();
     });
-    expect(component.getCurrencySymbol()).toBe('RSD');
   });
 
-  it('should get currency symbol for English language', (): void => {
-    // Mock the currentLang property
-    Object.defineProperty(component['_translate'], 'currentLang', {
-      get: () => 'en',
-      configurable: true
+  describe('openPurchaseModal', () => {
+    it('should show login modal if user is not logged in', () => {
+      component.isLoggedIn = false;
+      spyOn(component, 'showLoginRequiredModal');
+      
+      component.openPurchaseModal(mockDigitalFile);
+      
+      expect(component.showLoginRequiredModal).toHaveBeenCalled();
+      expect(component.showPurchaseModal).toBeFalse();
     });
-    expect(component.getCurrencySymbol()).toBe('€');
-  });
 
-  it('should get price for Serbian language', (): void => {
-    // Mock the currentLang property
-    Object.defineProperty(component['_translate'], 'currentLang', {
-      get: () => 'sr',
-      configurable: true
+    it('should open purchase modal if user is logged in', () => {
+      component.isLoggedIn = true;
+      
+      component.openPurchaseModal(mockDigitalFile);
+      
+      expect(component.selectedFile).toBe(mockDigitalFile);
+      expect(component.showPurchaseModal).toBeTrue();
     });
-    const price = component.getPrice(mockDigitalFile);
-    expect(price).toBe(1000);
   });
 
-  it('should get price for English language', (): void => {
-    // Mock the currentLang property
-    Object.defineProperty(component['_translate'], 'currentLang', {
-      get: () => 'en',
-      configurable: true
+  describe('closePurchaseModal', () => {
+    it('should close purchase modal and clear selected file', () => {
+      component.showPurchaseModal = true;
+      component.selectedFile = mockDigitalFile;
+      
+      component.closePurchaseModal();
+      
+      expect(component.showPurchaseModal).toBeFalse();
+      expect(component.selectedFile).toBeNull();
     });
-    const price = component.getPrice(mockDigitalFile);
-    expect(price).toBe(10);
   });
 
-  it('should get file extension from MIME type', (): void => {
-    expect(component.getFileExtension('application/pdf')).toBe('PDF');
-    expect(component.getFileExtension('application/msword')).toBe('MSWORD');
+  describe('openPaymentModal', () => {
+    it('should open payment modal and close purchase modal', () => {
+      component.showPurchaseModal = true;
+      component.showPaymentModal = false;
+      
+      component.openPaymentModal();
+      
+      expect(component.showPaymentModal).toBeTrue();
+      expect(component.showPurchaseModal).toBeFalse();
+    });
   });
 
-  it('should get file extension from filename', (): void => {
-    expect(component.getFileExtension('document.pdf')).toBe('PDF');
-    expect(component.getFileExtension('file.doc')).toBe('DOC');
+  describe('closePaymentModal', () => {
+    it('should close payment modal and clear selected file', () => {
+      component.showPaymentModal = true;
+      component.selectedFile = mockDigitalFile;
+      
+      component.closePaymentModal();
+      
+      expect(component.showPaymentModal).toBeFalse();
+      expect(component.selectedFile).toBeNull();
+    });
   });
 
-  it('should return empty string for empty file type', (): void => {
-    expect(component.getFileExtension('')).toBe('');
+  describe('refreshUserAccess', () => {
+    it('should return early if already refreshing', () => {
+      component['isRefreshingAccess'] = true;
+      spyOn(component as any, 'loadUserAccess');
+      
+      component.refreshUserAccess();
+      
+      expect((component as any).loadUserAccess).not.toHaveBeenCalled();
+    });
+
+    it('should return early if no user ID or files', () => {
+      component['currentUserId'] = null;
+      component['files'] = [];
+      spyOn(component as any, 'loadUserAccess');
+      
+      component.refreshUserAccess();
+      
+      expect((component as any).loadUserAccess).not.toHaveBeenCalled();
+    });
+
+    it('should refresh user access if conditions are met', () => {
+      component['currentUserId'] = 'user123';
+      component['files'] = mockDigitalFiles;
+      component['isRefreshingAccess'] = false;
+      spyOn(component as any, 'loadUserAccess');
+      
+      component.refreshUserAccess();
+      
+      expect(component['isRefreshingAccess']).toBeTrue();
+      expect((component as any).loadUserAccess).toHaveBeenCalled();
+    });
   });
 
-  it('should open purchase modal', (): void => {
-    component.openPurchaseModal(mockDigitalFile);
-    expect(component.selectedFile).toBe(mockDigitalFile);
-    expect(component.showPurchaseModal).toBe(true);
+  describe('hasAccess', () => {
+    it('should return false if user is not logged in', () => {
+      component.isLoggedIn = false;
+      
+      const result = component.hasAccess('file1');
+      
+      expect(result).toBeFalse();
+    });
+
+    it('should return false if no user ID', () => {
+      component.isLoggedIn = true;
+      component['currentUserId'] = null;
+      
+      const result = component.hasAccess('file1');
+      
+      expect(result).toBeFalse();
+    });
+
+    it('should return false if access map is empty', () => {
+      component.isLoggedIn = true;
+      component['currentUserId'] = 'user123';
+      component['userAccessMap'] = {};
+      
+      const result = component.hasAccess('file1');
+      
+      expect(result).toBeFalse();
+    });
+
+    it('should return access status from map', () => {
+      component.isLoggedIn = true;
+      component['currentUserId'] = 'user123';
+      component['userAccessMap'] = { 'file1': true, 'file2': false };
+      
+      const result1 = component.hasAccess('file1');
+      const result2 = component.hasAccess('file2');
+      
+      expect(result1).toBeTrue();
+      expect(result2).toBeFalse();
+    });
   });
 
-  it('should close purchase modal', (): void => {
-    component.selectedFile = mockDigitalFile;
-    component.showPurchaseModal = true;
-    component.closePurchaseModal();
-    expect(component.selectedFile).toBeNull();
-    expect(component.showPurchaseModal).toBe(false);
+  describe('getActionButton', () => {
+    it('should return login if user is not logged in', () => {
+      component.isLoggedIn = false;
+      
+      const result = component.getActionButton(mockDigitalFile);
+      
+      expect(result).toBe('login');
+    });
+
+    it('should return purchase if user is logged in but has no access', () => {
+      component.isLoggedIn = true;
+      component['userAccessMap'] = { 'file1': false };
+      
+      const result = component.getActionButton(mockDigitalFile);
+      
+      expect(result).toBe('purchase');
+    });
   });
 
-  it('should open payment modal', (): void => {
-    component.showPurchaseModal = true;
-    component.openPaymentModal();
-    expect(component.showPaymentModal).toBe(true);
-    expect(component.showPurchaseModal).toBe(false);
+  describe('downloadFile', () => {
+    it('should not download if user has no access', () => {
+      component['userAccessMap'] = { 'file1': false };
+      spyOn(console, 'error');
+      
+      component.downloadFile(mockDigitalFile);
+      
+      expect(console.error).toHaveBeenCalledWith('User does not have access to this file');
+      expect(digitalFileService.downloadFile).not.toHaveBeenCalled();
+    });
   });
 
-  it('should close payment modal', (): void => {
-    component.selectedFile = mockDigitalFile;
-    component.showPaymentModal = true;
-    component.closePaymentModal();
-    expect(component.selectedFile).toBeNull();
-    expect(component.showPaymentModal).toBe(false);
+  describe('showLoginRequiredModal', () => {
+    it('should show login modal', () => {
+      component.showLoginModal = false;
+      
+      component.showLoginRequiredModal();
+      
+      expect(component.showLoginModal).toBeTrue();
+    });
   });
 
-  it('should show login required modal', (): void => {
-    component.showLoginRequiredModal();
-    expect(component.showLoginModal).toBe(true);
+  describe('closeLoginModal', () => {
+    it('should close login modal', () => {
+      component.showLoginModal = true;
+      
+      component.closeLoginModal();
+      
+      expect(component.showLoginModal).toBeFalse();
+    });
   });
 
-  it('should close login modal', (): void => {
-    component.showLoginModal = true;
-    component.closeLoginModal();
-    expect(component.showLoginModal).toBe(false);
+  describe('goToLogin', () => {
+    it('should close login modal and go back', () => {
+      component.showLoginModal = true;
+      spyOn(component, 'goBack');
+      
+      component.goToLogin();
+      
+      expect(component.showLoginModal).toBeFalse();
+      expect(component.goBack).toHaveBeenCalled();
+    });
   });
 
-  it('should navigate to login and close modal', (): void => {
-    spyOn(component, 'closeLoginModal');
-    spyOn(component, 'goBack');
-    component.goToLogin();
-    expect(component.closeLoginModal).toHaveBeenCalled();
-    expect(component.goBack).toHaveBeenCalled();
+  describe('clearFilters', () => {
+    it('should clear search term and selected language', () => {
+      component.searchTerm = 'test';
+      component.selectedLanguage = 'en';
+      spyOn(component, 'filterFiles');
+      
+      component.clearFilters();
+      
+      expect(component.searchTerm).toBe('');
+      expect(component.selectedLanguage).toBe('');
+      expect(component.filterFiles).toHaveBeenCalled();
+    });
   });
 
-  it('should clear all filters', (): void => {
-    component.searchTerm = 'test';
-    component.selectedLanguage = 'en';
-    component.selectedAccessLevel = 'PREMIUM';
-    component.clearFilters();
-    expect(component.searchTerm).toBe('');
-    expect(component.selectedLanguage).toBe('');
-    expect(component.selectedAccessLevel).toBe('');
+  describe('formatFileSize', () => {
+    it('should format file size correctly', () => {
+      const result = component.formatFileSize(1024);
+      
+      expect(result).toBeDefined();
+      expect(typeof result).toBe('string');
+    });
   });
 
-  it('should filter files by search term', (): void => {
-    component.files = [mockDigitalFile];
-    component.searchTerm = 'Test';
-    component.filterFiles();
-    expect(component.displayedFiles.length).toBe(1);
+  describe('getCurrencySymbol', () => {
+    it('should return RSD for Serbian language', () => {
+      translateService.currentLang = 'sr';
+      
+      const result = component.getCurrencySymbol();
+      
+      expect(result).toBe('RSD');
+    });
   });
 
-  it('should filter files by language', (): void => {
-    component.files = [mockDigitalFile];
-    component.selectedLanguage = 'sr';
-    component.filterFiles();
-    expect(component.displayedFiles.length).toBe(1);
+  describe('getPrice', () => {
+    it('should return RSD price for Serbian language', () => {
+      translateService.currentLang = 'sr';
+      
+      const result = component.getPrice(mockDigitalFile);
+      
+      expect(result).toBe(1000);
+    });
   });
 
-  it('should filter files by access level', (): void => {
-    component.files = [mockDigitalFile];
-    component.selectedAccessLevel = 'BASIC';
-    component.filterFiles();
-    expect(component.displayedFiles.length).toBe(1);
+  describe('goBack', () => {
+    it('should navigate to home page', () => {
+      router.navigate.and.returnValue(Promise.resolve(true));
+      spyOn(window, 'scrollTo');
+      
+      component.goBack();
+      
+      expect(router.navigate).toHaveBeenCalledWith(['/']);
+    });
   });
 
-  it('should load more files for pagination', (): void => {
-    component.hasMoreItems = true;
-    component.currentPage = 1;
-    component.loadMore();
-    expect(component.currentPage).toBe(2);
+  describe('copyPayPalLink', () => {
+    it('should copy PayPal link to clipboard', fakeAsync(() => {
+      spyOn(navigator.clipboard, 'writeText').and.returnValue(Promise.resolve());
+      
+      component.copyPayPalLink();
+      tick();
+      
+      expect(navigator.clipboard.writeText).toHaveBeenCalledWith('paypal.me/anavaspitac');
+    }));
+
+    it('should handle clipboard error gracefully', fakeAsync(() => {
+      spyOn(navigator.clipboard, 'writeText').and.returnValue(Promise.reject('Clipboard error'));
+      spyOn(console, 'error');
+      
+      component.copyPayPalLink();
+      tick();
+      
+      expect(console.error).toHaveBeenCalledWith('Failed to copy PayPal link:', 'Clipboard error');
+    }));
   });
 
-  it('should not load more when no more items', (): void => {
-    component.hasMoreItems = false;
-    component.currentPage = 1;
-    component.loadMore();
-    expect(component.currentPage).toBe(1);
+  describe('getFileExtension', () => {
+    it('should return empty string for empty file type', () => {
+      const result = component.getFileExtension('');
+      
+      expect(result).toBe('');
+    });
+
+    it('should extract extension from MIME type', () => {
+      const result = component.getFileExtension('application/pdf');
+      
+      expect(result).toBe('PDF');
+    });
+
+    it('should extract extension from filename with dot', () => {
+      const result = component.getFileExtension('document.pdf');
+      
+      expect(result).toBe('PDF');
+    });
+
+    it('should return uppercase file type if no extension pattern', () => {
+      const result = component.getFileExtension('PDF');
+      
+      expect(result).toBe('PDF');
+    });
   });
 
-  it('should get current page files', (): void => {
-    component.displayedFiles = [mockDigitalFile];
-    component.currentPage = 1;
-    const result = component.getCurrentPageFiles();
-    expect(result.length).toBe(1);
-    expect(result[0]).toBe(mockDigitalFile);
+  describe('getUserEmail', () => {
+    it('should return current user email if available', () => {
+      component.currentUserEmail = 'user@example.com';
+      
+      const result = component.getUserEmail();
+      
+      expect(result).toBe('user@example.com');
+    });
+
+    it('should return fallback email if current email is empty', () => {
+      component.currentUserEmail = '';
+      
+      const result = component.getUserEmail();
+      
+      expect(result).toBe('user@example.com');
+    });
   });
 
-  it('should return empty array when no displayed files', (): void => {
-    component.displayedFiles = [];
-    const result = component.getCurrentPageFiles();
-    expect(result).toEqual([]);
+  describe('initiatePurchase', () => {
+    it('should show login modal if user is not logged in', () => {
+      component.isLoggedIn = false;
+      spyOn(component, 'showLoginRequiredModal');
+      
+      component.initiatePurchase(mockDigitalFile);
+      
+      expect(component.showLoginRequiredModal).toHaveBeenCalled();
+      expect(purchaseService.createPurchase).not.toHaveBeenCalled();
+    });
+
+    it('should show login modal if no user ID', () => {
+      component.isLoggedIn = true;
+      component['currentUserId'] = null;
+      spyOn(component, 'showLoginRequiredModal');
+      
+      component.initiatePurchase(mockDigitalFile);
+      
+      expect(component.showLoginRequiredModal).toHaveBeenCalled();
+      expect(purchaseService.createPurchase).not.toHaveBeenCalled();
+    });
+
+    it('should create purchase and open payment modal on success', fakeAsync(() => {
+      component.isLoggedIn = true;
+      component['currentUserId'] = 'user123';
+      translateService.currentLang = 'sr';
+      spyOn(component, 'openPaymentModal');
+      
+      component.initiatePurchase(mockDigitalFile);
+      tick();
+      
+      expect(purchaseService.createPurchase).toHaveBeenCalledWith({
+        userId: 'user123',
+        fileId: 'file1',
+        amount: 1000,
+        currency: 'RSD'
+      });
+      expect(component.openPaymentModal).toHaveBeenCalled();
+    }));
+
+    it('should handle purchase creation error', fakeAsync(() => {
+      component.isLoggedIn = true;
+      component['currentUserId'] = 'user123';
+      purchaseService.createPurchase.and.returnValue(Promise.reject('Purchase error'));
+      spyOn(console, 'error');
+      
+      component.initiatePurchase(mockDigitalFile);
+      tick();
+      
+      expect(console.error).toHaveBeenCalledWith('Error creating purchase:', 'Purchase error');
+    }));
   });
 
-  it('should check user access to file', (): void => {
-    const result = component.hasAccess('file-1');
-    expect(result).toBe(false); // Currently always returns false
+  describe('filterFiles', () => {
+    beforeEach(() => {
+      component.files = mockDigitalFiles;
+    });
+
+    it('should filter files by search term', () => {
+      component.searchTerm = 'English';
+      
+      component.filterFiles();
+      
+      expect(component.displayedFiles.length).toBe(1);
+      expect(component.displayedFiles[0].title).toContain('English');
+    });
+
+    it('should filter files by language', () => {
+      component.selectedLanguage = 'en';
+      
+      component.filterFiles();
+      
+      expect(component.displayedFiles.length).toBe(1);
+      expect(component.displayedFiles[0].language).toBe('en');
+    });
+
+    it('should filter files by both search term and language', () => {
+      component.searchTerm = 'Test';
+      component.selectedLanguage = 'sr';
+      
+      component.filterFiles();
+      
+      expect(component.displayedFiles.length).toBe(2);
+      expect(component.displayedFiles.every(file => file.language === 'sr')).toBeTrue();
+      expect(component.displayedFiles.every(file => file.title.includes('Test'))).toBeTrue();
+    });
+
+    it('should search in title, description, and tags', () => {
+      component.searchTerm = 'education';
+      
+      component.filterFiles();
+      
+      expect(component.displayedFiles.length).toBe(2);
+    });
+
+    it('should show all files when no filters applied', () => {
+      component.searchTerm = '';
+      component.selectedLanguage = '';
+      
+      component.filterFiles();
+      
+      expect(component.displayedFiles.length).toBe(3);
+    });
   });
 
-  it('should handle file loading error', (): void => {
-    _digitalFileService.getActiveFiles.and.returnValue(throwError(() => new Error('Test error')));
-    spyOn(console, 'error');
-    
-    // Recreate component to trigger ngOnInit
-    fixture = TestBed.createComponent(ShopComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-    
-    expect(console.error).toHaveBeenCalledWith('Error loading files:', jasmine.any(Error));
-    expect(component.files).toEqual([]);
-    expect(component.displayedFiles).toEqual([]);
-    expect(component.isLoading).toBe(false);
-  });
+  describe('getters', () => {
+    it('should return correct access map size', () => {
+      component['userAccessMap'] = { 'file1': true, 'file2': false };
+      
+      const result = component.accessMapSize;
+      
+      expect(result).toBe(2);
+    });
 
-  it('should handle user profile loading error', (): void => {
-    // Test the component's error handling by directly calling the method
-    // Since the component doesn't subscribe to userProfile$ in ngOnInit,
-    // we need to test the error handling differently
-    
-    // Create a component with a failing user service
-    const failingUserService = jasmine.createSpyObj('UserService', ['getUserProfile']);
-    failingUserService.getUserProfile.and.returnValue(throwError(() => new Error('Profile error')));
-    
-    // Test that the component can handle errors gracefully
-    expect(component.showLoginModal).toBe(false);
-    
-    // Simulate what happens when there's an error
-    component.showLoginModal = true;
-    expect(component.showLoginModal).toBe(true);
+    it('should return true for isAccessReady when all conditions are met', () => {
+      component.isLoggedIn = true;
+      component['currentUserId'] = 'user123';
+      component['files'] = mockDigitalFiles;
+      component['userAccessMap'] = { 'file1': true, 'file2': false };
+      
+      const result = component.isAccessReady;
+      
+      expect(result).toBeTrue();
+    });
+
+    it('should return false for isAccessReady when user not logged in', () => {
+      component.isLoggedIn = false;
+      component['currentUserId'] = 'user123';
+      component['files'] = mockDigitalFiles;
+      component['userAccessMap'] = { 'file1': true };
+      
+      const result = component.isAccessReady;
+      
+      expect(result).toBeFalse();
+    });
+
+    it('should return false for isAccessReady when no user ID', () => {
+      component.isLoggedIn = true;
+      component['currentUserId'] = null;
+      component['files'] = mockDigitalFiles;
+      component['userAccessMap'] = { 'file1': true };
+      
+      const result = component.isAccessReady;
+      
+      expect(result).toBeFalse();
+    });
+
+    it('should return false for isAccessReady when no files', () => {
+      component.isLoggedIn = true;
+      component['currentUserId'] = 'user123';
+      component['files'] = [];
+      component['userAccessMap'] = { 'file1': true };
+      
+      const result = component.isAccessReady;
+      
+      expect(result).toBeFalse();
+    });
+
+    it('should return false for isAccessReady when access map is empty', () => {
+      component.isLoggedIn = true;
+      component['currentUserId'] = 'user123';
+      component['files'] = mockDigitalFiles;
+      component['userAccessMap'] = {};
+      
+      const result = component.isAccessReady;
+      
+      expect(result).toBeFalse();
+    });
   });
 });

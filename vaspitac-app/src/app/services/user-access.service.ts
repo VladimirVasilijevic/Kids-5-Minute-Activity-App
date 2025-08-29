@@ -30,11 +30,27 @@ export class UserAccessService {
     return new Observable(observer => {
       verifyAccess({ fileId }).subscribe({
         next: (result: any) => {
-          observer.next(result.data.hasAccess);
+          // Firebase Functions return data directly, not wrapped in result.data
+          // Check both possible locations: result.data.hasAccess and result.hasAccess
+          let hasAccess: boolean | undefined;
+          
+          if (result?.data?.hasAccess !== undefined) {
+            hasAccess = result.data.hasAccess;
+          } else if (result?.hasAccess !== undefined) {
+            hasAccess = result.hasAccess;
+          }
+          
+          if (typeof hasAccess === 'boolean') {
+            observer.next(hasAccess);
+          } else {
+            console.warn('Could not find valid hasAccess value in result');
+            observer.next(false);
+          }
           observer.complete();
         },
         error: (error: any) => {
-          console.error('Error verifying file access:', error);
+          console.error('❌ Error verifying file access:', error);
+          // Return false on error to prevent access issues
           observer.next(false);
           observer.complete();
         }
@@ -155,7 +171,7 @@ export class UserAccessService {
           observer.complete();
         })
         .catch(error => {
-          console.error('Error checking multiple access:', error);
+          console.error('❌ Error checking multiple access:', error);
           // Fallback to empty access map
           const accessMap: Record<string, boolean> = {};
           fileIds.forEach(fileId => accessMap[fileId] = false);
@@ -188,7 +204,22 @@ export class UserAccessService {
     return new Observable(observer => {
       getSecureDownload({ fileId }).subscribe({
         next: (result: any) => {
-          observer.next(result.data);
+          // Firebase Functions return data directly, not wrapped in result.data
+          // Check both possible locations: result.data and result
+          let downloadData: any;
+          
+          if (result?.data && typeof result.data === 'object') {
+            downloadData = result.data;
+          } else if (result && typeof result === 'object') {
+            downloadData = result;
+          }
+          
+          if (downloadData && typeof downloadData.hasAccess === 'boolean') {
+            observer.next(downloadData);
+          } else {
+            console.warn('Could not find valid download data');
+            observer.next({ hasAccess: false, fileId });
+          }
           observer.complete();
         },
         error: (error: any) => {
@@ -218,7 +249,23 @@ export class UserAccessService {
       // Use Firebase Function for server-side purchase verification
       const verifyPurchase = this.functions.httpsCallable('verifyPurchaseAndGrantAccess');
       const result = await firstValueFrom(verifyPurchase({ purchaseId, adminNotes }));
-      return result.data;
+      
+      // Firebase Functions return data directly, not wrapped in result.data
+      // Check both possible locations: result.data and result
+      let responseData: any;
+      
+      if (result?.data && typeof result.data === 'object') {
+        responseData = result.data;
+      } else if (result && typeof result === 'object') {
+        responseData = result;
+      }
+      
+      if (responseData) {
+        return responseData;
+      } else {
+        console.error('Invalid response format from verifyPurchaseAndGrantAccess');
+        throw new Error('Invalid response format from purchase verification');
+      }
     } catch (error) {
       console.error('Error verifying purchase and granting access:', error);
       throw new Error('Failed to verify purchase and grant access');

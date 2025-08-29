@@ -58,9 +58,9 @@
       
       <!-- Search and Filters -->
       <div class="bg-white rounded-3xl shadow-lg p-6 mb-8">
-                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                 <div class="grid grid-cols-1 gap-4">
           <!-- Search -->
-          <div class="md:col-span-2">
+          <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">
               {{ 'SHOP.SEARCH_MATERIALS' | translate }}
             </label>
@@ -80,21 +80,7 @@
           
 
           
-          <!-- Access Level Filter -->
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">
-              {{ 'SHOP.ACCESS_LEVEL' | translate }}
-            </label>
-            <select
-              [(ngModel)]="selectedAccessLevel"
-              (ngModelChange)="filterFiles()"
-              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500"
-            >
-              <option value="">{{ 'SHOP.ALL_LEVELS' | translate }}</option>
-              <option value="BASIC">{{ 'SHOP.BASIC' | translate }}</option>
-              <option value="PREMIUM">{{ 'SHOP.PREMIUM' | translate }}</option>
-            </select>
-          </div>
+
         </div>
         
         <!-- Results Count -->
@@ -158,19 +144,15 @@
         </div>
         
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          <div *ngFor="let file of getCurrentPageFiles()" class="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
+          <div *ngFor="let file of displayedFiles" class="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
           <!-- File Icon and Type -->
           <div class="p-6 pb-4">
-            <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center justify-center mb-4">
               <div class="h-12 w-12 rounded-lg bg-green-100 flex items-center justify-center">
                 <svg class="h-8 w-8 text-green-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                   <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                 </svg>
               </div>
-              <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium"
-                    [class]="file.accessLevel === 'PREMIUM' ? 'bg-yellow-100 text-yellow-800' : 'bg-blue-100 text-blue-800'">
-                {{ file.accessLevel }}
-              </span>
             </div>
             
             <!-- File Title -->
@@ -200,7 +182,7 @@
           <!-- Action Buttons -->
           <div class="px-6 pb-6">
             <!-- Download Button (for users with access) -->
-            <div *ngIf="hasAccess(file.id)" class="w-full">
+            <div *ngIf="isAccessReady && hasAccess(file.id)" class="w-full">
               <button
                 (click)="downloadFile(file)"
                 class="w-full bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg font-medium flex items-center justify-center gap-2 transition-colors"
@@ -213,7 +195,7 @@
             </div>
             
             <!-- Purchase Button (for users without access) -->
-            <div *ngIf="!hasAccess(file.id)" class="w-full">
+            <div *ngIf="isAccessReady && !hasAccess(file.id)" class="w-full">
               <button
                 (click)="initiatePurchase(file)"
                 class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg font-medium flex items-center justify-center gap-2 transition-colors"
@@ -222,6 +204,20 @@
                   <path d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
                 </svg>
                 {{ 'SHOP.BUY_NOW' | translate }}
+              </button>
+            </div>
+            
+            <!-- Loading state when access is not ready -->
+            <div *ngIf="!isAccessReady" class="w-full">
+              <button
+                disabled
+                class="w-full bg-gray-400 text-white py-2 px-4 rounded-lg font-medium flex items-center justify-center gap-2 cursor-not-allowed"
+              >
+                <svg class="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Loading...
               </button>
             </div>
           </div>
@@ -252,15 +248,7 @@
         </button>
       </div>
 
-      <!-- Load More Button -->
-      <div *ngIf="hasMoreItems && isLoggedIn && !isLoading" class="text-center mt-8">
-        <button
-          (click)="loadMore()"
-          class="bg-white hover:bg-gray-50 text-green-600 border border-green-600 px-6 py-3 rounded-lg font-medium transition-colors"
-        >
-          {{ 'SHOP.LOAD_MORE' | translate }}
-        </button>
-      </div>
+
     </div>
   </div>
 </div>
@@ -289,12 +277,12 @@
            <markdown [data]="selectedFile.description"></markdown>
          </div>
                  <div class="flex items-center gap-4 text-sm text-gray-500 mb-3">
-           <span>{{ getFileExtension(selectedFile?.fileType || '') }}</span>
-           <span>{{ formatFileSize(selectedFile?.fileSize || 0) }}</span>
+           <span>{{ getFileExtension(selectedFile.fileType || '') }}</span>
+           <span>{{ formatFileSize(selectedFile.fileSize || 0) }}</span>
          </div>
                  <div class="text-right">
            <div class="text-2xl font-bold text-green-600">
-             {{ selectedFile?.priceRSD }} RSD / {{ selectedFile?.priceEUR }} EUR
+             {{ selectedFile.priceRSD }} RSD / {{ selectedFile.priceEUR }} EUR
            </div>
          </div>
       </div>

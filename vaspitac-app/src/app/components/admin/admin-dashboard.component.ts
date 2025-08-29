@@ -107,6 +107,8 @@ export class AdminDashboardComponent implements OnInit {
     this._router.navigate(['/admin/files']);
   }
 
+
+
   /**
    * Navigates to the admin about page management
    */

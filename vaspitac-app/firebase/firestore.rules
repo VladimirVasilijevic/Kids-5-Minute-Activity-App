@@ -86,7 +86,7 @@ service cloud.firestore {
       allow read: if request.auth != null && 
         resource.data.userId == request.auth.uid;
       allow create: if request.auth != null && 
-        request.auth.uid == resource.data.userId;
+        request.auth.uid == request.resource.data.userId;
       allow update: if false; // Only server-side operations can update purchases
       allow delete: if false; // No deletion allowed
     }

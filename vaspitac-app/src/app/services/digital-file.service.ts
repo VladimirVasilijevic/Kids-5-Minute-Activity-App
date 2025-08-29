@@ -254,43 +254,53 @@ export class DigitalFileService {
     return this.firestore
       .collection(this.COLLECTION, ref => 
         ref.where('isActive', '==', true)
-           .orderBy('createdAt', 'desc')
+           // .orderBy('createdAt', 'desc') // Temporarily commented out while index builds
       )
       .valueChanges({ idField: 'id' }) as Observable<DigitalFile[]>;
   }
 
   /**
    * Download file with enhanced security
-   * This method now uses server-side validation
    */
-  downloadFile(file: DigitalFile): Observable<Blob> {
-    if (!file?.fileUrl) {
-      throw new Error('File URL not available');
+  downloadFile(file: DigitalFile): Observable<boolean> {
+    if (!file?.id) {
+      throw new Error('File ID not available');
     }
 
-    // Use Firebase Function for server-side access validation
-    const getSecureDownload = this.functions.httpsCallable('getSecureFileDownload');
+    // Use Firebase Function for server-side access validation and file content
+    const downloadFileContent = this.functions.httpsCallable('downloadFileContent');
     
     return new Observable(observer => {
-      getSecureDownload({ fileId: file.id }).subscribe({
+      downloadFileContent({ fileId: file.id }).subscribe({
         next: (result: any) => {
-          if (result.data.hasAccess) {
-            // Create a secure download link
-            this.createSecureDownloadLink(result.data.downloadUrl)
-              .then(blob => {
-                observer.next(blob);
+          // Firebase Functions return data directly, not wrapped in result.data
+          // Check both possible locations: result.data and result
+          let downloadData: any;
+          
+          if (result?.data && typeof result.data === 'object') {
+            downloadData = result.data;
+          } else if (result && typeof result === 'object') {
+            downloadData = result;
+          }
+          
+          if (downloadData?.hasAccess && downloadData?.fileContent) {
+            // Create download from base64 content
+            this.createDownloadFromContent(downloadData.fileContent, downloadData.fileName, downloadData.fileType)
+              .then(() => {
+                observer.next(true);
                 observer.complete();
               })
               .catch(error => {
-                console.error('Error creating secure download:', error);
+                console.error('Error creating download from content:', error);
                 observer.error(error);
               });
           } else {
-            observer.error(new Error('Access denied'));
+            console.error('Access denied or no file content for file:', file.id);
+            observer.error(new Error('Access denied or file content unavailable'));
           }
         },
         error: (error: any) => {
-          console.error('Error getting secure download:', error);
+          console.error('Error downloading file content:', error);
           observer.error(error);
         }
       });
@@ -300,7 +310,7 @@ export class DigitalFileService {
   /**
    * Download file by ID with enhanced security
    */
-  downloadFileById(fileId: string): Observable<Blob> {
+  downloadFileById(fileId: string): Observable<boolean> {
     if (!fileId) {
       throw new Error('Missing file ID');
     }
@@ -311,6 +321,10 @@ export class DigitalFileService {
           throw new Error('File not found');
         }
         return this.downloadFile(file);
+      }),
+      catchError(error => {
+        console.error('Error downloading file by ID:', error);
+        throw error;
       })
     );
   }
@@ -323,17 +337,30 @@ export class DigitalFileService {
       throw new Error('File ID not available');
     }
 
-    // Use Firebase Function for server-side access validation
-    const getSecureDownload = this.functions.httpsCallable('getSecureFileDownload');
+    // Use Firebase Function for server-side access validation and file content
+    const downloadFileContent = this.functions.httpsCallable('downloadFileContent');
     
     return new Observable(observer => {
-      getSecureDownload({ fileId: file.id }).subscribe({
+      downloadFileContent({ fileId: file.id }).subscribe({
         next: (result: any) => {
-          if (result.data.hasAccess) {
-            observer.next(result.data.downloadUrl);
+          // Firebase Functions return data directly, not wrapped in result.data
+          // Check both possible locations: result.data and result
+          let downloadData: any;
+          
+          if (result?.data && typeof result.data === 'object') {
+            downloadData = result.data;
+          } else if (result && typeof result === 'object') {
+            downloadData = result;
+          }
+          
+          if (downloadData?.hasAccess && downloadData?.fileContent) {
+            // Create a data URL from the base64 content
+            const dataUrl = `data:${downloadData.fileType};base64,${downloadData.fileContent}`;
+            observer.next(dataUrl);
             observer.complete();
           } else {
-            observer.error(new Error('Access denied'));
+            console.error('Access denied or no file content for file:', file.id);
+            observer.error(new Error('Access denied or file content unavailable'));
           }
         },
         error: (error: any) => {
@@ -345,19 +372,25 @@ export class DigitalFileService {
   }
 
   /**
-   * Create a secure download link
-   * This method handles the actual file download securely
+   * Create a download from base64 file content
    */
-  private async createSecureDownloadLink(downloadUrl: string): Promise<Blob> {
+  private async createDownloadFromContent(base64Content: string, fileName: string, fileType: string): Promise<void> {
     try {
-      const response = await fetch(downloadUrl);
-      if (!response.ok) {
-        throw new Error(`Download failed: ${response.status}`);
-      }
-      return await response.blob();
+      // Create a temporary anchor element to trigger the download
+      const link = document.createElement('a');
+      link.href = `data:${fileType};base64,${base64Content}`; // Create a data URL
+      link.download = fileName; // Use the provided filename
+      link.target = '_blank';
+      
+      // Append to DOM, click, and remove
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+
     } catch (error) {
-      console.error('Error creating secure download link:', error);
-      throw new Error('Failed to create secure download link');
+      console.error('Error creating download from content:', error);
+      throw new Error('Failed to create download from content');
     }
   }
 }

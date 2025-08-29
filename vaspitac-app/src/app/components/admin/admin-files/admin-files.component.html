@@ -160,6 +160,15 @@
                   <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <div class="flex justify-end gap-2">
                       <button 
+                        (click)="openGrantAccessModal(file)"
+                        class="text-green-600 hover:text-green-900 px-2 py-1 rounded"
+                        title="{{ 'ADMIN.GRANT_ACCESS' | translate }}"
+                      >
+                        <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                          <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                      </button>
+                      <button 
                         (click)="handleEdit(file)"
                         class="text-indigo-600 hover:text-indigo-900 px-2 py-1 rounded"
                         title="{{ 'ADMIN.EDIT' | translate }}"
@@ -414,6 +423,68 @@
     </div>
   </div>
 </ng-container>
+
+<!-- Grant Access Modal -->
+<div *ngIf="showGrantAccessModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+  <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+    <div class="mt-3">
+      <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100">
+        <svg class="h-6 w-6 text-green-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+      </div>
+      <h3 class="text-lg font-medium text-gray-900 mt-4 text-center">{{ 'ADMIN.GRANT_ACCESS' | translate }}</h3>
+      <div class="mt-4">
+        <p class="text-sm text-gray-600 mb-4">{{ 'ADMIN.GRANT_ACCESS_DESCRIPTION' | translate }}</p>
+        
+                 <!-- File Info -->
+         <div class="bg-gray-50 p-3 rounded-lg mb-4">
+           <div class="text-sm font-medium text-gray-900">{{ selectedFileForAccess?.title }}</div>
+           <div class="text-sm text-gray-500">{{ selectedFileForAccess?.fileType }} • {{ selectedFileForAccess?.fileSize ? formatFileSize(selectedFileForAccess?.fileSize || 0) : 'N/A' }}</div>
+         </div>
+
+        <!-- User Email Input -->
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-700 mb-2">{{ 'ADMIN.USER_EMAIL' | translate }}</label>
+          <input 
+            type="email" 
+            [(ngModel)]="userEmailForAccess"
+            placeholder="user@example.com"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+          >
+        </div>
+
+        <!-- Admin Notes -->
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-700 mb-2">{{ 'ADMIN.ADMIN_NOTES' | translate }}</label>
+          <textarea 
+            [(ngModel)]="adminNotesForAccess"
+            placeholder="{{ 'ADMIN.ADMIN_NOTES_PLACEHOLDER' | translate }}"
+            rows="3"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+          ></textarea>
+        </div>
+      </div>
+      
+      <div class="flex gap-3 mt-6">
+        <button 
+          (click)="grantAccess()"
+          [disabled]="!userEmailForAccess || isGrantingAccess"
+          class="flex-1 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white font-medium py-2 px-4 rounded-md transition-colors"
+        >
+          <span *ngIf="!isGrantingAccess">{{ 'ADMIN.GRANT_ACCESS' | translate }}</span>
+          <span *ngIf="isGrantingAccess">{{ 'ADMIN.GRANTING_ACCESS' | translate }}...</span>
+        </button>
+        <button 
+          (click)="closeGrantAccessModal()"
+          class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-700 font-medium py-2 px-4 rounded-md transition-colors"
+        >
+          {{ 'ADMIN.CANCEL' | translate }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- Success Message -->
 <div *ngIf="showSuccessMessage" 

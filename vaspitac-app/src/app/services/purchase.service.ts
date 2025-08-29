@@ -119,7 +119,6 @@ export class PurchaseService {
 
   /**
    * Verify a purchase and grant access
-   * This method now uses Firebase Functions for enhanced security
    */
   async verifyPurchase(purchaseId: string, adminNotes?: string, verifiedBy?: string): Promise<boolean> {
     if (!purchaseId) {
@@ -130,7 +129,23 @@ export class PurchaseService {
       // Use Firebase Function for server-side verification
       const verifyPurchase = this.functions.httpsCallable('verifyPurchaseAndGrantAccess');
       const result = await firstValueFrom(verifyPurchase({ purchaseId, adminNotes }));
-      return result.data.success;
+      
+      // Firebase Functions return data directly, not wrapped in result.data
+      // Check both possible locations: result.data and result
+      let responseData: any;
+      
+      if (result?.data && typeof result.data === 'object') {
+        responseData = result.data;
+      } else if (result && typeof result === 'object') {
+        responseData = result;
+      }
+      
+      if (responseData?.success !== undefined) {
+        return responseData.success;
+      } else {
+        console.error('Invalid response format from verifyPurchaseAndGrantAccess');
+        throw new Error('Invalid response format from purchase verification');
+      }
     } catch (error) {
       console.error('Error verifying purchase:', error);
       throw new Error('Failed to verify purchase');

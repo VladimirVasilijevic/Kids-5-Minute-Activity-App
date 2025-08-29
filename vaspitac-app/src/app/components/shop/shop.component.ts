@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { Observable, of, combineLatest, from } from 'rxjs';
 import { map, switchMap, catchError } from 'rxjs/operators';
 import { TranslateService } from '@ngx-translate/core';
+import { AngularFireFunctions } from '@angular/fire/compat/functions';
 import { AuthService } from '../../services/auth.service';
 import { UserService } from '../../services/user.service';
 import { UserProfile } from '../../models/user-profile.model';
@@ -23,6 +24,8 @@ import { formatFileSize } from '../../models/marketplace.utils';
   styleUrls: ['./shop.component.scss'],
 })
 export class ShopComponent implements OnInit {
+
+  
   // User authentication
   userProfile$: Observable<UserProfile | null> = of(null);
   isLoggedIn = false;
@@ -35,12 +38,8 @@ export class ShopComponent implements OnInit {
   // Search and filters
   searchTerm = '';
   selectedLanguage = '';
-  selectedAccessLevel = '';
   
-  // Pagination
-  currentPage = 1;
-  itemsPerPage = 12;
-  hasMoreItems = true;
+
   
   // Purchase modal
   showPurchaseModal = false;
@@ -58,6 +57,8 @@ export class ShopComponent implements OnInit {
   // User access tracking
   userAccessMap: Record<string, boolean> = {};
   currentUserId: string | null = null;
+  isRefreshingAccess = false; // Add flag to prevent multiple simultaneous refreshes
+
   
   constructor(
     private _router: Router,
@@ -66,17 +67,19 @@ export class ShopComponent implements OnInit {
     private _digitalFileService: DigitalFileService,
     private _userAccessService: UserAccessService,
     private _purchaseService: PurchaseService,
-    private _translate: TranslateService
+    private _translate: TranslateService,
+    private _functions: AngularFireFunctions
   ) {
     // Initialize arrays to prevent undefined issues
     this.files = [];
     this.displayedFiles = [];
+    
+
   }
 
   ngOnInit(): void {
+    // First load user profile and check authentication
     this.loadUserProfile();
-    this.loadFiles();
-    this.setupLanguageDetection();
     
     // Check authentication status immediately
     this._auth.user$.subscribe(user => {
@@ -86,16 +89,32 @@ export class ShopComponent implements OnInit {
         this.currentUserEmail = '';
         this.currentUserId = null;
         this.userAccessMap = {};
-        console.log('User not authenticated, showing login modal');
       } else {
         this.isLoggedIn = true;
         this.showLoginModal = false;
         this.currentUserEmail = user.email || '';
         this.currentUserId = user.uid;
-        console.log('User authenticated:', user.uid, 'Email:', user.email);
-        this.loadUserAccess();
+        
+        // Only load files after user is authenticated
+        this.loadFiles();
+        // Note: loadUserAccess will be called after files are loaded
       }
     });
+    
+    this.setupLanguageDetection();
+  }
+
+  /**
+   * Manually trigger access loading (for user control)
+   */
+  loadAccessNow(): void {
+    if (this.isAccessReady) {
+      return;
+    }
+    
+    if (this.currentUserId && this.files.length > 0) {
+      this.loadUserAccess();
+    }
   }
 
   /**
@@ -128,15 +147,76 @@ export class ShopComponent implements OnInit {
    */
   private loadUserAccess(): void {
     if (!this.currentUserId || this.files.length === 0) {
+      this.isRefreshingAccess = false; // Reset flag
       return;
     }
 
     const fileIds = this.files.map(file => file.id);
+    
+    // First try the Firebase function approach
     this._userAccessService.hasMultipleAccess(this.currentUserId, fileIds)
-      .subscribe(accessMap => {
-        this.userAccessMap = accessMap;
-        console.log('User access map loaded:', accessMap);
+      .subscribe({
+        next: (accessMap) => {
+          this.userAccessMap = accessMap;
+          this.isRefreshingAccess = false; // Reset flag
+          // User access map loaded successfully via Firebase function
+          
+        },
+        error: (error) => {
+          console.error('Error loading user access via Firebase function, trying direct Firestore query:', error);
+          // Fallback: try direct Firestore query
+          this.loadUserAccessDirectly(fileIds);
+        }
       });
+  }
+
+  /**
+   * Fallback method to load user access directly from Firestore
+   */
+  private loadUserAccessDirectly(fileIds: string[]): void {
+    // Use the injected AngularFirestore service
+    const firestore = (this as any)._afs || (this as any)._firestore;
+    
+    if (!firestore) {
+      console.error('Firestore service not available for direct query');
+      // Final fallback: initialize with all false
+      this.userAccessMap = {};
+      fileIds.forEach(fileId => {
+        this.userAccessMap[fileId] = false;
+      });
+      this.isRefreshingAccess = false; // Reset flag
+      return;
+    }
+    
+    // Query the user_access collection directly
+    const accessQuery = firestore
+      .collection('user_access', (ref: any) => 
+        ref.where('userId', '==', this.currentUserId)
+           .where('isActive', '==', true)
+      )
+      .valueChanges({ idField: 'id' });
+    
+    accessQuery.subscribe({
+      next: (accessRecords: any[]) => {
+        // Create access map
+        const accessMap: Record<string, boolean> = {};
+        fileIds.forEach(fileId => {
+          accessMap[fileId] = accessRecords.some(record => record.fileId === fileId);
+        });
+        
+        this.userAccessMap = accessMap;
+        this.isRefreshingAccess = false; // Reset flag
+      },
+      error: (error: any) => {
+        console.error('Error with direct Firestore query:', error);
+        // Final fallback: initialize with all false
+        this.userAccessMap = {};
+        fileIds.forEach(fileId => {
+          this.userAccessMap[fileId] = false;
+        });
+        this.isRefreshingAccess = false; // Reset flag
+      }
+    });
   }
 
   /**
@@ -149,12 +229,10 @@ export class ShopComponent implements OnInit {
         this.files = files;
         this.displayedFiles = files;
         this.isLoading = false;
-        console.log('Files loaded:', files.length);
         
-        // Load user access after files are loaded
-        if (this.currentUserId) {
-          this.loadUserAccess();
-        }
+        // Always try to load user access after files are loaded
+        // The loadUserAccess method will handle the case where user is not authenticated
+        this.loadUserAccess();
       },
       error: (error) => {
         console.error('Error loading files:', error);
@@ -194,33 +272,12 @@ export class ShopComponent implements OnInit {
       filtered = filtered.filter(file => file.language === this.selectedLanguage);
     }
 
-    // Filter by access level
-    if (this.selectedAccessLevel) {
-      filtered = filtered.filter(file => file.accessLevel === this.selectedAccessLevel);
-    }
+
 
     this.displayedFiles = filtered;
-    this.currentPage = 1;
-    this.hasMoreItems = filtered.length > this.itemsPerPage;
   }
 
-  /**
-   * Loads more files for pagination
-   */
-  loadMore(): void {
-    if (this.hasMoreItems) {
-      this.currentPage++;
-    }
-  }
 
-  /**
-   * Gets files for the current page
-   */
-  getCurrentPageFiles(): DigitalFile[] {
-    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
-    const endIndex = startIndex + this.itemsPerPage;
-    return this.displayedFiles.slice(startIndex, endIndex);
-  }
 
   /**
    * Opens purchase modal for a specific file
@@ -260,13 +317,43 @@ export class ShopComponent implements OnInit {
   }
 
   /**
+   * Refreshes the user access map
+   */
+  refreshUserAccess(): void {
+    if (this.isRefreshingAccess) {
+      return;
+    }
+    
+    if (!this.currentUserId || this.files.length === 0) {
+      return;
+    }
+    
+    this.isRefreshingAccess = true;
+
+    
+    this.loadUserAccess();
+  }
+
+
+
+  /**
    * Checks if user has access to a file
    */
   hasAccess(fileId: string): boolean {
     if (!this.isLoggedIn || !this.currentUserId) {
       return false;
     }
-    return this.userAccessMap[fileId] || false;
+    
+    // If the access map is empty, just return false - don't trigger refresh here
+    if (Object.keys(this.userAccessMap).length === 0) {
+      return false;
+    }
+    
+    const hasAccess = this.userAccessMap[fileId] || false;
+    
+
+    
+    return hasAccess;
   }
 
   /**
@@ -288,9 +375,12 @@ export class ShopComponent implements OnInit {
     }
 
     this._digitalFileService.downloadFile(file).subscribe({
-      next: () => {
-        console.log('File download initiated:', file.title);
-        // You can add a success notification here
+      next: (success: boolean) => {
+        if (success) {
+          // File download successful
+        } else {
+          console.error('File download failed:', file.title);
+        }
       },
       error: (error) => {
         console.error('Error downloading file:', error);
@@ -327,7 +417,6 @@ export class ShopComponent implements OnInit {
   clearFilters(): void {
     this.searchTerm = '';
     this.selectedLanguage = '';
-    this.selectedAccessLevel = '';
     this.filterFiles();
   }
 
@@ -369,8 +458,7 @@ export class ShopComponent implements OnInit {
   copyPayPalLink(): void {
     const paypalLink = 'paypal.me/anavaspitac';
     navigator.clipboard.writeText(paypalLink).then(() => {
-      // You can add a toast notification here if you want
-      console.log('PayPal link copied to clipboard');
+      // PayPal link copied successfully
     }).catch(err => {
       console.error('Failed to copy PayPal link:', err);
     });
@@ -423,12 +511,26 @@ export class ShopComponent implements OnInit {
     };
 
     this._purchaseService.createPurchase(purchaseData).then(purchaseId => {
-      console.log('Purchase created:', purchaseId);
       // Open payment modal to show instructions
       this.openPaymentModal();
     }).catch(error => {
       console.error('Error creating purchase:', error);
-      // You can add an error notification here
     });
+  }
+
+
+
+  /**
+   * Getter for access map size (for template use)
+   */
+  get accessMapSize(): number {
+    return Object.keys(this.userAccessMap).length;
+  }
+
+  /**
+   * Check if access checking is ready (for template use)
+   */
+  get isAccessReady(): boolean {
+    return this.isLoggedIn && !!this.currentUserId && this.files.length > 0 && Object.keys(this.userAccessMap).length > 0;
   }
 }

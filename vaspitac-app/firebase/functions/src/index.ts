@@ -665,6 +665,7 @@ export const getPublicContent = onCall(async (request) => {
 export const verifyFileAccess = onCall(async (request) => {
   // Verify authentication
   if (!request.auth) {
+    console.log('ERROR: No authentication');
     throw new HttpsError('unauthenticated', 'User must be authenticated');
   }
 
@@ -676,6 +677,7 @@ export const verifyFileAccess = onCall(async (request) => {
   }
 
   try {
+
     // Check if user has access to this file
     const accessDoc = await db
       .collection('user_access')
@@ -686,7 +688,22 @@ export const verifyFileAccess = onCall(async (request) => {
       .get();
 
     if (accessDoc.empty) {
-      throw new HttpsError('permission-denied', 'User does not have access to this file');
+      // Let's also check what records exist for this user
+      const allUserAccess = await db
+        .collection('user_access')
+        .where('userId', '==', userId)
+        .get();
+      
+      allUserAccess.docs.forEach(doc => {
+        const data = doc.data();
+      });
+      
+      // Instead of throwing an error, return a response indicating no access
+      return {
+        hasAccess: false,
+        fileId: fileId,
+        message: 'User does not have access to this file'
+      };
     }
 
     // Get file details
@@ -789,6 +806,76 @@ export const grantFileAccess = onCall(async (request) => {
 });
 
 /**
+ * Grant admin access to a user for a digital file (without purchase)
+ * This function handles admin-granted access that doesn't require a purchase
+ */
+export const grantAdminAccess = onCall(async (request) => {
+  // Verify authentication and admin role
+  if (!request.auth) {
+    throw new HttpsError('unauthenticated', 'User must be authenticated');
+  }
+
+  const { userId, fileId, adminNotes } = request.data;
+  const adminUid = request.auth.uid;
+
+  if (!userId || !fileId) {
+    throw new HttpsError('invalid-argument', 'User ID and File ID are required');
+  }
+
+  try {
+    // Verify admin role
+    const adminDoc = await db.collection('users').doc(adminUid).get();
+    if (!adminDoc.exists || adminDoc.data()?.role !== UserRole.ADMIN) {
+      throw new HttpsError('permission-denied', 'Admin role required');
+    }
+
+    // Check if access already exists
+    const existingAccess = await db
+      .collection('user_access')
+      .where('userId', '==', userId)
+      .where('fileId', '==', fileId)
+      .where('isActive', '==', true)
+      .limit(1)
+      .get();
+
+    if (!existingAccess.empty) {
+      throw new HttpsError('already-exists', 'User already has access to this file');
+    }
+
+    // Create access record for admin-granted access
+    const accessData = {
+      userId,
+      fileId,
+      grantedAt: admin.firestore.FieldValue.serverTimestamp(),
+      grantedBy: adminUid,
+      isActive: true,
+      purchaseId: null, // No purchase for admin-granted access
+      adminNotes: adminNotes || null,
+      accessType: 'ADMIN_GRANTED'
+    };
+
+    
+    const accessRef = await db.collection('user_access').add(accessData);
+    
+    // Verify the record was created by reading it back
+    const createdDoc = await accessRef.get();
+
+    return {
+      success: true,
+      message: 'Admin access granted successfully',
+      accessGrantedAt: new Date().toISOString()
+    };
+
+  } catch (error) {
+    console.error('Error granting admin access:', error);
+    if (error instanceof HttpsError) {
+      throw error;
+    }
+    throw new HttpsError('internal', 'Failed to grant admin access');
+  }
+});
+
+/**
  * Revoke access from a user for a digital file
  */
 export const revokeFileAccess = onCall(async (request) => {
@@ -885,15 +972,23 @@ export const getSecureFileDownload = onCall(async (request) => {
 
     const fileData = fileDoc.data();
     
-    // Return secure download information
+    // Instead of returning a URL, we'll return the file data
+    // The client will need to handle the download differently
     return {
       hasAccess: true,
       fileId: fileId,
       fileName: fileData?.fileName,
       fileType: fileData?.fileType,
       fileSize: fileData?.fileSize,
-      downloadUrl: fileData?.fileUrl, // This URL is still protected by Storage rules
-      accessVerifiedAt: new Date().toISOString()
+      // Don't return the direct Storage URL - it causes permission issues
+      // downloadUrl: fileData?.fileUrl,
+      accessVerifiedAt: new Date().toISOString(),
+      // Return file metadata for client-side handling
+      fileMetadata: {
+        name: fileData?.fileName,
+        type: fileData?.fileType,
+        size: fileData?.fileSize
+      }
     };
 
   } catch (error) {
@@ -915,7 +1010,7 @@ export const verifyPurchaseAndGrantAccess = onCall(async (request) => {
     throw new HttpsError('unauthenticated', 'User must be authenticated');
   }
 
-  const { purchaseId, adminNotes } = request.data;
+  const { purchaseId } = request.data; // Removed unused adminNotes
   const adminUid = request.auth.uid;
 
   if (!purchaseId) {
@@ -941,21 +1036,45 @@ export const verifyPurchaseAndGrantAccess = onCall(async (request) => {
       throw new HttpsError('failed-precondition', 'Purchase is not in pending status');
     }
 
-    // Grant access using the existing function
-    const accessResult = await grantFileAccess({
-      data: {
-        userId: purchaseData.userId,
-        fileId: purchaseData.fileId,
-        purchaseId: purchaseId
-      },
-      auth: request.auth
-    } as any);
+    // Grant access directly instead of calling the function
+    // Check if access already exists
+    const existingAccess = await db
+      .collection('user_access')
+      .where('userId', '==', purchaseData.userId)
+      .where('fileId', '==', purchaseData.fileId)
+      .where('isActive', '==', true)
+      .limit(1)
+      .get();
+
+    if (!existingAccess.empty) {
+      throw new HttpsError('already-exists', 'User already has access to this file');
+    }
+
+    // Create access record
+    const accessData = {
+      userId: purchaseData.userId,
+      fileId: purchaseData.fileId,
+      grantedAt: admin.firestore.FieldValue.serverTimestamp(),
+      grantedBy: adminUid,
+      isActive: true,
+      purchaseId: purchaseId
+    };
+
+    await db.collection('user_access').add(accessData);
+
+    // Update purchase status to verified
+    await db.collection('purchases').doc(purchaseId).update({
+      status: 'VERIFIED',
+      verifiedAt: admin.firestore.FieldValue.serverTimestamp(),
+      verifiedBy: adminUid,
+      updatedAt: admin.firestore.FieldValue.serverTimestamp()
+    });
 
     return {
       success: true,
       message: 'Purchase verified and access granted successfully',
       purchaseId: purchaseId,
-      accessResult: accessResult
+      accessGrantedAt: new Date().toISOString()
     };
 
   } catch (error) {
@@ -964,5 +1083,100 @@ export const verifyPurchaseAndGrantAccess = onCall(async (request) => {
       throw error;
     }
     throw new HttpsError('internal', 'Failed to verify purchase and grant access');
+  }
+}); 
+
+/**
+ * Download file content directly (bypasses Storage permissions)
+ * This function validates access and serves the file content
+ */
+export const downloadFileContent = onCall(async (request) => {
+  // Verify authentication
+  if (!request.auth) {
+    throw new HttpsError('unauthenticated', 'User must be authenticated');
+  }
+
+  const { fileId } = request.data;
+  const userId = request.auth.uid;
+
+  if (!fileId) {
+    throw new HttpsError('invalid-argument', 'File ID is required');
+  }
+
+  try {
+    // Verify access on server side
+    const accessDoc = await db
+      .collection('user_access')
+      .where('userId', '==', userId)
+      .where('fileId', '==', fileId)
+      .where('isActive', '==', true)
+      .limit(1)
+      .get();
+
+    if (accessDoc.empty) {
+      throw new HttpsError('permission-denied', 'User does not have access to this file');
+    }
+
+    // Get file details
+    const fileDoc = await db.collection('digital-files').doc(fileId).get();
+    if (!fileDoc.exists) {
+      throw new HttpsError('not-found', 'File not found');
+    }
+
+    const fileData = fileDoc.data();
+    
+    if (!fileData?.fileUrl) {
+      throw new HttpsError('not-found', 'File URL not available');
+    }
+
+    // Extract file path from Storage URL
+    let filePath = '';
+    
+    if (fileData.fileUrl.includes('firebasestorage.googleapis.com')) {
+      // Firebase Storage URLs have format: https://firebasestorage.googleapis.com/v0/b/BUCKET_NAME/o/PATH%2FTO%2FFILE?token=...
+      const url = new URL(fileData.fileUrl);
+      const pathMatch = url.pathname.match(/\/o\/(.+)/);
+      if (pathMatch && pathMatch[1]) {
+        filePath = decodeURIComponent(pathMatch[1]);
+      }
+    }
+
+    if (!filePath) {
+      console.error('Could not extract file path from URL:', fileData.fileUrl);
+      throw new HttpsError('internal', 'Could not extract file path from URL');
+    }
+
+    // Get the file from Storage
+    const bucket = admin.storage().bucket();
+    const file = bucket.file(filePath);
+    
+    // Check if file exists
+    const [exists] = await file.exists();
+    
+    if (!exists) {
+      console.error('File not found in storage at path:', filePath);
+      throw new HttpsError('not-found', 'File not found in storage');
+    }
+
+    // Get file content
+    const [fileContent] = await file.download();
+    
+    // Return file content as base64 for client-side download
+    return {
+      hasAccess: true,
+      fileId: fileId,
+      fileName: fileData.fileName,
+      fileType: fileData.fileType,
+      fileSize: fileData.fileSize,
+      fileContent: fileContent.toString('base64'),
+      accessVerifiedAt: new Date().toISOString()
+    };
+
+  } catch (error) {
+    console.error('Error downloading file content:', error);
+    if (error instanceof HttpsError) {
+      throw error;
+    }
+    throw new HttpsError('internal', 'Failed to download file content');
   }
 }); 
