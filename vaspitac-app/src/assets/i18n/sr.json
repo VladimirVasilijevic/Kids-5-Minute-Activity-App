@@ -155,7 +155,21 @@
     "BANK_HOWTO_REFERENCE_DESC": "97 123-456789",
     "BANK_NOTE_TITLE": "Napomena",
     "BANK_NOTE_DESC": "Molimo vas da nakon uplate pošaljete potvrdu na email ili Viber radi brže obrade porudžbine.",
-    "COPY_PAYPAL": "Kopiraj"
+    "COPY_PAYPAL": "Kopiraj",
+    "PAYMENT_INSTRUCTIONS": "Instrukcije za plaćanje",
+    "PAYMENT_DESCRIPTION": "Izvršite uplatu na sledeći račun i pošaljite dokaz o plaćanju. Pristup će biti odobren u najkracem roku.",
+    "BANK_TRANSFER": "Bankovski Transfer",
+    "BANK_TRANSFER_DESC": "Za plaćanje uplatnicom, molimo vas da koristite sledeće podatke:",
+    "BANK_NAME": "Srpska Banka",
+    "BANK_ACCOUNT": "160-123456789-12",
+    "BANK_RECIPIENT": "Ana Vaspitac",
+    "USER": "Korisnik",
+    "BANK_NOTE": "Važna napomena",
+    "BANK_NOTE_DESC": "Molimo vas da nakon uplate pošaljete potvrdu na email ili Viber radi brže obrade porudžbine.",
+    "VIBER_CONTACT": "Viber: +381 64 123 4567",
+    "COPY_BANK_DETAILS": "Kopiraj bankovne podatke",
+    "PAYMENT_PURPOSE": "Svrha plaćanja",
+    "PAYMENT_PURPOSE_DESC": "Kupovina: {{documentName}} - {{userEmail}}"
   },
   "ABOUT": {
     "BACK": "Nazad na početnu",
@@ -677,6 +691,7 @@
     "LIMITATIONS": "Ograničenja:",
     "CONTACT_TITLE": "Imate pitanja o planovima pretplate?",
     "CONTACT_BUTTON": "Kontaktirajte nas",
+
     "PAYMENT": {
       "PROCESSING": "Obrađivanje plaćanja...",
       "SUCCESS": "Plaćanje uspešno!",

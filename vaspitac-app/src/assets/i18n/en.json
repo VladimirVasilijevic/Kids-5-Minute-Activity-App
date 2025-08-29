@@ -155,7 +155,21 @@
     "BANK_HOWTO_REFERENCE_DESC": "97 123-456789",
     "BANK_NOTE_TITLE": "Important Note",
     "BANK_NOTE_DESC": "Please send confirmation after payment via email or Viber for faster order processing.",
-    "COPY_PAYPAL": "Copy"
+    "COPY_PAYPAL": "Copy",
+    "PAYMENT_INSTRUCTIONS": "Payment Instructions",
+    "PAYMENT_DESCRIPTION": "Complete the payment using the following details and send proof of payment. Access will be approved as soon as possible.",
+    "BANK_TRANSFER": "Bank Transfer",
+    "BANK_TRANSFER_DESC": "For payment by bank transfer, please use the following details:",
+    "BANK_NAME": "Serbian Bank",
+    "BANK_ACCOUNT": "160-123456789-12",
+    "BANK_RECIPIENT": "Ana Vaspitac",
+    "USER": "User",
+    "BANK_NOTE": "Important Note",
+    "BANK_NOTE_DESC": "Please send confirmation after payment via email or Viber for faster order processing.",
+    "VIBER_CONTACT": "Viber: +381 64 123 4567",
+    "COPY_BANK_DETAILS": "Copy Bank Details",
+    "PAYMENT_PURPOSE": "Payment Purpose",
+    "PAYMENT_PURPOSE_DESC": "Purchase: {{documentName}} - {{userEmail}}"
   },
   "ABOUT": {
     "BACK": "Back to home",
@@ -680,6 +694,7 @@
     "LIMITATIONS": "Limitations:",
     "CONTACT_TITLE": "Have questions about subscription plans?",
     "CONTACT_BUTTON": "Contact us",
+
     "PAYMENT": {
       "PROCESSING": "Processing payment...",
       "SUCCESS": "Payment successful!",

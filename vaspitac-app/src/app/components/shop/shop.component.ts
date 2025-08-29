@@ -465,6 +465,20 @@ export class ShopComponent implements OnInit {
   }
 
   /**
+   * Copies bank details to clipboard
+   */
+  copyBankDetails(): void {
+    const bankDetails = `Account Number: ${this._translate.instant('SHOP.BANK_ACCOUNT')}
+Recipient: ${this._translate.instant('SHOP.BANK_RECIPIENT')}`;
+    
+    navigator.clipboard.writeText(bankDetails).then(() => {
+      // Bank details copied successfully
+    }).catch(err => {
+      console.error('Failed to copy bank details:', err);
+    });
+  }
+
+  /**
    * Gets file extension from MIME type or filename
    */
   getFileExtension(fileType: string): string {
@@ -501,6 +515,9 @@ export class ShopComponent implements OnInit {
       this.showLoginRequiredModal();
       return;
     }
+
+    // Set the selected file for the payment modal
+    this.selectedFile = file;
 
     // Create purchase record
     const purchaseData: PurchaseFormData = {

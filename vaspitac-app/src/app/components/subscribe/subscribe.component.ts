@@ -24,6 +24,8 @@ export class SubscribeComponent implements OnInit, OnDestroy {
   showSuccessMessage = false;
   showErrorMessage = false;
   errorMessage = '';
+  showPaymentModal = false;
+  selectedPlan: SubscriptionPlan | null = null;
   private languageSubscription?: Subscription;
 
   constructor(
@@ -72,7 +74,8 @@ export class SubscribeComponent implements OnInit, OnDestroy {
     }
 
     if (planId === 'premium') {
-      this.processMockPayment();
+      this.selectedPlan = this.plans.find(plan => plan.id === planId) || null;
+      this.openPaymentModal();
     }
   }
 
@@ -139,6 +142,61 @@ export class SubscribeComponent implements OnInit, OnDestroy {
            userProfile.role === UserRole.ADMIN ||
            (userProfile.subscription?.status === 'active' || 
             userProfile.subscription?.status === 'trial');
+  }
+
+  /**
+   * Opens the payment instructions modal
+   */
+  openPaymentModal(): void {
+    this.showPaymentModal = true;
+  }
+
+  /**
+   * Closes the payment instructions modal
+   */
+  closePaymentModal(): void {
+    this.showPaymentModal = false;
+    this.selectedPlan = null;
+  }
+
+  /**
+   * Copies PayPal link to clipboard
+   */
+  copyPayPalLink(): void {
+    const paypalLink = 'paypal.me/anavaspitac';
+    navigator.clipboard.writeText(paypalLink).then(() => {
+      // PayPal link copied successfully
+    }).catch(err => {
+      console.error('Failed to copy PayPal link:', err);
+    });
+  }
+
+  /**
+   * Copies bank details to clipboard
+   */
+  copyBankDetails(): void {
+    const bankDetails = `Account Number: ${this._translate.instant('SHOP.BANK_ACCOUNT')}
+Recipient: ${this._translate.instant('SHOP.BANK_RECIPIENT')}`;
+    
+    navigator.clipboard.writeText(bankDetails).then(() => {
+      // Bank details copied successfully
+    }).catch(err => {
+      console.error('Failed to copy bank details:', err);
+    });
+  }
+
+  /**
+   * Gets the current user's email
+   * @returns User email or empty string if not available
+   */
+  getUserEmail(): string {
+    let userEmail = '';
+    this.userProfile$.subscribe(profile => {
+      if (profile?.email) {
+        userEmail = profile.email;
+      }
+    }).unsubscribe();
+    return userEmail;
   }
 
   /**
