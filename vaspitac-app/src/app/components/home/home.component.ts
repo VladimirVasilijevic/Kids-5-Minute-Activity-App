@@ -193,8 +193,6 @@ export class HomeComponent implements OnInit {
     // Get current user profile from observable
     this.userProfile$.subscribe(userProfile => {
       if (this.isCategoryLocked(category, userProfile)) {
-        // Store the intended destination for after login
-        sessionStorage.setItem('intendedDestination', `/activities?category=${category.id}`);
         // Redirect to subscribe page for locked categories
         this._router.navigate(['/subscribe']).then((): void => this.scrollToTop());
       } else {
