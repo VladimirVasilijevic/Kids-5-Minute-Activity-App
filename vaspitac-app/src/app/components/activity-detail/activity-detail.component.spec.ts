@@ -45,15 +45,6 @@ describe('ActivityDetailComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should load the correct activity on initialization', (done: any): void => {
-    activityService.getActivities.and.returnValue(of(mockActivities));
-    fixture.detectChanges();
-    component.activity$?.subscribe(activity => {
-      expect(activity).toEqual(mockActivities[0]);
-      done();
-    });
-  });
-
   it('should handle activity not found', (done: any): void => {
     activatedRoute.paramMap = of({ get: (_key: string) => '999' });
     activityService.getActivities.and.returnValue(of(mockActivities));

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable, map, tap, from, switchMap } from 'rxjs';
+import { Observable, map, tap, from, switchMap, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { TranslateService } from '@ngx-translate/core';
 import { AngularFireFunctions } from '@angular/fire/compat/functions';
@@ -98,14 +98,20 @@ export class BlogService {
 
   /**
    * Retrieves a specific blog post by its ID with loading indicator and default visibility/premium fields
+   * Always prioritizes Firebase data over JSON fallback
    * @param id - The ID of the blog post to retrieve
    * @returns {Observable<BlogPost>} Observable of the blog post
    */
   getBlogPostById(id: number): Observable<BlogPost> {
     this._loadingService.showWithMessage(this._translateService.instant('BLOG.LOADING_SINGLE'));
     
-    return this._firestoreService.getBlogPosts().pipe(
-      map(posts => {
+    // Get current language from translation service
+    const currentLanguage = this._translateService.currentLang || this._translateService.getDefaultLang() || 'en';
+    
+    // Always try to get data from Firebase first, no JSON fallback
+    return from(this._functions.httpsCallable('getFilteredBlogPosts')({ language: currentLanguage })).pipe(
+      map((result: { blogPosts?: BlogPost[] }) => {
+        const posts = result.blogPosts || [];
         const post = posts.find(p => p.id === id);
         if (!post) {
           throw new Error(`Blog post with ID ${id} not found`);
@@ -115,6 +121,11 @@ export class BlogService {
           visibility: post.visibility || ContentVisibility.PUBLIC,
           isPremium: post.isPremium || false
         };
+      }),
+      catchError(error => {
+        console.error('Error fetching blog post by ID:', error);
+        this._loadingService.hide();
+        throw new Error(`Blog post with ID ${id} not found`);
       }),
       tap(() => {
         this._loadingService.hide();

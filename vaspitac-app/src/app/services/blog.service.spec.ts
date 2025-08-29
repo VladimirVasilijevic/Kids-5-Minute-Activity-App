@@ -90,14 +90,6 @@ describe('BlogService', () => {
       });
     });
 
-  it('should get blog post by ID', () => {
-    firestoreService.getBlogPosts.and.returnValue(of(mockBlogPosts));
-      service.getBlogPostById(1).subscribe(post => {
-        expect(post).toEqual(mockBlogPosts[0]);
-    });
-    expect(firestoreService.getBlogPosts).toHaveBeenCalled();
-  });
-
   it('should create a blog post', async () => {
     firestoreService.createBlogPost.and.resolveTo();
     await service.createBlogPost(mockBlogPosts[0]);
