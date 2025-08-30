@@ -28,8 +28,9 @@
         <!-- Language Switcher -->
         <button
           class="p-2 flex items-center gap-1 md:gap-2 rounded hover:bg-green-50 transition"
-          (click)="switchLanguage()"
-        >
+          >
+          <!-- disable language switcher for now -->
+          <!-- (click)="switchLanguage()" -->
           <span class="text-base md:text-lg">{{ currentLang === 'sr' ? '🇷🇸' : '🇺🇸' }}</span>
           <svg
             class="h-3 w-3 md:h-4 md:w-4 text-green-600"
