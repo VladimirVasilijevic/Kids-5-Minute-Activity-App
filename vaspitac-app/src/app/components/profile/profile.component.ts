@@ -297,11 +297,19 @@ export class ProfileComponent implements OnInit {
         updateData.avatarUrl = profileData.avatarUrl;
       }
 
-      // Update the user profile in Firestore (merge will only update provided fields)
-      await this._userService.setUserProfile({
+      // Prepare the complete profile data
+      const completeProfileData = {
         ...this.selectedUser,
         ...updateData
-      });
+      };
+      
+      // Filter out undefined and null values to prevent Firebase errors
+      const filteredProfileData = Object.fromEntries(
+        Object.entries(completeProfileData).filter(([_, value]) => value !== undefined && value !== null)
+      ) as unknown as UserProfile;
+      
+      // Update the user profile in Firestore (merge will only update provided fields)
+      await this._userService.setUserProfile(filteredProfileData);
       
       // Update Firebase Auth display name and photo URL
       const currentUser = await this._auth.getCurrentUser();
@@ -326,11 +334,8 @@ export class ProfileComponent implements OnInit {
         });
       }
       
-      // Update the local user profile
-      this.selectedUser = {
-        ...this.selectedUser,
-        ...updateData
-      };
+      // Update the local user profile with the filtered data
+      this.selectedUser = filteredProfileData;
       
       // Close the modal
       this.closeEditProfile();

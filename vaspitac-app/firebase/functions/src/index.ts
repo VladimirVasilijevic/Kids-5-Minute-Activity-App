@@ -684,17 +684,7 @@ export const verifyFileAccess = onCall(async (request) => {
       .limit(1)
       .get();
 
-    if (accessDoc.empty) {
-      // Let's also check what records exist for this user
-      const allUserAccess = await db
-        .collection('user_access')
-        .where('userId', '==', userId)
-        .get();
-      
-      allUserAccess.docs.forEach(doc => {
-        const data = doc.data();
-      });
-      
+    if (accessDoc.empty) {      
       // Instead of throwing an error, return a response indicating no access
       return {
         hasAccess: false,
@@ -856,6 +846,12 @@ export const grantAdminAccess = onCall(async (request) => {
     
     // Verify the record was created by reading it back
     const createdDoc = await accessRef.get();
+    
+    if (!createdDoc.exists) {
+      throw new Error('Failed to create user access record');
+    }
+    
+    console.log('User access record created successfully:', createdDoc.id);
 
     return {
       success: true,

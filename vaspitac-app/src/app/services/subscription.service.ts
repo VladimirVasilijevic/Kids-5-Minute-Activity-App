@@ -83,7 +83,12 @@ export class SubscriptionService {
           updatedAt: new Date().toISOString()
         };
 
-        return from(this._afs.doc<UserProfile>(`users/${userId}`).set(updatedProfile)).pipe(
+        // Filter out undefined and null values to prevent Firebase errors
+        const filteredProfile = Object.fromEntries(
+          Object.entries(updatedProfile).filter(([_, value]) => value !== undefined && value !== null)
+        ) as unknown as UserProfile;
+        
+        return from(this._afs.doc<UserProfile>(`users/${userId}`).set(filteredProfile)).pipe(
           map(() => subscription),
           tap(() => {
             this._loadingService.hide();
@@ -126,7 +131,12 @@ export class SubscriptionService {
           updatedAt: new Date().toISOString()
         };
 
-        return from(this._afs.doc<UserProfile>(`users/${userId}`).set(updatedProfile)).pipe(
+        // Filter out undefined and null values to prevent Firebase errors
+        const filteredProfile = Object.fromEntries(
+          Object.entries(updatedProfile).filter(([_, value]) => value !== undefined && value !== null)
+        ) as unknown as UserProfile;
+        
+        return from(this._afs.doc<UserProfile>(`users/${userId}`).set(filteredProfile)).pipe(
           map(() => updatedSubscription),
           tap(() => {
             this._loadingService.hide();
@@ -187,7 +197,12 @@ export class SubscriptionService {
           updatedAt: new Date().toISOString()
         };
 
-        return from(this._afs.doc<UserProfile>(`users/${userId}`).set(updatedProfile)).pipe(
+        // Filter out undefined and null values to prevent Firebase errors
+        const filteredProfile = Object.fromEntries(
+          Object.entries(updatedProfile).filter(([_, value]) => value !== undefined && value !== null)
+        ) as unknown as UserProfile;
+        
+        return from(this._afs.doc<UserProfile>(`users/${userId}`).set(filteredProfile)).pipe(
           map(() => updatedSubscription),
           tap(() => {
             this._loadingService.hide();
