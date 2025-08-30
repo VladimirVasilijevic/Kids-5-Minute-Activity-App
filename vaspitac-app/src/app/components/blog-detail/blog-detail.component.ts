@@ -3,6 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Observable, switchMap, combineLatest, of } from 'rxjs';
 import { map, startWith } from 'rxjs/operators';
 import { TranslateService } from '@ngx-translate/core';
+import { catchError } from 'rxjs/operators';
 
 import { BlogPost } from '../../models/blog-post.model';
 import { BlogService } from '../../services/blog.service';
@@ -38,6 +39,8 @@ export class BlogDetailComponent implements OnInit {
    */
   ngOnInit(): void {
     this.lang = this._translate.currentLang || this._translate.getDefaultLang() || 'sr';
+    
+    // Create observables for blog post, error, and loading states
     this.blogPost$ = combineLatest([
       this._route.paramMap.pipe(map((params) => params.get('id'))),
       this._translate.onLangChange.pipe(
@@ -47,8 +50,26 @@ export class BlogDetailComponent implements OnInit {
     ]).pipe(
       switchMap(([id, lang]) => {
         this.lang = lang;
-        if (!id) return of(undefined);
-        return this._blogService.getBlogPostById(Number(id));
+        
+        if (!id) {
+          this._router.navigate(['/blog']);
+          return of(undefined);
+        }
+        
+        const blogId = Number(id);
+        
+        if (isNaN(blogId) || blogId <= 0) {
+          this._router.navigate(['/blog']);
+          return of(undefined);
+        }
+        
+        return this._blogService.getBlogPostById(blogId).pipe(
+          catchError((error: Error) => {
+            // Navigate back to blog list on error
+            setTimeout(() => this._router.navigate(['/blog']), 2000);
+            return of(undefined);
+          })
+        );
       })
     );
   }

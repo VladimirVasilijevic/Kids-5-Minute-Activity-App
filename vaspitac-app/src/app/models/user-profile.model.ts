@@ -109,9 +109,9 @@ export enum Permission {
   // eslint-disable-next-line no-unused-vars
   ACCESS_PREMIUM_BLOG = 'access_premium_blog',
   // eslint-disable-next-line no-unused-vars
-  ACCESS_TIPS = 'access_tips',
+
   // eslint-disable-next-line no-unused-vars
-  ACCESS_PREMIUM_TIPS = 'access_premium_tips',
+
   
   // Download permissions
   // eslint-disable-next-line no-unused-vars

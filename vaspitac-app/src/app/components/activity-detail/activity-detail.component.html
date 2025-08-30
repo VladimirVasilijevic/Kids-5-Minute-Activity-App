@@ -14,26 +14,18 @@
     </div>
 
     <div class="p-3 md:p-4 space-y-4 md:space-y-6 max-w-3xl mx-auto">
-      <!-- Video/Image Section -->
-      <div class="overflow-hidden bg-white shadow-sm border border-green-100 rounded-xl">
-        <div class="relative h-40 md:h-48 bg-gray-100">
-          <ng-container *ngIf="activity.videoUrl; else showImage">
-            <video
-              [src]="activity.videoUrl"
-              controls
-              class="w-full h-full object-cover rounded-lg"
-              [attr.title]="activity.title"
-            ></video>
-          </ng-container>
-          <ng-template #showImage>
-            <img
-              [src]="activity.imageUrl"
-              [alt]="activity.title"
-              class="w-full h-full object-cover"
-            />
-          </ng-template>
+      <!-- Image Section (always show if exists) -->
+      <div *ngIf="activity.imageUrl" class="overflow-hidden bg-white shadow-sm border border-green-100 rounded-xl">
+        <div class="relative h-64 md:h-80 bg-gray-100">
+          <img
+            [src]="activity.imageUrl"
+            [alt]="activity.title"
+            class="w-full h-full object-contain"
+          />
         </div>
       </div>
+
+      
 
       <!-- Activity Info Card -->
       <div class="bg-white shadow-sm border border-green-100 rounded-xl p-3 md:p-4">
@@ -104,6 +96,59 @@
         </h3>
         <div class="prose prose-sm max-w-none">
           <markdown [data]="activity.instructions"></markdown>
+        </div>
+      </div>
+
+      <!-- Video Section (show below text content if exists) -->
+      <div *ngIf="activity.videoUrl" class="overflow-hidden bg-white shadow-sm border border-green-100 rounded-xl">
+        <div class="p-3 md:p-4 border-b border-green-100">
+          <h3 class="text-sm md:text-base font-semibold text-gray-900">{{ 'ACTIVITY.VIDEO' | translate }}</h3>
+        </div>
+        <div class="video-container loading" style="padding-bottom: 56.25%;">
+          <iframe
+            *ngIf="isVideoEmbeddable(activity.videoUrl)"
+            [src]="getVideoEmbedUrl(activity.videoUrl) | safe:'resourceUrl'"
+            class="absolute top-0 left-0 w-full h-full rounded-lg"
+            frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen
+            loading="lazy"
+            (load)="onIframeLoad($event)"
+            (error)="onIframeError($event)"
+          ></iframe>
+          <video
+            *ngIf="!isVideoEmbeddable(activity.videoUrl) && isVideoPlayable(activity.videoUrl)"
+            [src]="activity.videoUrl"
+            class="absolute top-0 left-0 w-full h-full rounded-lg"
+            controls
+            preload="metadata"
+            loading="lazy"
+            (loadstart)="onVideoLoadStart($event)"
+            (canplay)="onVideoCanPlay($event)"
+            (error)="onVideoError($event)"
+          >
+            {{ 'ACTIVITY.VIDEO_NOT_SUPPORTED' | translate }}
+          </video>
+          <div
+            *ngIf="!isVideoPlayable(activity.videoUrl)"
+            class="absolute top-0 left-0 w-full h-full flex items-center justify-center bg-gray-100 rounded-lg"
+          >
+            <div class="text-center p-6">
+              <svg class="mx-auto h-12 w-12 text-gray-400 mb-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 002 2z" />
+              </svg>
+              <p class="text-gray-600 text-sm">{{ 'ACTIVITY.VIDEO_UNAVAILABLE' | translate }}</p>
+              <a
+                *ngIf="isVideoEmbeddable(activity.videoUrl)"
+                [href]="activity.videoUrl"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="inline-block mt-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm"
+              >
+                {{ 'ACTIVITY.WATCH_ON_PLATFORM' | translate }}
+              </a>
+            </div>
+          </div>
         </div>
       </div>
     </div>

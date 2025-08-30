@@ -229,12 +229,46 @@
                 <div *ngIf="formErrors['instructions']" class="text-red-500 text-xs mt-1">{{ formErrors['instructions'] }}</div>
               </div>
 
-              <!-- Media Upload Section (Image or Video) -->
+              <!-- Media Section (Image or Video) -->
               <div>
                 <label class="block text-xs sm:text-sm font-medium mb-2">{{ 'ADMIN.COVER_IMAGE' | translate }} / Video</label>
+                
+                <!-- URL Input Fields -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                  <!-- Image URL Input -->
+                  <div>
+                    <label class="block text-xs font-medium text-gray-600 mb-1">{{ 'ADMIN.IMAGE_URL' | translate }}</label>
+                    <input
+                      type="url"
+                      [(ngModel)]="formData.imageUrl"
+                      name="imageUrl"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 text-sm"
+                      placeholder="https://example.com/image.jpg"
+                    />
+                    <p class="text-xs text-gray-400 mt-1">{{ 'ADMIN.OR_UPLOAD_FILE' | translate }}</p>
+                  </div>
+                  
+                  <!-- Video URL Input -->
+                  <div>
+                    <label class="block text-xs font-medium text-gray-600 mb-1">{{ 'ADMIN.VIDEO_URL' | translate }}</label>
+                    <input
+                      type="url"
+                      [(ngModel)]="formData.videoUrl"
+                      name="videoUrl"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 text-sm"
+                      placeholder="https://youtube.com/watch?v=..."
+                    />
+                    <p class="text-xs text-gray-400 mt-1">{{ 'ADMIN.OR_UPLOAD_FILE' | translate }}</p>
+                  </div>
+                </div>
+
                 <!-- Image Preview -->
-                <div *ngIf="imagePreview" class="mb-4">
-                  <img [src]="imagePreview" alt="Activity preview" class="w-32 h-32 object-cover rounded-lg border border-gray-300" />
+                <div *ngIf="imagePreview || formData.imageUrl" class="mb-4">
+                  <img 
+                    [src]="imagePreview || formData.imageUrl" 
+                    alt="Activity preview" 
+                    class="w-32 h-32 object-cover rounded-lg border border-gray-300" 
+                  />
                   <button
                     type="button"
                     (click)="removeImage()"
@@ -243,9 +277,14 @@
                     {{ 'ADMIN.REMOVE_IMAGE' | translate }}
                   </button>
                 </div>
+                
                 <!-- Video Preview -->
-                <div *ngIf="videoPreview" class="mb-4">
-                  <video [src]="videoPreview" controls class="w-64 h-36 rounded-lg border border-gray-300"></video>
+                <div *ngIf="videoPreview || formData.videoUrl" class="mb-4">
+                  <video 
+                    [src]="videoPreview || formData.videoUrl" 
+                    controls 
+                    class="w-64 h-36 rounded-lg border border-gray-300"
+                  ></video>
                   <button
                     type="button"
                     (click)="removeVideo()"
@@ -254,17 +293,18 @@
                     {{ 'ADMIN.REMOVE_VIDEO' | translate }}
                   </button>
                 </div>
+                
                 <!-- Upload Area -->
                 <div class="flex flex-col sm:flex-row gap-4">
                   <div class="flex-1">
                     <div
                       class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-green-500 transition-colors"
-                      [class.opacity-50]="videoPreview"
+                      [class.opacity-50]="videoPreview || formData.videoUrl"
                       (dragover)="onDragOver($event)"
                       (drop)="onDrop($event)"
                     >
-                      <div *ngIf="!imagePreview && !isUploadingImage">
-                        <label for="image-upload" class="cursor-pointer bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg text-sm" [class.opacity-50]="videoPreview">
+                      <div *ngIf="!imagePreview && !formData.imageUrl && !isUploadingImage">
+                        <label for="image-upload" class="cursor-pointer bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg text-sm" [class.opacity-50]="videoPreview || formData.videoUrl">
                           Choose Image
                         </label>
                         <input
@@ -273,10 +313,10 @@
                           accept="image/*"
                           (change)="onImageSelected($event)"
                           class="hidden"
-                          [disabled]="videoPreview"
+                          [disabled]="videoPreview || formData.videoUrl"
                         />
-                                          <p class="text-xs text-gray-500 mt-2">{{ 'ADMIN.OR_DRAG_DROP' | translate }}</p>
-                  <p class="text-xs text-gray-400">{{ 'ADMIN.IMAGE_FORMATS' | translate }}</p>
+                        <p class="text-xs text-gray-500 mt-2">{{ 'ADMIN.OR_DRAG_DROP' | translate }}</p>
+                        <p class="text-xs text-gray-400">{{ 'ADMIN.IMAGE_FORMATS' | translate }}</p>
                       </div>
                       <div *ngIf="isUploadingImage" class="flex items-center justify-center">
                         <svg class="animate-spin h-8 w-8 text-green-600" fill="none" viewBox="0 0 24 24">
@@ -290,10 +330,10 @@
                   <div class="flex-1">
                     <div
                       class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-green-500 transition-colors"
-                      [class.opacity-50]="imagePreview"
+                      [class.opacity-50]="imagePreview || formData.imageUrl"
                     >
-                      <div *ngIf="!videoPreview && !isUploadingVideo">
-                        <label for="video-upload" class="cursor-pointer bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg text-sm" [class.opacity-50]="imagePreview">
+                      <div *ngIf="!videoPreview && !formData.videoUrl && !isUploadingVideo">
+                        <label for="video-upload" class="cursor-pointer bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg text-sm" [class.opacity-50]="imagePreview || formData.imageUrl">
                           Choose Video
                         </label>
                         <input
@@ -302,7 +342,7 @@
                           accept="video/*"
                           (change)="onVideoSelected($event)"
                           class="hidden"
-                          [disabled]="imagePreview"
+                          [disabled]="imagePreview || formData.imageUrl"
                         />
                         <p class="text-xs text-gray-400 mt-2">MP4, WebM up to 20MB</p>
                       </div>

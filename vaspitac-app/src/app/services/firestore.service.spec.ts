@@ -6,13 +6,12 @@ import { of, throwError } from 'rxjs';
 import { mockActivities } from '../../test-utils/mock-activities';
 import { mockCategories } from '../../test-utils/mock-categories';
 import { mockBlogPosts } from '../../test-utils/mock-blog-posts';
-import { mockTips } from '../../test-utils/mock-tips';
+
 
 import { LanguageService } from './language.service';
 import { FirestoreService } from './firestore.service';
 import { Category } from '../models/category.model';
 import { BlogPost } from '../models/blog-post.model';
-import { Tip } from '../models/tip.model';
 
 describe('FirestoreService', () => {
   let service: FirestoreService;
@@ -85,28 +84,9 @@ describe('FirestoreService', () => {
     });
   });
 
-  it('should get tips from Firestore', (done) => {
-    langSpy.getLanguage.and.returnValue(of('en'));
-    const valueChangesSpy = jasmine.createSpy().and.returnValue(of([mockTips[0]]));
-    afsSpy.collection.and.returnValue({ valueChanges: valueChangesSpy } as unknown as AngularFirestoreCollection<Tip>);
-    service.getTips().subscribe((tips) => {
-      expect(tips).toEqual([mockTips[0] as Tip]);
-      done();
-    });
-  });
 
-  it('should fallback to JSON for tips if Firestore fails', (done) => {
-    langSpy.getLanguage.and.returnValue(of('en'));
-    const valueChangesSpy = jasmine
-      .createSpy()
-      .and.returnValue(throwError(() => new Error('fail')));
-    afsSpy.collection.and.returnValue({ valueChanges: valueChangesSpy } as unknown as AngularFirestoreCollection<Tip>);
-    httpSpy.get.and.returnValue(of([mockTips[1]]));
-    service.getTips().subscribe((tips) => {
-      expect(tips).toEqual([mockTips[1] as Tip]);
-      done();
-    });
-  });
+
+
 
   it('should get activities from Firestore', (done) => {
     langSpy.getLanguage.and.returnValue(of('en'));

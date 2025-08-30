@@ -41,8 +41,7 @@ export const mockSubscriber: UserProfile = {
     Permission.ACCESS_PREMIUM_ACTIVITIES,
     Permission.ACCESS_BLOG_POSTS,
     Permission.ACCESS_PREMIUM_BLOG,
-    Permission.ACCESS_TIPS,
-    Permission.ACCESS_PREMIUM_TIPS,
+    
     Permission.DOWNLOAD_PDF_GUIDES,
     Permission.DOWNLOAD_VIDEO_MATERIALS,
     Permission.EDIT_PROFILE,
@@ -74,7 +73,6 @@ export const mockTrialUser: UserProfile = {
   permissions: [
     Permission.ACCESS_ALL_ACTIVITIES,
     Permission.ACCESS_BLOG_POSTS,
-    Permission.ACCESS_TIPS,
     Permission.EDIT_PROFILE,
     Permission.VIEW_PROFILE,
     Permission.MANAGE_OWN_SUBSCRIPTION

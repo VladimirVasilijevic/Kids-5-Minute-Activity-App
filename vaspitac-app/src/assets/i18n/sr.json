@@ -7,7 +7,7 @@
     "HOME": "Početna",
     "ACTIVITIES": "Aktivnosti",
     "BLOG": "Blog",
-    "TIPS": "Saveti",
+  
     "SHOP": "Prodavnica",
     "ABOUT": "O meni"
   },
@@ -22,24 +22,25 @@
     "CAT_SHOP_DESC": "Edukativni materijali i vodiči za aktivnosti",
     "CAT_SUBSCRIBE_TITLE": "Pretplata",
     "CAT_SUBSCRIBE_DESC": "Izaberite plan pretplate koji vam odgovara",
-    "CAT_BLOG_TITLE": "Blog",
+    "CAT_BLOG_TITLE": "Saveti",
     "CAT_BLOG_DESC": "Članci o roditeljstvu i razvoju dece",
-    "CAT_TIPS_TITLE": "Saveti",
-    "CAT_TIPS_DESC": "Korisni saveti za svakodnevno vaspitanje",
+
     "CAT_PHYSICAL_TITLE": "Fizičke aktivnosti",
     "CAT_PHYSICAL_DESC": "Aktivnosti za razvoj motorike i pokret",
-    "CAT_CREATIVE_TITLE": "Kreativne aktivnosti",
+    "CAT_CREATIVE_TITLE": "Likovne aktivnosti",
     "CAT_CREATIVE_DESC": "Umetnost, crtanje i kreativne igre",
-    "CAT_EDUCATIONAL_TITLE": "Edukativne aktivnosti",
-    "CAT_EDUCATIONAL_DESC": "Učenje kroz igru i zabavu",
+    "CAT_MATHEMATICS_TITLE": "Matematičke aktivnosti",
+    "CAT_MATHEMATICS_DESC": "Brojevi, brojanje i matematičke igre",
     "CAT_MUSICAL_TITLE": "Muzičke aktivnosti",
     "CAT_MUSICAL_DESC": "Muzika, ritam i pevanje",
-    "CAT_NATURE_TITLE": "Priroda",
-    "CAT_NATURE_DESC": "Istraživanje i upoznavanje prirode",
-    "LOGIN_PROMPT": "Prijavite se da biste pristupili svom profilu i personalizovanim funkcijama."
+    "CAT_SPEAKING_TITLE": "Govorne aktivnosti",
+    "CAT_SPEAKING_DESC": "Razvoj govora i komunikacije",
+    "LOGIN_PROMPT": "Prijavite se da biste pristupili svom profilu i personalizovanim funkcijama.",
+    "LOCKED_CATEGORY_MESSAGE": "Pretplati se da otključaš"
   },
   "ACTIVITIES": {
     "TITLE": "Aktivnosti",
+    "SUBTITLE": "Izaberite iz naše kolekcije zabavnih i edukativnih aktivnosti",
     "BACK": "Nazad na početnu",
     "EMPTY": "Nema dostupnih aktivnosti.",
     "START": "Započni aktivnost",
@@ -51,7 +52,11 @@
     "DELETING": "Brisanje aktivnosti..."
   },
   "ACTIVITY": {
+    "VIDEO": "Video",
     "VIDEO_NOT_AVAILABLE": "Video nije dostupan",
+    "VIDEO_NOT_SUPPORTED": "Video nije podržan",
+    "VIDEO_UNAVAILABLE": "Video nedostupan",
+    "WATCH_ON_PLATFORM": "Pogledaj na platformi",
     "NOT_FOUND": "Aktivnost nije pronađena.",
     "PLAY_VIDEO": "Pokreni video",
     "MATERIALS_TITLE": "Potreban materijal",
@@ -76,7 +81,7 @@
     "PDF_CREATIVE": "Kreativne igre",
     "VIDEO_MATERIALS": "Video materijali",
     "VIDEO_DEMO": "Demonstracije aktivnosti",
-    "VIDEO_TIPS": "Saveti za roditelje",
+
     "VIDEO_CONSULT": "Online konsultacije",
     "VIDEO_WEBINAR": "Webinari",
     "PAYPAL_TITLE": "PayPal plaćanje",
@@ -97,7 +102,7 @@
     "BANK_HOWTO_RECIPIENT": "2. Primalac: ",
     "BANK_HOWTO_RECIPIENT_DESC": "Ana Petrović",
     "BANK_HOWTO_ACCOUNT": "3. Broj računa: ",
-    "BANK_HOWTO_ACCOUNT_DESC": "160-123456789-12",
+    "BANK_HOWTO_ACCOUNT_DESC": "205-9001025650416-10",
     "MARKETPLACE_TITLE": "Prodavnica materijala",
     "MARKETPLACE_DESCRIPTION": "Edukativni materijali i vodiči za aktivnosti sa decom do 7 godina",
     "BACK_TO_HOME": "Nazad na početnu",
@@ -121,6 +126,7 @@
     "LOAD_MORE": "Učitaj više",
     "DOWNLOAD_FILE": "Preuzmi fajl",
     "BUY": "Kupi",
+    "BUY_NOW": "Kupi sada",
     "PURCHASE_TITLE": "Kupovina materijala",
     "PAYMENT_NOTE": "Napomena: Plaćanje se vrši ručno preko bankovnog transfera ili paypal. Nakon što pošaljete dokaz o uplati, naš tim će proveriti plaćanje i odobriti pristup materijalu u najkracem roku.",
     "CANCEL": "Otkaži",
@@ -142,7 +148,7 @@
     "STEPS": "Koraci",
     "STEP_1": "Izvršite uplatu pomoću podataka iznad",
     "STEP_2": "Napravite screenshot potvrde o uplati",
-    "STEP_3": "Pošaljite screenshot na Viber: +381 64 123 4567",
+    "STEP_3": "Pošaljite screenshot na Viber: +381 61 634 9493",
     "STEP_4": "Pristup će biti odobren u najkracem roku",
     "BACK": "Nazad",
     "SENT_PROOF": "Poslao/la sam dokaz",
@@ -150,7 +156,21 @@
     "BANK_HOWTO_REFERENCE_DESC": "97 123-456789",
     "BANK_NOTE_TITLE": "Napomena",
     "BANK_NOTE_DESC": "Molimo vas da nakon uplate pošaljete potvrdu na email ili Viber radi brže obrade porudžbine.",
-    "COPY_PAYPAL": "Kopiraj"
+    "COPY_PAYPAL": "Kopiraj",
+    "PAYMENT_INSTRUCTIONS": "Instrukcije za plaćanje",
+    "PAYMENT_DESCRIPTION": "Izvršite uplatu na sledeći račun i pošaljite dokaz o plaćanju. Pristup će biti odobren u najkracem roku.",
+    "BANK_TRANSFER": "Bankovski Transfer",
+    "BANK_TRANSFER_DESC": "Za plaćanje uplatnicom, molimo vas da koristite sledeće podatke:",
+    "BANK_NAME": "Srpska Banka",
+    "BANK_ACCOUNT": "205-9001025650416-10",
+    "BANK_RECIPIENT": "Ana Vaspitac",
+    "USER": "Korisnik",
+    "BANK_NOTE": "Važna napomena",
+    "BANK_NOTE_DESC": "Molimo vas da nakon uplate pošaljete potvrdu na email ili Viber radi brže obrade porudžbine.",
+    "VIBER_CONTACT": "Viber: +381 61 634 9493",
+    "COPY_BANK_DETAILS": "Kopiraj bankovne podatke",
+    "PAYMENT_PURPOSE": "Svrha plaćanja",
+    "PAYMENT_PURPOSE_DESC": "Kupovina: {{documentName}} - {{userEmail}}"
   },
   "ABOUT": {
     "BACK": "Nazad na početnu",
@@ -170,6 +190,7 @@
     "PRESENT": "sadašnjost",
     "CONTACT_TITLE": "Kontakt",
     "LOCATION": "Beograd, Srbija",
+    "SOCIAL_NETWORKS": "Društvene mreže",
     "LOADING": "Učitavanje sadržaja o meni..."
   },
   "BLOG": {
@@ -194,23 +215,7 @@
     "WATCH_ON_PLATFORM": "Pogledaj na platformi",
     "VIDEO_INDICATOR": "Video"
   },
-  "TIPS": {
-    "BACK": "Nazad na početnu",
-    "QUICK_TITLE": "Brzi saveti",
-    "QUICK_SUBTITLE": "Jednostavni saveti za svaki dan",
-    "TITLE": "Saveti",
-    "SUBTITLE": "Korisni saveti za svakodnevno vaspitanje",
-    "TIP1_TITLE": "Slušajte aktivno",
-    "TIP1_DESC": "Kad se dete obraća vama, zaustavite se i pokažite da slušate. To gradi poverenje i podstiče komunikaciju.",
-    "TIP2_TITLE": "Postavite rutinu",
-    "TIP2_DESC": "Redovna rutina pomaže deci da se osećaju sigurno i da razviju discipline. Budite konzistentni.",
-    "TIP3_TITLE": "Slavite mala dostignuća",
-    "TIP3_DESC": "Svaki napredak je važan. Pohvaljivanje motiviše dete i gradi samopoštovanje.",
-    "TIP4_TITLE": "Budite kreativni",
-    "TIP4_DESC": "Koristite svakodnevne situacije za učenje. Brojanje prilikom kuvanja, boje tokom šetnje...",
-    "EMPTY": "Nema dostupnih saveta.",
-    "LOADING": "Učitavanje saveta..."
-  },
+
   "SEARCH": {
     "PLACEHOLDER": "Pretražite aktivnosti i blogove...",
     "ACTIVITIES": "Aktivnosti",
@@ -438,6 +443,12 @@
     "ACTIONS": "Akcije",
     "EDIT": "Izmeni",
     "DELETE": "Obriši",
+    "GRANT_ACCESS": "Dodeli Pristup",
+    "GRANT_ACCESS_DESCRIPTION": "Dajte korisniku pristup ovom digitalnom fajlu",
+    "USER_EMAIL": "Email Korisnika",
+    "ADMIN_NOTES": "Admin Napomene",
+    "ADMIN_NOTES_PLACEHOLDER": "Unesite bilo koje napomene o dodeli pristupa...",
+    "GRANTING_ACCESS": "Dodeljivanje Pristupa...",
     "CONFIRM_DELETE": "Da li ste sigurni da želite da obrišete ovu stavku?",
     "MINUTES": "minuta",
     "SELECT_AGE_GROUP": "Izaberite starosnu grupu",
@@ -445,6 +456,7 @@
     "ENTER_DESCRIPTION": "Kratak opis aktivnosti",
     "ENTER_INSTRUCTIONS": "Korak 1: Prvo uradite ovo&#10;Korak 2: Zatim uradite ono&#10;Korak 3: Na kraju...",
     "ENTER_IMAGE_URL": "https://example.com/activity-image.jpg",
+    "OR_UPLOAD_FILE": "Ili učitajte fajl",
     "ENTER_BLOG_TITLE": "Unesite naslov bloga",
     "ENTER_EXCERPT": "Kratak izvod blog članka",
     "ENTER_CONTENT": "Napišite sadržaj bloga ovde...",
@@ -625,39 +637,29 @@
       "PRICE": "Besplatno",
       "DESCRIPTION": "Osnovne funkcionalnosti za početak",
       "FEATURES": [
-        "Pristup osnovnim aktivnostima",
-        "Ograničeni saveti",
-        "Čitanje blog članaka"
+        "Čitanje blogova i članaka",
+        "Osnovni saveti iz oblasti dečijeg razvoja"
       ],
-      "FEATURES.0": "Pristup osnovnim aktivnostima",
-      "FEATURES.1": "Ograničeni saveti",
-      "FEATURES.2": "Čitanje blog članaka",
       "LIMITATIONS": [
-        "Ograničen broj aktivnosti dnevno",
-        "Bez ekskluzivnog sadržaja"
+        "Bez aktivnosti",
+        "Bez pristup video materijalima sa detaljnim objašnjenjima i mogućnošću komentarisanja (budite deo zajednice)",
+        "Nema ekskluzivnog sadržaja i video materijala",
+        "Nema personalizovanih saveta"
       ],
-      "LIMITATIONS.0": "Ograničen broj aktivnosti dnevno",
-      "LIMITATIONS.1": "Bez ekskluzivnog sadržaja",
       "BUTTON": "Trenutni plan"
     },
     "PREMIUM": {
       "NAME": "Premium",
-      "PRICE": "$9.99/mesečno",
-      "DESCRIPTION": "Sve funkcionalnosti za ozbiljne roditelje",
+      "PRICE": "1000 RSD / 10 EUR (mesečno)",
+      "DESCRIPTION": "Sve funkcionalnosti",
       "FEATURES": [
-        "Neograničen pristup svim aktivnostima",
-        "Ekskluzivni sadržaj i aktivnosti",
-        "Personalizovani saveti",
-        "Prioritetna podrška",
-        "Offline pristup sadržaju",
-        "Mesečni vodiči za aktivnosti"
+        "Neograničen pristup svim aktivnostima (fizičkim, matematičkim, muzičkim i govornim za razvoj decu od 0–7 god.)",
+        "Pristup kartici „Saveti“ sa stručnim preporukama",
+        "Pristup video materijalima sa detaljnim objašnjenjima i mogućnošću komentarisanja (budite deo zajednice)",
+        "Personalizovani saveti – mogućnost da pošaljete e-mail ili poruku i dobijete individualizovan odgovor",
+        "Prioritetan pristup svim live i Zoom sastancima (poziv dobijate prvi)",
+        "Neograničen pristup novim sadržajima koji se dodaju svakog meseca"
       ],
-      "FEATURES.0": "Neograničen pristup svim aktivnostima",
-      "FEATURES.1": "Ekskluzivni sadržaj i aktivnosti",
-      "FEATURES.2": "Personalizovani saveti",
-      "FEATURES.3": "Prioritetna podrška",
-      "FEATURES.4": "Offline pristup sadržaju",
-      "FEATURES.5": "Mesečni vodiči za aktivnosti",
       "BUTTON": "Pretplati se",
       "POPULAR": "Najpopularniji"
     },
@@ -665,11 +667,13 @@
     "LIMITATIONS": "Ograničenja:",
     "CONTACT_TITLE": "Imate pitanja o planovima pretplate?",
     "CONTACT_BUTTON": "Kontaktirajte nas",
+
     "PAYMENT": {
       "PROCESSING": "Obrađivanje plaćanja...",
       "SUCCESS": "Plaćanje uspešno!",
       "ERROR": "Plaćanje neuspešno. Pokušajte ponovo.",
       "MOCK_MESSAGE": "Ovo je simulacija plaćanja. U produkciji bi se integrisalo sa Stripe-om."
-    }
+    },
+    "ENTER_YOUR_EMAIL": "Unesite vaš email"
   }
 }

@@ -158,6 +158,8 @@ export class AppComponent implements OnInit, OnDestroy {
   /** Close the auth modal */
   closeAuthModal(): void {
     this.showAuthModal = false;
+    // Redirect to home page when auth modal is closed
+    this._router.navigate(['/']);
   }
 
   /** Handle logout */

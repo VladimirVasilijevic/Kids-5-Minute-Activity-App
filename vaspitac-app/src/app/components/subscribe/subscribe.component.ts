@@ -20,10 +20,13 @@ import { switchMap } from 'rxjs/operators';
 export class SubscribeComponent implements OnInit, OnDestroy {
   plans: SubscriptionPlan[] = [];
   userProfile$: Observable<UserProfile | null> = of(null);
+  userEmail$: Observable<string> = of('');
   isProcessing = false;
   showSuccessMessage = false;
   showErrorMessage = false;
   errorMessage = '';
+  showPaymentModal = false;
+  selectedPlan: SubscriptionPlan | null = null;
   private languageSubscription?: Subscription;
 
   constructor(
@@ -37,6 +40,11 @@ export class SubscribeComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.userProfile$ = this._auth.user$.pipe(
       switchMap(user => user ? this._userService.getUserProfile(user.uid) : of(null))
+    );
+    
+    // Create userEmail$ observable from userProfile$
+    this.userEmail$ = this.userProfile$.pipe(
+      switchMap(profile => of(profile?.email || ''))
     );
     
     // Wait for translation service to be ready
@@ -72,7 +80,8 @@ export class SubscribeComponent implements OnInit, OnDestroy {
     }
 
     if (planId === 'premium') {
-      this.processMockPayment();
+      this.selectedPlan = this.plans.find(plan => plan.id === planId) || null;
+      this.openPaymentModal();
     }
   }
 
@@ -111,6 +120,13 @@ export class SubscribeComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Navigate to about page
+   */
+  navigateToAbout(): void {
+    this._router.navigate(['/about'], { fragment: 'contact' });
+  }
+
+  /**
    * Show success message
    * @param _message - Success message to display
    */
@@ -139,6 +155,47 @@ export class SubscribeComponent implements OnInit, OnDestroy {
            userProfile.role === UserRole.ADMIN ||
            (userProfile.subscription?.status === 'active' || 
             userProfile.subscription?.status === 'trial');
+  }
+
+  /**
+   * Opens the payment instructions modal
+   */
+  openPaymentModal(): void {
+    this.showPaymentModal = true;
+  }
+
+  /**
+   * Closes the payment instructions modal
+   */
+  closePaymentModal(): void {
+    this.showPaymentModal = false;
+    this.selectedPlan = null;
+  }
+
+  /**
+   * Copies PayPal link to clipboard
+   */
+  copyPayPalLink(): void {
+    const paypalLink = 'https://paypal.me/anavaspitac?country.x=RS&locale.x=en_US';
+    navigator.clipboard.writeText(paypalLink).then(() => {
+      // PayPal link copied successfully
+    }).catch(err => {
+      console.error('Failed to copy PayPal link:', err);
+    });
+  }
+
+  /**
+   * Copies bank details to clipboard
+   */
+  copyBankDetails(): void {
+    const bankDetails = `Account Number: ${this._translate.instant('SHOP.BANK_ACCOUNT')}
+Recipient: ${this._translate.instant('SHOP.BANK_RECIPIENT')}`;
+    
+    navigator.clipboard.writeText(bankDetails).then(() => {
+      // Bank details copied successfully
+    }).catch(err => {
+      console.error('Failed to copy bank details:', err);
+    });
   }
 
   /**

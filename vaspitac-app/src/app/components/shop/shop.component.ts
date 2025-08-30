@@ -3,11 +3,15 @@ import { Router } from '@angular/router';
 import { Observable, of, combineLatest, from } from 'rxjs';
 import { map, switchMap, catchError } from 'rxjs/operators';
 import { TranslateService } from '@ngx-translate/core';
+import { AngularFireFunctions } from '@angular/fire/compat/functions';
 import { AuthService } from '../../services/auth.service';
 import { UserService } from '../../services/user.service';
 import { UserProfile } from '../../models/user-profile.model';
 import { DigitalFile } from '../../models/digital-file.model';
 import { DigitalFileService } from '../../services/digital-file.service';
+import { UserAccessService } from '../../services/user-access.service';
+import { PurchaseService } from '../../services/purchase.service';
+import { PurchaseFormData } from '../../models/purchase.model';
 
 import { formatFileSize } from '../../models/marketplace.utils';
 
@@ -20,6 +24,8 @@ import { formatFileSize } from '../../models/marketplace.utils';
   styleUrls: ['./shop.component.scss'],
 })
 export class ShopComponent implements OnInit {
+
+  
   // User authentication
   userProfile$: Observable<UserProfile | null> = of(null);
   isLoggedIn = false;
@@ -32,12 +38,8 @@ export class ShopComponent implements OnInit {
   // Search and filters
   searchTerm = '';
   selectedLanguage = '';
-  selectedAccessLevel = '';
   
-  // Pagination
-  currentPage = 1;
-  itemsPerPage = 12;
-  hasMoreItems = true;
+
   
   // Purchase modal
   showPurchaseModal = false;
@@ -52,22 +54,32 @@ export class ShopComponent implements OnInit {
   // Current user email for payment purposes
   currentUserEmail = '';
   
+  // User access tracking
+  userAccessMap: Record<string, boolean> = {};
+  currentUserId: string | null = null;
+  isRefreshingAccess = false; // Add flag to prevent multiple simultaneous refreshes
+
+  
   constructor(
     private _router: Router,
     private _auth: AuthService,
     private _userService: UserService,
     private _digitalFileService: DigitalFileService,
-    private _translate: TranslateService
+    private _userAccessService: UserAccessService,
+    private _purchaseService: PurchaseService,
+    private _translate: TranslateService,
+    private _functions: AngularFireFunctions
   ) {
     // Initialize arrays to prevent undefined issues
     this.files = [];
     this.displayedFiles = [];
+    
+
   }
 
   ngOnInit(): void {
+    // First load user profile and check authentication
     this.loadUserProfile();
-    this.loadFiles();
-    this.setupLanguageDetection();
     
     // Check authentication status immediately
     this._auth.user$.subscribe(user => {
@@ -75,14 +87,34 @@ export class ShopComponent implements OnInit {
         this.isLoggedIn = false;
         this.showLoginModal = true;
         this.currentUserEmail = '';
-        console.log('User not authenticated, showing login modal');
+        this.currentUserId = null;
+        this.userAccessMap = {};
       } else {
         this.isLoggedIn = true;
         this.showLoginModal = false;
         this.currentUserEmail = user.email || '';
-        console.log('User authenticated:', user.uid, 'Email:', user.email);
+        this.currentUserId = user.uid;
+        
+        // Only load files after user is authenticated
+        this.loadFiles();
+        // Note: loadUserAccess will be called after files are loaded
       }
     });
+    
+    this.setupLanguageDetection();
+  }
+
+  /**
+   * Manually trigger access loading (for user control)
+   */
+  loadAccessNow(): void {
+    if (this.isAccessReady) {
+      return;
+    }
+    
+    if (this.currentUserId && this.files.length > 0) {
+      this.loadUserAccess();
+    }
   }
 
   /**
@@ -101,25 +133,106 @@ export class ShopComponent implements OnInit {
           return of(null);
         }
       }),
-      catchError(() => {
+      catchError(error => {
+        console.error('Error loading user profile:', error);
         this.isLoggedIn = false;
-        this.showLoginModal = true; // Show modal on error
+        this.showLoginModal = true;
         return of(null);
       })
     );
   }
 
   /**
-   * Loads all active digital files
+   * Loads user access for all displayed files
+   */
+  private loadUserAccess(): void {
+    if (!this.currentUserId || this.files.length === 0) {
+      this.isRefreshingAccess = false; // Reset flag
+      return;
+    }
+
+    const fileIds = this.files.map(file => file.id);
+    
+    // First try the Firebase function approach
+    this._userAccessService.hasMultipleAccess(this.currentUserId, fileIds)
+      .subscribe({
+        next: (accessMap) => {
+          this.userAccessMap = accessMap;
+          this.isRefreshingAccess = false; // Reset flag
+          // User access map loaded successfully via Firebase function
+          
+        },
+        error: (error) => {
+          console.error('Error loading user access via Firebase function, trying direct Firestore query:', error);
+          // Fallback: try direct Firestore query
+          this.loadUserAccessDirectly(fileIds);
+        }
+      });
+  }
+
+  /**
+   * Fallback method to load user access directly from Firestore
+   */
+  private loadUserAccessDirectly(fileIds: string[]): void {
+    // Use the injected AngularFirestore service
+    const firestore = (this as any)._afs || (this as any)._firestore;
+    
+    if (!firestore) {
+      console.error('Firestore service not available for direct query');
+      // Final fallback: initialize with all false
+      this.userAccessMap = {};
+      fileIds.forEach(fileId => {
+        this.userAccessMap[fileId] = false;
+      });
+      this.isRefreshingAccess = false; // Reset flag
+      return;
+    }
+    
+    // Query the user_access collection directly
+    const accessQuery = firestore
+      .collection('user_access', (ref: any) => 
+        ref.where('userId', '==', this.currentUserId)
+           .where('isActive', '==', true)
+      )
+      .valueChanges({ idField: 'id' });
+    
+    accessQuery.subscribe({
+      next: (accessRecords: any[]) => {
+        // Create access map
+        const accessMap: Record<string, boolean> = {};
+        fileIds.forEach(fileId => {
+          accessMap[fileId] = accessRecords.some(record => record.fileId === fileId);
+        });
+        
+        this.userAccessMap = accessMap;
+        this.isRefreshingAccess = false; // Reset flag
+      },
+      error: (error: any) => {
+        console.error('Error with direct Firestore query:', error);
+        // Final fallback: initialize with all false
+        this.userAccessMap = {};
+        fileIds.forEach(fileId => {
+          this.userAccessMap[fileId] = false;
+        });
+        this.isRefreshingAccess = false; // Reset flag
+      }
+    });
+  }
+
+  /**
+   * Loads digital files from the service
    */
   private loadFiles(): void {
     this.isLoading = true;
-    
     this._digitalFileService.getActiveFiles().subscribe({
       next: (files) => {
         this.files = files;
-        this.filterFiles();
+        this.displayedFiles = files;
         this.isLoading = false;
+        
+        // Always try to load user access after files are loaded
+        // The loadUserAccess method will handle the case where user is not authenticated
+        this.loadUserAccess();
       },
       error: (error) => {
         console.error('Error loading files:', error);
@@ -131,103 +244,50 @@ export class ShopComponent implements OnInit {
   }
 
   /**
-   * Sets up language detection for currency display
+   * Sets up language detection for translations
    */
   private setupLanguageDetection(): void {
-    // Language detection is handled in the template via _translate.currentLang
-    // No need for additional subscription
-  }
-  
-  /**
-   * Shows login required modal
-   */
-  showLoginRequiredModal(): void {
-    this.showLoginModal = true;
-  }
-  
-  /**
-   * Closes login required modal
-   */
-  closeLoginModal(): void {
-    this.showLoginModal = false;
-  }
-  
-  /**
-   * Navigates to login page
-   */
-  goToLogin(): void {
-    this.closeLoginModal();
-    this.goBack();
-  }
-
-  /**
-   * Clears all filters and resets to show all files
-   */
-  clearFilters(): void {
-    this.searchTerm = '';
-    this.selectedLanguage = '';
-    this.selectedAccessLevel = '';
-    this.filterFiles();
+    // This will be handled by the translate service
+    // We can add custom logic here if needed
   }
 
   /**
    * Filters files based on search term and selected filters
    */
   filterFiles(): void {
-    let filtered = this.files || [];
+    let filtered = [...this.files];
 
-    // Search filter
+    // Filter by search term
     if (this.searchTerm.trim()) {
-      const search = this.searchTerm.toLowerCase().trim();
+      const searchLower = this.searchTerm.toLowerCase();
       filtered = filtered.filter(file =>
-        file.title.toLowerCase().includes(search) ||
-        file.description.toLowerCase().includes(search) ||
-        (file.tags && file.tags.some(tag => tag.toLowerCase().includes(search)))
+        file.title.toLowerCase().includes(searchLower) ||
+        file.description.toLowerCase().includes(searchLower) ||
+        (file.tags && file.tags.some(tag => tag.toLowerCase().includes(searchLower)))
       );
     }
 
-    // Language filter
-    if (this.selectedLanguage && this.selectedLanguage !== 'all') {
+    // Filter by language
+    if (this.selectedLanguage) {
       filtered = filtered.filter(file => file.language === this.selectedLanguage);
     }
 
-    // Access level filter
-    if (this.selectedAccessLevel && this.selectedAccessLevel !== 'all') {
-      filtered = filtered.filter(file => file.accessLevel === this.selectedAccessLevel);
-    }
+
 
     this.displayedFiles = filtered;
-    this.currentPage = 1;
-    this.hasMoreItems = this.displayedFiles.length > this.itemsPerPage;
-    console.log('Filtered:', filtered.length, 'files from', this.files.length, 'total');
   }
 
-  /**
-   * Loads more files for pagination
-   */
-  loadMore(): void {
-    if (this.hasMoreItems) {
-      this.currentPage++;
-      this.hasMoreItems = this.displayedFiles.length > this.currentPage * this.itemsPerPage;
-    }
-  }
+
 
   /**
-   * Gets files for current page
-   */
-  getCurrentPageFiles(): DigitalFile[] {
-    if (!this.displayedFiles || this.displayedFiles.length === 0) {
-      return [];
-    }
-    const startIndex = 0;
-    const endIndex = this.currentPage * this.itemsPerPage;
-    return this.displayedFiles.slice(startIndex, endIndex);
-  }
-
-  /**
-   * Opens purchase modal for a file
+   * Opens purchase modal for a specific file
    */
   openPurchaseModal(file: DigitalFile): void {
+    if (!this.isLoggedIn) {
+      this.showLoginRequiredModal();
+      return;
+    }
+    
     this.selectedFile = file;
     this.showPurchaseModal = true;
   }
@@ -257,12 +317,107 @@ export class ShopComponent implements OnInit {
   }
 
   /**
+   * Refreshes the user access map
+   */
+  refreshUserAccess(): void {
+    if (this.isRefreshingAccess) {
+      return;
+    }
+    
+    if (!this.currentUserId || this.files.length === 0) {
+      return;
+    }
+    
+    this.isRefreshingAccess = true;
+
+    
+    this.loadUserAccess();
+  }
+
+
+
+  /**
    * Checks if user has access to a file
    */
   hasAccess(fileId: string): boolean {
-    // TODO: Implement access check from UserAccess service
-    // For now, always return false to show buy buttons
-    return false;
+    if (!this.isLoggedIn || !this.currentUserId) {
+      return false;
+    }
+    
+    // If the access map is empty, just return false - don't trigger refresh here
+    if (Object.keys(this.userAccessMap).length === 0) {
+      return false;
+    }
+    
+    const hasAccess = this.userAccessMap[fileId] || false;
+    
+
+    
+    return hasAccess;
+  }
+
+  /**
+   * Gets the appropriate action button for a file
+   */
+  getActionButton(file: DigitalFile): 'purchase' | 'download' | 'login' {
+    if (!this.isLoggedIn) return 'login';
+    if (this.hasAccess(file.id)) return 'download';
+    return 'purchase';
+  }
+
+  /**
+   * Downloads a file (for users who have access)
+   */
+  downloadFile(file: DigitalFile): void {
+    if (!this.hasAccess(file.id)) {
+      console.error('User does not have access to this file');
+      return;
+    }
+
+    this._digitalFileService.downloadFile(file).subscribe({
+      next: (success: boolean) => {
+        if (success) {
+          // File download successful
+        } else {
+          console.error('File download failed:', file.title);
+        }
+      },
+      error: (error) => {
+        console.error('Error downloading file:', error);
+        // You can add an error notification here
+      }
+    });
+  }
+
+  /**
+   * Shows login required modal
+   */
+  showLoginRequiredModal(): void {
+    this.showLoginModal = true;
+  }
+
+  /**
+   * Closes login modal
+   */
+  closeLoginModal(): void {
+    this.showLoginModal = false;
+  }
+
+  /**
+   * Navigates to login page
+   */
+  goToLogin(): void {
+    this.closeLoginModal();
+    this.goBack(); // For now, just go back. You can implement actual login navigation
+  }
+
+  /**
+   * Clears all filters
+   */
+  clearFilters(): void {
+    this.searchTerm = '';
+    this.selectedLanguage = '';
+    this.filterFiles();
   }
 
   /**
@@ -275,9 +430,9 @@ export class ShopComponent implements OnInit {
   /**
    * Gets currency symbol based on current language
    */
-  getCurrencySymbol(): string {
+  getCurrencySymbol(): 'RSD' | 'EUR' {
     const currentLang = this._translate.currentLang || 'sr';
-    return currentLang === 'sr' ? 'RSD' : '€';
+    return currentLang === 'sr' ? 'RSD' : 'EUR';
   }
 
   /**
@@ -301,12 +456,25 @@ export class ShopComponent implements OnInit {
    * Copies PayPal link to clipboard
    */
   copyPayPalLink(): void {
-    const paypalLink = 'paypal.me/anavaspitac';
+    const paypalLink = 'https://paypal.me/anavaspitac?country.x=RS&locale.x=en_US';
     navigator.clipboard.writeText(paypalLink).then(() => {
-      // You can add a toast notification here if you want
-      console.log('PayPal link copied to clipboard');
+      // PayPal link copied successfully
     }).catch(err => {
       console.error('Failed to copy PayPal link:', err);
+    });
+  }
+
+  /**
+   * Copies bank details to clipboard
+   */
+  copyBankDetails(): void {
+    const bankDetails = `Account Number: ${this._translate.instant('SHOP.BANK_ACCOUNT')}
+Recipient: ${this._translate.instant('SHOP.BANK_RECIPIENT')}`;
+    
+    navigator.clipboard.writeText(bankDetails).then(() => {
+      // Bank details copied successfully
+    }).catch(err => {
+      console.error('Failed to copy bank details:', err);
     });
   }
 
@@ -339,5 +507,47 @@ export class ShopComponent implements OnInit {
     return this.currentUserEmail || 'user@example.com';
   }
 
+  /**
+   * Initiates purchase process for a file
+   */
+  initiatePurchase(file: DigitalFile): void {
+    if (!this.isLoggedIn || !this.currentUserId) {
+      this.showLoginRequiredModal();
+      return;
+    }
 
+    // Set the selected file for the payment modal
+    this.selectedFile = file;
+
+    // Create purchase record
+    const purchaseData: PurchaseFormData = {
+      userId: this.currentUserId,
+      fileId: file.id,
+      amount: this.getPrice(file),
+      currency: this.getCurrencySymbol()
+    };
+
+    this._purchaseService.createPurchase(purchaseData).then(purchaseId => {
+      // Open payment modal to show instructions
+      this.openPaymentModal();
+    }).catch(error => {
+      console.error('Error creating purchase:', error);
+    });
+  }
+
+
+
+  /**
+   * Getter for access map size (for template use)
+   */
+  get accessMapSize(): number {
+    return Object.keys(this.userAccessMap).length;
+  }
+
+  /**
+   * Check if access checking is ready (for template use)
+   */
+  get isAccessReady(): boolean {
+    return this.isLoggedIn && !!this.currentUserId && this.files.length > 0 && Object.keys(this.userAccessMap).length > 0;
+  }
 }

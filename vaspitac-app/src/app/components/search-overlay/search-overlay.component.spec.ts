@@ -77,10 +77,9 @@ describe('SearchOverlayComponent', () => {
     expect(mockRouter.navigate).toHaveBeenCalledWith(['/activity', activityId]);
   });
 
-  it('should navigate to blog on result click', () => {
-    const blogId = 1;
-    component.onBlogClick(blogId);
-    expect(mockRouter.navigate).toHaveBeenCalledWith(['/blog'], { queryParams: { post: 1 } });
+  it('should navigate to blog post page when blog is clicked', () => {
+    component.onBlogClick(1);
+    expect(mockRouter.navigate).toHaveBeenCalledWith(['/blog', 1]);
   });
 
   it('should emit close event', () => {

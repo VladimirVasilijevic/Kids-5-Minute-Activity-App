@@ -76,12 +76,27 @@
   <!-- Category Cards -->
   <ng-container *ngFor="let cat of categories$ | async">
     <div
-      (click)="goToCategory(cat.id)"
-      class="cursor-pointer transform hover:scale-105 transition-all duration-300 bg-white rounded-xl shadow hover:shadow-lg border border-green-100 p-4 md:p-6 flex flex-col items-center text-center min-h-[140px] md:min-h-[160px]"
+      (click)="onCategoryClick(cat)"
+      class="cursor-pointer transform hover:scale-105 transition-all duration-300 rounded-xl shadow hover:shadow-lg border p-4 md:p-6 flex flex-col items-center text-center min-h-[140px] md:min-h-[160px] relative"
+      [ngClass]="{
+        'bg-white border-green-100': !isCategoryLocked(cat, (userProfile$ | async)),
+        'bg-gray-100 border-gray-300': isCategoryLocked(cat, (userProfile$ | async))
+      }"
     >
+      <!-- Lock Icon for locked categories -->
+      <div 
+        *ngIf="isCategoryLocked(cat, (userProfile$ | async))"
+        class="absolute top-3 right-3 w-6 h-6 text-gray-500"
+        [title]="'HOME.LOCKED_CATEGORY_MESSAGE' | translate"
+      >
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+        </svg>
+      </div>
+
       <div
         class="w-12 h-12 md:w-16 md:h-16 rounded-full flex items-center justify-center shadow-lg mb-3 md:mb-4"
-        [ngClass]="cat.color"
+        [ngClass]="isCategoryLocked(cat, (userProfile$ | async)) ? 'bg-gray-400' : cat.color"
       >
         <ng-container *ngIf="cat.id === 'about'; else otherCategoryIcon">
           <ng-container *ngIf="aboutContent$ | async as aboutContent">
@@ -127,18 +142,6 @@
             </svg>
             <!-- Lucide BookOpen -->
             <svg
-              *ngSwitchCase="'book-open'"
-              class="h-6 w-6 md:h-8 md:w-8 text-white"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              viewBox="0 0 24 24"
-            >
-              <path d="M2 7v13a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V7" />
-              <path d="M16 3v4M8 3v4" />
-            </svg>
-            <!-- Lucide Lightbulb -->
-            <svg
               *ngSwitchCase="'lightbulb'"
               class="h-6 w-6 md:h-8 md:w-8 text-white"
               fill="none"
@@ -150,6 +153,7 @@
               <path d="M10 22h4" />
               <path d="M12 2a7 7 0 0 0-7 7c0 3.87 3.13 7 7 7s7-3.13 7-7a7 7 0 0 0-7-7z" />
             </svg>
+            
             <!-- Lucide Dumbbell -->
             <svg
               *ngSwitchCase="'dumbbell'"
@@ -164,7 +168,7 @@
               <path d="M3 3l1.5 1.5" />
               <path d="M18 22v-4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v4" />
             </svg>
-            <!-- Lucide Palette -->
+            <!-- Lucide Paintbrush -->
             <svg
               *ngSwitchCase="'palette'"
               class="h-6 w-6 md:h-8 md:w-8 text-white"
@@ -173,23 +177,28 @@
               stroke-width="2"
               viewBox="0 0 24 24"
             >
-              <circle cx="12" cy="12" r="10" />
-              <circle cx="7.5" cy="10.5" r="1.5" />
-              <circle cx="16.5" cy="10.5" r="1.5" />
-              <circle cx="12" cy="16.5" r="1.5" />
-              <path d="M12 2v2" />
+              <path d="M18.37 2.63 14 7l-1.59-1.59a2 2 0 0 0-2.82 0L8 7.82a2 2 0 0 0 0 2.82L12 15l5.37-4.37a2 2 0 0 0 0-2.82L18.37 2.63z" />
+              <path d="M9 15l-4 4 2 2 4-4" />
             </svg>
-            <!-- Lucide GraduationCap -->
+            <!-- Lucide Calculator -->
             <svg
-              *ngSwitchCase="'graduation-cap'"
+              *ngSwitchCase="'calculator'"
               class="h-6 w-6 md:h-8 md:w-8 text-white"
               fill="none"
               stroke="currentColor"
               stroke-width="2"
               viewBox="0 0 24 24"
             >
-              <path d="M22 12l-10-7-10 7 10 7 10-7z" />
-              <path d="M2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6" />
+              <rect x="4" y="2" width="16" height="20" rx="2" />
+              <!-- Display area -->
+              <rect x="6" y="4" width="12" height="5" rx="1" />
+              <!-- Button grid -->
+              <rect x="6" y="11" width="3" height="3" rx="0.5" />
+              <rect x="11" y="11" width="3" height="3" rx="0.5" />
+              <rect x="16" y="11" width="3" height="3" rx="0.5" />
+              <rect x="6" y="16" width="3" height="3" rx="0.5" />
+              <rect x="11" y="16" width="3" height="3" rx="0.5" />
+              <rect x="16" y="16" width="3" height="3" rx="0.5" />
             </svg>
             <!-- Lucide Music -->
             <svg
@@ -203,17 +212,16 @@
               <circle cx="12" cy="12" r="10" />
               <path d="M9 17V9l8-2v8" />
             </svg>
-            <!-- Lucide TreePine -->
+            <!-- Lucide MessageCircle -->
             <svg
-              *ngSwitchCase="'tree'"
+              *ngSwitchCase="'campaign'"
               class="h-6 w-6 md:h-8 md:w-8 text-white"
               fill="none"
               stroke="currentColor"
               stroke-width="2"
               viewBox="0 0 24 24"
             >
-              <path d="M12 2l-7 12h14L12 2z" />
-              <path d="M12 22v-4" />
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
             </svg>
             <!-- Lucide CreditCard -->
             <svg
@@ -230,10 +238,24 @@
           </ng-container>
         </ng-template>
       </div>
-      <h3 class="text-base md:text-lg font-semibold text-green-800 mb-1 md:mb-2">
+      <h3 
+        class="text-base md:text-lg font-semibold mb-1 md:mb-2"
+        [ngClass]="{
+          'text-green-800': !isCategoryLocked(cat, (userProfile$ | async)),
+          'text-gray-600': isCategoryLocked(cat, (userProfile$ | async))
+        }"
+      >
         {{ cat.title | translate }}
       </h3>
-      <p class="text-xs md:text-sm text-gray-600 line-clamp-2">{{ cat.description | translate }}</p>
+      <p 
+        class="text-xs md:text-sm line-clamp-2"
+        [ngClass]="{
+          'text-gray-600': !isCategoryLocked(cat, (userProfile$ | async)),
+          'text-gray-500': isCategoryLocked(cat, (userProfile$ | async))
+        }"
+      >
+        {{ cat.description | translate }}
+      </p>
     </div>
   </ng-container>
 </div>

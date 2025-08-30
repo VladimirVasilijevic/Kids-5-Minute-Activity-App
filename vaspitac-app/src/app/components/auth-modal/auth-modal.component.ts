@@ -7,6 +7,7 @@ import { AuthService } from '../../services/auth.service';
 import { UserService } from '../../services/user.service';
 import { UserProfile, UserRole, Permission } from '../../models/user-profile.model';
 import { TranslateService } from '@ngx-translate/core';
+import { Router } from '@angular/router';
 
 /**
  * Modal component for user authentication (login/register)
@@ -40,7 +41,8 @@ export class AuthModalComponent {
   constructor(
     private _auth: AuthService,
     private _userService: UserService,
-    private _translate: TranslateService
+    private _translate: TranslateService,
+    private _router: Router
   ) {}
 
   /**
@@ -76,6 +78,8 @@ export class AuthModalComponent {
     try {
       if (this.isLogin) {
         await this._auth.signIn(this.email, this.password);
+        // Redirect to home page after successful login
+        this._router.navigate(['/']);
       } else {
         const user = await this._auth.signUp(this.email, this.password, this.name);
         if (user) {
@@ -89,6 +93,8 @@ export class AuthModalComponent {
             permissions: [Permission.VIEW_PROFILE, Permission.EDIT_PROFILE]
           };
           await this._userService.setUserProfile(profile);
+          // Redirect to home page after successful registration
+          this._router.navigate(['/']);
         }
       }
       this.onClose();

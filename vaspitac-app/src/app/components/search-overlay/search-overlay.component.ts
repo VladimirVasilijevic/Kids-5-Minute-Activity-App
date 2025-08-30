@@ -100,7 +100,7 @@ export class SearchOverlayComponent implements OnInit, OnDestroy, OnChanges {
    * @param blogId - The unique identifier of the blog post
    */
   onBlogClick(blogId: number): void {
-    this._router.navigate(['/blog'], { queryParams: { post: blogId } });
+    this._router.navigate(['/blog', blogId]);
     this.closeOverlay();
   }
 

@@ -1,7 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { Observable, of, switchMap } from 'rxjs';
+import { Observable, of, switchMap, firstValueFrom } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
+import { AngularFireFunctions } from '@angular/fire/compat/functions';
+import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { AuthService } from '../../../services/auth.service';
 import { UserService } from '../../../services/user.service';
 import { UserProfile, UserRole } from '../../../models/user-profile.model';
@@ -10,6 +12,7 @@ import { LanguageService } from '../../../services/language.service';
 import { ACCESS_LEVELS } from '../../../models/marketplace.constants';
 import { formatFileSize, validateFileForUpload } from '../../../models/marketplace.utils';
 import { DigitalFileService } from '../../../services/digital-file.service';
+import { UserAccessService } from '../../../services/user-access.service';
 
 /**
  * Admin files component for managing digital files
@@ -82,6 +85,13 @@ export class AdminFilesComponent implements OnInit {
     tags: []
   };
 
+  // Grant access functionality
+  showGrantAccessModal = false;
+  selectedFileForAccess: DigitalFile | null = null;
+  userEmailForAccess = '';
+  adminNotesForAccess = '';
+  isGrantingAccess = false;
+
   /**
    * Initializes the admin files component
    * @param router - Angular router for navigation
@@ -96,7 +106,10 @@ export class AdminFilesComponent implements OnInit {
     private _userService: UserService,
     private _languageService: LanguageService,
     private _translate: TranslateService,
-    private _digitalFileService: DigitalFileService
+    private _digitalFileService: DigitalFileService,
+    private _userAccessService: UserAccessService,
+    private _functions: AngularFireFunctions,
+    private _afs: AngularFirestore
   ) {}
 
   /**
@@ -196,7 +209,7 @@ export class AdminFilesComponent implements OnInit {
    * Handles form submission
    * @param event - The form submit event
    */
-  handleSubmit(event: Event): void {
+  async handleSubmit(event: Event): Promise<void> {
     event.preventDefault();
     
     if (!this.validateForm()) {
@@ -204,9 +217,9 @@ export class AdminFilesComponent implements OnInit {
     }
 
     if (this.editingFile) {
-      this.updateFile();
+      await this.updateFile();
     } else {
-      this.createFile();
+      await this.createFile();
     }
   }
 
@@ -249,7 +262,7 @@ export class AdminFilesComponent implements OnInit {
   /**
    * Creates a new file
    */
-  private createFile(): void {
+  private async createFile(): Promise<void> {
     if (!this.selectedFile) {
       this.showErrorModal = true;
       this.errorTitle = 'File Required';
@@ -259,28 +272,26 @@ export class AdminFilesComponent implements OnInit {
 
     this.isUploadingFile = true;
     
-    this._digitalFileService.createFile(this.formData, this.selectedFile).subscribe({
-      next: (file) => {
-        this.isUploadingFile = false;
-        this.showSuccessMessage = true;
-        this.successMessage = 'File created successfully';
-        this.resetForm();
-        this.loadFiles();
-      },
-      error: (error) => {
-        this.isUploadingFile = false;
-        console.error('Error creating file:', error);
-        this.showErrorModal = true;
-        this.errorTitle = 'Error Creating File';
-        this.errorMessage = error.message || 'Failed to create file. Please try again.';
-      }
-    });
+    try {
+      const fileId = await this._digitalFileService.createFile(this.formData, this.selectedFile);
+      this.isUploadingFile = false;
+      this.showSuccessMessage = true;
+      this.successMessage = 'File created successfully';
+      this.resetForm();
+      this.loadFiles();
+    } catch (error: any) {
+      this.isUploadingFile = false;
+      console.error('Error creating file:', error);
+      this.showErrorModal = true;
+      this.errorTitle = 'Error Creating File';
+      this.errorMessage = error.message || 'Failed to create file. Please try again.';
+    }
   }
 
   /**
    * Updates an existing file
    */
-  private updateFile(): void {
+  private async updateFile(): Promise<void> {
     if (!this.editingFile) return;
 
     const updates: Partial<DigitalFile> = {
@@ -293,20 +304,18 @@ export class AdminFilesComponent implements OnInit {
       tags: this.formData.tags || []
     };
 
-    this._digitalFileService.updateFile(this.editingFile.id, updates).subscribe({
-      next: (file) => {
-        this.showSuccessMessage = true;
-        this.successMessage = 'File updated successfully';
-        this.resetForm();
-        this.loadFiles();
-      },
-      error: (error) => {
-        console.error('Error updating file:', error);
-        this.showErrorModal = true;
-        this.errorTitle = 'Error Updating File';
-        this.errorMessage = error.message || 'Failed to update file. Please try again.';
-      }
-    });
+    try {
+      await this._digitalFileService.updateFile(this.editingFile.id, updates);
+      this.showSuccessMessage = true;
+      this.successMessage = 'File updated successfully';
+      this.resetForm();
+      this.loadFiles();
+    } catch (error: any) {
+      console.error('Error updating file:', error);
+      this.showErrorModal = true;
+      this.errorTitle = 'Error Updating File';
+      this.errorMessage = error.message || 'Failed to update file. Please try again.';
+    }
   }
 
   /**
@@ -316,7 +325,7 @@ export class AdminFilesComponent implements OnInit {
   handleDelete(file: DigitalFile): void {
     this.confirmTitle = 'Delete File';
     this.confirmMessage = `Are you sure you want to delete "${file.title}"? This action cannot be undone.`;
-    this.confirmAction = () => this.deleteFile(file);
+    this.confirmAction = async () => await this.deleteFile(file);
     this.showConfirmModal = true;
   }
 
@@ -324,20 +333,18 @@ export class AdminFilesComponent implements OnInit {
    * Deletes a file
    * @param file - The file to delete
    */
-  private deleteFile(file: DigitalFile): void {
-    this._digitalFileService.deleteFile(file.id).subscribe({
-      next: () => {
-        this.showSuccessMessage = true;
-        this.successMessage = 'File deleted successfully';
-        this.loadFiles();
-      },
-      error: (error) => {
-        console.error('Error deleting file:', error);
-        this.showErrorModal = true;
-        this.errorTitle = 'Error Deleting File';
-        this.errorMessage = error.message || 'Failed to delete file. Please try again.';
-      }
-    });
+  private async deleteFile(file: DigitalFile): Promise<void> {
+    try {
+      await this._digitalFileService.deleteFile(file.id);
+      this.showSuccessMessage = true;
+      this.successMessage = 'File deleted successfully';
+      this.loadFiles();
+    } catch (error: any) {
+      console.error('Error deleting file:', error);
+      this.showErrorModal = true;
+      this.errorTitle = 'Error Deleting File';
+      this.errorMessage = error.message || 'Failed to delete file. Please try again.';
+    }
   }
 
   /**
@@ -348,7 +355,7 @@ export class AdminFilesComponent implements OnInit {
     const action = file.isActive ? 'deactivate' : 'activate';
     this.confirmTitle = `${action.charAt(0).toUpperCase() + action.slice(1)} File`;
     this.confirmMessage = `Are you sure you want to ${action} "${file.title}"?`;
-    this.confirmAction = () => this.updateFileStatus(file, !file.isActive);
+    this.confirmAction = async () => await this.updateFileStatus(file, !file.isActive);
     this.showConfirmModal = true;
   }
 
@@ -357,25 +364,23 @@ export class AdminFilesComponent implements OnInit {
    * @param file - The file to update
    * @param isActive - New status
    */
-  private updateFileStatus(file: DigitalFile, isActive: boolean): void {
-    this._digitalFileService.toggleFileStatus(file.id, isActive).subscribe({
-      next: (updatedFile) => {
-        // Update the local file object
-        const index = this.files.findIndex(f => f.id === file.id);
-        if (index !== -1) {
-          this.files[index] = updatedFile;
-          this.filterFiles(); // Refresh filtered list
-        }
-        this.showSuccessMessage = true;
-        this.successMessage = `File ${isActive ? 'activated' : 'deactivated'} successfully`;
-      },
-      error: (error) => {
-        console.error('Error updating file status:', error);
-        this.showErrorModal = true;
-        this.errorTitle = 'Error Updating Status';
-        this.errorMessage = error.message || 'Failed to update file status. Please try again.';
+  private async updateFileStatus(file: DigitalFile, isActive: boolean): Promise<void> {
+    try {
+      await this._digitalFileService.toggleFileStatus(file.id);
+      // Update the local file object
+      const index = this.files.findIndex(f => f.id === file.id);
+      if (index !== -1) {
+        this.files[index] = { ...this.files[index], isActive };
+        this.filterFiles(); // Refresh filtered list
       }
-    });
+      this.showSuccessMessage = true;
+      this.successMessage = `File ${isActive ? 'activated' : 'deactivated'} successfully`;
+    } catch (error: any) {
+      console.error('Error updating file status:', error);
+      this.showErrorModal = true;
+      this.errorTitle = 'Error Updating Status';
+      this.errorMessage = error.message || 'Failed to update file status. Please try again.';
+    }
   }
 
   /**
@@ -526,5 +531,154 @@ export class AdminFilesComponent implements OnInit {
     // TODO: Implement sales count retrieval from purchase service
     // For now, return 0 as placeholder
     return 0;
+  }
+
+  /**
+   * Opens the grant access modal for a specific file
+   * @param file - The file to grant access to
+   */
+  openGrantAccessModal(file: DigitalFile): void {
+    this.selectedFileForAccess = file;
+    this.userEmailForAccess = '';
+    this.adminNotesForAccess = '';
+    this.showGrantAccessModal = true;
+  }
+
+  /**
+   * Closes the grant access modal
+   */
+  closeGrantAccessModal(): void {
+    this.showGrantAccessModal = false;
+    this.selectedFileForAccess = null;
+    this.userEmailForAccess = '';
+    this.adminNotesForAccess = '';
+  }
+
+  /**
+   * Grants access to a file for a specific user
+   */
+  async grantAccess(): Promise<void> {
+    console.log('grantAccess() method called');
+    console.log('selectedFileForAccess:', this.selectedFileForAccess);
+    console.log('userEmailForAccess:', this.userEmailForAccess);
+    
+    if (!this.selectedFileForAccess || !this.userEmailForAccess) {
+      console.log('Missing required data, returning early');
+      return;
+    }
+
+    this.isGrantingAccess = true;
+    console.log('isGrantingAccess set to true');
+
+    try {
+      console.log('Finding user by email...');
+      // Find user by email - use a direct Firestore query to avoid loading service issues
+      const user = await this.findUserByEmail(this.userEmailForAccess);
+      console.log('Found user:', user);
+
+      if (!user) {
+        console.log('User not found, showing error');
+        this.showError('User Not Found', 'No user found with this email address.');
+        return;
+      }
+
+      console.log('User found successfully:', user);
+
+      console.log('Attempting to grant access...');
+      // Grant access using Firebase Function for admin-granted access
+      const grantAdminAccess = this._functions.httpsCallable('grantAdminAccess');
+      try {
+        console.log('Calling grantAdminAccess function...');
+        console.log('Parameters being sent:', { 
+          userId: user.uid, 
+          fileId: this.selectedFileForAccess.id, 
+          adminNotes: this.adminNotesForAccess 
+        });
+        
+        const result = await firstValueFrom(grantAdminAccess({ 
+          userId: user.uid, 
+          fileId: this.selectedFileForAccess.id, 
+          adminNotes: this.adminNotesForAccess 
+        }));
+        
+        console.log('grantAdminAccess successful, result:', result);
+      } catch (error: any) {
+        console.error('Error calling grantAdminAccess:', error);
+        console.error('Error details:', {
+          message: error?.message,
+          code: error?.code,
+          details: error?.details
+        });
+        
+        console.log('Falling back to grantFileAccess...');
+        // Fallback: try to use the existing grantFileAccess with a dummy purchase ID
+        const grantFileAccess = this._functions.httpsCallable('grantFileAccess');
+        await grantFileAccess({ 
+          userId: user.uid, 
+          fileId: this.selectedFileForAccess.id, 
+          purchaseId: 'admin-granted-' + Date.now() // Generate a dummy purchase ID
+        });
+        console.log('grantFileAccess fallback successful');
+      }
+      
+      console.log('Access granted successfully, showing success message');
+      this.showSuccessMessage = true;
+      this.successMessage = `Access granted to ${this.userEmailForAccess} for ${this.selectedFileForAccess.title}`;
+      
+      this.closeGrantAccessModal();
+      
+      // Refresh the files list
+      this.loadFiles();
+      
+    } catch (error) {
+      console.error('Error granting access:', error);
+      this.showError('Access Grant Failed', 'Failed to grant access. Please try again.');
+    } finally {
+      console.log('Setting isGrantingAccess to false');
+      this.isGrantingAccess = false;
+    }
+  }
+
+  /**
+   * Finds a user by email using direct Firestore query
+   * @param email - User email to search for
+   * @returns Promise<UserProfile | null>
+   */
+  private async findUserByEmail(email: string): Promise<UserProfile | null> {
+    try {
+      const usersRef = this._afs.collection<UserProfile>('users');
+      const query = usersRef.ref.where('email', '==', email).limit(1);
+      const snapshot = await query.get();
+      
+      if (snapshot.empty) {
+        return null;
+      }
+      
+      const userDoc = snapshot.docs[0];
+      const userData = userDoc.data();
+      
+      if (!userData) {
+        return null;
+      }
+      
+      return {
+        ...userData,
+        uid: userDoc.id
+      } as UserProfile;
+    } catch (error) {
+      console.error('Error finding user by email:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Shows an error modal with custom title and message
+   * @param title - Error title
+   * @param message - Error message
+   */
+  private showError(title: string, message: string): void {
+    this.errorTitle = title;
+    this.errorMessage = message;
+    this.showErrorModal = true;
   }
 }

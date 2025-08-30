@@ -146,6 +146,8 @@ describe('AdminActivitiesComponent', (): void => {
       instructions: 'Step 1\nStep 2',
       image: 'new-activity.jpg', // Provide image to pass validation
       video: '',
+      imageUrl: 'new-activity.jpg',
+      videoUrl: '',
       category: 'creative',
       language: 'en',
       materials: '',
@@ -183,6 +185,8 @@ describe('AdminActivitiesComponent', (): void => {
       instructions: 'Updated Step 1\nUpdated Step 2',
       image: 'updated-activity.jpg', // Provide image to pass validation
       video: '',
+      imageUrl: 'updated-activity.jpg',
+      videoUrl: '',
       category: 'educational',
       language: 'en',
       materials: '',
@@ -266,6 +270,8 @@ describe('AdminActivitiesComponent', (): void => {
       instructions: 'Test',
       image: 'test.jpg',
       video: '',
+      imageUrl: 'test.jpg',
+      videoUrl: '',
       category: 'creative',
       language: 'en',
       materials: '',
@@ -301,6 +307,8 @@ describe('AdminActivitiesComponent', (): void => {
       instructions: 'Step 1\nStep 2\nStep 3',
       image: 'test.jpg', // Provide image to pass validation
       video: '',
+      imageUrl: 'test.jpg',
+      videoUrl: '',
       category: 'creative',
       language: 'en',
       materials: '',
@@ -360,6 +368,8 @@ describe('AdminActivitiesComponent', (): void => {
       instructions: 'Test instructions', // Provide valid instructions to pass validation
       image: 'test.jpg', // Provide image to pass validation
       video: '',
+      imageUrl: 'test.jpg',
+      videoUrl: '',
       category: 'creative',
       language: 'en',
       materials: '',
@@ -393,6 +403,8 @@ describe('AdminActivitiesComponent', (): void => {
       instructions: '', // Empty instructions should fail validation
       image: 'test.jpg',
       video: '',
+      imageUrl: 'test.jpg',
+      videoUrl: '',
       category: 'creative',
       language: 'en',
       materials: '',
@@ -416,6 +428,8 @@ describe('AdminActivitiesComponent', (): void => {
       instructions: 'Test',
       image: '',
       video: 'test-video.mp4', // Provide video instead of image to pass validation
+      imageUrl: '',
+      videoUrl: 'test-video.mp4',
       category: 'creative',
       language: 'en',
       materials: '',
@@ -450,6 +464,8 @@ describe('AdminActivitiesComponent', (): void => {
       instructions: 'Test instructions',
       image: 'test.jpg',
       video: '',
+      imageUrl: 'test.jpg',
+      videoUrl: '',
       category: 'creative',
       language: 'en',
       materials: '',
@@ -476,6 +492,8 @@ describe('AdminActivitiesComponent', (): void => {
       instructions: 'Step 1\nStep 2',
       image: 'new-activity.jpg',
       video: '',
+      imageUrl: 'new-activity.jpg',
+      videoUrl: '',
       category: 'creative',
       language: 'en',
       materials: '',

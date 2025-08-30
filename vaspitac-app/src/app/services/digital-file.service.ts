@@ -1,258 +1,396 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { AngularFireStorage } from '@angular/fire/compat/storage';
-import { Observable, from, of, throwError, combineLatest } from 'rxjs';
-import { map, switchMap, catchError, tap, filter, take } from 'rxjs/operators';
+import { AngularFireFunctions } from '@angular/fire/compat/functions';
+import { Observable, of, map, catchError, switchMap, filter, take, firstValueFrom } from 'rxjs';
 import { DigitalFile, DigitalFileFormData } from '../models/digital-file.model';
-import { generateId } from '../models/marketplace.utils';
+import { validateFileForUpload, generateId, getFileTypeFromName } from '../models/marketplace.utils';
 
-/**
- * Service for managing digital files in the marketplace
- * Handles CRUD operations, file uploads, and Firebase integration
- */
 @Injectable({
   providedIn: 'root'
 })
 export class DigitalFileService {
-  private readonly COLLECTION_NAME = 'digital-files';
+  private readonly COLLECTION = 'digital-files';
   private readonly STORAGE_PATH = 'digital-files';
 
   constructor(
     private firestore: AngularFirestore,
-    private storage: AngularFireStorage
+    private storage: AngularFireStorage,
+    private functions: AngularFireFunctions
   ) {}
 
   /**
-   * Gets all digital files
-   * @returns Observable of all digital files
+   * Get all digital files with enhanced security
    */
   getFiles(): Observable<DigitalFile[]> {
     return this.firestore
-      .collection<DigitalFile>(this.COLLECTION_NAME)
+      .collection(this.COLLECTION, ref => ref.orderBy('createdAt', 'desc'))
+      .valueChanges({ idField: 'id' }) as Observable<DigitalFile[]>;
+  }
+
+  /**
+   * Get a specific digital file by ID
+   */
+  getFile(id: string): Observable<DigitalFile | null> {
+    if (!id) {
+      return of(null);
+    }
+
+    return this.firestore
+      .collection(this.COLLECTION)
+      .doc(id)
+      .valueChanges({ idField: 'id' }) as Observable<DigitalFile | null>;
+  }
+
+  /**
+   * Create a new digital file with enhanced security
+   */
+  async createFile(fileData: DigitalFileFormData, file: File): Promise<string> {
+    // Enhanced validation
+    if (!fileData.title || !fileData.description || !file) {
+      throw new Error('Missing required file information');
+    }
+
+    if (!validateFileForUpload(file)) {
+      throw new Error('Invalid file type or size');
+    }
+
+    try {
+      // Generate unique file name
+      const fileExtension = file.name.split('.').pop() || 'pdf';
+      const uniqueFileName = `${generateId()}_${fileData.title.replace(/[^a-zA-Z0-9]/g, '_')}_${new Date().toISOString().slice(0, 10)}_${Date.now()}_${fileExtension}`;
+      
+      // Upload file to Firebase Storage
+      const filePath = `${this.STORAGE_PATH}/${uniqueFileName}`;
+      const uploadTask = this.storage.upload(filePath, file);
+      
+      // Wait for upload to complete and get download URL
+      const snapshot = await firstValueFrom(uploadTask.snapshotChanges().pipe(
+        filter(snapshot => snapshot?.state === 'success'),
+        take(1)
+      ));
+      
+      if (!snapshot) {
+        throw new Error('File upload failed');
+      }
+
+      const downloadURL = await firstValueFrom(uploadTask.snapshotChanges().pipe(
+        filter(snapshot => snapshot?.state === 'success'),
+        take(1),
+        switchMap(() => this.storage.ref(filePath).getDownloadURL())
+      ));
+
+      // Create file document in Firestore
+      const digitalFile: Omit<DigitalFile, 'id'> = {
+        ...fileData,
+        fileName: file.name,
+        fileSize: file.size,
+        fileType: file.type,
+        fileUrl: downloadURL,
+        isActive: true,
+        createdBy: 'admin', // TODO: Get from auth service
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
+
+      const docRef = await this.firestore.collection(this.COLLECTION).add(digitalFile);
+      return docRef.id;
+
+    } catch (error) {
+      console.error('Error creating digital file:', error);
+      throw new Error('Failed to create digital file');
+    }
+  }
+
+  /**
+   * Update an existing digital file
+   */
+  async updateFile(id: string, fileData: Partial<DigitalFileFormData>): Promise<void> {
+    if (!id) {
+      throw new Error('Missing file ID');
+    }
+
+    try {
+      const updateData = {
+        ...fileData,
+        updatedAt: new Date().toISOString()
+      };
+
+      await this.firestore
+        .collection(this.COLLECTION)
+        .doc(id)
+        .update(updateData);
+    } catch (error) {
+      console.error('Error updating digital file:', error);
+      throw new Error('Failed to update digital file');
+    }
+  }
+
+  /**
+   * Delete a digital file with enhanced security
+   */
+  async deleteFile(id: string): Promise<void> {
+    if (!id) {
+      throw new Error('Missing file ID');
+    }
+
+    try {
+      // Get file details first
+      const file = await firstValueFrom(this.getFile(id));
+      
+      // Delete from Firestore
+      await this.firestore.collection(this.COLLECTION).doc(id).delete();
+      
+      // Delete from Storage if file exists
+      if (file?.fileUrl) {
+        try {
+          const fileRef = this.storage.refFromURL(file.fileUrl);
+          await firstValueFrom(fileRef.delete());
+        } catch (storageError) {
+          console.warn('Could not delete file from storage:', storageError);
+          // Continue even if storage deletion fails
+        }
+      }
+    } catch (error) {
+      console.error('Error deleting digital file:', error);
+      throw new Error('Failed to delete digital file');
+    }
+  }
+
+  /**
+   * Toggle file active status
+   */
+  async toggleFileStatus(id: string): Promise<void> {
+    if (!id) {
+      throw new Error('Missing file ID');
+    }
+
+    try {
+      const file = await firstValueFrom(this.getFile(id));
+      if (!file) {
+        throw new Error('File not found');
+      }
+
+      await this.firestore
+        .collection(this.COLLECTION)
+        .doc(id)
+        .update({
+          isActive: !file.isActive,
+          updatedAt: new Date().toISOString()
+        });
+    } catch (error) {
+      console.error('Error toggling file status:', error);
+      throw new Error('Failed to toggle file status');
+    }
+  }
+
+  /**
+   * Search files with enhanced security
+   */
+  searchFiles(query: string): Observable<DigitalFile[]> {
+    if (!query || query.trim().length < 2) {
+      return of([]);
+    }
+
+    const searchTerm = query.toLowerCase().trim();
+    
+    return this.firestore
+      .collection(this.COLLECTION, ref => 
+        ref.where('isActive', '==', true)
+           .orderBy('title')
+      )
       .valueChanges({ idField: 'id' })
       .pipe(
-        map(files => files.sort((a, b) => b.createdAt.localeCompare(a.createdAt))),
+                 map(files => (files as DigitalFile[]).filter(file => 
+           file.title.toLowerCase().includes(searchTerm) ||
+           file.description.toLowerCase().includes(searchTerm) ||
+           (file.tags && file.tags.some(tag => tag.toLowerCase().includes(searchTerm)))
+         )),
         catchError(error => {
-          console.error('Error fetching files:', error);
+          console.error('Error searching files:', error);
           return of([]);
         })
       );
   }
 
   /**
-   * Gets a specific digital file by ID
-   * @param id - The file ID
-   * @returns Observable of the digital file or null
-   */
-  getFile(id: string): Observable<DigitalFile | null> {
-    return this.firestore
-      .doc<DigitalFile>(`${this.COLLECTION_NAME}/${id}`)
-      .valueChanges()
-      .pipe(
-        map(file => file ? { ...file, id } : null),
-        catchError(error => {
-          console.error('Error fetching file:', error);
-          return of(null);
-        })
-      );
-  }
-
-  /**
-   * Creates a new digital file
-   * @param fileData - The file form data
-   * @param file - The actual file to upload
-   * @returns Observable of the created digital file
-   */
-  createFile(fileData: DigitalFileFormData, file: File): Observable<DigitalFile> {
-    const fileId = generateId();
-    const fileName = `${fileId}_${file.name}`;
-    const filePath = `${this.STORAGE_PATH}/${fileName}`;
-
-    // Upload file to Firebase Storage
-    const uploadTask = this.storage.upload(filePath, file);
-    
-    return uploadTask.snapshotChanges().pipe(
-      // Wait for upload to complete successfully
-      filter(snapshot => snapshot?.state === 'success'),
-      take(1),
-      switchMap(() => this.storage.ref(filePath).getDownloadURL()),
-      switchMap(downloadURL => {
-        const newFile: DigitalFile = {
-          id: fileId,
-          title: fileData.title,
-          description: fileData.description,
-          priceRSD: fileData.priceRSD,
-          priceEUR: fileData.priceEUR,
-          accessLevel: fileData.accessLevel,
-          language: fileData.language,
-          tags: fileData.tags || [],
-          fileUrl: downloadURL,
-          fileName: file.name,
-          fileSize: file.size,
-          fileType: file.type,
-          isActive: true,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-          createdBy: 'admin' // TODO: Get from auth service
-        };
-
-        // Save to Firestore
-        return from(
-          this.firestore.doc(`${this.COLLECTION_NAME}/${fileId}`).set(newFile)
-        ).pipe(
-          map(() => newFile),
-          catchError(error => {
-            console.error('Error saving file to Firestore:', error);
-            // Clean up uploaded file if Firestore save fails
-            this.storage.ref(filePath).delete();
-            return throwError(() => new Error('Failed to save file metadata'));
-          })
-        );
-      }),
-      catchError(error => {
-        console.error('Error uploading file:', error);
-        return throwError(() => new Error('Failed to upload file'));
-      })
-    );
-  }
-
-  /**
-   * Updates an existing digital file
-   * @param id - The file ID
-   * @param updates - The updates to apply
-   * @returns Observable of the updated digital file
-   */
-  updateFile(id: string, updates: Partial<DigitalFile>): Observable<DigitalFile> {
-    const updateData = {
-      ...updates,
-      updatedAt: new Date().toISOString()
-    };
-
-    return from(
-      this.firestore.doc(`${this.COLLECTION_NAME}/${id}`).update(updateData)
-    ).pipe(
-      switchMap(() => this.getFile(id)),
-      map(file => {
-        if (!file) {
-          throw new Error('File not found after update');
-        }
-        return file;
-      }),
-      catchError(error => {
-        console.error('Error updating file:', error);
-        return throwError(() => new Error('Failed to update file'));
-      })
-    );
-  }
-
-  /**
-   * Deletes a digital file
-   * @param id - The file ID
-   * @returns Observable that completes when deletion is done
-   */
-  deleteFile(id: string): Observable<void> {
-    return this.getFile(id).pipe(
-      switchMap(file => {
-        if (!file) {
-          // Try to delete from Firestore even if file object not found
-          return from(this.firestore.doc(`${this.COLLECTION_NAME}/${id}`).delete()).pipe(
-            map(() => void 0),
-            catchError(error => {
-              console.error('Error deleting from Firestore:', error);
-              return throwError(() => new Error('Failed to delete file from database'));
-            })
-          );
-        }
-
-        // Delete from Firebase Storage if file exists
-        const deleteStorage = file.fileUrl ? 
-          this.storage.refFromURL(file.fileUrl).delete() : 
-          Promise.resolve();
-
-        // Delete from Firestore
-        const deleteFirestore = this.firestore.doc(`${this.COLLECTION_NAME}/${id}`).delete();
-
-        return combineLatest([deleteStorage, deleteFirestore]).pipe(
-          map(() => void 0),
-          catchError(error => {
-            console.error('Error deleting file:', error);
-            return throwError(() => new Error('Failed to delete file'));
-          })
-        );
-      })
-    );
-  }
-
-  /**
-   * Toggles file active status
-   * @param id - The file ID
-   * @param isActive - New active status
-   * @returns Observable of the updated digital file
-   */
-  toggleFileStatus(id: string, isActive: boolean): Observable<DigitalFile> {
-    return this.updateFile(id, { isActive });
-  }
-
-  /**
-   * Searches files by title or description
-   * @param query - Search query
-   * @returns Observable of matching files
-   */
-  searchFiles(query: string): Observable<DigitalFile[]> {
-    if (!query.trim()) {
-      return this.getFiles();
-    }
-
-    const searchTerm = query.toLowerCase().trim();
-    
-    return this.getFiles().pipe(
-      map(files => files.filter(file => 
-        file.title.toLowerCase().includes(searchTerm) ||
-        file.description.toLowerCase().includes(searchTerm) ||
-        (file.tags && file.tags.some(tag => tag.toLowerCase().includes(searchTerm)))
-      ))
-    );
-  }
-
-  /**
-   * Gets files by language
-   * @param language - Language filter
-   * @returns Observable of filtered files
+   * Get files by language
    */
   getFilesByLanguage(language: string): Observable<DigitalFile[]> {
-    if (!language || language === 'all') {
-      return this.getFiles();
+    if (!language) {
+      return of([]);
     }
 
-    return this.getFiles().pipe(
-      map(files => files.filter(file => file.language === language))
-    );
+    return this.firestore
+      .collection(this.COLLECTION, ref => 
+        ref.where('language', '==', language)
+           .where('isActive', '==', true)
+           .orderBy('createdAt', 'desc')
+      )
+      .valueChanges({ idField: 'id' }) as Observable<DigitalFile[]>;
   }
 
   /**
-   * Gets files by access level
-   * @param accessLevel - Access level filter
-   * @returns Observable of filtered files
+   * Get files by access level
    */
   getFilesByAccessLevel(accessLevel: string): Observable<DigitalFile[]> {
-    if (!accessLevel || accessLevel === 'all') {
-      return this.getFiles();
+    if (!accessLevel) {
+      return of([]);
     }
 
-    return this.getFiles().pipe(
-      map(files => files.filter(file => file.accessLevel === accessLevel))
+    return this.firestore
+      .collection(this.COLLECTION, ref => 
+        ref.where('accessLevel', '==', accessLevel)
+           .where('isActive', '==', true)
+           .orderBy('createdAt', 'desc')
+      )
+      .valueChanges({ idField: 'id' }) as Observable<DigitalFile[]>;
+  }
+
+  /**
+   * Get only active files
+   */
+  getActiveFiles(): Observable<DigitalFile[]> {
+    return this.firestore
+      .collection(this.COLLECTION, ref => 
+        ref.where('isActive', '==', true)
+           // .orderBy('createdAt', 'desc') // Temporarily commented out while index builds
+      )
+      .valueChanges({ idField: 'id' }) as Observable<DigitalFile[]>;
+  }
+
+  /**
+   * Download file with enhanced security
+   */
+  downloadFile(file: DigitalFile): Observable<boolean> {
+    if (!file?.id) {
+      throw new Error('File ID not available');
+    }
+
+    // Use Firebase Function for server-side access validation and file content
+    const downloadFileContent = this.functions.httpsCallable('downloadFileContent');
+    
+    return new Observable(observer => {
+      downloadFileContent({ fileId: file.id }).subscribe({
+        next: (result: any) => {
+          // Firebase Functions return data directly, not wrapped in result.data
+          // Check both possible locations: result.data and result
+          let downloadData: any;
+          
+          if (result?.data && typeof result.data === 'object') {
+            downloadData = result.data;
+          } else if (result && typeof result === 'object') {
+            downloadData = result;
+          }
+          
+          if (downloadData?.hasAccess && downloadData?.fileContent) {
+            // Create download from base64 content
+            this.createDownloadFromContent(downloadData.fileContent, downloadData.fileName, downloadData.fileType)
+              .then(() => {
+                observer.next(true);
+                observer.complete();
+              })
+              .catch(error => {
+                console.error('Error creating download from content:', error);
+                observer.error(error);
+              });
+          } else {
+            console.error('Access denied or no file content for file:', file.id);
+            observer.error(new Error('Access denied or file content unavailable'));
+          }
+        },
+        error: (error: any) => {
+          console.error('Error downloading file content:', error);
+          observer.error(error);
+        }
+      });
+    });
+  }
+
+  /**
+   * Download file by ID with enhanced security
+   */
+  downloadFileById(fileId: string): Observable<boolean> {
+    if (!fileId) {
+      throw new Error('Missing file ID');
+    }
+
+    return this.getFile(fileId).pipe(
+      switchMap(file => {
+        if (!file) {
+          throw new Error('File not found');
+        }
+        return this.downloadFile(file);
+      }),
+      catchError(error => {
+        console.error('Error downloading file by ID:', error);
+        throw error;
+      })
     );
   }
 
   /**
-   * Gets active files only
-   * @returns Observable of active files
+   * Get secure download URL with enhanced security
    */
-  getActiveFiles(): Observable<DigitalFile[]> {
-    return this.getFiles().pipe(
-      map(files => files.filter(file => file.isActive))
-    );
+  getFileDownloadUrl(file: DigitalFile): Observable<string> {
+    if (!file?.id) {
+      throw new Error('File ID not available');
+    }
+
+    // Use Firebase Function for server-side access validation and file content
+    const downloadFileContent = this.functions.httpsCallable('downloadFileContent');
+    
+    return new Observable(observer => {
+      downloadFileContent({ fileId: file.id }).subscribe({
+        next: (result: any) => {
+          // Firebase Functions return data directly, not wrapped in result.data
+          // Check both possible locations: result.data and result
+          let downloadData: any;
+          
+          if (result?.data && typeof result.data === 'object') {
+            downloadData = result.data;
+          } else if (result && typeof result === 'object') {
+            downloadData = result;
+          }
+          
+          if (downloadData?.hasAccess && downloadData?.fileContent) {
+            // Create a data URL from the base64 content
+            const dataUrl = `data:${downloadData.fileType};base64,${downloadData.fileContent}`;
+            observer.next(dataUrl);
+            observer.complete();
+          } else {
+            console.error('Access denied or no file content for file:', file.id);
+            observer.error(new Error('Access denied or file content unavailable'));
+          }
+        },
+        error: (error: any) => {
+          console.error('Error getting secure download URL:', error);
+          observer.error(error);
+        }
+      });
+    });
   }
 
+  /**
+   * Create a download from base64 file content
+   */
+  private async createDownloadFromContent(base64Content: string, fileName: string, fileType: string): Promise<void> {
+    try {
+      // Create a temporary anchor element to trigger the download
+      const link = document.createElement('a');
+      link.href = `data:${fileType};base64,${base64Content}`; // Create a data URL
+      link.download = fileName; // Use the provided filename
+      link.target = '_blank';
+      
+      // Append to DOM, click, and remove
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
 
+    } catch (error) {
+      console.error('Error creating download from content:', error);
+      throw new Error('Failed to create download from content');
+    }
+  }
 }

@@ -11,14 +11,7 @@ export const mockCategories = [
     icon: 'user',
     order: 1,
   },
-  {
-    id: 'tips',
-    title: 'HOME.CAT_TIPS_TITLE',
-    description: 'HOME.CAT_TIPS_DESC',
-    color: 'bg-yellow-500',
-    icon: 'lightbulb',
-    order: 2,
-  },
+
   {
     id: 'shop',
     title: 'HOME.CAT_SHOP_TITLE',
@@ -56,7 +49,7 @@ export const mockCategories = [
     title: 'HOME.CAT_EDUCATIONAL_TITLE',
     description: 'HOME.CAT_EDUCATIONAL_DESC',
     color: 'bg-indigo-500',
-    icon: 'graduation-cap',
+    icon: 'calculator',
     order: 7,
   },
   {
@@ -74,5 +67,21 @@ export const mockCategories = [
     color: 'bg-emerald-500',
     icon: 'tree',
     order: 9,
+  },
+  {
+    id: 'mathematics',
+    title: 'HOME.CAT_MATHEMATICS_TITLE',
+    description: 'HOME.CAT_MATHEMATICS_DESC',
+    color: 'bg-cyan-500',
+    icon: 'calculator',
+    order: 10,
+  },
+  {
+    id: 'speaking',
+    title: 'HOME.CAT_SPEAKING_TITLE',
+    description: 'HOME.CAT_SPEAKING_DESC',
+    color: 'bg-amber-500',
+    icon: 'campaign',
+    order: 11,
   },
 ];

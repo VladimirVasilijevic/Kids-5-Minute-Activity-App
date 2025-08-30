@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable, map, tap, from, switchMap } from 'rxjs';
+import { Observable, map, tap, from, switchMap, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { TranslateService } from '@ngx-translate/core';
 import { AngularFireFunctions } from '@angular/fire/compat/functions';
@@ -90,6 +90,11 @@ export class BlogService {
           isPremium: blogPost.isPremium || false
         }));
       }),
+      catchError((error) => {
+        console.warn('Public blog posts failed, returning empty array:', error);
+        this._loadingService.hide();
+        return of([]); // Return empty array instead of throwing error
+      }),
       tap(() => {
         this._loadingService.hide();
       })
@@ -98,23 +103,60 @@ export class BlogService {
 
   /**
    * Retrieves a specific blog post by its ID with loading indicator and default visibility/premium fields
+   * Handles both authenticated and non-authenticated users
    * @param id - The ID of the blog post to retrieve
    * @returns {Observable<BlogPost>} Observable of the blog post
    */
   getBlogPostById(id: number): Observable<BlogPost> {
     this._loadingService.showWithMessage(this._translateService.instant('BLOG.LOADING_SINGLE'));
     
-    return this._firestoreService.getBlogPosts().pipe(
-      map(posts => {
-        const post = posts.find(p => p.id === id);
-        if (!post) {
-          throw new Error(`Blog post with ID ${id} not found`);
+    // Get current language from translation service
+    const currentLanguage = this._translateService.currentLang || this._translateService.getDefaultLang() || 'en';
+    
+    // Check if user is authenticated to determine which function to use
+    return this._authService.user$.pipe(
+      switchMap(user => {
+        if (user) {
+          // User is authenticated - use filtered function
+          return from(this._functions.httpsCallable('getFilteredBlogPosts')({ language: currentLanguage })).pipe(
+            map((result: { blogPosts?: BlogPost[] }) => {
+              const posts = result.blogPosts || [];
+              const post = posts.find(p => p.id === id);
+              if (!post) {
+                throw new Error(`Blog post with ID ${id} not found`);
+              }
+              return {
+                ...post,
+                visibility: post.visibility || ContentVisibility.PUBLIC,
+                isPremium: post.isPremium || false
+              };
+            })
+          );
+        } else {
+          // User is not authenticated - use public content function
+          return from(this._functions.httpsCallable('getPublicContent')({ 
+            contentType: 'blog', 
+            language: currentLanguage 
+          })).pipe(
+            map((result: { content?: BlogPost[] }) => {
+              const posts = result.content || [];
+              const post = posts.find(p => p.id === id);
+              if (!post) {
+                throw new Error(`Blog post with ID ${id} not found`);
+              }
+              return {
+                ...post,
+                visibility: post.visibility || ContentVisibility.PUBLIC,
+                isPremium: post.isPremium || false
+              };
+            })
+          );
         }
-        return {
-          ...post,
-          visibility: post.visibility || ContentVisibility.PUBLIC,
-          isPremium: post.isPremium || false
-        };
+      }),
+      catchError(error => {
+        console.error('Error fetching blog post by ID:', error);
+        this._loadingService.hide();
+        throw new Error(`Blog post with ID ${id} not found`);
       }),
       tap(() => {
         this._loadingService.hide();
