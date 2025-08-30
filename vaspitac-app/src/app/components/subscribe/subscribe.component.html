@@ -133,12 +133,15 @@
       </div>
     </div>
 
-    <!-- Contact Section -->
+          <!-- Contact Section -->
     <div class="mt-12 text-center">
       <p class="text-gray-600 mb-4">
         {{ 'SUBSCRIBE.CONTACT_TITLE' | translate }}
       </p>
-      <button class="bg-white border border-gray-300 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-50 transition-colors">
+      <button 
+        (click)="navigateToAbout()"
+        class="bg-white border border-gray-300 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-50 transition-colors"
+      >
         {{ 'SUBSCRIBE.CONTACT_BUTTON' | translate }}
       </button>
     </div>
@@ -174,7 +177,7 @@
         <div class="space-y-2 text-sm">
           <div class="flex justify-between">
             <span class="text-blue-600">{{ 'SHOP.PAYPAL_LINK' | translate }}:</span>
-            <span class="font-medium">paypal.me/anavaspitac</span>
+            <span class="font-medium">https://paypal.me/anavaspitac?country.x=RS&locale.x=en_US</span>
           </div>
           <div class="flex justify-between">
             <span class="text-blue-600">{{ 'SHOP.AMOUNT' | translate }}:</span>
@@ -202,7 +205,7 @@
         <div class="space-y-2 text-sm">
           <div class="flex justify-between">
             <span class="text-green-600">{{ 'SHOP.PAYMENT_PURPOSE' | translate }}:</span>
-            <span class="font-medium">Pretplata: {{ selectedPlan?.name }} - {{ getUserEmail() }}</span>
+            <span class="font-medium">Pretplata: {{ selectedPlan?.name }} - {{ (userEmail$ | async) || ('SUBSCRIBE.ENTER_YOUR_EMAIL' | translate) }}</span>
           </div>
           <div class="flex justify-between">
             <span class="text-green-600">{{ 'SHOP.ACCOUNT_NUMBER' | translate }}:</span>

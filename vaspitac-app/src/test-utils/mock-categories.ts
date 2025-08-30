@@ -11,14 +11,7 @@ export const mockCategories = [
     icon: 'user',
     order: 1,
   },
-  {
-    id: 'tips',
-    title: 'HOME.CAT_TIPS_TITLE',
-    description: 'HOME.CAT_TIPS_DESC',
-    color: 'bg-yellow-500',
-    icon: 'lightbulb',
-    order: 2,
-  },
+
   {
     id: 'shop',
     title: 'HOME.CAT_SHOP_TITLE',
@@ -56,7 +49,7 @@ export const mockCategories = [
     title: 'HOME.CAT_EDUCATIONAL_TITLE',
     description: 'HOME.CAT_EDUCATIONAL_DESC',
     color: 'bg-indigo-500',
-    icon: 'graduation-cap',
+    icon: 'calculator',
     order: 7,
   },
   {

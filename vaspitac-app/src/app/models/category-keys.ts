@@ -6,7 +6,7 @@ export const CATEGORY_KEYS = {
   SHOP: 'shop',
   SUBSCRIBE: 'subscribe',
   BLOG: 'blog',
-  TIPS: 'tips',
+
   PHYSICAL: 'physical',
   CREATIVE: 'creative',
   EDUCATIONAL: 'educational',

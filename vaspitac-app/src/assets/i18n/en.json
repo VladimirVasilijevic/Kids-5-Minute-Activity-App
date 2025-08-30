@@ -7,7 +7,7 @@
     "HOME": "Home",
     "ACTIVITIES": "Activities",
     "BLOG": "Blog",
-    "TIPS": "Tips",
+  
     "SHOP": "Shop",
     "ABOUT": "About"
   },
@@ -24,8 +24,7 @@
     "CAT_SUBSCRIBE_DESC": "Choose a subscription plan that suits you",
     "CAT_BLOG_TITLE": "Blog",
     "CAT_BLOG_DESC": "Articles about parenting and child development",
-    "CAT_TIPS_TITLE": "Tips",
-    "CAT_TIPS_DESC": "Useful tips for everyday parenting",
+
     "CAT_PHYSICAL_TITLE": "Physical Activities",
     "CAT_PHYSICAL_DESC": "Activities for motor skills and movement",
     "CAT_CREATIVE_TITLE": "Creative Activities",
@@ -81,7 +80,7 @@
     "PDF_CREATIVE": "Creative games",
     "VIDEO_MATERIALS": "Video Materials",
     "VIDEO_DEMO": "Activity demonstrations",
-    "VIDEO_TIPS": "Parenting tips",
+
     "VIDEO_CONSULT": "Online consultations",
     "VIDEO_WEBINAR": "Webinars",
     "PAYPAL_TITLE": "PayPal Payment",
@@ -214,23 +213,7 @@
     "WATCH_ON_PLATFORM": "Watch on platform",
     "VIDEO_INDICATOR": "Video"
   },
-  "TIPS": {
-    "BACK": "Back to home",
-    "TITLE": "Tips",
-    "SUBTITLE": "Useful tips for everyday parenting",
-    "TIP1_TITLE": "Listen actively",
-    "TIP1_DESC": "When your child talks to you, stop and show that you're listening. This builds trust and encourages communication.",
-    "TIP2_TITLE": "Establish routine",
-    "TIP2_DESC": "Regular routine helps children feel secure and develop discipline. Be consistent.",
-    "TIP3_TITLE": "Celebrate small achievements",
-    "TIP3_DESC": "Every progress is important. Praise motivates the child and builds self-esteem.",
-    "TIP4_TITLE": "Be creative",
-    "TIP4_DESC": "Use everyday situations for learning. Counting while cooking, colors during walks...",
-    "QUICK_TITLE": "Quick Tips",
-    "QUICK_SUBTITLE": "Simple tips for every day",
-    "EMPTY": "No tips available.",
-    "LOADING": "Loading tips..."
-  },
+
   "SEARCH": {
     "PLACEHOLDER": "Search activities and blogs...",
     "ACTIVITIES": "Activities",
@@ -648,7 +631,7 @@
 
   "SUBSCRIBE": {
     "TITLE": "Choose your plan",
-    "SUBTITLE": "Access rich content of activities and parenting tips",
+          "SUBTITLE": "Access rich content of activities",
     "BACK_TO_HOME": "Back to home",
     "FREE": {
       "NAME": "Free",
@@ -656,11 +639,11 @@
       "DESCRIPTION": "Basic features to get started",
       "FEATURES": [
         "Access to basic activities",
-        "Limited tips",
+
         "Read blog articles"
       ],
       "FEATURES.0": "Access to basic activities",
-      "FEATURES.1": "Limited tips",
+      
       "FEATURES.2": "Read blog articles",
       "LIMITATIONS": [
         "Limited activities per day",
@@ -677,14 +660,14 @@
       "FEATURES": [
         "Unlimited access to all activities",
         "Exclusive content and activities",
-        "Personalized tips",
+
         "Priority support",
         "Offline content access",
         "Monthly activity guides"
       ],
       "FEATURES.0": "Unlimited access to all activities",
       "FEATURES.1": "Exclusive content and activities",
-      "FEATURES.2": "Personalized tips",
+      
       "FEATURES.3": "Priority support",
       "FEATURES.4": "Offline content access",
       "FEATURES.5": "Monthly activity guides",
@@ -701,6 +684,7 @@
       "SUCCESS": "Payment successful!",
       "ERROR": "Payment failed. Please try again.",
       "MOCK_MESSAGE": "This is a mock payment flow. In production, this would integrate with Stripe."
-    }
+    },
+    "ENTER_YOUR_EMAIL": "Enter your email"
   }
 }

@@ -14,8 +14,6 @@ const ADMIN_PERMISSIONS = [
   'access_premium_activities',
   'access_blog_posts',
   'access_premium_blog',
-  'access_tips',
-  'access_premium_tips',
   'download_pdf_guides',
   'download_video_materials',
   'manage_content',
@@ -30,7 +28,6 @@ const ADMIN_PERMISSIONS = [
 // Free user permissions
 const FREE_USER_PERMISSIONS = [
   'access_blog_posts',
-  'access_tips',
   'edit_profile',
   'view_profile'
 ];

@@ -6,7 +6,6 @@ import { Observable, of, catchError, switchMap, map, firstValueFrom, tap } from 
 import { Activity } from '../models/activity.model';
 import { Category } from '../models/category.model';
 import { BlogPost } from '../models/blog-post.model';
-import { Tip } from '../models/tip.model';
 import { AboutContent, AboutContentData } from '../models/about-content.model';
 
 import { LanguageService } from './language.service';
@@ -163,25 +162,7 @@ export class FirestoreService {
     );
   }
 
-  /**
-   * Get tips from Firestore with JSON fallback
-   * @returns {Observable<Tip[]>} Observable of tips array
-   */
-  getTips(): Observable<Tip[]> {
-    return this._languageService.getLanguage().pipe(
-      switchMap((lang) => {
-        return this._firestore
-          .collection<Tip>(`tips_${lang}`)
-          .valueChanges()
-          .pipe(
-            catchError(() => {
-              // Fallback to JSON for tips
-              return this._http.get<Tip[]>(`assets/tips_${lang}.json`);
-            })
-          );
-      })
-    );
-  }
+
 
   /**
    * Get about content from Firestore with JSON fallback
