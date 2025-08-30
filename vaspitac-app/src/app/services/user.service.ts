@@ -73,7 +73,14 @@ export class UserService {
    * @returns Promise resolved when the profile is set
    */
   setUserProfile(profile: UserProfile): Promise<void> {
-    return this._afs.doc<UserProfile>(`users/${profile.uid}`).set(profile, { merge: true });
+    // Filter out undefined and null values to prevent Firebase errors
+    const filteredProfile = Object.fromEntries(
+      Object.entries(profile).filter(([_, value]) => value !== undefined && value !== null)
+    ) as unknown as UserProfile;
+    
+
+    
+    return this._afs.doc<UserProfile>(`users/${profile.uid}`).set(filteredProfile, { merge: true });
   }
 
   /**
