@@ -12,7 +12,6 @@ import { LanguageService } from './language.service';
 import { FirestoreService } from './firestore.service';
 import { Category } from '../models/category.model';
 import { BlogPost } from '../models/blog-post.model';
-import { Tip } from '../models/tip.model';
 
 describe('FirestoreService', () => {
   let service: FirestoreService;
