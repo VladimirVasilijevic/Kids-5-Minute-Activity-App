@@ -127,11 +127,7 @@ describe('HomeComponent', () => {
       expect(router.navigate).toHaveBeenCalledWith(['/blog']);
     }));
 
-    it('should navigate to /tips', fakeAsync(() => {
-      component.goToCategory(CATEGORY_KEYS.TIPS);
-      tick();
-      expect(router.navigate).toHaveBeenCalledWith(['/tips']);
-    }));
+
 
     it('should navigate to /activities with category', fakeAsync(() => {
       component.goToCategory(CATEGORY_KEYS.PHYSICAL);

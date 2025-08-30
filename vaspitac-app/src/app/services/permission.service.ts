@@ -134,8 +134,7 @@ export class PermissionService {
         // Check for premium content permissions
         const premiumPermissions = [
           Permission.ACCESS_PREMIUM_ACTIVITIES,
-          Permission.ACCESS_PREMIUM_BLOG,
-          Permission.ACCESS_PREMIUM_TIPS
+          Permission.ACCESS_PREMIUM_BLOG
         ];
 
         return premiumPermissions.some(permission => 
@@ -185,8 +184,7 @@ export class PermissionService {
           Permission.ACCESS_PREMIUM_ACTIVITIES,
           Permission.ACCESS_BLOG_POSTS,
           Permission.ACCESS_PREMIUM_BLOG,
-          Permission.ACCESS_TIPS,
-          Permission.ACCESS_PREMIUM_TIPS,
+
           Permission.DOWNLOAD_PDF_GUIDES,
           Permission.DOWNLOAD_VIDEO_MATERIALS,
           Permission.EDIT_PROFILE,
@@ -198,7 +196,6 @@ export class PermissionService {
         return [
           Permission.ACCESS_ALL_ACTIVITIES,
           Permission.ACCESS_BLOG_POSTS,
-          Permission.ACCESS_TIPS,
           Permission.EDIT_PROFILE,
           Permission.VIEW_PROFILE,
           Permission.MANAGE_OWN_SUBSCRIPTION
@@ -207,7 +204,6 @@ export class PermissionService {
       case UserRole.FREE_USER:
         return [
           Permission.ACCESS_BLOG_POSTS,
-          Permission.ACCESS_TIPS,
           Permission.EDIT_PROFILE,
           Permission.VIEW_PROFILE
         ];

@@ -20,6 +20,7 @@ import { switchMap } from 'rxjs/operators';
 export class SubscribeComponent implements OnInit, OnDestroy {
   plans: SubscriptionPlan[] = [];
   userProfile$: Observable<UserProfile | null> = of(null);
+  userEmail$: Observable<string> = of('');
   isProcessing = false;
   showSuccessMessage = false;
   showErrorMessage = false;
@@ -39,6 +40,11 @@ export class SubscribeComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.userProfile$ = this._auth.user$.pipe(
       switchMap(user => user ? this._userService.getUserProfile(user.uid) : of(null))
+    );
+    
+    // Create userEmail$ observable from userProfile$
+    this.userEmail$ = this.userProfile$.pipe(
+      switchMap(profile => of(profile?.email || ''))
     );
     
     // Wait for translation service to be ready
@@ -114,6 +120,13 @@ export class SubscribeComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Navigate to about page
+   */
+  navigateToAbout(): void {
+    this._router.navigate(['/about'], { fragment: 'contact' });
+  }
+
+  /**
    * Show success message
    * @param _message - Success message to display
    */
@@ -163,7 +176,7 @@ export class SubscribeComponent implements OnInit, OnDestroy {
    * Copies PayPal link to clipboard
    */
   copyPayPalLink(): void {
-    const paypalLink = 'paypal.me/anavaspitac';
+    const paypalLink = 'https://paypal.me/anavaspitac?country.x=RS&locale.x=en_US';
     navigator.clipboard.writeText(paypalLink).then(() => {
       // PayPal link copied successfully
     }).catch(err => {
@@ -183,20 +196,6 @@ Recipient: ${this._translate.instant('SHOP.BANK_RECIPIENT')}`;
     }).catch(err => {
       console.error('Failed to copy bank details:', err);
     });
-  }
-
-  /**
-   * Gets the current user's email
-   * @returns User email or empty string if not available
-   */
-  getUserEmail(): string {
-    let userEmail = '';
-    this.userProfile$.subscribe(profile => {
-      if (profile?.email) {
-        userEmail = profile.email;
-      }
-    }).unsubscribe();
-    return userEmail;
   }
 
   /**

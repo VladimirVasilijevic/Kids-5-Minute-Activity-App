@@ -456,7 +456,7 @@ export class ShopComponent implements OnInit {
    * Copies PayPal link to clipboard
    */
   copyPayPalLink(): void {
-    const paypalLink = 'paypal.me/anavaspitac';
+    const paypalLink = 'https://paypal.me/anavaspitac?country.x=RS&locale.x=en_US';
     navigator.clipboard.writeText(paypalLink).then(() => {
       // PayPal link copied successfully
     }).catch(err => {

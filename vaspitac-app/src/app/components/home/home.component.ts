@@ -76,9 +76,7 @@ export class HomeComponent implements OnInit {
       case CATEGORY_KEYS.BLOG:
         this._router.navigate(['/blog']).then((): void => this.scrollToTop());
         break;
-      case CATEGORY_KEYS.TIPS:
-        this._router.navigate(['/tips']).then((): void => this.scrollToTop());
-        break;
+
       case CATEGORY_KEYS.PHYSICAL:
       case CATEGORY_KEYS.CREATIVE:
       case CATEGORY_KEYS.EDUCATIONAL:

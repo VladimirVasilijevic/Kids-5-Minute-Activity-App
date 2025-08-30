@@ -41,7 +41,7 @@ import { ShopComponent } from './components/shop/shop.component';
 import { AboutComponent } from './components/about/about.component';
 import { BlogComponent } from './components/blog/blog.component';
 import { BlogDetailComponent } from './components/blog-detail/blog-detail.component';
-import { TipsComponent } from './components/tips/tips.component';
+
 import { ScrollToTopComponent } from './components/scroll-to-top/scroll-to-top.component';
 import { SearchOverlayComponent } from './components/search-overlay/search-overlay.component';
 import { AuthModalComponent } from './components/auth-modal/auth-modal.component';
@@ -87,7 +87,7 @@ export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
     AboutComponent,
     BlogComponent,
     BlogDetailComponent,
-    TipsComponent,
+
     ScrollToTopComponent,
     SearchOverlayComponent,
     AuthModalComponent,
@@ -124,7 +124,7 @@ export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
       { path: 'about', component: AboutComponent },
       { path: 'blog', component: BlogComponent },
       { path: 'blog/:id', component: BlogDetailComponent },
-      { path: 'tips', component: TipsComponent },
+
       { path: 'profile', component: ProfileComponent },
       { path: 'splash-demo', component: SplashDemoComponent },
       { path: 'admin', component: AdminDashboardComponent },

@@ -350,7 +350,7 @@ describe('ShopComponent', () => {
       component.copyPayPalLink();
       tick();
       
-      expect(navigator.clipboard.writeText).toHaveBeenCalledWith('paypal.me/anavaspitac');
+      expect(navigator.clipboard.writeText).toHaveBeenCalledWith('https://paypal.me/anavaspitac?country.x=RS&locale.x=en_US');
     }));
 
     it('should handle clipboard error gracefully', fakeAsync(() => {

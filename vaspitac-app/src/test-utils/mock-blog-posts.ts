@@ -19,9 +19,9 @@ export const mockBlogPosts: BlogPost[] = [
   },
   {
     id: 2,
-    title: 'Tips for a Healthy Diet for Kids',
-    excerpt: 'A healthy diet is crucial for a child\'s growth and development. Here are some tips...',
-    fullContent: 'Full content of the blog post about tips for a healthy diet...',
+    title: 'Guidance for a Healthy Diet for Kids',
+    excerpt: 'A healthy diet is crucial for a child\'s growth and development. Here are some strategies...',
+    fullContent: 'Full content of the blog post about guidance for a healthy diet...',
     author: 'Guest Author',
     readTime: '7 min',
     date: '2023-09-25',
