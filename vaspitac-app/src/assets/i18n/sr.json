@@ -29,17 +29,18 @@
     "CAT_PHYSICAL_DESC": "Aktivnosti za razvoj motorike i pokret",
     "CAT_CREATIVE_TITLE": "Likovne aktivnosti",
     "CAT_CREATIVE_DESC": "Umetnost, crtanje i kreativne igre",
-    "CAT_EDUCATIONAL_TITLE": "Matematicke aktivnosti",
-    "CAT_EDUCATIONAL_DESC": "Učenje kroz igru i zabavu",
+    "CAT_MATHEMATICS_TITLE": "Matematičke aktivnosti",
+    "CAT_MATHEMATICS_DESC": "Brojevi, brojanje i matematičke igre",
     "CAT_MUSICAL_TITLE": "Muzičke aktivnosti",
     "CAT_MUSICAL_DESC": "Muzika, ritam i pevanje",
-    "CAT_NATURE_TITLE": "Govorne aktivnosti",
-    "CAT_NATURE_DESC": "Podsticanje govora i komunikacije kroz zabavne aktivnosti",
+    "CAT_SPEAKING_TITLE": "Govorne aktivnosti",
+    "CAT_SPEAKING_DESC": "Razvoj govora i komunikacije",
     "LOGIN_PROMPT": "Prijavite se da biste pristupili svom profilu i personalizovanim funkcijama.",
     "LOCKED_CATEGORY_MESSAGE": "Pretplati se da otključaš"
   },
   "ACTIVITIES": {
     "TITLE": "Aktivnosti",
+    "SUBTITLE": "Izaberite iz naše kolekcije zabavnih i edukativnih aktivnosti",
     "BACK": "Nazad na početnu",
     "EMPTY": "Nema dostupnih aktivnosti.",
     "START": "Započni aktivnost",
@@ -189,6 +190,7 @@
     "PRESENT": "sadašnjost",
     "CONTACT_TITLE": "Kontakt",
     "LOCATION": "Beograd, Srbija",
+    "SOCIAL_NETWORKS": "Društvene mreže",
     "LOADING": "Učitavanje sadržaja o meni..."
   },
   "BLOG": {

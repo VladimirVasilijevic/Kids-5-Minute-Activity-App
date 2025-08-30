@@ -63,7 +63,7 @@ describe('ActivityListComponent', (): void => {
     const compiled = fixture.nativeElement;
     const title = compiled.querySelector('h2');
     expect(title).toBeTruthy();
-    expect(title && title.textContent).toContain(translate.instant('HOME.CAT_PHYSICAL_TITLE'));
+    expect(title && title.textContent).toContain(translate.instant('ACTIVITIES.TITLE'));
   });
 
   it('should show a message if no activities are available', (): void => {
