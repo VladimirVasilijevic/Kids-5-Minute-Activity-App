@@ -6,6 +6,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 
 import { Activity } from '../../models/activity.model';
 import { ActivityService } from '../../services/activity.service';
+import { CATEGORY_KEYS } from '../../models/category-keys';
 
 /**
  * Component for displaying and filtering a list of activities
@@ -53,6 +54,15 @@ export class ActivityListComponent implements OnInit {
       }
     });
 
+    // Set all available activity categories (excluding about, shop, subscribe, blog)
+    this.categories = [
+      CATEGORY_KEYS.PHYSICAL,
+      CATEGORY_KEYS.CREATIVE,
+      CATEGORY_KEYS.MUSICAL,
+      CATEGORY_KEYS.MATHEMATICS,
+      CATEGORY_KEYS.SPEAKING
+    ];
+
     this.activities$ = combineLatest([
       this._translate.onLangChange.pipe(
         map((e) => e.lang as string),
@@ -66,7 +76,6 @@ export class ActivityListComponent implements OnInit {
         return this._activityService.getActivities(lang).pipe(
           map((activities) => {
             this.allActivities = activities;
-            this.categories = Array.from(new Set(activities.map((a) => a.category)));
             return category ? activities.filter((a) => a.category === category) : activities;
           })
         );
@@ -116,5 +125,39 @@ export class ActivityListComponent implements OnInit {
         window.scrollTo({ top: 0, behavior: 'smooth' });
       }
     });
+  }
+
+  /**
+   * Gets the current category title translation key
+   */
+  get currentCategoryTitleKey(): string {
+    return this.selectedCategory ? `HOME.CAT_${this.selectedCategory.toUpperCase()}_TITLE` : 'ACTIVITIES.TITLE';
+  }
+
+  /**
+   * Gets the current category description translation key
+   */
+  get currentCategoryDescKey(): string {
+    return this.selectedCategory ? `HOME.CAT_${this.selectedCategory.toUpperCase()}_DESC` : 'ACTIVITIES.SUBTITLE';
+  }
+
+  /**
+   * Gets the translated category title
+   * @param category - The category name
+   * @returns Translated category title
+   */
+  getCategoryTitle(category: string): string {
+    const key = `HOME.CAT_${category.toUpperCase()}_TITLE`;
+    return this._translate.instant(key);
+  }
+
+  /**
+   * Gets the translated category description
+   * @param category - The category name
+   * @returns Translated category description
+   */
+  getCategoryDesc(category: string): string {
+    const key = `HOME.CAT_${category.toUpperCase()}_DESC`;
+    return this._translate.instant(key);
   }
 }

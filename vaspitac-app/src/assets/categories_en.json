@@ -49,14 +49,6 @@
     "order": 7
   },
   {
-    "id": "educational",
-    "title": "HOME.CAT_EDUCATIONAL_TITLE",
-    "description": "HOME.CAT_EDUCATIONAL_DESC",
-    "color": "bg-indigo-500",
-    "icon": "calculator",
-    "order": 8
-  },
-  {
     "id": "musical",
     "title": "HOME.CAT_MUSICAL_TITLE",
     "description": "HOME.CAT_MUSICAL_DESC",
@@ -65,11 +57,19 @@
     "order": 9
   },
   {
-    "id": "nature",
-    "title": "HOME.CAT_NATURE_TITLE",
-    "description": "HOME.CAT_NATURE_DESC",
-    "color": "bg-emerald-500",
-    "icon": "tree",
-    "order": 10
+    "id": "mathematics",
+    "title": "HOME.CAT_MATHEMATICS_TITLE",
+    "description": "HOME.CAT_MATHEMATICS_DESC",
+    "color": "bg-cyan-500",
+    "icon": "calculator",
+    "order": 11
+  },
+  {
+    "id": "speaking",
+    "title": "HOME.CAT_SPEAKING_TITLE",
+    "description": "HOME.CAT_SPEAKING_DESC",
+    "color": "bg-amber-500",
+    "icon": "campaign",
+    "order": 12
   }
 ]

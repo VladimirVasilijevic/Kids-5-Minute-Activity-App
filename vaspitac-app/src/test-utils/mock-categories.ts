@@ -68,4 +68,20 @@ export const mockCategories = [
     icon: 'tree',
     order: 9,
   },
+  {
+    id: 'mathematics',
+    title: 'HOME.CAT_MATHEMATICS_TITLE',
+    description: 'HOME.CAT_MATHEMATICS_DESC',
+    color: 'bg-cyan-500',
+    icon: 'calculator',
+    order: 10,
+  },
+  {
+    id: 'speaking',
+    title: 'HOME.CAT_SPEAKING_TITLE',
+    description: 'HOME.CAT_SPEAKING_DESC',
+    color: 'bg-amber-500',
+    icon: 'campaign',
+    order: 11,
+  },
 ];

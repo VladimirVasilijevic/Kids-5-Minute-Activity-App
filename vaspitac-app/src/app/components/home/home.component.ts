@@ -79,9 +79,9 @@ export class HomeComponent implements OnInit {
 
       case CATEGORY_KEYS.PHYSICAL:
       case CATEGORY_KEYS.CREATIVE:
-      case CATEGORY_KEYS.EDUCATIONAL:
       case CATEGORY_KEYS.MUSICAL:
-      case CATEGORY_KEYS.NATURE:
+      case CATEGORY_KEYS.MATHEMATICS:
+      case CATEGORY_KEYS.SPEAKING:
         this._router
           .navigate(['/activities'], { queryParams: { category: categoryId } })
           .then((): void => this.scrollToTop());
@@ -142,9 +142,9 @@ export class HomeComponent implements OnInit {
     const activityCategories: CategoryKey[] = [
       CATEGORY_KEYS.PHYSICAL,
       CATEGORY_KEYS.CREATIVE,
-      CATEGORY_KEYS.EDUCATIONAL,
       CATEGORY_KEYS.MUSICAL,
-      CATEGORY_KEYS.NATURE
+      CATEGORY_KEYS.MATHEMATICS,
+      CATEGORY_KEYS.SPEAKING
     ];
 
     if (!activityCategories.includes(category.id)) {

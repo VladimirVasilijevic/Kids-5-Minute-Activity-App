@@ -9,9 +9,9 @@ export const CATEGORY_KEYS = {
 
   PHYSICAL: 'physical',
   CREATIVE: 'creative',
-  EDUCATIONAL: 'educational',
   MUSICAL: 'musical',
-  NATURE: 'nature',
+  MATHEMATICS: 'mathematics',
+  SPEAKING: 'speaking',
 } as const;
 
 /**
