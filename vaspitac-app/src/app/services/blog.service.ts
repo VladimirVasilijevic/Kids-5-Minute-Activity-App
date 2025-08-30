@@ -90,6 +90,11 @@ export class BlogService {
           isPremium: blogPost.isPremium || false
         }));
       }),
+      catchError((error) => {
+        console.warn('Public blog posts failed, returning empty array:', error);
+        this._loadingService.hide();
+        return of([]); // Return empty array instead of throwing error
+      }),
       tap(() => {
         this._loadingService.hide();
       })
@@ -98,7 +103,7 @@ export class BlogService {
 
   /**
    * Retrieves a specific blog post by its ID with loading indicator and default visibility/premium fields
-   * Always prioritizes Firebase data over JSON fallback
+   * Handles both authenticated and non-authenticated users
    * @param id - The ID of the blog post to retrieve
    * @returns {Observable<BlogPost>} Observable of the blog post
    */
@@ -108,19 +113,45 @@ export class BlogService {
     // Get current language from translation service
     const currentLanguage = this._translateService.currentLang || this._translateService.getDefaultLang() || 'en';
     
-    // Always try to get data from Firebase first, no JSON fallback
-    return from(this._functions.httpsCallable('getFilteredBlogPosts')({ language: currentLanguage })).pipe(
-      map((result: { blogPosts?: BlogPost[] }) => {
-        const posts = result.blogPosts || [];
-        const post = posts.find(p => p.id === id);
-        if (!post) {
-          throw new Error(`Blog post with ID ${id} not found`);
+    // Check if user is authenticated to determine which function to use
+    return this._authService.user$.pipe(
+      switchMap(user => {
+        if (user) {
+          // User is authenticated - use filtered function
+          return from(this._functions.httpsCallable('getFilteredBlogPosts')({ language: currentLanguage })).pipe(
+            map((result: { blogPosts?: BlogPost[] }) => {
+              const posts = result.blogPosts || [];
+              const post = posts.find(p => p.id === id);
+              if (!post) {
+                throw new Error(`Blog post with ID ${id} not found`);
+              }
+              return {
+                ...post,
+                visibility: post.visibility || ContentVisibility.PUBLIC,
+                isPremium: post.isPremium || false
+              };
+            })
+          );
+        } else {
+          // User is not authenticated - use public content function
+          return from(this._functions.httpsCallable('getPublicContent')({ 
+            contentType: 'blog', 
+            language: currentLanguage 
+          })).pipe(
+            map((result: { content?: BlogPost[] }) => {
+              const posts = result.content || [];
+              const post = posts.find(p => p.id === id);
+              if (!post) {
+                throw new Error(`Blog post with ID ${id} not found`);
+              }
+              return {
+                ...post,
+                visibility: post.visibility || ContentVisibility.PUBLIC,
+                isPremium: post.isPremium || false
+              };
+            })
+          );
         }
-        return {
-          ...post,
-          visibility: post.visibility || ContentVisibility.PUBLIC,
-          isPremium: post.isPremium || false
-        };
       }),
       catchError(error => {
         console.error('Error fetching blog post by ID:', error);
