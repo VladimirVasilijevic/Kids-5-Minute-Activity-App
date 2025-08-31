@@ -15,6 +15,7 @@ import { mockAdminUser, mockFreeUser } from '../../../test-utils/mock-user-profi
 import { mockAboutContent } from '../../../test-utils/mock-about-content';
 import { CATEGORY_KEYS, CategoryKey } from '../../models/category-keys';
 import { Category } from '../../models/category.model';
+import { UserRole, SubscriptionStatus, SubscriptionType } from '../../models/user-profile.model';
 
 describe('HomeComponent', () => {
   let component: HomeComponent;
@@ -154,6 +155,117 @@ describe('HomeComponent', () => {
     it('should navigate to the admin dashboard', () => {
       component.navigateToAdmin();
       expect(router.navigate).toHaveBeenCalledWith(['/admin']);
+    });
+  });
+
+  describe('Category Locking Logic', () => {
+    const activityCategory: Category = {
+      id: CATEGORY_KEYS.PHYSICAL,
+      title: 'Physical Activities',
+      description: 'Physical activities for kids',
+      color: 'bg-blue-500',
+      icon: 'dumbbell',
+      order: 1
+    };
+
+    const nonActivityCategory: Category = {
+      id: CATEGORY_KEYS.ABOUT,
+      title: 'About',
+      description: 'About us',
+      color: 'bg-green-500',
+      icon: 'user',
+      order: 0
+    };
+
+    describe('isCategoryLocked method', () => {
+      it('should return false for non-activity categories regardless of user status', () => {
+        expect(component.isCategoryLocked(nonActivityCategory, null)).toBeFalse();
+        expect(component.isCategoryLocked(nonActivityCategory, mockFreeUser)).toBeFalse();
+        expect(component.isCategoryLocked(nonActivityCategory, mockAdminUser)).toBeFalse();
+      });
+
+      it('should return true for activity categories when user is not logged in', () => {
+        expect(component.isCategoryLocked(activityCategory, null)).toBeTrue();
+      });
+
+      it('should return false for activity categories when user is admin', () => {
+        expect(component.isCategoryLocked(activityCategory, mockAdminUser)).toBeFalse();
+      });
+
+      it('should return false for activity categories when user has SUBSCRIBER role', () => {
+        const userWithSubscriberRole = {
+          ...mockFreeUser,
+          role: UserRole.SUBSCRIBER,
+          subscription: undefined // Even without subscription, SUBSCRIBER role should have access
+        };
+        expect(component.isCategoryLocked(activityCategory, userWithSubscriberRole)).toBeFalse();
+      });
+
+      it('should return false for activity categories when user has TRIAL_USER role', () => {
+        const userWithTrialRole = {
+          ...mockFreeUser,
+          role: UserRole.TRIAL_USER,
+          subscription: undefined // Even without subscription, TRIAL_USER role should have access
+        };
+        expect(component.isCategoryLocked(activityCategory, userWithTrialRole)).toBeFalse();
+      });
+
+      it('should return true for activity categories when user has FREE_USER role and no subscription', () => {
+        const userWithFreeRole = {
+          ...mockFreeUser,
+          role: UserRole.FREE_USER,
+          subscription: undefined
+        };
+        expect(component.isCategoryLocked(activityCategory, userWithFreeRole)).toBeTrue();
+      });
+
+      it('should return false for activity categories when user has FREE_USER role with active subscription', () => {
+        const userWithActiveSubscription = {
+          ...mockFreeUser,
+          role: UserRole.FREE_USER,
+          subscription: {
+            status: SubscriptionStatus.ACTIVE,
+            type: SubscriptionType.MONTHLY,
+            startDate: '2023-01-01T00:00:00.000Z',
+            endDate: '2024-01-01T00:00:00.000Z',
+            autoRenew: true
+          }
+        };
+        expect(component.isCategoryLocked(activityCategory, userWithActiveSubscription)).toBeFalse();
+      });
+
+      it('should return false for activity categories when user has FREE_USER role with trial subscription', () => {
+        const userWithTrialSubscription = {
+          ...mockFreeUser,
+          role: UserRole.FREE_USER,
+          subscription: {
+            status: SubscriptionStatus.TRIAL,
+            type: SubscriptionType.TRIAL,
+            startDate: '2023-01-01T00:00:00.000Z',
+            endDate: '2024-01-01T00:00:00.000Z',
+            autoRenew: false
+          }
+        };
+        expect(component.isCategoryLocked(activityCategory, userWithTrialSubscription)).toBeFalse();
+      });
+
+      it('should return false for activity categories when subscription end date is in the future', () => {
+        const futureDate = new Date();
+        futureDate.setFullYear(futureDate.getFullYear() + 1);
+        
+        const userWithFutureEndDate = {
+          ...mockFreeUser,
+          role: UserRole.FREE_USER,
+          subscription: {
+            status: SubscriptionStatus.EXPIRED, // Even with expired status
+            type: SubscriptionType.MONTHLY,
+            startDate: '2023-01-01T00:00:00.000Z',
+            endDate: futureDate.toISOString(),
+            autoRenew: false
+          }
+        };
+        expect(component.isCategoryLocked(activityCategory, userWithFutureEndDate)).toBeFalse();
+      });
     });
   });
 
