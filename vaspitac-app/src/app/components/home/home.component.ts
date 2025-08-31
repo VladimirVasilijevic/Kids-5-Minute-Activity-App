@@ -160,27 +160,30 @@ export class HomeComponent implements OnInit {
       return false;
     }
 
-    // Check if user has active subscription
+    // SUBSCRIBER and TRIAL_USER roles always have access to activities
+    // (they have ACCESS_ALL_ACTIVITIES permission)
+    if (userProfile.role === UserRole.SUBSCRIBER || userProfile.role === UserRole.TRIAL_USER) {
+      return false;
+    }
+
+    // For FREE_USER and other roles, check subscription details
     if (!userProfile.subscription) {
       return true; // No subscription = locked
     }
 
-    // Check if subscription is expired
-    if (userProfile.subscription.endDate) {
-      const now = new Date();
-      const endDate = new Date(userProfile.subscription.endDate);
-      if (endDate < now) {
-        return true; // Expired subscription = locked
-      }
-    }
+    // Use the same logic as PermissionService.hasActiveSubscription
+    const now = new Date();
+    const endDate = userProfile.subscription.endDate ? new Date(userProfile.subscription.endDate) : null;
+    
+    // Subscription is active if:
+    // 1. Status is 'active' or 'trial', OR
+    // 2. End date is in the future
+    const hasActiveSubscription = 
+      userProfile.subscription.status === 'active' ||
+      userProfile.subscription.status === 'trial' ||
+      (endDate !== null && endDate > now);
 
-    // Check subscription status
-    if (userProfile.subscription.status === 'cancelled' || 
-        userProfile.subscription.status === 'expired') {
-      return true; // Cancelled/expired = locked
-    }
-
-    return false; // Active subscription = unlocked
+    return !hasActiveSubscription; // Return true if locked (no active subscription)
   }
 
   /**
