@@ -78,14 +78,15 @@ export class ShopComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // First load user profile and check authentication
-    this.loadUserProfile();
+    // Load files immediately - everyone can browse shop
+    this.loadFiles();
+    this.setupLanguageDetection();
     
-    // Check authentication status immediately
+    // Check authentication status for download functionality only
     this._auth.user$.subscribe(user => {
       if (!user) {
         this.isLoggedIn = false;
-        this.showLoginModal = true;
+        this.showLoginModal = false; // Don't show modal - shop is accessible to all
         this.currentUserEmail = '';
         this.currentUserId = null;
         this.userAccessMap = {};
@@ -94,14 +95,10 @@ export class ShopComponent implements OnInit {
         this.showLoginModal = false;
         this.currentUserEmail = user.email || '';
         this.currentUserId = user.uid;
-        
-        // Only load files after user is authenticated
-        this.loadFiles();
-        // Note: loadUserAccess will be called after files are loaded
+        this.loadUserProfile();
+        this.loadUserAccess();
       }
     });
-    
-    this.setupLanguageDetection();
   }
 
   /**
@@ -230,9 +227,10 @@ export class ShopComponent implements OnInit {
         this.displayedFiles = files;
         this.isLoading = false;
         
-        // Always try to load user access after files are loaded
-        // The loadUserAccess method will handle the case where user is not authenticated
-        this.loadUserAccess();
+        // Load user access if user is logged in
+        if (this.isLoggedIn && this.currentUserId) {
+          this.loadUserAccess();
+        }
       },
       error: (error) => {
         console.error('Error loading files:', error);
@@ -511,28 +509,11 @@ Recipient: ${this._translate.instant('SHOP.BANK_RECIPIENT')}`;
    * Initiates purchase process for a file
    */
   initiatePurchase(file: DigitalFile): void {
-    if (!this.isLoggedIn || !this.currentUserId) {
-      this.showLoginRequiredModal();
-      return;
-    }
-
     // Set the selected file for the payment modal
     this.selectedFile = file;
 
-    // Create purchase record
-    const purchaseData: PurchaseFormData = {
-      userId: this.currentUserId,
-      fileId: file.id,
-      amount: this.getPrice(file),
-      currency: this.getCurrencySymbol()
-    };
-
-    this._purchaseService.createPurchase(purchaseData).then(purchaseId => {
-      // Open payment modal to show instructions
-      this.openPaymentModal();
-    }).catch(error => {
-      console.error('Error creating purchase:', error);
-    });
+    // Open payment modal to show instructions directly
+    this.openPaymentModal();
   }
 
 
@@ -548,6 +529,9 @@ Recipient: ${this._translate.instant('SHOP.BANK_RECIPIENT')}`;
    * Check if access checking is ready (for template use)
    */
   get isAccessReady(): boolean {
-    return this.isLoggedIn && !!this.currentUserId && this.files.length > 0 && Object.keys(this.userAccessMap).length > 0;
+    if (!this.isLoggedIn) {
+      return this.files.length > 0; // Show files even if not logged in
+    }
+    return this.files.length > 0 && Object.keys(this.userAccessMap).length > 0;
   }
 }
