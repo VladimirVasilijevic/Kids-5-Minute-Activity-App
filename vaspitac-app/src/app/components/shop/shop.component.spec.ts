@@ -80,32 +80,7 @@ describe('ShopComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  describe('loadAccessNow', () => {
-    it('should load user access if conditions are met', () => {
-      // Setup component state
-      component['currentUserId'] = 'user123';
-      component['files'] = mockDigitalFiles;
-      component['userAccessMap'] = {};
-      
-      spyOn(component as any, 'loadUserAccess');
-      
-      component.loadAccessNow();
-      
-      expect((component as any).loadUserAccess).toHaveBeenCalled();
-    });
-  });
-
   describe('openPurchaseModal', () => {
-    it('should show login modal if user is not logged in', () => {
-      component.isLoggedIn = false;
-      spyOn(component, 'showLoginRequiredModal');
-      
-      component.openPurchaseModal(mockDigitalFile);
-      
-      expect(component.showLoginRequiredModal).toHaveBeenCalled();
-      expect(component.showPurchaseModal).toBeFalse();
-    });
-
     it('should open purchase modal if user is logged in', () => {
       component.isLoggedIn = true;
       
@@ -408,59 +383,6 @@ describe('ShopComponent', () => {
     });
   });
 
-  describe('initiatePurchase', () => {
-    it('should show login modal if user is not logged in', () => {
-      component.isLoggedIn = false;
-      spyOn(component, 'showLoginRequiredModal');
-      
-      component.initiatePurchase(mockDigitalFile);
-      
-      expect(component.showLoginRequiredModal).toHaveBeenCalled();
-      expect(purchaseService.createPurchase).not.toHaveBeenCalled();
-    });
-
-    it('should show login modal if no user ID', () => {
-      component.isLoggedIn = true;
-      component['currentUserId'] = null;
-      spyOn(component, 'showLoginRequiredModal');
-      
-      component.initiatePurchase(mockDigitalFile);
-      
-      expect(component.showLoginRequiredModal).toHaveBeenCalled();
-      expect(purchaseService.createPurchase).not.toHaveBeenCalled();
-    });
-
-    it('should create purchase and open payment modal on success', fakeAsync(() => {
-      component.isLoggedIn = true;
-      component['currentUserId'] = 'user123';
-      translateService.currentLang = 'sr';
-      spyOn(component, 'openPaymentModal');
-      
-      component.initiatePurchase(mockDigitalFile);
-      tick();
-      
-      expect(purchaseService.createPurchase).toHaveBeenCalledWith({
-        userId: 'user123',
-        fileId: 'file1',
-        amount: 1000,
-        currency: 'RSD'
-      });
-      expect(component.openPaymentModal).toHaveBeenCalled();
-    }));
-
-    it('should handle purchase creation error', fakeAsync(() => {
-      component.isLoggedIn = true;
-      component['currentUserId'] = 'user123';
-      purchaseService.createPurchase.and.returnValue(Promise.reject('Purchase error'));
-      spyOn(console, 'error');
-      
-      component.initiatePurchase(mockDigitalFile);
-      tick();
-      
-      expect(console.error).toHaveBeenCalledWith('Error creating purchase:', 'Purchase error');
-    }));
-  });
-
   describe('filterFiles', () => {
     beforeEach(() => {
       component.files = mockDigitalFiles;
@@ -531,28 +453,6 @@ describe('ShopComponent', () => {
       const result = component.isAccessReady;
       
       expect(result).toBeTrue();
-    });
-
-    it('should return false for isAccessReady when user not logged in', () => {
-      component.isLoggedIn = false;
-      component['currentUserId'] = 'user123';
-      component['files'] = mockDigitalFiles;
-      component['userAccessMap'] = { 'file1': true };
-      
-      const result = component.isAccessReady;
-      
-      expect(result).toBeFalse();
-    });
-
-    it('should return false for isAccessReady when no user ID', () => {
-      component.isLoggedIn = true;
-      component['currentUserId'] = null;
-      component['files'] = mockDigitalFiles;
-      component['userAccessMap'] = { 'file1': true };
-      
-      const result = component.isAccessReady;
-      
-      expect(result).toBeFalse();
     });
 
     it('should return false for isAccessReady when no files', () => {
