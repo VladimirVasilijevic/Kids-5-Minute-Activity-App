@@ -23,7 +23,11 @@ export const mockDigitalFile: DigitalFile = {
   createdBy: 'admin123',
   tags: ['test', 'pdf', 'education'],
   previewImageUrl: 'https://example.com/preview.jpg',
-  fileName: 'test-file.pdf'
+  fileName: 'test-file.pdf',
+  bankAccountNumber: '205-9001025650416-10',
+  phoneNumber: '+381 61 634 9493',
+  author: 'Ana Vaspitac',
+  paypalLink: 'https://paypal.me/anavaspitac?country.x=RS&locale.x=en_US'
 };
 
 /**
@@ -46,7 +50,11 @@ export const mockEnglishDigitalFile: DigitalFile = {
   createdBy: 'admin123',
   tags: ['english', 'premium', 'education'],
   previewImageUrl: 'https://example.com/english-preview.jpg',
-  fileName: 'english-file.pdf'
+  fileName: 'english-file.pdf',
+  bankAccountNumber: '160-5555123456789-12',
+  phoneNumber: '+381 64 123 4567',
+  author: 'John Doe',
+  paypalLink: 'https://paypal.me/johndoe'
 };
 
 /**
@@ -69,7 +77,11 @@ export const mockVideoFile: DigitalFile = {
   createdBy: 'admin123',
   tags: ['test', 'video', 'mp4'],
   previewImageUrl: 'https://example.com/video-preview.jpg',
-  fileName: 'test-video.mp4'
+  fileName: 'test-video.mp4',
+  bankAccountNumber: '205-9001025650416-10',
+  phoneNumber: '+381 61 634 9493',
+  author: 'Ana Vaspitac',
+  paypalLink: 'https://paypal.me/anavaspitac?country.x=RS&locale.x=en_US'
 };
 
 /**

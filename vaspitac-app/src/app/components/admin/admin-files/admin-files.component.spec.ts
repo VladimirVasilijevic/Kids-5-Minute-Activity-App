@@ -182,6 +182,10 @@ describe('AdminFilesComponent', () => {
       expect(component.formData.accessLevel).toBe(mockDigitalFile.accessLevel);
       expect(component.formData.language).toBe(mockDigitalFile.language);
       expect(component.formData.tags).toEqual(mockDigitalFile.tags || []);
+      expect(component.formData.bankAccountNumber).toBe(mockDigitalFile.bankAccountNumber || '');
+      expect(component.formData.phoneNumber).toBe(mockDigitalFile.phoneNumber || '');
+      expect(component.formData.author).toBe(mockDigitalFile.author || '');
+      expect(component.formData.paypalLink).toBe(mockDigitalFile.paypalLink || '');
       expect(component.filePreview).toBe(mockDigitalFile.fileUrl);
       expect(component.showForm).toBeTrue();
     });
@@ -196,7 +200,11 @@ describe('AdminFilesComponent', () => {
         priceEUR: 10,
         accessLevel: 'BASIC',
         language: 'sr',
-        tags: []
+        tags: [],
+        bankAccountNumber: '',
+        phoneNumber: '',
+        author: '',
+        paypalLink: ''
       };
       component.selectedFile = createMockFile('test.pdf', 1024, 'application/pdf');
       
@@ -290,7 +298,11 @@ describe('AdminFilesComponent', () => {
         priceEUR: 15,
         accessLevel: 'PREMIUM',
         language: 'en',
-        tags: ['updated']
+        tags: ['updated'],
+        bankAccountNumber: '',
+        phoneNumber: '',
+        author: '',
+        paypalLink: ''
       };
       
       await (component as any).updateFile();
@@ -303,7 +315,11 @@ describe('AdminFilesComponent', () => {
         priceEUR: 15,
         accessLevel: 'PREMIUM',
         language: 'en',
-        tags: ['updated']
+        tags: ['updated'],
+        bankAccountNumber: undefined,
+        phoneNumber: undefined,
+        author: undefined,
+        paypalLink: undefined
       });
       expect(component.showSuccessMessage).toBeTrue();
       expect(component.successMessage).toBe('File updated successfully');
@@ -562,6 +578,10 @@ describe('AdminFilesComponent', () => {
       expect(component.formData.accessLevel).toBe('BASIC');
       expect(component.formData.language).toBe('sr');
       expect(component.formData.tags).toEqual([]);
+      expect(component.formData.bankAccountNumber).toBe('');
+      expect(component.formData.phoneNumber).toBe('');
+      expect(component.formData.author).toBe('');
+      expect(component.formData.paypalLink).toBe('');
       expect(component.selectedFile).toBeNull();
       expect(component.filePreview).toBeNull();
       expect(Object.keys(component.formErrors).length).toBe(0);

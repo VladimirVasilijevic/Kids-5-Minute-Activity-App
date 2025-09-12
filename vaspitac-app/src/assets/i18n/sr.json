@@ -170,6 +170,11 @@
     "VIBER_CONTACT": "Viber: +381 61 634 9493",
     "COPY_BANK_DETAILS": "Kopiraj bankovne podatke",
     "PAYMENT_PURPOSE": "Svrha plaćanja",
+    "AUTHOR": "Autor",
+    "PHONE_NUMBER": "Telefon",
+    "BANK_ACCOUNT_NUMBER": "Broj računa",
+    "PAYPAL_LINK_LABEL": "PayPal Link",
+    "VIBER_MESSAGE": "Pošaljite screenshot na Viber",
     "PAYMENT_PURPOSE_DESC": "Kupovina: {{documentName}} - {{userEmail}}"
   },
   "ABOUT": {
@@ -626,7 +631,12 @@
     "LOAD_MORE": "Učitaj više",
     "LOADING": "Učitava",
     "ENTER_TITLE": "Unesite naslov",
-    "ENTER_DESCRIPTION": "Unesite opis"
+    "ENTER_DESCRIPTION": "Unesite opis",
+    "PAYMENT_INFORMATION": "Podaci za plaćanje",
+    "BANK_ACCOUNT_NUMBER": "Broj računa",
+    "PHONE_NUMBER": "Broj telefona",
+    "AUTHOR": "Autor",
+    "PAYPAL_LINK": "PayPal Link"
   },
   "SUBSCRIBE": {
     "TITLE": "Izaberite svoj plan",
