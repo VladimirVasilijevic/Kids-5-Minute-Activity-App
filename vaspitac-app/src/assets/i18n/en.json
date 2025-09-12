@@ -170,6 +170,11 @@
     "VIBER_CONTACT": "Viber: +381 64 123 4567",
     "COPY_BANK_DETAILS": "Copy Bank Details",
     "PAYMENT_PURPOSE": "Payment Purpose",
+    "AUTHOR": "Author",
+    "PHONE_NUMBER": "Phone Number",
+    "BANK_ACCOUNT_NUMBER": "Bank Account Number",
+    "PAYPAL_LINK_LABEL": "PayPal Link",
+    "VIBER_MESSAGE": "Send screenshot on Viber",
     "PAYMENT_PURPOSE_DESC": "Purchase: {{documentName}} - {{userEmail}}"
   },
   "ABOUT": {
@@ -628,7 +633,12 @@
     "LOAD_MORE": "Load More",
     "LOADING": "Loading",
     "ENTER_TITLE": "Enter title",
-    "ENTER_DESCRIPTION": "Enter description"
+    "ENTER_DESCRIPTION": "Enter description",
+    "PAYMENT_INFORMATION": "Payment Information",
+    "BANK_ACCOUNT_NUMBER": "Bank Account Number",
+    "PHONE_NUMBER": "Phone Number",
+    "AUTHOR": "Author",
+    "PAYPAL_LINK": "PayPal Link"
   },
 
   "SUBSCRIBE": {

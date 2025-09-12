@@ -454,7 +454,7 @@ export class ShopComponent implements OnInit {
    * Copies PayPal link to clipboard
    */
   copyPayPalLink(): void {
-    const paypalLink = 'https://paypal.me/anavaspitac?country.x=RS&locale.x=en_US';
+    const paypalLink = this.selectedFile?.paypalLink || 'https://paypal.me/anavaspitac?country.x=RS&locale.x=en_US';
     navigator.clipboard.writeText(paypalLink).then(() => {
       // PayPal link copied successfully
     }).catch(err => {
@@ -466,8 +466,13 @@ export class ShopComponent implements OnInit {
    * Copies bank details to clipboard
    */
   copyBankDetails(): void {
-    const bankDetails = `Account Number: ${this._translate.instant('SHOP.BANK_ACCOUNT')}
-Recipient: ${this._translate.instant('SHOP.BANK_RECIPIENT')}`;
+    const bankAccount = this.selectedFile?.bankAccountNumber || this._translate.instant('SHOP.BANK_ACCOUNT');
+    const recipient = this.selectedFile?.author || this._translate.instant('SHOP.BANK_RECIPIENT');
+    const phoneNumber = this.selectedFile?.phoneNumber || '+381 61 634 9493';
+    
+    const bankDetails = `Account Number: ${bankAccount}
+Recipient: ${recipient}
+Phone (Viber): ${phoneNumber}`;
     
     navigator.clipboard.writeText(bankDetails).then(() => {
       // Bank details copied successfully

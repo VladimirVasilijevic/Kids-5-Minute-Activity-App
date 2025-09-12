@@ -75,14 +75,23 @@ export class AdminFilesComponent implements OnInit {
   showDescriptionPreview = false;
 
   // Form data
-  formData: DigitalFileFormData = {
+  formData: DigitalFileFormData & {
+    bankAccountNumber?: string;
+    phoneNumber?: string;
+    author?: string;
+    paypalLink?: string;
+  } = {
     title: '',
     description: '',
     priceRSD: 0,
     priceEUR: 0,
     accessLevel: 'BASIC',
     language: 'sr' as 'sr' | 'en',
-    tags: []
+    tags: [],
+    bankAccountNumber: '',
+    phoneNumber: '',
+    author: '',
+    paypalLink: ''
   };
 
   // Grant access functionality
@@ -199,7 +208,11 @@ export class AdminFilesComponent implements OnInit {
       priceEUR: file.priceEUR,
       accessLevel: file.accessLevel,
       language: file.language,
-      tags: file.tags || []
+      tags: file.tags || [],
+      bankAccountNumber: file.bankAccountNumber || '',
+      phoneNumber: file.phoneNumber || '',
+      author: file.author || '',
+      paypalLink: file.paypalLink || ''
     };
     this.filePreview = file.fileUrl || null;
     this.showForm = true;
@@ -301,7 +314,11 @@ export class AdminFilesComponent implements OnInit {
       priceEUR: this.formData.priceEUR,
       accessLevel: this.formData.accessLevel,
       language: this.formData.language,
-      tags: this.formData.tags || []
+      tags: this.formData.tags || [],
+      bankAccountNumber: this.formData.bankAccountNumber || undefined,
+      phoneNumber: this.formData.phoneNumber || undefined,
+      author: this.formData.author || undefined,
+      paypalLink: this.formData.paypalLink || undefined
     };
 
     try {
@@ -461,7 +478,11 @@ export class AdminFilesComponent implements OnInit {
       priceEUR: 0,
       accessLevel: 'BASIC',
       language: this.currentLanguage as 'sr' | 'en',
-      tags: []
+      tags: [],
+      bankAccountNumber: '',
+      phoneNumber: '',
+      author: '',
+      paypalLink: ''
     };
     this.selectedFile = null;
     this.filePreview = null;

@@ -38,6 +38,14 @@ export interface DigitalFile {
   previewImageUrl?: string;
   /** Original filename */
   fileName?: string;
+  /** Bank account number for payments */
+  bankAccountNumber?: string;
+  /** Phone number for contact (Viber) */
+  phoneNumber?: string;
+  /** Author/recipient name */
+  author?: string;
+  /** PayPal payment link */
+  paypalLink?: string;
 }
 
 /**
@@ -58,6 +66,14 @@ export interface DigitalFileFormData {
   language: 'en' | 'sr';
   /** Optional tags for categorization */
   tags?: string[];
+  /** Bank account number for payments */
+  bankAccountNumber?: string;
+  /** Phone number for contact (Viber) */
+  phoneNumber?: string;
+  /** Author/recipient name */
+  author?: string;
+  /** PayPal payment link */
+  paypalLink?: string;
 }
 
 /**
