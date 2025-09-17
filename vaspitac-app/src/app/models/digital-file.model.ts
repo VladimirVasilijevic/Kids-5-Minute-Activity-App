@@ -36,6 +36,8 @@ export interface DigitalFile {
   tags?: string[];
   /** Optional preview image URL */
   previewImageUrl?: string;
+  /** Main product image URL */
+  imageUrl?: string;
   /** Original filename */
   fileName?: string;
   /** Bank account number for payments */
@@ -66,6 +68,8 @@ export interface DigitalFileFormData {
   language: 'en' | 'sr';
   /** Optional tags for categorization */
   tags?: string[];
+  /** Main product image URL */
+  imageUrl?: string;
   /** Bank account number for payments */
   bankAccountNumber?: string;
   /** Phone number for contact (Viber) */

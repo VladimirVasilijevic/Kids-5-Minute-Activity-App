@@ -125,6 +125,7 @@
     "NO_FILES_DESCRIPTION": "Pokušajte da promenite filtere ili pretragu.",
     "LOAD_MORE": "Učitaj više",
     "DOWNLOAD_FILE": "Preuzmi fajl",
+    "MORE_DETAILS": "Pogledaj detalje",
     "BUY": "Kupi",
     "BUY_NOW": "Kupi sada",
     "PURCHASE_TITLE": "Kupovina materijala",
@@ -175,7 +176,10 @@
     "BANK_ACCOUNT_NUMBER": "Broj računa",
     "PAYPAL_LINK_LABEL": "PayPal Link",
     "VIBER_MESSAGE": "Pošaljite screenshot na Viber",
-    "PAYMENT_PURPOSE_DESC": "Kupovina: {{documentName}} - {{userEmail}}"
+    "PAYMENT_PURPOSE_DESC": "Kupovina: {{documentName}} - {{userEmail}}",
+    "BACK_TO_SHOP": "Nazad na prodavnicu",
+    "FILE_NOT_FOUND": "Datoteka nije pronađena",
+    "FILE_NOT_FOUND_DESC": "Datoteka koju tražite ne postoji ili je uklonjena."
   },
   "ABOUT": {
     "BACK": "Nazad na početnu",
@@ -636,7 +640,14 @@
     "BANK_ACCOUNT_NUMBER": "Broj računa",
     "PHONE_NUMBER": "Broj telefona",
     "AUTHOR": "Autor",
-    "PAYPAL_LINK": "PayPal Link"
+    "PAYPAL_LINK": "PayPal Link",
+    "PRODUCT_IMAGE": "Slika proizvoda",
+    "UPLOAD_IMAGE": "Otpremi sliku",
+    "UPLOAD_IMAGE_BUTTON": "Otpremi sliku",
+    "IMAGE_URL": "URL slike",
+    "IMAGE_URL_DESC": "Ili unesite direktnu vezu do slike",
+    "IMAGE_PREVIEW": "Pregled slike",
+    "IMAGE_TYPES_SUPPORTED": "PNG, JPG, WebP do 5MB"
   },
   "SUBSCRIBE": {
     "TITLE": "Izaberite svoj plan",

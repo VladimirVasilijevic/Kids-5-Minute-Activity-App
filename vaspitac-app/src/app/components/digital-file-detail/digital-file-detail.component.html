@@ -1,0 +1,398 @@
+<div class="min-h-screen bg-green-50/30">
+  <ng-container *ngIf="file$ | async as file; else notFound">
+    <!-- Back Button and Header -->
+    <div class="sticky top-0 z-50 bg-white shadow-sm border-b border-green-100">
+      <div class="px-4 py-3 flex flex-col items-start gap-2">
+        <app-back-button
+          [label]="'SHOP.BACK_TO_SHOP' | translate"
+          (back)="goBack()"
+        ></app-back-button>
+        <h1 class="font-semibold text-gray-900 text-sm md:text-base">
+          {{ file.title }}
+        </h1>
+      </div>
+    </div>
+
+    <div class="p-3 md:p-4 space-y-4 md:space-y-6 max-w-3xl mx-auto">
+      <!-- Image Section -->
+      <div *ngIf="file.imageUrl" class="overflow-hidden bg-white shadow-sm border border-green-100 rounded-xl">
+        <div class="relative h-64 md:h-80 bg-gray-100">
+          <img
+            [src]="file.imageUrl"
+            [alt]="file.title"
+            class="w-full h-full object-contain"
+          />
+        </div>
+      </div>
+
+      <!-- File Info Card -->
+      <div class="bg-white shadow-sm border border-green-100 rounded-xl p-3 md:p-4">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-3 md:mb-4 space-y-2 md:space-y-0">
+          <div class="flex flex-wrap items-center space-x-3 md:space-x-4">
+            <div class="flex items-center text-green-600">
+              <svg class="h-3 w-3 md:h-4 md:w-4 mr-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+              </svg>
+              <span class="text-xs md:text-sm font-medium">{{ getFileExtension(file.fileType) }}</span>
+            </div>
+            <div class="flex items-center text-green-600">
+              <svg class="h-3 w-3 md:h-4 md:w-4 mr-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+              </svg>
+              <span class="text-xs md:text-sm font-medium">{{ formatFileSize(file.fileSize) }}</span>
+            </div>
+          </div>
+          
+          <!-- Price -->
+          <div class="text-right">
+            <div class="text-lg md:text-xl font-bold text-green-600">
+              {{ getPrice(file) }} {{ getCurrencySymbol() }}
+            </div>
+            <div class="text-xs text-gray-500">
+              {{ file.priceRSD }} RSD / {{ file.priceEUR }} EUR
+            </div>
+          </div>
+        </div>
+
+        <!-- Language -->
+        <div class="flex items-center mb-3 md:mb-4">
+          <svg class="h-4 w-4 text-gray-400 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"/>
+          </svg>
+          <span class="text-sm text-gray-600">
+            {{ file.language === 'sr' ? ('SHOP.SERBIAN' | translate) : ('SHOP.ENGLISH' | translate) }}
+          </span>
+        </div>
+
+        <!-- Author -->
+        <div *ngIf="file.author" class="flex items-center mb-3 md:mb-4">
+          <svg class="h-4 w-4 text-gray-400 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+          </svg>
+          <span class="text-sm text-gray-600">{{ file.author }}</span>
+        </div>
+
+        <!-- Tags -->
+        <div *ngIf="file.tags && file.tags.length > 0" class="flex flex-wrap gap-2 mb-4">
+          <span *ngFor="let tag of file.tags" 
+                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+            {{ tag }}
+          </span>
+        </div>
+
+        <!-- Description -->
+        <div class="prose prose-sm max-w-none text-gray-700">
+          <markdown [data]="file.description"></markdown>
+        </div>
+      </div>
+
+      <!-- Action Button -->
+      <div class="bg-white shadow-sm border border-green-100 rounded-xl p-4">
+        <!-- Download Button (for logged-in users with access) -->
+        <div *ngIf="isLoggedIn && !isLoadingAccess && hasAccess" class="w-full">
+          <button
+            (click)="downloadFile(file)"
+            class="w-full bg-green-600 hover:bg-green-700 text-white py-3 px-6 rounded-lg font-medium flex items-center justify-center gap-2 transition-colors text-lg"
+          >
+            <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+            </svg>
+            {{ 'SHOP.DOWNLOAD_FILE' | translate }}
+          </button>
+        </div>
+        
+        <!-- Purchase Button (for logged-in users without access) -->
+        <div *ngIf="isLoggedIn && !isLoadingAccess && !hasAccess" class="w-full">
+          <button
+            (click)="initiatePurchase(file)"
+            class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-lg font-medium flex items-center justify-center gap-2 transition-colors text-lg"
+          >
+            <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+            </svg>
+            {{ 'SHOP.BUY_NOW' | translate }}
+          </button>
+        </div>
+        
+        <!-- Purchase Button (for non-logged-in users) -->
+        <div *ngIf="!isLoggedIn && !isLoadingAccess" class="w-full">
+          <button
+            (click)="initiatePurchase(file)"
+            class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-lg font-medium flex items-center justify-center gap-2 transition-colors text-lg"
+          >
+            <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+            </svg>
+            {{ 'SHOP.BUY_NOW' | translate }}
+          </button>
+        </div>
+        
+        <!-- Loading state when access is being checked -->
+        <div *ngIf="isLoadingAccess" class="w-full">
+          <button
+            disabled
+            class="w-full bg-gray-400 text-white py-3 px-6 rounded-lg font-medium flex items-center justify-center gap-2 cursor-not-allowed text-lg"
+          >
+            <svg class="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            {{ 'SHOP.LOADING' | translate }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+
+  <!-- Not Found Template -->
+  <ng-template #notFound>
+    <div class="min-h-screen bg-green-50/30 flex items-center justify-center p-4">
+      <div class="text-center">
+        <svg class="mx-auto h-16 w-16 text-gray-400 mb-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+        </svg>
+        <h2 class="text-xl font-semibold text-gray-900 mb-2">{{ 'SHOP.FILE_NOT_FOUND' | translate }}</h2>
+        <p class="text-gray-600 mb-6">{{ 'SHOP.FILE_NOT_FOUND_DESC' | translate }}</p>
+        <button
+          (click)="goBack()"
+          class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg font-medium"
+        >
+          {{ 'SHOP.BACK_TO_SHOP' | translate }}
+        </button>
+      </div>
+    </div>
+  </ng-template>
+</div>
+
+<!-- Purchase Modal -->
+<div *ngIf="showPurchaseModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+  <div class="relative top-20 mx-auto p-5 border max-w-2xl w-full shadow-lg rounded-md bg-white">
+    <div class="mt-3">
+      <!-- Header -->
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-lg font-medium text-gray-900">{{ 'SHOP.PURCHASE_TITLE' | translate }}</h3>
+        <button
+          (click)="closePurchaseModal()"
+          class="text-gray-400 hover:text-gray-600"
+        >
+          <svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+      
+      <!-- File Details -->
+      <div *ngIf="selectedFile" class="mb-6">
+        <h4 class="font-semibold text-gray-900 mb-2">{{ selectedFile.title }}</h4>
+        <div class="text-sm text-gray-600 mb-3 prose prose-sm max-w-none">
+          <markdown [data]="selectedFile.description"></markdown>
+        </div>
+        <div class="flex items-center gap-4 text-sm text-gray-500 mb-3">
+          <span>{{ getFileExtension(selectedFile.fileType || '') }}</span>
+          <span>{{ formatFileSize(selectedFile.fileSize || 0) }}</span>
+        </div>
+        <div class="text-right">
+          <div class="text-2xl font-bold text-green-600">
+            {{ selectedFile.priceRSD }} RSD / {{ selectedFile.priceEUR }} EUR
+          </div>
+        </div>
+      </div>
+      
+      <!-- Payment Note -->
+      <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+        <div class="flex items-start gap-3">
+          <svg class="h-5 w-5 text-blue-400 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+          <p class="text-sm text-blue-700">
+            {{ 'SHOP.PAYMENT_NOTE' | translate }}
+          </p>
+        </div>
+      </div>
+      
+      <!-- Action Buttons -->
+      <div class="flex gap-3">
+        <button
+          (click)="closePurchaseModal()"
+          class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-700 py-2 px-4 rounded-lg font-medium"
+        >
+          {{ 'SHOP.CANCEL' | translate }}
+        </button>
+        <button
+          (click)="openPaymentModal()"
+          class="flex-1 bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg font-medium flex items-center justify-center gap-2"
+        >
+          <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
+          </svg>
+          {{ 'SHOP.CONTINUE_PAYMENT' | translate }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Payment Instructions Modal -->
+<div *ngIf="showPaymentModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+  <div class="relative top-20 mx-auto p-5 border max-w-4xl w-full shadow-lg rounded-md bg-white">
+    <div class="mt-3">
+      <!-- Header -->
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-lg font-medium text-gray-900">{{ 'SHOP.PAYMENT_INSTRUCTIONS' | translate }}</h3>
+        <button
+          (click)="closePaymentModal()"
+          class="text-gray-400 hover:text-gray-600"
+        >
+          <svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+      
+      <p class="text-sm text-gray-600 mb-6">
+        {{ 'SHOP.PAYMENT_DESCRIPTION' | translate }}
+      </p>
+
+      <!-- PayPal Payment Details -->
+      <div class="bg-blue-50 rounded-lg p-4 mb-6">
+        <h4 class="font-semibold text-blue-900 mb-3">{{ 'SHOP.PAYPAL_PAYMENT' | translate }}</h4>
+        <div class="space-y-2 text-sm">
+          <div class="flex justify-between">
+            <span class="text-blue-600">{{ 'SHOP.PAYPAL_LINK' | translate }}:</span>
+            <span class="font-medium">{{ selectedFile?.paypalLink || 'https://paypal.me/anavaspitac?country.x=RS&locale.x=en_US' }}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-blue-600">{{ 'SHOP.AMOUNT' | translate }}:</span>
+            <span class="font-medium text-green-600">{{ selectedFile?.priceRSD }} RSD / {{ selectedFile?.priceEUR }} EUR</span>
+          </div>
+        </div>
+        <div class="mt-3">
+          <button
+            (click)="copyPayPalLink()"
+            class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg font-medium flex items-center justify-center gap-2 transition-colors"
+          >
+            <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12l2-2 4-4m-4 4l-4-4m4 4V8"/>
+            </svg>
+            {{ 'SHOP.COPY_PAYPAL_LINK' | translate }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Bank Transfer Details -->
+      <div class="bg-green-50 rounded-lg p-4 mb-6">
+        <h4 class="font-semibold text-green-900 mb-3">{{ 'SHOP.BANK_TRANSFER' | translate }}</h4>
+        <p class="text-sm text-green-700 mb-4">{{ 'SHOP.BANK_TRANSFER_DESC' | translate }}</p>
+        
+        <div class="space-y-2 text-sm">
+          <div class="flex justify-between">
+            <span class="text-green-600">{{ 'SHOP.PAYMENT_PURPOSE' | translate }}:</span>
+            <span class="font-medium">Kupovina: {{ selectedFile?.title }} - {{ getUserEmail() }}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-green-600">{{ 'SHOP.ACCOUNT_NUMBER' | translate }}:</span>
+            <span class="font-medium">{{ selectedFile?.bankAccountNumber || ('SHOP.BANK_ACCOUNT' | translate) }}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-green-600">{{ 'SHOP.RECIPIENT' | translate }}:</span>
+            <span class="font-medium">{{ selectedFile?.author || ('SHOP.BANK_RECIPIENT' | translate) }}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-green-600">{{ 'SHOP.PHONE_NUMBER' | translate }} (Viber):</span>
+            <span class="font-medium">{{ selectedFile?.phoneNumber || '+381 61 634 9493' }}</span>
+          </div>
+        </div>
+        <div class="mt-3">
+          <button
+            (click)="copyBankDetails()"
+            class="w-full bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg font-medium flex items-center justify-center gap-2 transition-colors"
+          >
+            <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12l2-2 4-4m-4 4l-4-4m4 4V8"/>
+            </svg>
+            {{ 'SHOP.COPY_BANK_DETAILS' | translate }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Bank Transfer Note -->
+      <div class="bg-yellow-50 rounded-lg p-4 mb-6">
+        <h4 class="font-semibold text-yellow-900 mb-3">{{ 'SHOP.BANK_NOTE' | translate }}</h4>
+        <p class="text-sm text-yellow-700">{{ 'SHOP.BANK_NOTE_DESC' | translate }}</p>
+      </div>
+      
+      <!-- Steps -->
+      <div class="space-y-3 mb-6">
+        <h4 class="font-semibold text-gray-900">{{ 'SHOP.STEPS' | translate }}</h4>
+        <div class="space-y-2 text-sm text-gray-600">
+          <div class="flex items-start gap-3">
+            <span class="bg-green-100 text-green-800 text-xs font-medium px-2 py-1 rounded-full">1</span>
+            <span>{{ 'SHOP.STEP_1' | translate }}</span>
+          </div>
+          <div class="flex items-start gap-3">
+            <span class="bg-green-100 text-green-800 text-xs font-medium px-2 py-1 rounded-full">2</span>
+            <span>{{ 'SHOP.STEP_2' | translate }}</span>
+          </div>
+          <div class="flex items-start gap-3">
+            <span class="bg-green-100 text-green-800 text-xs font-medium px-2 py-1 rounded-full">3</span>
+            <span>{{ 'SHOP.VIBER_MESSAGE' | translate }}: {{ selectedFile?.phoneNumber || '+381 61 634 9493' }}</span>
+          </div>
+          <div class="flex items-start gap-3">
+            <span class="bg-green-100 text-green-800 text-xs font-medium px-2 py-1 rounded-full">4</span>
+            <span>{{ 'SHOP.STEP_4' | translate }}</span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Action Buttons -->
+      <div class="flex gap-3">
+        <button
+          (click)="closePaymentModal()"
+          class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-700 py-2 px-4 rounded-lg font-medium"
+        >
+          {{ 'SHOP.BACK' | translate }}
+        </button>
+        <button
+          (click)="closePaymentModal()"
+          class="flex-1 bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg font-medium flex items-center justify-center gap-2"
+        >
+          <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+          {{ 'SHOP.SENT_PROOF' | translate }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Login Required Modal -->
+<div *ngIf="showLoginModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+  <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+    <div class="mt-3 text-center">
+      <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-yellow-100">
+        <svg class="h-6 w-6 text-yellow-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"/>
+        </svg>
+      </div>
+      <h3 class="text-lg font-medium text-gray-900 mt-4">{{ 'SHOP.LOGIN_REQUIRED_TITLE' | translate }}</h3>
+      <div class="mt-2 px-7 py-3">
+        <p class="text-sm text-gray-500">{{ 'SHOP.LOGIN_REQUIRED_MESSAGE' | translate }}</p>
+      </div>
+      <div class="flex gap-3 mt-6">
+        <button
+          (click)="closeLoginModal()"
+          class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-700 py-2 px-4 rounded-md font-medium"
+        >
+          {{ 'SHOP.CANCEL' | translate }}
+        </button>
+        <button
+          (click)="goToLogin()"
+          class="flex-1 bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-md font-medium"
+        >
+          {{ 'SHOP.GO_TO_LOGIN' | translate }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

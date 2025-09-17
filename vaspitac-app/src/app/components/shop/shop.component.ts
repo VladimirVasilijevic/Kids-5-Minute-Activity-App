@@ -451,6 +451,15 @@ export class ShopComponent implements OnInit {
   }
 
   /**
+   * Navigate to digital file detail page
+   */
+  goToFileDetail(file: DigitalFile): void {
+    this._router.navigate(['/shop/file', file.id]).then(() => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  }
+
+  /**
    * Copies PayPal link to clipboard
    */
   copyPayPalLink(): void {
@@ -470,9 +479,9 @@ export class ShopComponent implements OnInit {
     const recipient = this.selectedFile?.author || this._translate.instant('SHOP.BANK_RECIPIENT');
     const phoneNumber = this.selectedFile?.phoneNumber || '+381 61 634 9493';
     
-    const bankDetails = `Account Number: ${bankAccount}
-Recipient: ${recipient}
-Phone (Viber): ${phoneNumber}`;
+    const bankDetails = `Broj računa: ${bankAccount}
+Primalac: ${recipient}
+Telefon (Viber): ${phoneNumber}`;
     
     navigator.clipboard.writeText(bankDetails).then(() => {
       // Bank details copied successfully
@@ -520,8 +529,6 @@ Phone (Viber): ${phoneNumber}`;
     // Open payment modal to show instructions directly
     this.openPaymentModal();
   }
-
-
 
   /**
    * Getter for access map size (for template use)
