@@ -67,5 +67,28 @@ service cloud.firestore {
       allow read: if true;
       allow write: if request.auth != null && userRole() == 'admin';
     }
+    
+    // Digital marketplace collections
+    match /digital-files/{fileId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && userRole() == 'admin';
+    }
+    
+    // User access records - users can only read their own access records
+    match /user_access/{accessId} {
+      allow read: if request.auth != null && 
+        resource.data.userId == request.auth.uid;
+      allow write: if false; // Only server-side operations can modify access
+    }
+    
+    // Purchase records - users can only read their own purchases
+    match /purchases/{purchaseId} {
+      allow read: if request.auth != null && 
+        resource.data.userId == request.auth.uid;
+      allow create: if request.auth != null && 
+        request.auth.uid == request.resource.data.userId;
+      allow update: if false; // Only server-side operations can update purchases
+      allow delete: if false; // No deletion allowed
+    }
   }
 } 
