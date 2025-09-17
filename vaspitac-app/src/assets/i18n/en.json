@@ -125,8 +125,15 @@
     "NO_FILES_DESCRIPTION": "Try changing filters or search terms.",
     "LOAD_MORE": "Load more",
     "DOWNLOAD_FILE": "Download file",
+    "MORE_DETAILS": "More Details",
     "BUY": "Buy",
     "BUY_NOW": "Buy Now",
+    "ORDER_NOW": "Order Now",
+    "ORDER_PHYSICAL": "Order",
+    "PHYSICAL_PRODUCT": "Physical Product",
+    "SHIPPED_TO_ADDRESS": "Shipped to address",
+    "PURCHASE_CONFIRMED": "Purchase Confirmed",
+    "SHIPPING_INFO_SENT": "Shipping information will be sent to email",
     "PURCHASE_TITLE": "Material Purchase",
     "PAYMENT_NOTE": "Note: Payment is made manually via bank transfer or PayPal. After you send proof of payment, our team will verify the payment and approve access to the material in the shortest time.",
     "CANCEL": "Cancel",
@@ -175,7 +182,10 @@
     "BANK_ACCOUNT_NUMBER": "Bank Account Number",
     "PAYPAL_LINK_LABEL": "PayPal Link",
     "VIBER_MESSAGE": "Send screenshot on Viber",
-    "PAYMENT_PURPOSE_DESC": "Purchase: {{documentName}} - {{userEmail}}"
+    "PAYMENT_PURPOSE_DESC": "Purchase: {{documentName}} - {{userEmail}}",
+    "BACK_TO_SHOP": "Back to Shop",
+    "FILE_NOT_FOUND": "File Not Found",
+    "FILE_NOT_FOUND_DESC": "The file you're looking for doesn't exist or has been removed."
   },
   "ABOUT": {
     "BACK": "Back to home",
@@ -638,7 +648,16 @@
     "BANK_ACCOUNT_NUMBER": "Bank Account Number",
     "PHONE_NUMBER": "Phone Number",
     "AUTHOR": "Author",
-    "PAYPAL_LINK": "PayPal Link"
+    "PAYPAL_LINK": "PayPal Link",
+    "PRODUCT_IMAGE": "Product Image",
+    "UPLOAD_IMAGE": "Upload Image",
+    "UPLOAD_IMAGE_BUTTON": "Upload Image",
+    "IMAGE_URL": "Image URL",
+    "IMAGE_URL_DESC": "Or enter direct link to image",
+    "IMAGE_PREVIEW": "Image Preview",
+    "IMAGE_TYPES_SUPPORTED": "PNG, JPG, WebP up to 5MB",
+    "FILE_OPTIONAL": "optional",
+    "FILE_OPTIONAL_HINT": "💡 Leave empty for physical products that will be shipped to address"
   },
 
   "SUBSCRIBE": {

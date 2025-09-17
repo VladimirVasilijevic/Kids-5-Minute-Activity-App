@@ -14,12 +14,12 @@ export interface DigitalFile {
   priceRSD: number;
   /** Price in Euros */
   priceEUR: number;
-  /** URL to the file in Firebase Storage */
-  fileUrl: string;
-  /** File size in bytes */
-  fileSize: number;
-  /** File type (PDF, DOC, DOCX, etc.) */
-  fileType: string;
+  /** URL to the file in Firebase Storage (optional for physical products) */
+  fileUrl?: string;
+  /** File size in bytes (optional for physical products) */
+  fileSize?: number;
+  /** File type (PDF, DOC, DOCX, etc.) (optional for physical products) */
+  fileType?: string;
   /** Access level for pricing tier */
   accessLevel: 'BASIC' | 'PREMIUM';
   /** Language of the file content */
@@ -36,6 +36,8 @@ export interface DigitalFile {
   tags?: string[];
   /** Optional preview image URL */
   previewImageUrl?: string;
+  /** Main product image URL */
+  imageUrl?: string;
   /** Original filename */
   fileName?: string;
   /** Bank account number for payments */
@@ -66,6 +68,8 @@ export interface DigitalFileFormData {
   language: 'en' | 'sr';
   /** Optional tags for categorization */
   tags?: string[];
+  /** Main product image URL */
+  imageUrl?: string;
   /** Bank account number for payments */
   bankAccountNumber?: string;
   /** Phone number for contact (Viber) */

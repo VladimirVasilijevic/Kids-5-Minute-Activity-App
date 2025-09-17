@@ -135,7 +135,7 @@
                       <div class="ml-4">
                         <div class="text-sm font-medium text-gray-900">{{ file.title }}</div>
                         <div class="text-sm text-gray-500">
-                          {{ file.fileType }} • {{ formatFileSize(file.fileSize) }} • 
+                          {{ file.fileType || 'N/A' }} • {{ file.fileSize ? formatFileSize(file.fileSize) : 'N/A' }} • 
                           <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium"
                                 [class]="file.accessLevel === 'PREMIUM' ? 'bg-yellow-100 text-yellow-800' : 'bg-blue-100 text-blue-800'">
                             {{ file.accessLevel }}
@@ -364,6 +364,70 @@
                 </div>
               </div>
 
+              <!-- Product Image Section -->
+              <div class="border-t pt-6">
+                <h3 class="text-lg font-medium text-gray-900 mb-4">{{ 'ADMIN.PRODUCT_IMAGE' | translate }}</h3>
+                
+                <!-- Image Upload or URL Input -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                  <!-- Upload Image -->
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">{{ 'ADMIN.UPLOAD_IMAGE' | translate }}</label>
+                    <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg hover:border-gray-400 transition-colors">
+                      <div class="space-y-1 text-center">
+                        <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                          <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        <div class="flex text-sm text-gray-600">
+                          <label class="relative cursor-pointer bg-white rounded-md font-medium text-green-600 hover:text-green-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-green-500">
+                            <span>{{ 'ADMIN.UPLOAD_IMAGE_BUTTON' | translate }}</span>
+                            <input 
+                              type="file" 
+                              class="sr-only" 
+                              accept="image/jpeg,image/png,image/webp,image/jpg"
+                              (change)="onImageSelected($event)"
+                              [disabled]="isUploadingImage"
+                            >
+                          </label>
+                          <p class="pl-1">{{ 'ADMIN.OR_DRAG_DROP' | translate }}</p>
+                        </div>
+                        <p class="text-xs text-gray-500">{{ 'ADMIN.IMAGE_TYPES_SUPPORTED' | translate }}</p>
+                      </div>
+                    </div>
+                    <div *ngIf="formErrors['image']" class="text-red-500 text-xs mt-1">{{ formErrors['image'] }}</div>
+                  </div>
+                  
+                  <!-- Manual URL Input -->
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">{{ 'ADMIN.IMAGE_URL' | translate }}</label>
+                    <input
+                      [(ngModel)]="formData.imageUrl"
+                      (ngModelChange)="onImageUrlChange()"
+                      name="imageUrl"
+                      type="url"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500"
+                      placeholder="https://example.com/image.jpg"
+                    >
+                    <p class="text-xs text-gray-500 mt-1">{{ 'ADMIN.IMAGE_URL_DESC' | translate }}</p>
+                  </div>
+                </div>
+                
+                <!-- Image Preview -->
+                <div *ngIf="imagePreview" class="mb-6">
+                  <label class="block text-sm font-medium text-gray-700 mb-2">{{ 'ADMIN.IMAGE_PREVIEW' | translate }}</label>
+                  <div class="relative max-w-sm">
+                    <img [src]="imagePreview" [alt]="formData.title || 'Product image'" 
+                         class="w-full h-48 object-cover rounded-lg border border-gray-300">
+                    <div *ngIf="isUploadingImage" class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center rounded-lg">
+                      <svg class="animate-spin h-8 w-8 text-white" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
               <!-- Payment Information Section -->
               <div class="border-t pt-6">
                 <h3 class="text-lg font-medium text-gray-900 mb-4">{{ 'ADMIN.PAYMENT_INFORMATION' | translate }}</h3>
@@ -418,8 +482,11 @@
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">
                   {{ editingFile ? ('ADMIN.REPLACE_FILE' | translate) : ('ADMIN.FILE' | translate) }}
-                  <span *ngIf="!editingFile" class="text-red-500">*</span>
+                  <span class="text-sm text-gray-500 font-normal">({{ 'ADMIN.FILE_OPTIONAL' | translate }})</span>
                 </label>
+                <p class="text-xs text-blue-600 mb-3">
+                  <span class="font-medium">{{ 'ADMIN.FILE_OPTIONAL_HINT' | translate }}</span>
+                </p>
                 <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg hover:border-gray-400 transition-colors">
                   <div class="space-y-1 text-center">
                     <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">

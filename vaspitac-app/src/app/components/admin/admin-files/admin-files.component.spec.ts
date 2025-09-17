@@ -10,6 +10,7 @@ import { UserService } from '../../../services/user.service';
 import { LanguageService } from '../../../services/language.service';
 import { DigitalFileService } from '../../../services/digital-file.service';
 import { UserAccessService } from '../../../services/user-access.service';
+import { ImageUploadService } from '../../../services/image-upload.service';
 import { AngularFireFunctions } from '@angular/fire/compat/functions';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { mockAdminUser } from '../../../../test-utils/mock-user-profiles';
@@ -30,6 +31,7 @@ describe('AdminFilesComponent', () => {
   let languageService: jasmine.SpyObj<LanguageService>;
   let digitalFileService: jasmine.SpyObj<DigitalFileService>;
   let userAccessService: jasmine.SpyObj<UserAccessService>;
+  let imageUploadService: jasmine.SpyObj<ImageUploadService>;
   let fireFunctions: jasmine.SpyObj<AngularFireFunctions>;
   let firestore: jasmine.SpyObj<AngularFirestore>;
 
@@ -51,6 +53,7 @@ describe('AdminFilesComponent', () => {
       'getFiles', 'createFile', 'updateFile', 'deleteFile', 'toggleFileStatus'
     ]);
     const userAccessSpy = jasmine.createSpyObj('UserAccessService', ['grantAccess']);
+    const imageUploadSpy = jasmine.createSpyObj('ImageUploadService', ['uploadImage']);
     const fireFunctionsSpy = jasmine.createSpyObj('AngularFireFunctions', ['httpsCallable']);
     const firestoreSpy = jasmine.createSpyObj('AngularFirestore', ['collection']);
 
@@ -63,6 +66,7 @@ describe('AdminFilesComponent', () => {
     digitalFileSpy.deleteFile.and.returnValue(Promise.resolve());
     digitalFileSpy.toggleFileStatus.and.returnValue(Promise.resolve());
     userAccessSpy.grantAccess.and.returnValue(Promise.resolve());
+    imageUploadSpy.uploadImage.and.returnValue(of('https://example.com/uploaded-image.jpg'));
 
     // Mock Firestore collection
     const collectionSpy = jasmine.createSpyObj('collection', ['ref']);
@@ -96,6 +100,7 @@ describe('AdminFilesComponent', () => {
         { provide: LanguageService, useValue: languageSpy },
         { provide: DigitalFileService, useValue: digitalFileSpy },
         { provide: UserAccessService, useValue: userAccessSpy },
+        { provide: ImageUploadService, useValue: imageUploadSpy },
         { provide: AngularFireFunctions, useValue: fireFunctionsSpy },
         { provide: AngularFirestore, useValue: firestoreSpy }
       ],
@@ -116,6 +121,7 @@ describe('AdminFilesComponent', () => {
     languageService = TestBed.inject(LanguageService) as jasmine.SpyObj<LanguageService>;
     digitalFileService = TestBed.inject(DigitalFileService) as jasmine.SpyObj<DigitalFileService>;
     userAccessService = TestBed.inject(UserAccessService) as jasmine.SpyObj<UserAccessService>;
+    imageUploadService = TestBed.inject(ImageUploadService) as jasmine.SpyObj<ImageUploadService>;
     fireFunctions = TestBed.inject(AngularFireFunctions) as jasmine.SpyObj<AngularFireFunctions>;
     firestore = TestBed.inject(AngularFirestore) as jasmine.SpyObj<AngularFirestore>;
   });
@@ -182,11 +188,12 @@ describe('AdminFilesComponent', () => {
       expect(component.formData.accessLevel).toBe(mockDigitalFile.accessLevel);
       expect(component.formData.language).toBe(mockDigitalFile.language);
       expect(component.formData.tags).toEqual(mockDigitalFile.tags || []);
+      expect(component.formData.imageUrl).toBe(mockDigitalFile.imageUrl || '');
       expect(component.formData.bankAccountNumber).toBe(mockDigitalFile.bankAccountNumber || '');
       expect(component.formData.phoneNumber).toBe(mockDigitalFile.phoneNumber || '');
       expect(component.formData.author).toBe(mockDigitalFile.author || '');
       expect(component.formData.paypalLink).toBe(mockDigitalFile.paypalLink || '');
-      expect(component.filePreview).toBe(mockDigitalFile.fileUrl);
+      expect(component.filePreview).toBe(mockDigitalFile.fileUrl || null);
       expect(component.showForm).toBeTrue();
     });
   });
@@ -201,6 +208,7 @@ describe('AdminFilesComponent', () => {
         accessLevel: 'BASIC',
         language: 'sr',
         tags: [],
+        imageUrl: '',
         bankAccountNumber: '',
         phoneNumber: '',
         author: '',
@@ -250,28 +258,70 @@ describe('AdminFilesComponent', () => {
       expect(component.formErrors['priceEUR']).toBe('EUR price must be greater than 0');
     });
 
-    it('should return false and set error for missing file when creating', () => {
+    it('should return true when no file is provided (for physical products)', () => {
       component.editingFile = null;
       component.selectedFile = null;
+      // Set valid form data for physical product
+      component.formData = {
+        title: 'Physical Product',
+        description: 'A physical product that will be shipped',
+        priceRSD: 1000,
+        priceEUR: 10,
+        accessLevel: 'BASIC',
+        language: 'sr',
+        tags: [],
+        imageUrl: '',
+        bankAccountNumber: '',
+        phoneNumber: '',
+        author: '',
+        paypalLink: ''
+      };
       
       const result = (component as any).validateForm();
       
-      expect(result).toBeFalse();
-      expect(component.formErrors['file']).toBe('File is required');
+      expect(result).toBeTrue();
+      expect(component.formErrors['file']).toBeUndefined();
     });
   });
 
   describe('createFile', () => {
-    it('should show error if no file selected', fakeAsync(async () => {
+    it('should create physical product successfully without file', fakeAsync(async () => {
       component.selectedFile = null;
+      component.formData = {
+        title: 'Physical Product',
+        description: 'A physical product',
+        priceRSD: 1000,
+        priceEUR: 10,
+        accessLevel: 'BASIC',
+        language: 'sr',
+        tags: [],
+        imageUrl: '',
+        bankAccountNumber: '',
+        phoneNumber: '',
+        author: '',
+        paypalLink: ''
+      };
+      digitalFileService.createFile.and.returnValue(Promise.resolve('new-file-id'));
       
       await (component as any).createFile();
       tick();
       
-      expect(component.showErrorModal).toBeTrue();
-      expect(component.errorTitle).toBe('File Required');
-      expect(component.errorMessage).toBe('Please select a file to upload.');
-      expect(digitalFileService.createFile).not.toHaveBeenCalled();
+      expect(digitalFileService.createFile).toHaveBeenCalledWith({
+        title: 'Physical Product',
+        description: 'A physical product',
+        priceRSD: 1000,
+        priceEUR: 10,
+        accessLevel: 'BASIC',
+        language: 'sr',
+        tags: [],
+        imageUrl: '',
+        bankAccountNumber: '',
+        phoneNumber: '',
+        author: '',
+        paypalLink: ''
+      }, undefined);
+      expect(component.showSuccessMessage).toBeTrue();
+      expect(component.successMessage).toBe('Product created successfully');
     }));
 
     it('should handle creation error', fakeAsync(async () => {
@@ -299,6 +349,7 @@ describe('AdminFilesComponent', () => {
         accessLevel: 'PREMIUM',
         language: 'en',
         tags: ['updated'],
+        imageUrl: '',
         bankAccountNumber: '',
         phoneNumber: '',
         author: '',
@@ -316,6 +367,7 @@ describe('AdminFilesComponent', () => {
         accessLevel: 'PREMIUM',
         language: 'en',
         tags: ['updated'],
+        imageUrl: undefined,
         bankAccountNumber: undefined,
         phoneNumber: undefined,
         author: undefined,
@@ -578,6 +630,7 @@ describe('AdminFilesComponent', () => {
       expect(component.formData.accessLevel).toBe('BASIC');
       expect(component.formData.language).toBe('sr');
       expect(component.formData.tags).toEqual([]);
+      expect(component.formData.imageUrl).toBe('');
       expect(component.formData.bankAccountNumber).toBe('');
       expect(component.formData.phoneNumber).toBe('');
       expect(component.formData.author).toBe('');
@@ -758,5 +811,83 @@ describe('AdminFilesComponent', () => {
       expect(component.errorMessage).toBe('Custom Message');
       expect(component.showErrorModal).toBeTrue();
     });
+  });
+
+  describe('onImageSelected', () => {
+    it('should do nothing when no file is selected', () => {
+      const event = { target: { files: [] } };
+      spyOn(component as any, 'uploadImage');
+      
+      component.onImageSelected(event);
+      
+      expect((component as any).uploadImage).not.toHaveBeenCalled();
+    });
+
+    it('should set error for invalid image file', () => {
+      const invalidFile = createMockFile('test.txt', 1024, 'text/plain');
+      const event = { target: { files: [invalidFile] } };
+      
+      component.onImageSelected(event);
+      
+      expect(component.formErrors['image']).toBe('Please select a valid image file (JPG, PNG, WebP) under 5MB.');
+    });
+
+    it('should upload valid image file', () => {
+      const validFile = createMockFile('test.jpg', 1024, 'image/jpeg');
+      const event = { target: { files: [validFile] } };
+      spyOn(component as any, 'uploadImage');
+      
+      component.onImageSelected(event);
+      
+      expect(component.selectedImage).toBe(validFile);
+      expect((component as any).uploadImage).toHaveBeenCalledWith(validFile);
+      expect(component.formErrors['image']).toBeUndefined();
+    });
+  });
+
+  describe('onImageUrlChange', () => {
+    it('should set image preview when URL is provided', () => {
+      component.formData.imageUrl = 'https://example.com/image.jpg';
+      
+      component.onImageUrlChange();
+      
+      expect(component.imagePreview).toBe('https://example.com/image.jpg');
+      expect(component.formErrors['image']).toBeUndefined();
+    });
+
+    it('should clear image preview when URL is empty', () => {
+      component.formData.imageUrl = '';
+      
+      component.onImageUrlChange();
+      
+      expect(component.imagePreview).toBeNull();
+    });
+  });
+
+  describe('uploadImage', () => {
+    it('should upload image successfully', fakeAsync(() => {
+      const mockFile = createMockFile('test.jpg', 1024, 'image/jpeg');
+      const uploadUrl = 'https://example.com/uploaded-image.jpg';
+      imageUploadService.uploadImage.and.returnValue(of(uploadUrl));
+      
+      (component as any).uploadImage(mockFile);
+      tick();
+      
+      expect(imageUploadService.uploadImage).toHaveBeenCalledWith(mockFile, 'digital-files/images/');
+      expect(component.formData.imageUrl).toBe(uploadUrl);
+      expect(component.imagePreview).toBe(uploadUrl);
+      expect(component.isUploadingImage).toBeFalse();
+    }));
+
+    it('should handle upload error', fakeAsync(() => {
+      const mockFile = createMockFile('test.jpg', 1024, 'image/jpeg');
+      imageUploadService.uploadImage.and.returnValue(throwError(new Error('Upload failed')));
+      
+      (component as any).uploadImage(mockFile);
+      tick();
+      
+      expect(component.isUploadingImage).toBeFalse();
+      expect(component.formErrors['image']).toBe('Failed to upload image. Please try again.');
+    }));
   });
 });

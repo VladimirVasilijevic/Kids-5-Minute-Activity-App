@@ -28,6 +28,7 @@ describe('ShopComponent', () => {
 
   beforeEach(async () => {
     const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
+    routerSpy.navigate.and.returnValue(Promise.resolve(true));
     const authSpy = jasmine.createSpyObj('AuthService', [], {
       user$: of({ uid: 'user123', email: 'test@example.com' })
     });
@@ -432,6 +433,14 @@ describe('ShopComponent', () => {
       component.filterFiles();
       
       expect(component.displayedFiles.length).toBe(3);
+    });
+  });
+
+  describe('goToFileDetail', () => {
+    it('should navigate to file detail page', () => {
+      component.goToFileDetail(mockDigitalFile);
+      
+      expect(router.navigate).toHaveBeenCalledWith(['/shop/file', mockDigitalFile.id]);
     });
   });
 

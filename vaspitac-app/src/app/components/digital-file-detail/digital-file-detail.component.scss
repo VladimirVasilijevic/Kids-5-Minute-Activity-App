@@ -1,0 +1,190 @@
+// Digital File Detail Component Styles
+// Inherits most styles from the global stylesheet and Tailwind CSS
+
+.prose {
+  // Override prose styles for better integration
+  max-width: none;
+  
+  p {
+    margin-bottom: 0.75rem;
+    
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+  
+  ul, ol {
+    margin-bottom: 0.75rem;
+    padding-left: 1.25rem;
+  }
+  
+  li {
+    margin-bottom: 0.25rem;
+  }
+  
+  strong {
+    font-weight: 600;
+  }
+  
+  em {
+    font-style: italic;
+  }
+  
+  code {
+    background-color: #f3f4f6;
+    padding: 0.125rem 0.25rem;
+    border-radius: 0.25rem;
+    font-size: 0.875em;
+  }
+  
+  blockquote {
+    border-left: 4px solid #10b981;
+    padding-left: 1rem;
+    font-style: italic;
+    color: #6b7280;
+    margin: 1rem 0;
+  }
+}
+
+// Custom animations for loading states
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+// Smooth transitions for buttons
+button {
+  transition: all 0.2s ease-in-out;
+  
+  &:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
+  }
+  
+  &:active:not(:disabled) {
+    transform: translateY(0);
+  }
+  
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+}
+
+// Modal backdrop blur effect
+.fixed.inset-0 {
+  backdrop-filter: blur(2px);
+}
+
+// Image container enhancements
+.relative {
+  img {
+    transition: transform 0.3s ease-in-out;
+    
+    &:hover {
+      transform: scale(1.02);
+    }
+  }
+}
+
+// Tag styling enhancements
+.inline-flex.items-center {
+  transition: background-color 0.2s ease-in-out;
+  
+  &:hover {
+    background-color: #e5e7eb;
+  }
+}
+
+// Price highlight animation
+.text-green-600 {
+  &.font-bold {
+    position: relative;
+    
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: linear-gradient(90deg, #10b981, #059669);
+      border-radius: 1px;
+      opacity: 0.3;
+    }
+  }
+}
+
+// Responsive improvements
+@media (max-width: 768px) {
+  .space-y-4 > * + * {
+    margin-top: 1rem;
+  }
+  
+  .text-lg {
+    font-size: 1rem;
+    line-height: 1.5rem;
+  }
+  
+  .text-xl {
+    font-size: 1.125rem;
+    line-height: 1.75rem;
+  }
+}
+
+// Loading skeleton for image
+.bg-gray-100 {
+  &.animate-pulse {
+    background: linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 50%, #f3f4f6 75%);
+    background-size: 200% 100%;
+    animation: loading 1.5s infinite;
+  }
+}
+
+@keyframes loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+// Focus styles for accessibility
+button:focus,
+input:focus,
+textarea:focus {
+  outline: 2px solid #10b981;
+  outline-offset: 2px;
+}
+
+// Custom scrollbar for modals
+.overflow-y-auto {
+  scrollbar-width: thin;
+  scrollbar-color: #10b981 #f3f4f6;
+  
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: #f3f4f6;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: #10b981;
+    border-radius: 3px;
+  }
+  
+  &::-webkit-scrollbar-thumb:hover {
+    background: #059669;
+  }
+}

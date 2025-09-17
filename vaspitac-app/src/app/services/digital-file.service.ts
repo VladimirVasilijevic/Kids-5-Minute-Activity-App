@@ -43,55 +43,103 @@ export class DigitalFileService {
   }
 
   /**
-   * Create a new digital file with enhanced security
+   * Create a new product (digital file or physical product) with enhanced security
    */
-  async createFile(fileData: DigitalFileFormData, file: File): Promise<string> {
+  async createFile(fileData: DigitalFileFormData, file?: File): Promise<string> {
     // Enhanced validation
-    if (!fileData.title || !fileData.description || !file) {
+    if (!fileData.title || !fileData.description) {
       throw new Error('Missing required file information');
     }
 
-    if (!validateFileForUpload(file)) {
+    // File validation only for digital products (when file is provided)
+    if (file && !validateFileForUpload(file)) {
       throw new Error('Invalid file type or size');
     }
 
     try {
-      // Generate unique file name
-      const fileExtension = file.name.split('.').pop() || 'pdf';
-      const uniqueFileName = `${generateId()}_${fileData.title.replace(/[^a-zA-Z0-9]/g, '_')}_${new Date().toISOString().slice(0, 10)}_${Date.now()}_${fileExtension}`;
-      
-      // Upload file to Firebase Storage
-      const filePath = `${this.STORAGE_PATH}/${uniqueFileName}`;
-      const uploadTask = this.storage.upload(filePath, file);
-      
-      // Wait for upload to complete and get download URL
-      const snapshot = await firstValueFrom(uploadTask.snapshotChanges().pipe(
-        filter(snapshot => snapshot?.state === 'success'),
-        take(1)
-      ));
-      
-      if (!snapshot) {
-        throw new Error('File upload failed');
+      let downloadURL: string = '';
+      let fileSize: number = 0;
+      let fileType: string = '';
+      let fileName: string = '';
+
+      // Handle file upload for digital products
+      if (file) {
+        // Generate unique file name
+        const fileExtension = file.name.split('.').pop() || 'pdf';
+        const uniqueFileName = `${generateId()}_${fileData.title.replace(/[^a-zA-Z0-9]/g, '_')}_${new Date().toISOString().slice(0, 10)}_${Date.now()}.${fileExtension}`;
+        
+        // Upload file to Firebase Storage
+        const filePath = `${this.STORAGE_PATH}/${uniqueFileName}`;
+        const uploadTask = this.storage.upload(filePath, file);
+        
+        // Wait for upload to complete and get download URL
+        const snapshot = await firstValueFrom(uploadTask.snapshotChanges().pipe(
+          filter(snapshot => snapshot?.state === 'success'),
+          take(1)
+        ));
+        
+        if (!snapshot) {
+          throw new Error('File upload failed');
+        }
+
+        downloadURL = await firstValueFrom(uploadTask.snapshotChanges().pipe(
+          filter(snapshot => snapshot?.state === 'success'),
+          take(1),
+          switchMap(() => this.storage.ref(filePath).getDownloadURL())
+        ));
+
+        fileSize = file.size;
+        fileType = getFileTypeFromName(file.name);
+        fileName = file.name;
       }
 
-      const downloadURL = await firstValueFrom(uploadTask.snapshotChanges().pipe(
-        filter(snapshot => snapshot?.state === 'success'),
-        take(1),
-        switchMap(() => this.storage.ref(filePath).getDownloadURL())
-      ));
-
-      // Create file document in Firestore
-      const digitalFile: Omit<DigitalFile, 'id'> = {
-        ...fileData,
-        fileName: file.name,
-        fileSize: file.size,
-        fileType: file.type,
-        fileUrl: downloadURL,
+      // Create product document in Firestore (filter out undefined values)
+      const digitalFile: any = {
+        title: fileData.title,
+        description: fileData.description,
+        priceRSD: fileData.priceRSD,
+        priceEUR: fileData.priceEUR,
+        accessLevel: fileData.accessLevel,
+        language: fileData.language,
         isActive: true,
         createdBy: 'admin', // TODO: Get from auth service
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
       };
+
+      // Add optional fields only if they have values
+      if (fileData.tags && fileData.tags.length > 0) {
+        digitalFile.tags = fileData.tags;
+      }
+      if (fileData.imageUrl && fileData.imageUrl.trim()) {
+        digitalFile.imageUrl = fileData.imageUrl.trim();
+      }
+      if (fileData.bankAccountNumber && fileData.bankAccountNumber.trim()) {
+        digitalFile.bankAccountNumber = fileData.bankAccountNumber.trim();
+      }
+      if (fileData.phoneNumber && fileData.phoneNumber.trim()) {
+        digitalFile.phoneNumber = fileData.phoneNumber.trim();
+      }
+      if (fileData.author && fileData.author.trim()) {
+        digitalFile.author = fileData.author.trim();
+      }
+      if (fileData.paypalLink && fileData.paypalLink.trim()) {
+        digitalFile.paypalLink = fileData.paypalLink.trim();
+      }
+
+      // Only add file-related fields if they have values (Firestore doesn't support undefined)
+      if (fileName) {
+        digitalFile.fileName = fileName;
+      }
+      if (fileSize && fileSize > 0) {
+        digitalFile.fileSize = fileSize;
+      }
+      if (fileType) {
+        digitalFile.fileType = fileType;
+      }
+      if (downloadURL) {
+        digitalFile.fileUrl = downloadURL;
+      }
 
       const docRef = await this.firestore.collection(this.COLLECTION).add(digitalFile);
       return docRef.id;

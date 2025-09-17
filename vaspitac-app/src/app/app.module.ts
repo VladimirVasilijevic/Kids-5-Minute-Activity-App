@@ -38,6 +38,7 @@ import { HomeComponent } from './components/home/home.component';
 import { ActivityListComponent } from './components/activity-list/activity-list.component';
 import { ActivityDetailComponent } from './components/activity-detail/activity-detail.component';
 import { ShopComponent } from './components/shop/shop.component';
+import { DigitalFileDetailComponent } from './components/digital-file-detail/digital-file-detail.component';
 import { AboutComponent } from './components/about/about.component';
 import { BlogComponent } from './components/blog/blog.component';
 import { BlogDetailComponent } from './components/blog-detail/blog-detail.component';
@@ -84,6 +85,7 @@ export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
     ActivityListComponent,
     ActivityDetailComponent,
     ShopComponent,
+    DigitalFileDetailComponent,
     AboutComponent,
     BlogComponent,
     BlogDetailComponent,
@@ -121,6 +123,7 @@ export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
       { path: 'activities', component: ActivityListComponent },
       { path: 'activity/:id', component: ActivityDetailComponent },
       { path: 'shop', component: ShopComponent },
+      { path: 'shop/file/:id', component: DigitalFileDetailComponent },
       { path: 'about', component: AboutComponent },
       { path: 'blog', component: BlogComponent },
       { path: 'blog/:id', component: BlogDetailComponent },
