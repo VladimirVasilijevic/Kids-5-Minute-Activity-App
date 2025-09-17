@@ -13,6 +13,7 @@ import { ACCESS_LEVELS } from '../../../models/marketplace.constants';
 import { formatFileSize, validateFileForUpload } from '../../../models/marketplace.utils';
 import { DigitalFileService } from '../../../services/digital-file.service';
 import { UserAccessService } from '../../../services/user-access.service';
+import { ImageUploadService } from '../../../services/image-upload.service';
 
 /**
  * Admin files component for managing digital files
@@ -71,18 +72,33 @@ export class AdminFilesComponent implements OnInit {
   selectedFile: File | null = null;
   filePreview: string | null = null;
 
+  // Image upload
+  isUploadingImage = false;
+  selectedImage: File | null = null;
+  imagePreview: string | null = null;
+
   // Markdown functionality
   showDescriptionPreview = false;
 
   // Form data
-  formData: DigitalFileFormData = {
+  formData: DigitalFileFormData & {
+    bankAccountNumber?: string;
+    phoneNumber?: string;
+    author?: string;
+    paypalLink?: string;
+  } = {
     title: '',
     description: '',
     priceRSD: 0,
     priceEUR: 0,
     accessLevel: 'BASIC',
     language: 'sr' as 'sr' | 'en',
-    tags: []
+    tags: [],
+    imageUrl: '',
+    bankAccountNumber: '',
+    phoneNumber: '',
+    author: '',
+    paypalLink: ''
   };
 
   // Grant access functionality
@@ -109,7 +125,8 @@ export class AdminFilesComponent implements OnInit {
     private _digitalFileService: DigitalFileService,
     private _userAccessService: UserAccessService,
     private _functions: AngularFireFunctions,
-    private _afs: AngularFirestore
+    private _afs: AngularFirestore,
+    private _imageUploadService: ImageUploadService
   ) {}
 
   /**
@@ -199,8 +216,14 @@ export class AdminFilesComponent implements OnInit {
       priceEUR: file.priceEUR,
       accessLevel: file.accessLevel,
       language: file.language,
-      tags: file.tags || []
+      tags: file.tags || [],
+      imageUrl: file.imageUrl || '',
+      bankAccountNumber: file.bankAccountNumber || '',
+      phoneNumber: file.phoneNumber || '',
+      author: file.author || '',
+      paypalLink: file.paypalLink || ''
     };
+    this.imagePreview = file.imageUrl || null;
     this.filePreview = file.fileUrl || null;
     this.showForm = true;
   }
@@ -251,32 +274,22 @@ export class AdminFilesComponent implements OnInit {
       isValid = false;
     }
 
-    if (!this.editingFile && !this.selectedFile) {
-      this.formErrors['file'] = 'File is required';
-      isValid = false;
-    }
+    // File is optional - products without files are physical products that will be shipped
 
     return isValid;
   }
 
   /**
-   * Creates a new file
+   * Creates a new product (digital or physical)
    */
   private async createFile(): Promise<void> {
-    if (!this.selectedFile) {
-      this.showErrorModal = true;
-      this.errorTitle = 'File Required';
-      this.errorMessage = 'Please select a file to upload.';
-      return;
-    }
-
     this.isUploadingFile = true;
     
     try {
-      const fileId = await this._digitalFileService.createFile(this.formData, this.selectedFile);
+      const fileId = await this._digitalFileService.createFile(this.formData, this.selectedFile ?? undefined);
       this.isUploadingFile = false;
       this.showSuccessMessage = true;
-      this.successMessage = 'File created successfully';
+      this.successMessage = 'Product created successfully';
       this.resetForm();
       this.loadFiles();
     } catch (error: any) {
@@ -301,7 +314,12 @@ export class AdminFilesComponent implements OnInit {
       priceEUR: this.formData.priceEUR,
       accessLevel: this.formData.accessLevel,
       language: this.formData.language,
-      tags: this.formData.tags || []
+      tags: this.formData.tags || [],
+      imageUrl: this.formData.imageUrl || undefined,
+      bankAccountNumber: this.formData.bankAccountNumber || undefined,
+      phoneNumber: this.formData.phoneNumber || undefined,
+      author: this.formData.author || undefined,
+      paypalLink: this.formData.paypalLink || undefined
     };
 
     try {
@@ -403,6 +421,69 @@ export class AdminFilesComponent implements OnInit {
   }
 
   /**
+   * Handles image selection for upload
+   * @param event - The image input change event
+   */
+  onImageSelected(event: any): void {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    if (!this.isValidImage(file)) {
+      this.formErrors['image'] = 'Please select a valid image file (JPG, PNG, WebP) under 5MB.';
+      return;
+    }
+
+    this.selectedImage = file;
+    this.uploadImage(file);
+    delete this.formErrors['image'];
+  }
+
+  /**
+   * Validates image file
+   * @param file - The image file to validate
+   * @returns True if valid
+   */
+  private isValidImage(file: File): boolean {
+    const validTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/jpg'];
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    
+    return validTypes.includes(file.type) && file.size <= maxSize;
+  }
+
+  /**
+   * Uploads an image to Firebase Storage
+   * @param file - The image file to upload
+   */
+  private uploadImage(file: File): void {
+    this.isUploadingImage = true;
+    
+    this._imageUploadService.uploadImage(file, 'digital-files/images/').subscribe({
+      next: (downloadUrl) => {
+        this.formData.imageUrl = downloadUrl;
+        this.imagePreview = downloadUrl;
+        this.isUploadingImage = false;
+      },
+      error: (error: Error) => {
+        console.error('Error uploading image:', error);
+        this.isUploadingImage = false;
+        this.formErrors['image'] = 'Failed to upload image. Please try again.';
+      }
+    });
+  }
+
+  /**
+   * Handles manual image URL input
+   */
+  onImageUrlChange(): void {
+    if (this.formData.imageUrl) {
+      this.imagePreview = this.formData.imageUrl;
+      delete this.formErrors['image'];
+    } else {
+      this.imagePreview = null;
+    }
+  }
+
+  /**
    * Filters files based on search criteria
    */
   filterFiles(): void {
@@ -461,10 +542,17 @@ export class AdminFilesComponent implements OnInit {
       priceEUR: 0,
       accessLevel: 'BASIC',
       language: this.currentLanguage as 'sr' | 'en',
-      tags: []
+      tags: [],
+      imageUrl: '',
+      bankAccountNumber: '',
+      phoneNumber: '',
+      author: '',
+      paypalLink: ''
     };
     this.selectedFile = null;
     this.filePreview = null;
+    this.selectedImage = null;
+    this.imagePreview = null;
     this.formErrors = {};
     this.showDescriptionPreview = false;
   }

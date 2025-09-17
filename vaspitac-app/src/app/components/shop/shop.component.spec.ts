@@ -28,6 +28,7 @@ describe('ShopComponent', () => {
 
   beforeEach(async () => {
     const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
+    routerSpy.navigate.and.returnValue(Promise.resolve(true));
     const authSpy = jasmine.createSpyObj('AuthService', [], {
       user$: of({ uid: 'user123', email: 'test@example.com' })
     });
@@ -319,17 +320,28 @@ describe('ShopComponent', () => {
   });
 
   describe('copyPayPalLink', () => {
+    let clipboardSpy: jasmine.Spy;
+    
+    beforeEach(() => {
+      // Mock clipboard API
+      clipboardSpy = jasmine.createSpy('writeText').and.returnValue(Promise.resolve());
+      Object.defineProperty(navigator, 'clipboard', {
+        value: {
+          writeText: clipboardSpy
+        },
+        configurable: true
+      });
+    });
+
     it('should copy PayPal link to clipboard', fakeAsync(() => {
-      spyOn(navigator.clipboard, 'writeText').and.returnValue(Promise.resolve());
-      
       component.copyPayPalLink();
       tick();
       
-      expect(navigator.clipboard.writeText).toHaveBeenCalledWith('https://paypal.me/anavaspitac?country.x=RS&locale.x=en_US');
+      expect(clipboardSpy).toHaveBeenCalledWith('https://paypal.me/anavaspitac?country.x=RS&locale.x=en_US');
     }));
 
     it('should handle clipboard error gracefully', fakeAsync(() => {
-      spyOn(navigator.clipboard, 'writeText').and.returnValue(Promise.reject('Clipboard error'));
+      clipboardSpy.and.returnValue(Promise.reject('Clipboard error'));
       spyOn(console, 'error');
       
       component.copyPayPalLink();
@@ -432,6 +444,14 @@ describe('ShopComponent', () => {
       component.filterFiles();
       
       expect(component.displayedFiles.length).toBe(3);
+    });
+  });
+
+  describe('goToFileDetail', () => {
+    it('should navigate to file detail page', () => {
+      component.goToFileDetail(mockDigitalFile);
+      
+      expect(router.navigate).toHaveBeenCalledWith(['/shop/file', mockDigitalFile.id]);
     });
   });
 

@@ -450,11 +450,12 @@ export class ShopComponent implements OnInit {
     });
   }
 
+
   /**
    * Copies PayPal link to clipboard
    */
   copyPayPalLink(): void {
-    const paypalLink = 'https://paypal.me/anavaspitac?country.x=RS&locale.x=en_US';
+    const paypalLink = this.selectedFile?.paypalLink || 'https://paypal.me/anavaspitac?country.x=RS&locale.x=en_US';
     navigator.clipboard.writeText(paypalLink).then(() => {
       // PayPal link copied successfully
     }).catch(err => {
@@ -466,8 +467,13 @@ export class ShopComponent implements OnInit {
    * Copies bank details to clipboard
    */
   copyBankDetails(): void {
-    const bankDetails = `Account Number: ${this._translate.instant('SHOP.BANK_ACCOUNT')}
-Recipient: ${this._translate.instant('SHOP.BANK_RECIPIENT')}`;
+    const bankAccount = this.selectedFile?.bankAccountNumber || this._translate.instant('SHOP.BANK_ACCOUNT');
+    const recipient = this.selectedFile?.author || this._translate.instant('SHOP.BANK_RECIPIENT');
+    const phoneNumber = this.selectedFile?.phoneNumber || '+381 61 634 9493';
+    
+    const bankDetails = `Broj računa: ${bankAccount}
+Primalac: ${recipient}
+Telefon (Viber): ${phoneNumber}`;
     
     navigator.clipboard.writeText(bankDetails).then(() => {
       // Bank details copied successfully
@@ -516,8 +522,6 @@ Recipient: ${this._translate.instant('SHOP.BANK_RECIPIENT')}`;
     this.openPaymentModal();
   }
 
-
-
   /**
    * Getter for access map size (for template use)
    */
@@ -533,5 +537,35 @@ Recipient: ${this._translate.instant('SHOP.BANK_RECIPIENT')}`;
       return this.files.length > 0; // Show files even if not logged in
     }
     return this.files.length > 0 && Object.keys(this.userAccessMap).length > 0;
+  }
+
+  /**
+   * Navigate to file detail page
+   */
+  goToFileDetail(file: DigitalFile): void {
+    this._router.navigate(['/shop/file', file.id]).then(() => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  }
+
+  /**
+   * Check if a product is digital (has a file) or physical (no file)
+   */
+  isDigitalProduct(file: DigitalFile): boolean {
+    return !!(file.fileUrl && file.fileUrl.trim());
+  }
+
+  /**
+   * Check if a digital product has complete file information
+   */
+  hasCompleteFileInfo(file: DigitalFile): boolean {
+    return !!(file.fileType && file.fileSize && file.fileUrl);
+  }
+
+  /**
+   * Check if a product is physical (will be shipped)
+   */
+  isPhysicalProduct(file: DigitalFile): boolean {
+    return !this.isDigitalProduct(file);
   }
 }

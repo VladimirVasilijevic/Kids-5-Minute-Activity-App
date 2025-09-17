@@ -188,8 +188,10 @@ export class SubscribeComponent implements OnInit, OnDestroy {
    * Copies bank details to clipboard
    */
   copyBankDetails(): void {
-    const bankDetails = `Account Number: ${this._translate.instant('SHOP.BANK_ACCOUNT')}
-Recipient: ${this._translate.instant('SHOP.BANK_RECIPIENT')}`;
+    const phoneNumber = '+381 61 634 9493';
+    const bankDetails = `Broj računa: ${this._translate.instant('SHOP.BANK_ACCOUNT')}
+Primalac: ${this._translate.instant('SHOP.BANK_RECIPIENT')}
+Telefon (Viber): ${phoneNumber}`;
     
     navigator.clipboard.writeText(bankDetails).then(() => {
       // Bank details copied successfully
