@@ -1,14 +1,15 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
-import { Observable, of } from 'rxjs';
-import { switchMap, catchError } from 'rxjs/operators';
+import { Observable, of, Subject, combineLatest } from 'rxjs';
+import { switchMap, catchError, takeUntil } from 'rxjs/operators';
 
 import { DigitalFile } from '../../models/digital-file.model';
 import { DigitalFileService } from '../../services/digital-file.service';
 import { AuthService } from '../../services/auth.service';
 import { UserAccessService } from '../../services/user-access.service';
 import { formatFileSize } from '../../models/marketplace.utils';
+import firebase from 'firebase/compat/app';
 
 /**
  * Digital File detail component for displaying individual file information
@@ -18,13 +19,15 @@ import { formatFileSize } from '../../models/marketplace.utils';
   templateUrl: './digital-file-detail.component.html',
   styleUrls: ['./digital-file-detail.component.scss'],
 })
-export class DigitalFileDetailComponent implements OnInit {
+export class DigitalFileDetailComponent implements OnInit, OnDestroy {
   file$!: Observable<DigitalFile | null>;
   isLoggedIn = false;
   currentUserEmail = '';
   currentUserId: string | null = null;
   hasAccess = false;
   isLoadingAccess = false;
+  
+  private destroy$ = new Subject<void>();
 
   // Purchase modal
   showPurchaseModal = false;
@@ -61,18 +64,31 @@ export class DigitalFileDetailComponent implements OnInit {
       })
     );
 
-    // Check authentication status
-    this._auth.user$.subscribe(user => {
+    // Combine authentication status and file data to check access
+    combineLatest([
+      this._auth.user$,
+      this.file$
+    ]).pipe(
+      takeUntil(this.destroy$)
+    ).subscribe(([user, file]: [firebase.User | null, DigitalFile | null]) => {
       if (!user) {
         this.isLoggedIn = false;
         this.currentUserEmail = '';
         this.currentUserId = null;
         this.hasAccess = false;
+        this.isLoadingAccess = false;
       } else {
         this.isLoggedIn = true;
         this.currentUserEmail = user.email || '';
         this.currentUserId = user.uid;
-        this.loadUserAccess();
+        
+        // Check access if we have both user and file
+        if (file && user.uid) {
+          this.loadUserAccess(user.uid, file.id);
+        } else {
+          this.hasAccess = false;
+          this.isLoadingAccess = false;
+        }
       }
     });
   }
@@ -80,26 +96,43 @@ export class DigitalFileDetailComponent implements OnInit {
   /**
    * Loads user access for the current file
    */
-  private loadUserAccess(): void {
-    if (!this.currentUserId) return;
+  private loadUserAccess(userId: string, fileId: string): void {
+    this.isLoadingAccess = true;
+    this._userAccessService.hasAccess(userId, fileId)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (hasAccess) => {
+          this.hasAccess = hasAccess;
+          this.isLoadingAccess = false;
+        },
+        error: (error) => {
+          console.error('Error checking user access:', error);
+          this.hasAccess = false;
+          this.isLoadingAccess = false;
+        }
+      });
+  }
 
-    this.file$.subscribe(file => {
-      if (file) {
-        this.isLoadingAccess = true;
-        this._userAccessService.hasAccess(this.currentUserId!, file.id)
-          .subscribe({
-            next: (hasAccess) => {
-              this.hasAccess = hasAccess;
-              this.isLoadingAccess = false;
-            },
-            error: (error) => {
-              console.error('Error checking user access:', error);
-              this.hasAccess = false;
-              this.isLoadingAccess = false;
-            }
-          });
-      }
-    });
+  /**
+   * Component cleanup
+   */
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  /**
+   * Check if a product is digital (has a file) or physical (no file)
+   */
+  isDigitalProduct(file: DigitalFile): boolean {
+    return !!(file.fileUrl && file.fileUrl.trim());
+  }
+
+  /**
+   * Check if a product is physical (will be shipped)
+   */
+  isPhysicalProduct(file: DigitalFile): boolean {
+    return !this.isDigitalProduct(file);
   }
 
   /**

@@ -274,32 +274,22 @@ export class AdminFilesComponent implements OnInit {
       isValid = false;
     }
 
-    if (!this.editingFile && !this.selectedFile) {
-      this.formErrors['file'] = 'File is required';
-      isValid = false;
-    }
+    // File is optional - products without files are physical products that will be shipped
 
     return isValid;
   }
 
   /**
-   * Creates a new file
+   * Creates a new product (digital or physical)
    */
   private async createFile(): Promise<void> {
-    if (!this.selectedFile) {
-      this.showErrorModal = true;
-      this.errorTitle = 'File Required';
-      this.errorMessage = 'Please select a file to upload.';
-      return;
-    }
-
     this.isUploadingFile = true;
     
     try {
-      const fileId = await this._digitalFileService.createFile(this.formData, this.selectedFile);
+      const fileId = await this._digitalFileService.createFile(this.formData, this.selectedFile ?? undefined);
       this.isUploadingFile = false;
       this.showSuccessMessage = true;
-      this.successMessage = 'File created successfully';
+      this.successMessage = 'Product created successfully';
       this.resetForm();
       this.loadFiles();
     } catch (error: any) {

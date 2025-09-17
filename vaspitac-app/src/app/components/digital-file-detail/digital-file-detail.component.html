@@ -28,18 +28,36 @@
       <!-- File Info Card -->
       <div class="bg-white shadow-sm border border-green-100 rounded-xl p-3 md:p-4">
         <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-3 md:mb-4 space-y-2 md:space-y-0">
-          <div class="flex flex-wrap items-center space-x-3 md:space-x-4">
+          <!-- Digital Product Info -->
+          <div *ngIf="isDigitalProduct(file)" class="flex flex-wrap items-center space-x-3 md:space-x-4">
             <div class="flex items-center text-green-600">
               <svg class="h-3 w-3 md:h-4 md:w-4 mr-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                 <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
               </svg>
-              <span class="text-xs md:text-sm font-medium">{{ getFileExtension(file.fileType) }}</span>
+              <span class="text-xs md:text-sm font-medium">{{ file.fileType ? getFileExtension(file.fileType) : 'N/A' }}</span>
             </div>
             <div class="flex items-center text-green-600">
               <svg class="h-3 w-3 md:h-4 md:w-4 mr-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                 <path d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
               </svg>
-              <span class="text-xs md:text-sm font-medium">{{ formatFileSize(file.fileSize) }}</span>
+              <span class="text-xs md:text-sm font-medium">{{ file.fileSize ? formatFileSize(file.fileSize) : 'N/A' }}</span>
+            </div>
+          </div>
+          
+          <!-- Physical Product Info -->
+          <div *ngIf="isPhysicalProduct(file)" class="flex flex-wrap items-center space-x-3 md:space-x-4">
+            <div class="flex items-center text-blue-600">
+              <svg class="h-3 w-3 md:h-4 md:w-4 mr-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M9 1v6"/>
+              </svg>
+              <span class="text-xs md:text-sm font-medium">{{ 'SHOP.PHYSICAL_PRODUCT' | translate }}</span>
+            </div>
+            <div class="flex items-center text-blue-600">
+              <svg class="h-3 w-3 md:h-4 md:w-4 mr-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2 2z"/>
+                <path d="M8 21v-4a2 2 0 012-2h4a2 2 0 012 2v4"/>
+              </svg>
+              <span class="text-xs md:text-sm font-medium">{{ 'SHOP.SHIPPED_TO_ADDRESS' | translate }}</span>
             </div>
           </div>
           
@@ -88,8 +106,8 @@
 
       <!-- Action Button -->
       <div class="bg-white shadow-sm border border-green-100 rounded-xl p-4">
-        <!-- Download Button (for logged-in users with access) -->
-        <div *ngIf="isLoggedIn && !isLoadingAccess && hasAccess" class="w-full">
+        <!-- Download Button (for digital products with access) -->
+        <div *ngIf="isLoggedIn && !isLoadingAccess && hasAccess && isDigitalProduct(file)" class="w-full">
           <button
             (click)="downloadFile(file)"
             class="w-full bg-green-600 hover:bg-green-700 text-white py-3 px-6 rounded-lg font-medium flex items-center justify-center gap-2 transition-colors text-lg"
@@ -101,16 +119,32 @@
           </button>
         </div>
         
+        <!-- Access Granted Message (for physical products with access) -->
+        <div *ngIf="isLoggedIn && !isLoadingAccess && hasAccess && isPhysicalProduct(file)" class="w-full">
+          <div class="bg-green-50 border border-green-200 rounded-lg p-4 text-center">
+            <svg class="h-8 w-8 text-green-600 mx-auto mb-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <p class="text-green-800 font-medium">{{ 'SHOP.PURCHASE_CONFIRMED' | translate }}</p>
+            <p class="text-green-600 text-sm mt-1">{{ 'SHOP.SHIPPING_INFO_SENT' | translate }}</p>
+          </div>
+        </div>
+        
         <!-- Purchase Button (for logged-in users without access) -->
         <div *ngIf="isLoggedIn && !isLoadingAccess && !hasAccess" class="w-full">
           <button
             (click)="initiatePurchase(file)"
             class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-lg font-medium flex items-center justify-center gap-2 transition-colors text-lg"
           >
-            <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <!-- Digital Product Icon -->
+            <svg *ngIf="isDigitalProduct(file)" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
               <path d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
             </svg>
-            {{ 'SHOP.BUY_NOW' | translate }}
+            <!-- Physical Product Icon -->
+            <svg *ngIf="isPhysicalProduct(file)" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M9 1v6"/>
+            </svg>
+            {{ isDigitalProduct(file) ? ('SHOP.BUY_NOW' | translate) : ('SHOP.ORDER_NOW' | translate) }}
           </button>
         </div>
         
@@ -120,10 +154,15 @@
             (click)="initiatePurchase(file)"
             class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-lg font-medium flex items-center justify-center gap-2 transition-colors text-lg"
           >
-            <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <!-- Digital Product Icon -->
+            <svg *ngIf="isDigitalProduct(file)" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
               <path d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
             </svg>
-            {{ 'SHOP.BUY_NOW' | translate }}
+            <!-- Physical Product Icon -->
+            <svg *ngIf="isPhysicalProduct(file)" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M9 1v6"/>
+            </svg>
+            {{ isDigitalProduct(file) ? ('SHOP.BUY_NOW' | translate) : ('SHOP.ORDER_NOW' | translate) }}
           </button>
         </div>
         

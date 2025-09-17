@@ -193,7 +193,7 @@ describe('AdminFilesComponent', () => {
       expect(component.formData.phoneNumber).toBe(mockDigitalFile.phoneNumber || '');
       expect(component.formData.author).toBe(mockDigitalFile.author || '');
       expect(component.formData.paypalLink).toBe(mockDigitalFile.paypalLink || '');
-      expect(component.filePreview).toBe(mockDigitalFile.fileUrl);
+      expect(component.filePreview).toBe(mockDigitalFile.fileUrl || null);
       expect(component.showForm).toBeTrue();
     });
   });
@@ -258,28 +258,70 @@ describe('AdminFilesComponent', () => {
       expect(component.formErrors['priceEUR']).toBe('EUR price must be greater than 0');
     });
 
-    it('should return false and set error for missing file when creating', () => {
+    it('should return true when no file is provided (for physical products)', () => {
       component.editingFile = null;
       component.selectedFile = null;
+      // Set valid form data for physical product
+      component.formData = {
+        title: 'Physical Product',
+        description: 'A physical product that will be shipped',
+        priceRSD: 1000,
+        priceEUR: 10,
+        accessLevel: 'BASIC',
+        language: 'sr',
+        tags: [],
+        imageUrl: '',
+        bankAccountNumber: '',
+        phoneNumber: '',
+        author: '',
+        paypalLink: ''
+      };
       
       const result = (component as any).validateForm();
       
-      expect(result).toBeFalse();
-      expect(component.formErrors['file']).toBe('File is required');
+      expect(result).toBeTrue();
+      expect(component.formErrors['file']).toBeUndefined();
     });
   });
 
   describe('createFile', () => {
-    it('should show error if no file selected', fakeAsync(async () => {
+    it('should create physical product successfully without file', fakeAsync(async () => {
       component.selectedFile = null;
+      component.formData = {
+        title: 'Physical Product',
+        description: 'A physical product',
+        priceRSD: 1000,
+        priceEUR: 10,
+        accessLevel: 'BASIC',
+        language: 'sr',
+        tags: [],
+        imageUrl: '',
+        bankAccountNumber: '',
+        phoneNumber: '',
+        author: '',
+        paypalLink: ''
+      };
+      digitalFileService.createFile.and.returnValue(Promise.resolve('new-file-id'));
       
       await (component as any).createFile();
       tick();
       
-      expect(component.showErrorModal).toBeTrue();
-      expect(component.errorTitle).toBe('File Required');
-      expect(component.errorMessage).toBe('Please select a file to upload.');
-      expect(digitalFileService.createFile).not.toHaveBeenCalled();
+      expect(digitalFileService.createFile).toHaveBeenCalledWith({
+        title: 'Physical Product',
+        description: 'A physical product',
+        priceRSD: 1000,
+        priceEUR: 10,
+        accessLevel: 'BASIC',
+        language: 'sr',
+        tags: [],
+        imageUrl: '',
+        bankAccountNumber: '',
+        phoneNumber: '',
+        author: '',
+        paypalLink: ''
+      }, undefined);
+      expect(component.showSuccessMessage).toBeTrue();
+      expect(component.successMessage).toBe('Product created successfully');
     }));
 
     it('should handle creation error', fakeAsync(async () => {

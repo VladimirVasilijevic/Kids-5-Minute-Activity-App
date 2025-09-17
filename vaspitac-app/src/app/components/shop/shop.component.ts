@@ -450,14 +450,6 @@ export class ShopComponent implements OnInit {
     });
   }
 
-  /**
-   * Navigate to digital file detail page
-   */
-  goToFileDetail(file: DigitalFile): void {
-    this._router.navigate(['/shop/file', file.id]).then(() => {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    });
-  }
 
   /**
    * Copies PayPal link to clipboard
@@ -545,5 +537,28 @@ Telefon (Viber): ${phoneNumber}`;
       return this.files.length > 0; // Show files even if not logged in
     }
     return this.files.length > 0 && Object.keys(this.userAccessMap).length > 0;
+  }
+
+  /**
+   * Navigate to file detail page
+   */
+  goToFileDetail(file: DigitalFile): void {
+    this._router.navigate(['/shop/file', file.id]).then(() => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  }
+
+  /**
+   * Check if a product is digital (has a file) or physical (no file)
+   */
+  isDigitalProduct(file: DigitalFile): boolean {
+    return !!(file.fileUrl && file.fileUrl.trim());
+  }
+
+  /**
+   * Check if a product is physical (will be shipped)
+   */
+  isPhysicalProduct(file: DigitalFile): boolean {
+    return !this.isDigitalProduct(file);
   }
 }

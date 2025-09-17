@@ -14,12 +14,12 @@ export interface DigitalFile {
   priceRSD: number;
   /** Price in Euros */
   priceEUR: number;
-  /** URL to the file in Firebase Storage */
-  fileUrl: string;
-  /** File size in bytes */
-  fileSize: number;
-  /** File type (PDF, DOC, DOCX, etc.) */
-  fileType: string;
+  /** URL to the file in Firebase Storage (optional for physical products) */
+  fileUrl?: string;
+  /** File size in bytes (optional for physical products) */
+  fileSize?: number;
+  /** File type (PDF, DOC, DOCX, etc.) (optional for physical products) */
+  fileType?: string;
   /** Access level for pricing tier */
   accessLevel: 'BASIC' | 'PREMIUM';
   /** Language of the file content */

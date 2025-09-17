@@ -128,6 +128,12 @@
     "MORE_DETAILS": "More Details",
     "BUY": "Buy",
     "BUY_NOW": "Buy Now",
+    "ORDER_NOW": "Order Now",
+    "ORDER_PHYSICAL": "Order",
+    "PHYSICAL_PRODUCT": "Physical Product",
+    "SHIPPED_TO_ADDRESS": "Shipped to address",
+    "PURCHASE_CONFIRMED": "Purchase Confirmed",
+    "SHIPPING_INFO_SENT": "Shipping information will be sent to email",
     "PURCHASE_TITLE": "Material Purchase",
     "PAYMENT_NOTE": "Note: Payment is made manually via bank transfer or PayPal. After you send proof of payment, our team will verify the payment and approve access to the material in the shortest time.",
     "CANCEL": "Cancel",
@@ -649,7 +655,9 @@
     "IMAGE_URL": "Image URL",
     "IMAGE_URL_DESC": "Or enter direct link to image",
     "IMAGE_PREVIEW": "Image Preview",
-    "IMAGE_TYPES_SUPPORTED": "PNG, JPG, WebP up to 5MB"
+    "IMAGE_TYPES_SUPPORTED": "PNG, JPG, WebP up to 5MB",
+    "FILE_OPTIONAL": "optional",
+    "FILE_OPTIONAL_HINT": "💡 Leave empty for physical products that will be shipped to address"
   },
 
   "SUBSCRIBE": {

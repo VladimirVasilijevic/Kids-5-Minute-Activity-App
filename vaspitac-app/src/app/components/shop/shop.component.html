@@ -126,15 +126,27 @@
                 loading="lazy"
               />
             </div>
-            <div *ngIf="!file.imageUrl" class="h-48 sm:h-40 md:h-48 bg-gradient-to-br from-green-50 to-green-100 flex items-center justify-center">
-              <div class="text-center">
-                <div class="h-16 w-16 mx-auto rounded-lg bg-green-100 flex items-center justify-center mb-3">
-                  <svg class="h-10 w-10 text-green-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                  </svg>
-                </div>
-                <p class="text-green-600 font-medium text-sm">{{ getFileExtension(file.fileType) }}</p>
+          <!-- Digital Product Fallback -->
+          <div *ngIf="!file.imageUrl && isDigitalProduct(file)" class="h-48 sm:h-40 md:h-48 bg-gradient-to-br from-green-50 to-green-100 flex items-center justify-center">
+            <div class="text-center">
+              <div class="h-16 w-16 mx-auto rounded-lg bg-green-100 flex items-center justify-center mb-3">
+                <svg class="h-10 w-10 text-green-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                </svg>
               </div>
+              <p class="text-green-600 font-medium text-sm">{{ getFileExtension(file.fileType!) }}</p>
+            </div>
+          </div>
+          
+          <!-- Physical Product Fallback -->
+          <div *ngIf="!file.imageUrl && isPhysicalProduct(file)" class="h-48 sm:h-40 md:h-48 bg-gradient-to-br from-blue-50 to-blue-100 flex items-center justify-center">
+            <div class="text-center">
+              <div class="h-16 w-16 mx-auto rounded-lg bg-blue-100 flex items-center justify-center mb-3">
+                <svg class="h-10 w-10 text-blue-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M9 1v6"/>
+                </svg>
+              </div>
+              <p class="text-blue-600 font-medium text-sm">{{ 'SHOP.PHYSICAL_PRODUCT' | translate }}</p>
             </div>
           </div>
           
@@ -146,10 +158,18 @@
               {{ file.title }}
             </h3>
             
-            <!-- File Details -->
-            <div class="flex items-center gap-4 text-sm text-gray-500 mb-3">
-              <span>{{ getFileExtension(file.fileType) }}</span>
-              <span>{{ formatFileSize(file.fileSize) }}</span>
+            <!-- File Details (only for digital products) -->
+            <div *ngIf="isDigitalProduct(file)" class="flex items-center gap-4 text-sm text-gray-500 mb-3">
+              <span>{{ getFileExtension(file.fileType!) }}</span>
+              <span>{{ formatFileSize(file.fileSize!) }}</span>
+            </div>
+            
+            <!-- Product Type (only for physical products) -->
+            <div *ngIf="isPhysicalProduct(file)" class="flex items-center gap-2 text-sm text-blue-600 mb-3">
+              <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M9 1v6"/>
+              </svg>
+              <span class="font-medium">{{ 'SHOP.PHYSICAL_PRODUCT' | translate }}</span>
             </div>
             
             <!-- Description -->
@@ -195,10 +215,15 @@
                   (click)="initiatePurchase(file); $event.stopPropagation()"
                   class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-3 rounded-lg font-medium flex items-center justify-center gap-2 transition-colors text-sm"
                 >
-                  <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <!-- Digital Product Icon -->
+                  <svg *ngIf="isDigitalProduct(file)" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                     <path d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
                   </svg>
-                  {{ 'SHOP.BUY_NOW' | translate }}
+                  <!-- Physical Product Icon -->
+                  <svg *ngIf="isPhysicalProduct(file)" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M9 1v6"/>
+                  </svg>
+                  {{ isDigitalProduct(file) ? ('SHOP.BUY_NOW' | translate) : ('SHOP.ORDER_NOW' | translate) }}
                 </button>
                 <button
                   (click)="goToFileDetail(file); $event.stopPropagation()"
@@ -216,10 +241,15 @@
                   (click)="initiatePurchase(file); $event.stopPropagation()"
                   class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-3 rounded-lg font-medium flex items-center justify-center gap-2 transition-colors text-sm"
                 >
-                  <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <!-- Digital Product Icon -->
+                  <svg *ngIf="isDigitalProduct(file)" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                     <path d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
                   </svg>
-                  {{ 'SHOP.BUY_NOW' | translate }}
+                  <!-- Physical Product Icon -->
+                  <svg *ngIf="isPhysicalProduct(file)" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M9 1v6"/>
+                  </svg>
+                  {{ isDigitalProduct(file) ? ('SHOP.BUY_NOW' | translate) : ('SHOP.ORDER_NOW' | translate) }}
                 </button>
                 <button
                   (click)="goToFileDetail(file); $event.stopPropagation()"
