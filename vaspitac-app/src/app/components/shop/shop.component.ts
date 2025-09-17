@@ -556,6 +556,13 @@ Telefon (Viber): ${phoneNumber}`;
   }
 
   /**
+   * Check if a digital product has complete file information
+   */
+  hasCompleteFileInfo(file: DigitalFile): boolean {
+    return !!(file.fileType && file.fileSize && file.fileUrl);
+  }
+
+  /**
    * Check if a product is physical (will be shipped)
    */
   isPhysicalProduct(file: DigitalFile): boolean {
