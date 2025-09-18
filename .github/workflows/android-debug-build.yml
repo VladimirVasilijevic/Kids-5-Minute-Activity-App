@@ -103,6 +103,7 @@ jobs:
         uses: ./.github/actions/build-web
         with:
           configuration: 'development'
+          base-href: './'
           upload-artifact: 'true'
           artifact-name: 'web-build-dev'
 
@@ -126,6 +127,7 @@ jobs:
         uses: ./.github/actions/build-web
         with:
           configuration: 'production'
+          base-href: './'
           upload-artifact: 'true'
           artifact-name: 'web-build-prod'
 

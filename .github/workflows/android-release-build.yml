@@ -96,6 +96,7 @@ jobs:
         uses: ./.github/actions/build-web
         with:
           configuration: 'production'
+          base-href: './'
           upload-artifact: 'true'
           artifact-name: 'web-build-release'
 
