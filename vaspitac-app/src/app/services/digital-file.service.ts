@@ -5,6 +5,8 @@ import { AngularFireFunctions } from '@angular/fire/compat/functions';
 import { Observable, of, map, catchError, switchMap, filter, take, firstValueFrom } from 'rxjs';
 import { DigitalFile, DigitalFileFormData } from '../models/digital-file.model';
 import { validateFileForUpload, generateId, getFileTypeFromName } from '../models/marketplace.utils';
+import { Filesystem, Directory, Encoding } from '@capacitor/filesystem';
+import { Capacitor } from '@capacitor/core';
 
 @Injectable({
   providedIn: 'root'
@@ -421,24 +423,97 @@ export class DigitalFileService {
 
   /**
    * Create a download from base64 file content
+   * Works on both web browsers and Android apps
    */
   private async createDownloadFromContent(base64Content: string, fileName: string, fileType: string): Promise<void> {
     try {
-      // Create a temporary anchor element to trigger the download
-      const link = document.createElement('a');
-      link.href = `data:${fileType};base64,${base64Content}`; // Create a data URL
-      link.download = fileName; // Use the provided filename
-      link.target = '_blank';
-      
-      // Append to DOM, click, and remove
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      
-
+      // Check if we're running on a native platform (Android/iOS)
+      if (Capacitor.isNativePlatform()) {
+        console.log('📱 Native platform detected, using Capacitor Filesystem...');
+        await this.downloadFileNative(base64Content, fileName, fileType);
+      } else {
+        console.log('🌐 Web platform detected, using browser download...');
+        await this.downloadFileWeb(base64Content, fileName, fileType);
+      }
     } catch (error) {
       console.error('Error creating download from content:', error);
       throw new Error('Failed to create download from content');
     }
+  }
+
+  /**
+   * Download file on web browsers
+   */
+  private async downloadFileWeb(base64Content: string, fileName: string, fileType: string): Promise<void> {
+    // Create a temporary anchor element to trigger the download
+    const link = document.createElement('a');
+    link.href = `data:${fileType};base64,${base64Content}`; // Create a data URL
+    link.download = fileName; // Use the provided filename
+    link.target = '_blank';
+    
+    // Append to DOM, click, and remove
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+
+  /**
+   * Download file on native platforms (Android/iOS)
+   */
+  private async downloadFileNative(base64Content: string, fileName: string, fileType: string): Promise<void> {
+    try {
+      // Convert base64 to binary data
+      const binaryData = this.base64ToArrayBuffer(base64Content);
+      
+      // Create a Blob from the binary data
+      const blob = new Blob([binaryData], { type: fileType });
+      
+      // Write file using the blob data
+      const result = await Filesystem.writeFile({
+        path: fileName,
+        data: await this.blobToBase64(blob),
+        directory: Directory.Documents, // Use Documents directory for better access
+        encoding: Encoding.UTF8
+      });
+      
+      console.log('✅ File saved successfully:', result.uri);
+      
+      // Show success message (you can customize this)
+      // Note: On Android, the file will be saved to the Documents folder
+      // Users can find it in their file manager
+      
+    } catch (error) {
+      console.error('❌ Error saving file to device:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Convert Blob to base64 string
+   */
+  private async blobToBase64(blob: Blob): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const result = reader.result as string;
+        // Remove data URL prefix to get just the base64 part
+        const base64 = result.split(',')[1];
+        resolve(base64);
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+  }
+
+  /**
+   * Convert base64 string to ArrayBuffer
+   */
+  private base64ToArrayBuffer(base64: string): ArrayBuffer {
+    const binaryString = atob(base64);
+    const bytes = new Uint8Array(binaryString.length);
+    for (let i = 0; i < binaryString.length; i++) {
+      bytes[i] = binaryString.charCodeAt(i);
+    }
+    return bytes.buffer;
   }
 }
