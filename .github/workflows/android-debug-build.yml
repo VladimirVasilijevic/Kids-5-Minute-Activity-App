@@ -106,24 +106,6 @@ jobs:
           upload-artifact: 'true'
           artifact-name: 'web-build-dev'
 
-      - name: Debug development build output
-        working-directory: vaspitac-app
-        run: |
-          echo "🔍 Debugging development build output..."
-          echo "📁 Contents of vaspitac-app/dist:"
-          if [ -d "dist" ]; then
-            ls -la dist/
-            echo "🔍 Looking for index.html:"
-            find dist -name "index.html" -type f
-            if [ -f "dist/index.html" ]; then
-              echo "✅ index.html found in dist!"
-              head -5 dist/index.html
-            else
-              echo "❌ index.html NOT found in dist!"
-            fi
-          else
-            echo "❌ dist directory not found!"
-          fi
 
       # Production build  
       - name: Create production environment
@@ -244,7 +226,21 @@ jobs:
 
       - name: Create google-services.json
         working-directory: vaspitac-app/android/app
-        run: echo '${{ secrets.GOOGLE_SERVICES_JSON_DEV }}' > google-services.json
+        run: |
+          echo "🔧 Creating google-services.json for development..."
+          # Use cat with heredoc to avoid shell interpretation issues
+          cat > google-services.json << 'EOF'
+          ${{ secrets.GOOGLE_SERVICES_JSON }}
+          EOF
+          echo "✅ google-services.json created"
+          echo "📁 File size: $(wc -c < google-services.json) bytes"
+          # Validate JSON structure (first few lines only for security)
+          echo "🔍 Validating JSON structure..."
+          if command -v jq >/dev/null 2>&1; then
+            jq -e . google-services.json >/dev/null && echo "✅ Valid JSON" || echo "❌ Invalid JSON"
+          else
+            echo "⚠️ jq not available, skipping JSON validation"
+          fi
 
       - name: Build Android Debug APK
         working-directory: vaspitac-app/android
@@ -316,7 +312,21 @@ jobs:
 
       - name: Create google-services.json
         working-directory: vaspitac-app/android/app
-        run: echo '${{ secrets.GOOGLE_SERVICES_JSON }}' > google-services.json
+        run: |
+          echo "🔧 Creating google-services.json for production..."
+          # Use cat with heredoc to avoid shell interpretation issues
+          cat > google-services.json << 'EOF'
+          ${{ secrets.GOOGLE_SERVICES_JSON }}
+          EOF
+          echo "✅ google-services.json created"
+          echo "📁 File size: $(wc -c < google-services.json) bytes"
+          # Validate JSON structure (first few lines only for security)
+          echo "🔍 Validating JSON structure..."
+          if command -v jq >/dev/null 2>&1; then
+            jq -e . google-services.json >/dev/null && echo "✅ Valid JSON" || echo "❌ Invalid JSON"
+          else
+            echo "⚠️ jq not available, skipping JSON validation"
+          fi
 
       - name: Build Android Debug APK
         working-directory: vaspitac-app/android

@@ -195,7 +195,21 @@ jobs:
 
       - name: Create google-services.json
         working-directory: vaspitac-app/android/app
-        run: echo '${{ secrets.GOOGLE_SERVICES_JSON }}' > google-services.json
+        run: |
+          echo "🔧 Creating google-services.json for production release..."
+          # Use cat with heredoc to avoid shell interpretation issues
+          cat > google-services.json << 'EOF'
+          ${{ secrets.GOOGLE_SERVICES_JSON }}
+          EOF
+          echo "✅ google-services.json created"
+          echo "📁 File size: $(wc -c < google-services.json) bytes"
+          # Validate JSON structure (first few lines only for security)
+          echo "🔍 Validating JSON structure..."
+          if command -v jq >/dev/null 2>&1; then
+            jq -e . google-services.json >/dev/null && echo "✅ Valid JSON" || echo "❌ Invalid JSON"
+          else
+            echo "⚠️ jq not available, skipping JSON validation"
+          fi
 
       - name: Setup keystore for signing
         working-directory: vaspitac-app/android
@@ -290,7 +304,21 @@ jobs:
 
       - name: Create google-services.json
         working-directory: vaspitac-app/android/app
-        run: echo '${{ secrets.GOOGLE_SERVICES_JSON }}' > google-services.json
+        run: |
+          echo "🔧 Creating google-services.json for production release..."
+          # Use cat with heredoc to avoid shell interpretation issues
+          cat > google-services.json << 'EOF'
+          ${{ secrets.GOOGLE_SERVICES_JSON }}
+          EOF
+          echo "✅ google-services.json created"
+          echo "📁 File size: $(wc -c < google-services.json) bytes"
+          # Validate JSON structure (first few lines only for security)
+          echo "🔍 Validating JSON structure..."
+          if command -v jq >/dev/null 2>&1; then
+            jq -e . google-services.json >/dev/null && echo "✅ Valid JSON" || echo "❌ Invalid JSON"
+          else
+            echo "⚠️ jq not available, skipping JSON validation"
+          fi
 
       - name: Setup keystore for signing
         working-directory: vaspitac-app/android
