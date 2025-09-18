@@ -29,8 +29,8 @@ jobs:
           scan-dependencies: 'true'
           scan-code: 'true'
 
-  # Build and test job
-  build-and-test:
+  # Build job
+  build:
     runs-on: ubuntu-latest
     environment: production
     needs: security-scan
@@ -59,10 +59,6 @@ jobs:
       - name: Install dependencies
         working-directory: vaspitac-app
         run: npm ci
-        
-      - name: Run tests
-        working-directory: vaspitac-app
-        run: npm run test -- --browsers=ChromeHeadless --watch=false
         
       - name: Build application (Production)
         working-directory: vaspitac-app
@@ -95,11 +91,46 @@ jobs:
           path: vaspitac-app/dist/
           retention-days: 1
 
+  # Test job
+  test:
+    runs-on: ubuntu-latest
+    environment: production
+    needs: security-scan
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js and dependencies
+        uses: ./.github/actions/setup-node
+        with:
+          node-version: '18'
+
+      - name: Create environment configuration
+        uses: ./.github/actions/create-environment
+        with:
+          working-directory: 'vaspitac-app'
+          environment: 'production'
+          firebase-project: ${{ env.FIREBASE_PROJECT }}
+          firebase-api-key: ${{ secrets.FIREBASE_API_KEY }}
+          firebase-auth-domain: ${{ secrets.FIREBASE_AUTH_DOMAIN }}
+          firebase-storage-bucket: ${{ secrets.FIREBASE_STORAGE_BUCKET }}
+          firebase-messaging-sender-id: ${{ secrets.FIREBASE_MESSAGING_SENDER_ID }}
+          firebase-app-id: ${{ secrets.FIREBASE_APP_ID }}
+          firebase-measurement-id: ${{ secrets.FIREBASE_MEASUREMENT_ID }}
+
+      - name: Install dependencies
+        working-directory: vaspitac-app
+        run: npm ci
+        
+      - name: Run tests
+        working-directory: vaspitac-app
+        run: npm run test -- --browsers=ChromeHeadless --watch=false
+
   # Firebase hosting deployment job
   deploy-firebase-hosting:
     runs-on: ubuntu-latest
     environment: production
-    needs: build-and-test
+    needs: [build, test]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
