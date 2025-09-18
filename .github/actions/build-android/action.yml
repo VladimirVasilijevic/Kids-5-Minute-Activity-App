@@ -134,6 +134,27 @@ runs:
         echo "🔍 Post-sync Android directory:"
         if [ -d "android" ]; then
           ls -la android/
+          
+          echo "🔍 Checking Android app assets:"
+          if [ -d "android/app/src/main/assets/public" ]; then
+            echo "✅ Assets copied to Android"
+            echo "📊 Assets size: $(du -sh android/app/src/main/assets/public | cut -f1)"
+            echo "📁 Assets contents (first 10 items):"
+            ls -la android/app/src/main/assets/public/ | head -10
+            
+            echo "🔍 Checking for index.html in assets:"
+            if [ -f "android/app/src/main/assets/public/index.html" ]; then
+              echo "✅ index.html found in Android assets"
+              echo "🔍 First few lines of index.html:"
+              head -5 android/app/src/main/assets/public/index.html
+            else
+              echo "❌ index.html NOT found in Android assets"
+            fi
+          else
+            echo "❌ Assets directory not found in Android project"
+            echo "📁 Available directories in android/app/src/main/:"
+            ls -la android/app/src/main/ || echo "main directory not found"
+          fi
         else
           echo "❌ Android directory not found after sync"
           exit 1

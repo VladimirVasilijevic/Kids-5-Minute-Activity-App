@@ -62,6 +62,7 @@ jobs:
         uses: ./.github/actions/build-web
         with:
           configuration: 'production'
+          base-href: './'
           upload-artifact: 'true'
 
   # Android Debug Build (parallel with Release)
