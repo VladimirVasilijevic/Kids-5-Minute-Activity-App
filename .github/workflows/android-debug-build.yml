@@ -106,6 +106,25 @@ jobs:
           upload-artifact: 'true'
           artifact-name: 'web-build-dev'
 
+      - name: Debug development build output
+        working-directory: vaspitac-app
+        run: |
+          echo "🔍 Debugging development build output..."
+          echo "📁 Contents of vaspitac-app/dist:"
+          if [ -d "dist" ]; then
+            ls -la dist/
+            echo "🔍 Looking for index.html:"
+            find dist -name "index.html" -type f
+            if [ -f "dist/index.html" ]; then
+              echo "✅ index.html found in dist!"
+              head -5 dist/index.html
+            else
+              echo "❌ index.html NOT found in dist!"
+            fi
+          else
+            echo "❌ dist directory not found!"
+          fi
+
       # Production build  
       - name: Create production environment
         uses: ./.github/actions/create-environment
@@ -144,17 +163,60 @@ jobs:
           name: ${{ needs.web-build.outputs.dev-artifact }}
           path: web-build-artifacts/
 
-      - name: Move web build to correct location
+      - name: Debug and move web build to correct location
         run: |
+          echo "🔍 Debugging web build artifacts..."
+          echo "📁 Current directory contents:"
+          ls -la
+          
+          echo "📁 web-build-artifacts contents:"
+          if [ -d "web-build-artifacts" ]; then
+            ls -la web-build-artifacts/
+            echo "📁 Looking for nested directories:"
+            find web-build-artifacts -name "index.html" -type f
+          else
+            echo "❌ web-build-artifacts directory not found!"
+          fi
+          
+          echo "📁 vaspitac-app directory before cleanup:"
+          ls -la vaspitac-app/ || echo "vaspitac-app directory not found"
+          
           # Remove existing dist directory if it exists
           if [ -d "vaspitac-app/dist" ]; then
+            echo "🗑️ Removing existing vaspitac-app/dist"
             rm -rf vaspitac-app/dist
           fi
-          # Move the web build to the correct location
-          mv web-build-artifacts vaspitac-app/dist
+          
+          # Check if we have the right structure in artifacts
+          if [ -f "web-build-artifacts/index.html" ]; then
+            echo "✅ Found index.html directly in web-build-artifacts"
+            mv web-build-artifacts vaspitac-app/dist
+          elif [ -d "web-build-artifacts" ]; then
+            echo "🔍 Checking for nested structure..."
+            # Find the actual dist directory with index.html
+            DIST_DIR=$(find web-build-artifacts -name "index.html" -type f -exec dirname {} \; | head -1)
+            if [ -n "$DIST_DIR" ]; then
+              echo "✅ Found index.html in: $DIST_DIR"
+              mv "$DIST_DIR" vaspitac-app/dist
+            else
+              echo "❌ No index.html found in web-build-artifacts"
+              exit 1
+            fi
+          else
+            echo "❌ web-build-artifacts directory not found"
+            exit 1
+          fi
+          
           echo "✅ Web build moved to vaspitac-app/dist"
-          echo "📁 Contents of vaspitac-app/dist:"
+          echo "📁 Final contents of vaspitac-app/dist:"
           ls -la vaspitac-app/dist/
+          echo "🔍 Checking for index.html:"
+          if [ -f "vaspitac-app/dist/index.html" ]; then
+            echo "✅ index.html found!"
+          else
+            echo "❌ index.html NOT found!"
+            exit 1
+          fi
 
       - name: Setup Java and Android SDK
         uses: actions/setup-java@v4
