@@ -1,0 +1,262 @@
+name: Android Debug Build
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'vaspitac-app/src/**'
+      - 'vaspitac-app/package.json'
+      - 'vaspitac-app/package-lock.json'
+      - 'vaspitac-app/android/**'
+  pull_request:
+    branches: [main, develop]
+  workflow_dispatch:
+
+env:
+  NODE_VERSION: '18'
+
+jobs:
+  # Security scan job (runs first)
+  security-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js and dependencies
+        uses: ./.github/actions/setup-node
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Run security scan
+        uses: ./.github/actions/security-scan
+        with:
+          scan-dependencies: 'true'
+          scan-code: 'true'
+
+  # Test job (parallel with web-build)
+  test:
+    runs-on: ubuntu-latest
+    needs: security-scan
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js and dependencies
+        uses: ./.github/actions/setup-node
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Create environment configuration (for tests)
+        uses: ./.github/actions/create-environment
+        with:
+          working-directory: 'vaspitac-app'
+          environment: 'development'
+          firebase-project: 'test-project'
+          firebase-api-key: 'test-key'
+          firebase-auth-domain: 'test-domain'
+          firebase-storage-bucket: 'test-bucket'
+          firebase-messaging-sender-id: 'test-sender'
+          firebase-app-id: 'test-app'
+          firebase-measurement-id: 'test-measurement'
+
+      - name: Install dependencies
+        working-directory: vaspitac-app
+        run: npm ci
+        
+      - name: Run tests
+        working-directory: vaspitac-app
+        run: npm run test -- --browsers=ChromeHeadless --watch=false
+
+  # Web build job (parallel with test)
+  web-build:
+    runs-on: ubuntu-latest
+    needs: security-scan
+    outputs:
+      dev-artifact: ${{ steps.dev-build.outputs.artifact-name }}
+      prod-artifact: ${{ steps.prod-build.outputs.artifact-name }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js and dependencies
+        uses: ./.github/actions/setup-node
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      # Development build
+      - name: Create development environment
+        uses: ./.github/actions/create-environment
+        with:
+          working-directory: 'vaspitac-app'
+          environment: 'development'
+          firebase-project: ${{ vars.FIREBASE_PROJECT_DEV || 'ana-vaspitac-dev' }}
+          firebase-api-key: ${{ secrets.FIREBASE_API_KEY_DEV }}
+          firebase-auth-domain: ${{ secrets.FIREBASE_AUTH_DOMAIN_DEV }}
+          firebase-storage-bucket: ${{ secrets.FIREBASE_STORAGE_BUCKET_DEV }}
+          firebase-messaging-sender-id: ${{ secrets.FIREBASE_MESSAGING_SENDER_ID_DEV }}
+          firebase-app-id: ${{ secrets.FIREBASE_APP_ID_DEV }}
+          firebase-measurement-id: ${{ secrets.FIREBASE_MEASUREMENT_ID_DEV }}
+
+      - name: Build development web app
+        id: dev-build
+        uses: ./.github/actions/build-web
+        with:
+          configuration: 'development'
+          upload-artifact: 'true'
+          artifact-name: 'web-build-dev'
+
+      # Production build  
+      - name: Create production environment
+        uses: ./.github/actions/create-environment
+        with:
+          working-directory: 'vaspitac-app'
+          environment: 'production'
+          firebase-project: ${{ vars.FIREBASE_PROJECT_PROD || 'ana-vaspitac-prod-e7ee4' }}
+          firebase-api-key: ${{ secrets.FIREBASE_API_KEY }}
+          firebase-auth-domain: ${{ secrets.FIREBASE_AUTH_DOMAIN }}
+          firebase-storage-bucket: ${{ secrets.FIREBASE_STORAGE_BUCKET }}
+          firebase-messaging-sender-id: ${{ secrets.FIREBASE_MESSAGING_SENDER_ID }}
+          firebase-app-id: ${{ secrets.FIREBASE_APP_ID }}
+          firebase-measurement-id: ${{ secrets.FIREBASE_MEASUREMENT_ID }}
+
+      - name: Build production web app
+        id: prod-build
+        uses: ./.github/actions/build-web
+        with:
+          configuration: 'production'
+          upload-artifact: 'true'
+          artifact-name: 'web-build-prod'
+
+  # Android Development APK
+  android-dev-apk:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/develop' || github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch'
+    environment: development
+    needs: [test, web-build]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download development web build
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ needs.web-build.outputs.dev-artifact }}
+          path: vaspitac-app/dist/
+
+      - name: Setup Java and Android SDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Setup Node.js for Capacitor
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: vaspitac-app/package-lock.json
+
+      - name: Install Capacitor dependencies
+        working-directory: vaspitac-app
+        run: npm ci
+
+      - name: Sync Capacitor
+        working-directory: vaspitac-app
+        run: npx cap sync android
+
+      - name: Create google-services.json
+        working-directory: vaspitac-app/android/app
+        run: echo '${{ secrets.GOOGLE_SERVICES_JSON_DEV }}' > google-services.json
+
+      - name: Build Android Debug APK
+        working-directory: vaspitac-app/android
+        run: |
+          chmod +x gradlew
+          ./gradlew clean
+          ./gradlew assembleDevelopmentDebug
+        env:
+          ANDROID_HOME: ${{ env.ANDROID_SDK_ROOT }}
+
+      - name: Upload Development APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-dev-debug-apk
+          path: vaspitac-app/android/app/build/outputs/apk/development/debug/app-development-debug.apk
+          retention-days: 30
+
+  # Android Production APK  
+  android-prod-apk:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
+    environment: production
+    needs: [test, web-build]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download production web build
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ needs.web-build.outputs.prod-artifact }}
+          path: vaspitac-app/dist/
+
+      - name: Setup Java and Android SDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Setup Node.js for Capacitor
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: vaspitac-app/package-lock.json
+
+      - name: Install Capacitor dependencies
+        working-directory: vaspitac-app
+        run: npm ci
+
+      - name: Sync Capacitor
+        working-directory: vaspitac-app
+        run: npx cap sync android
+
+      - name: Create google-services.json
+        working-directory: vaspitac-app/android/app
+        run: echo '${{ secrets.GOOGLE_SERVICES_JSON }}' > google-services.json
+
+      - name: Build Android Debug APK
+        working-directory: vaspitac-app/android
+        run: |
+          chmod +x gradlew
+          ./gradlew clean
+          ./gradlew assembleProductionDebug
+        env:
+          ANDROID_HOME: ${{ env.ANDROID_SDK_ROOT }}
+
+      - name: Upload Production APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-prod-debug-apk
+          path: vaspitac-app/android/app/build/outputs/apk/production/debug/app-production-debug.apk
+          retention-days: 30
+
+  # Summary job
+  build-summary:
+    runs-on: ubuntu-latest
+    needs: [android-dev-apk, android-prod-apk]
+    if: always()
+    steps:
+      - name: Build Summary
+        run: |
+          echo "🚀 Android Debug Build Completed!"
+          echo "📱 Development APK: ${{ needs.android-dev-apk.result }}"
+          echo "📱 Production APK: ${{ needs.android-prod-apk.result }}"
+          echo "✅ All builds completed successfully!"
