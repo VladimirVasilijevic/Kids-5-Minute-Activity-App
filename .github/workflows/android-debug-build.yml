@@ -90,13 +90,28 @@ jobs:
         with:
           working-directory: 'vaspitac-app'
           environment: 'development'
-          firebase-project: ${{ vars.FIREBASE_PROJECT_DEV || 'ana-vaspitac-dev' }}
-          firebase-api-key: ${{ secrets.FIREBASE_API_KEY_DEV }}
-          firebase-auth-domain: ${{ secrets.FIREBASE_AUTH_DOMAIN_DEV }}
-          firebase-storage-bucket: ${{ secrets.FIREBASE_STORAGE_BUCKET_DEV }}
-          firebase-messaging-sender-id: ${{ secrets.FIREBASE_MESSAGING_SENDER_ID_DEV }}
-          firebase-app-id: ${{ secrets.FIREBASE_APP_ID_DEV }}
-          firebase-measurement-id: ${{ secrets.FIREBASE_MEASUREMENT_ID_DEV }}
+          firebase-project: ${{ secrets.FIREBASE_PROJECT_ID }}
+          firebase-api-key: ${{ secrets.FIREBASE_API_KEY }}
+          firebase-auth-domain: ${{ secrets.FIREBASE_AUTH_DOMAIN }}
+          firebase-storage-bucket: ${{ secrets.FIREBASE_STORAGE_BUCKET }}
+          firebase-messaging-sender-id: ${{ secrets.FIREBASE_MESSAGING_SENDER_ID }}
+          firebase-app-id: ${{ secrets.FIREBASE_APP_ID }}
+          firebase-measurement-id: ${{ secrets.FIREBASE_MEASUREMENT_ID }}
+
+      - name: Debug Firebase configuration
+        working-directory: vaspitac-app
+        run: |
+          echo "🔍 Debugging Firebase configuration for development..."
+          echo "📁 Environment file contents (first 10 lines, sensitive data masked):"
+          head -10 src/environments/environment.ts | sed 's/[a-zA-Z0-9]\{20,\}/***MASKED***/g'
+          echo "🔍 Checking if Firebase config looks valid..."
+          if grep -q "apiKey.*YOUR_FIREBASE_API_KEY" src/environments/environment.ts; then
+            echo "❌ API key not replaced - still contains template value!"
+          elif grep -q "apiKey.*\"\"" src/environments/environment.ts; then
+            echo "❌ API key is empty!"
+          else
+            echo "✅ API key appears to be set"
+          fi
 
       - name: Build development web app
         id: dev-build
@@ -114,7 +129,7 @@ jobs:
         with:
           working-directory: 'vaspitac-app'
           environment: 'production'
-          firebase-project: ${{ vars.FIREBASE_PROJECT_PROD || 'ana-vaspitac-prod-e7ee4' }}
+          firebase-project: ${{ secrets.FIREBASE_PROJECT_ID }}
           firebase-api-key: ${{ secrets.FIREBASE_API_KEY }}
           firebase-auth-domain: ${{ secrets.FIREBASE_AUTH_DOMAIN }}
           firebase-storage-bucket: ${{ secrets.FIREBASE_STORAGE_BUCKET }}
