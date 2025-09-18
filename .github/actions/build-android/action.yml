@@ -128,7 +128,7 @@ runs:
         fi
         
         echo "🚀 Starting Capacitor sync..."
-        npx cap sync android --verbose
+        npx cap sync android
         echo "✅ Capacitor sync completed"
         
         echo "🔍 Post-sync Android directory:"
@@ -299,7 +299,7 @@ runs:
         
         echo "🔍 Working Directory Structure:"
         echo "Current directory: $(pwd)"
-        find . -maxdepth 3 -type d | head -20
+        find . -maxdepth 3 -type d 2>/dev/null | head -20 || echo "Directory listing failed"
         
         echo "🔍 Capacitor Configuration:"
         if [ -f "capacitor.config.ts" ]; then
@@ -332,12 +332,12 @@ runs:
           fi
           
           echo "🔍 Gradle files:"
-          find android/ -name "*.gradle" -type f | head -10
+          find android/ -name "*.gradle" -type f 2>/dev/null | head -10 || echo "No Gradle files found"
           
           echo "🔍 Build directory:"
           if [ -d "android/app/build" ]; then
             echo "Build directory exists"
-            find android/app/build -name "*.apk" -o -name "*.aab" | head -10
+            find android/app/build -name "*.apk" -o -name "*.aab" 2>/dev/null | head -10 || echo "No build artifacts found"
           else
             echo "Build directory doesn't exist"
           fi
@@ -348,7 +348,7 @@ runs:
           fi
           
           echo "🔍 Last Gradle daemon log:"
-          find ~/.gradle/daemon -name "*.log" -type f -exec ls -la {} \; | tail -5 || echo "No Gradle daemon logs found"
+          find ~/.gradle/daemon -name "*.log" -type f 2>/dev/null -exec ls -la {} \; | tail -5 2>/dev/null || echo "No Gradle daemon logs found"
         else
           echo "❌ Android directory doesn't exist"
         fi
