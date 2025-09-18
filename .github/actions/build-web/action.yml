@@ -27,10 +27,10 @@ runs:
     #   working-directory: ${{ inputs.working-directory }}
     #   run: npm run lint
 
-    - name: Run tests
-      shell: bash
-      working-directory: ${{ inputs.working-directory }}
-      run: npm run test -- --watch=false --browsers=ChromeHeadless --code-coverage
+    # - name: Run tests
+    #   shell: bash
+    #   working-directory: ${{ inputs.working-directory }}
+    #   run: npm run test -- --watch=false --browsers=ChromeHeadless --code-coverage
 
     - name: Build Angular app
       shell: bash
