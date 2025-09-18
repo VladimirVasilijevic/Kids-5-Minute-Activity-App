@@ -149,7 +149,19 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: ${{ needs.web-build.outputs.artifact-name }}
-          path: vaspitac-app/dist/
+          path: web-build-artifacts/
+
+      - name: Move web build to correct location
+        run: |
+          # Remove existing dist directory if it exists
+          if [ -d "vaspitac-app/dist" ]; then
+            rm -rf vaspitac-app/dist
+          fi
+          # Move the web build to the correct location
+          mv web-build-artifacts vaspitac-app/dist
+          echo "✅ Web build moved to vaspitac-app/dist"
+          echo "📁 Contents of vaspitac-app/dist:"
+          ls -la vaspitac-app/dist/
 
       - name: Download keystore
         uses: actions/download-artifact@v4
@@ -232,7 +244,19 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: ${{ needs.web-build.outputs.artifact-name }}
-          path: vaspitac-app/dist/
+          path: web-build-artifacts/
+
+      - name: Move web build to correct location
+        run: |
+          # Remove existing dist directory if it exists
+          if [ -d "vaspitac-app/dist" ]; then
+            rm -rf vaspitac-app/dist
+          fi
+          # Move the web build to the correct location
+          mv web-build-artifacts vaspitac-app/dist
+          echo "✅ Web build moved to vaspitac-app/dist"
+          echo "📁 Contents of vaspitac-app/dist:"
+          ls -la vaspitac-app/dist/
 
       - name: Download keystore
         uses: actions/download-artifact@v4
