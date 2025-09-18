@@ -140,15 +140,18 @@ runs:
             echo "✅ Assets copied to Android"
             echo "📊 Assets size: $(du -sh android/app/src/main/assets/public | cut -f1)"
             echo "📁 Assets contents (first 10 items):"
-            ls -la android/app/src/main/assets/public/ | head -10
+            ls -la android/app/src/main/assets/public/ 2>/dev/null | head -10 || echo "Could not list assets contents"
             
             echo "🔍 Checking for index.html in assets:"
             if [ -f "android/app/src/main/assets/public/index.html" ]; then
               echo "✅ index.html found in Android assets"
+              echo "📊 index.html size: $(du -sh android/app/src/main/assets/public/index.html | cut -f1)"
               echo "🔍 First few lines of index.html:"
-              head -5 android/app/src/main/assets/public/index.html
+              head -5 android/app/src/main/assets/public/index.html 2>/dev/null || echo "Could not read index.html"
             else
               echo "❌ index.html NOT found in Android assets"
+              echo "📁 Files in assets/public directory:"
+              ls -la android/app/src/main/assets/public/ 2>/dev/null | grep -E '\.(html|js|css)$' | head -5 || echo "No web files found"
             fi
           else
             echo "❌ Assets directory not found in Android project"
@@ -378,8 +381,12 @@ runs:
         if [ -d "dist" ]; then
           echo "Dist directory exists"
           echo "Size: $(du -sh dist | cut -f1)"
-          echo "Contents:"
-          ls -la dist/ | head -10
+          echo "Contents (first 10 items):"
+          ls -la dist/ 2>/dev/null | head -10 || echo "Could not list dist contents"
+          
+          echo "🔍 Key files in dist:"
+          [ -f "dist/index.html" ] && echo "✅ index.html exists" || echo "❌ index.html missing"
+          [ -d "dist/assets" ] && echo "✅ assets directory exists" || echo "❌ assets directory missing"
         else
           echo "❌ Dist directory doesn't exist"
         fi
