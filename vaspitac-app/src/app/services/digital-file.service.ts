@@ -476,7 +476,7 @@ export class DigitalFileService {
       const writeOptions: any = {
         path: fileName,
         data: cleanBase64,
-        directory: Directory.ExternalStorage
+        directory: Directory.Data
       };
       
       // Only add encoding for text files, not for binary files
