@@ -427,17 +427,24 @@ export class DigitalFileService {
    */
   private async createDownloadFromContent(base64Content: string, fileName: string, fileType: string): Promise<void> {
     try {
+      console.log('🚀 Starting download process...');
+      console.log('📊 Download parameters:', { fileName, fileType, contentLength: base64Content?.length || 0 });
+      
       // Check if we're running on a native platform (Android/iOS)
       if (Capacitor.isNativePlatform()) {
         console.log('📱 Native platform detected, using Capacitor Filesystem...');
+        console.log('🔧 Capacitor platform:', Capacitor.getPlatform());
         await this.downloadFileNative(base64Content, fileName, fileType);
       } else {
         console.log('🌐 Web platform detected, using browser download...');
         await this.downloadFileWeb(base64Content, fileName, fileType);
       }
-    } catch (error) {
-      console.error('Error creating download from content:', error);
-      throw new Error('Failed to create download from content');
+      
+      console.log('✅ Download process completed successfully');
+    } catch (error: any) {
+      console.error('❌ Error creating download from content:', error);
+      console.error('❌ Error stack:', error.stack);
+      throw new Error(`Failed to create download from content: ${error.message}`);
     }
   }
 
@@ -463,8 +470,17 @@ export class DigitalFileService {
   private async downloadFileNative(base64Content: string, fileName: string, fileType: string): Promise<void> {
     try {
       console.log('📱 Native platform detected, using Capacitor Filesystem...');
-    
+      console.log('📁 File details:', { fileName, fileType, contentLength: base64Content.length });
+      
+      // Check if we have valid base64 content
+      if (!base64Content || base64Content.length === 0) {
+        throw new Error('Base64 content is empty or invalid');
+      }
+      
+      console.log('🔍 Base64 content preview:', base64Content.substring(0, 50) + '...');
+      
       // Write file directly with base64 string (no Blob conversion needed)
+      console.log('💾 Writing file to Documents directory...');
       const result = await Filesystem.writeFile({
         path: fileName,
         data: base64Content, // Pass base64 string directly
@@ -473,13 +489,19 @@ export class DigitalFileService {
       });
       
       console.log('✅ File saved successfully:', result.uri);
+      console.log('📂 File location:', result.uri);
       
       // Show success message (you can customize this)
       // Note: On Android, the file will be saved to the Documents folder
       // Users can find it in their file manager
       
-    } catch (error) {
+    } catch (error: any) {
       console.error('❌ Error saving file to device:', error);
+      console.error('❌ Error details:', {
+        name: error.name,
+        message: error.message,
+        stack: error.stack
+      });
       throw error;
     }
   }

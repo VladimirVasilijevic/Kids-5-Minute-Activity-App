@@ -1,5 +1,74 @@
 <!-- Digital Marketplace -->
 <div class="min-h-screen bg-gradient-to-br">
+  <!-- DEBUG PANEL - Remove after debugging -->
+  <div *ngIf="showDebugPanel" class="bg-red-100 border-l-4 border-red-500 p-4 m-4 rounded">
+    <div class="flex items-center justify-between mb-2">
+      <h3 class="text-lg font-semibold text-red-800">🐛 DEBUG PANEL - Remove after debugging</h3>
+      <div class="flex gap-2">
+        <button 
+          (click)="toggleDebugPanel()" 
+          class="bg-red-600 text-white px-3 py-1 rounded text-sm hover:bg-red-700"
+        >
+          Hide
+        </button>
+        <button 
+          (click)="clearDebugLogs()" 
+          class="bg-gray-600 text-white px-3 py-1 rounded text-sm hover:bg-gray-700"
+        >
+          Clear
+        </button>
+      </div>
+    </div>
+    
+    <!-- Platform Info -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+      <div class="bg-white p-3 rounded border">
+        <h4 class="font-semibold text-gray-800 mb-2">Platform Info</h4>
+        <p class="text-sm"><strong>Platform:</strong> {{ debugPlatform }}</p>
+        <p class="text-sm"><strong>Capacitor:</strong> {{ debugCapacitorAvailable ? 'Available' : 'Not Available' }}</p>
+        <p class="text-sm"><strong>Logged In:</strong> {{ isLoggedIn ? 'Yes' : 'No' }}</p>
+        <p class="text-sm"><strong>User ID:</strong> {{ currentUserId || 'None' }}</p>
+      </div>
+      
+      <div class="bg-white p-3 rounded border">
+        <h4 class="font-semibold text-gray-800 mb-2">Last Download Attempt</h4>
+        <div *ngIf="debugLastDownloadAttempt; else noDownloadAttempt">
+          <p class="text-sm"><strong>File:</strong> {{ debugLastDownloadAttempt.fileName }}</p>
+          <p class="text-sm"><strong>Type:</strong> {{ debugLastDownloadAttempt.fileType }}</p>
+          <p class="text-sm"><strong>Size:</strong> {{ debugLastDownloadAttempt.fileSize }} bytes</p>
+          <p class="text-sm"><strong>Time:</strong> {{ debugLastDownloadAttempt.timestamp | date:'short' }}</p>
+        </div>
+        <ng-template #noDownloadAttempt>
+          <p class="text-sm text-gray-500">No download attempts yet</p>
+        </ng-template>
+      </div>
+      
+      <div class="bg-white p-3 rounded border">
+        <h4 class="font-semibold text-gray-800 mb-2">Last Error</h4>
+        <div *ngIf="debugLastError; else noError">
+          <p class="text-sm text-red-600"><strong>Error:</strong> {{ debugLastError.message }}</p>
+          <p class="text-sm"><strong>Time:</strong> {{ debugLastError.timestamp | date:'short' }}</p>
+        </div>
+        <ng-template #noError>
+          <p class="text-sm text-gray-500">No errors yet</p>
+        </ng-template>
+      </div>
+    </div>
+    
+    <!-- Debug Logs -->
+    <div class="bg-white p-3 rounded border">
+      <h4 class="font-semibold text-gray-800 mb-2">Debug Logs (Last 10)</h4>
+      <div class="max-h-40 overflow-y-auto bg-gray-50 p-2 rounded text-xs font-mono">
+        <div *ngFor="let log of debugLogs.slice(0, 10)" class="mb-1 text-gray-700">
+          {{ log }}
+        </div>
+        <div *ngIf="debugLogs.length === 0" class="text-gray-500">
+          No debug logs yet
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Header -->
   <div class="max-w-7xl mx-auto px-4 py-8">
     <div class="bg-gradient-to-br from-emerald-600 via-green-600 to-teal-700 text-white py-12 px-6 rounded-3xl shadow-lg relative overflow-hidden  header-margin">
