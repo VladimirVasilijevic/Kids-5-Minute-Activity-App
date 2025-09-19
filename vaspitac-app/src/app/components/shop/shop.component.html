@@ -47,7 +47,12 @@
         <h4 class="font-semibold text-gray-800 mb-2">Last Error</h4>
         <div *ngIf="debugLastError; else noError">
           <p class="text-sm text-red-600"><strong>Error:</strong> {{ debugLastError.message }}</p>
+          <p class="text-sm text-red-600"><strong>Type:</strong> {{ debugLastError.errorType || 'Unknown' }}</p>
           <p class="text-sm"><strong>Time:</strong> {{ debugLastError.timestamp | date:'short' }}</p>
+          <div *ngIf="debugLastError.errorStack" class="mt-2">
+            <p class="text-xs text-gray-600"><strong>Stack:</strong></p>
+            <pre class="text-xs text-gray-500 bg-gray-100 p-2 rounded overflow-x-auto">{{ debugLastError.errorStack }}</pre>
+          </div>
         </div>
         <ng-template #noError>
           <p class="text-sm text-gray-500">No errors yet</p>

@@ -479,14 +479,25 @@ export class DigitalFileService {
       
       console.log('🔍 Base64 content preview:', base64Content.substring(0, 50) + '...');
       
-      // Write file directly with base64 string (no Blob conversion needed)
+      // For Capacitor, we need to pass the data without encoding parameter for binary files
+      // or use the correct encoding based on file type
       console.log('💾 Writing file to Documents directory...');
-      const result = await Filesystem.writeFile({
+      
+      let writeOptions: any = {
         path: fileName,
-        data: base64Content, // Pass base64 string directly
-        directory: Directory.Documents,
-        encoding: Encoding.UTF8
-      });
+        data: base64Content,
+        directory: Directory.Documents
+      };
+      
+      // Only add encoding for text files, not for binary files
+      if (fileType.startsWith('text/') || fileType === 'application/json') {
+        writeOptions.encoding = Encoding.UTF8;
+        console.log('📝 Using UTF8 encoding for text file');
+      } else {
+        console.log('📦 Using binary mode for non-text file');
+      }
+      
+      const result = await Filesystem.writeFile(writeOptions);
       
       console.log('✅ File saved successfully:', result.uri);
       console.log('📂 File location:', result.uri);

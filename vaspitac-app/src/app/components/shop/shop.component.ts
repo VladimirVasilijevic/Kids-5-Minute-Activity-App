@@ -431,10 +431,15 @@ export class ShopComponent implements OnInit {
       error: (error) => {
         const errorMsg = `Error downloading file: ${error.message || 'Unknown error'}`;
         console.error('❌', errorMsg);
+        console.error('❌ Full error object:', error);
         this.addDebugLog(`❌ ${errorMsg}`);
+        this.addDebugLog(`❌ Error type: ${error.name || 'Unknown'}`);
+        this.addDebugLog(`❌ Error stack: ${error.stack || 'No stack trace'}`);
         this.debugLastError = { 
           message: errorMsg, 
           error: error,
+          errorType: error.name || 'Unknown',
+          errorStack: error.stack || 'No stack trace',
           timestamp: new Date().toISOString() 
         };
         alert(`Error downloading "${file.title}": ${error.message || 'Unknown error'}`);
