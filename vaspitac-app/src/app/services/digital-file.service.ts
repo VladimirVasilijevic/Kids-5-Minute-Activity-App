@@ -323,28 +323,15 @@ export class DigitalFileService {
     return new Observable(observer => {
       downloadFileContent({ fileId: file.id }).subscribe({
         next: (result: any) => {
-          console.log('🔍 Firebase Function result received:', result);
-          console.log('🔍 Result type:', typeof result);
-          console.log('🔍 Result keys:', Object.keys(result || {}));
-          
           // Firebase Functions return data directly, not wrapped in result.data
           // Check both possible locations: result.data and result
           let downloadData: any;
           
           if (result?.data && typeof result.data === 'object') {
             downloadData = result.data;
-            console.log('📦 Using result.data');
           } else if (result && typeof result === 'object') {
             downloadData = result;
-            console.log('📦 Using result directly');
           }
-          
-          console.log('📦 Download data:', downloadData);
-          console.log('📦 Has access:', downloadData?.hasAccess);
-          console.log('📦 File content length:', downloadData?.fileContent?.length || 0);
-          console.log('📦 File content preview:', downloadData?.fileContent?.substring(0, 100) + '...');
-          console.log('📦 File name:', downloadData?.fileName);
-          console.log('📦 File type:', downloadData?.fileType);
           
           if (downloadData?.hasAccess && downloadData?.fileContent) {
             // Create download from base64 content
@@ -440,32 +427,14 @@ export class DigitalFileService {
    */
   private async createDownloadFromContent(base64Content: string, fileName: string, fileType: string): Promise<void> {
     try {
-      console.log('🚀 Starting download process...');
-      console.log('📊 Download parameters:', { fileName, fileType, contentLength: base64Content?.length || 0 });
-      
-      // Validate base64 content
-      console.log('🔍 Validating base64 content...');
-      const isValidBase64 = this.isValidBase64(base64Content);
-      console.log('✅ Base64 valid:', isValidBase64);
-      
-      if (!isValidBase64) {
-        throw new Error('Invalid base64 content received from server');
-      }
-      
       // Check if we're running on a native platform (Android/iOS)
       if (Capacitor.isNativePlatform()) {
-        console.log('📱 Native platform detected, using Capacitor Filesystem...');
-        console.log('🔧 Capacitor platform:', Capacitor.getPlatform());
         await this.downloadFileNative(base64Content, fileName, fileType);
       } else {
-        console.log('🌐 Web platform detected, using browser download...');
         await this.downloadFileWeb(base64Content, fileName, fileType);
       }
-      
-      console.log('✅ Download process completed successfully');
     } catch (error: any) {
-      console.error('❌ Error creating download from content:', error);
-      console.error('❌ Error stack:', error.stack);
+      console.error('Error creating download from content:', error);
       throw new Error(`Failed to create download from content: ${error.message}`);
     }
   }
@@ -491,59 +460,35 @@ export class DigitalFileService {
    */
   private async downloadFileNative(base64Content: string, fileName: string, fileType: string): Promise<void> {
     try {
-      console.log('📱 Native platform detected, using Capacitor Filesystem...');
-      console.log('📁 File details:', { fileName, fileType, contentLength: base64Content.length });
-      
       // Check if we have valid base64 content
       if (!base64Content || base64Content.length === 0) {
         throw new Error('Base64 content is empty or invalid');
       }
       
-      console.log('🔍 Base64 content preview:', base64Content.substring(0, 50) + '...');
-      
-      // Convert base64 to binary data first
-      console.log('🔄 Converting base64 to binary data...');
-      const binaryData = this.base64ToArrayBuffer(base64Content);
-      console.log('📊 Binary data size:', binaryData.byteLength, 'bytes');
-      
-      // Convert binary data back to base64 for Capacitor (it expects base64 encoded data)
-      console.log('🔄 Converting binary to base64 for Capacitor...');
-      const base64ForCapacitor = this.arrayBufferToBase64(binaryData);
-      console.log('📊 Base64 for Capacitor size:', base64ForCapacitor.length, 'characters');
-      
       // For Capacitor, we need to pass the data without encoding parameter for binary files
-      console.log('💾 Writing file to Documents directory...');
-      
+      // Clean base64 (strip "data:application/pdf;base64," prefix)
+      const cleanBase64 = base64Content.includes(',')
+      ? base64Content.split(',')[1]
+      : base64Content;
+
+      await Filesystem.requestPermissions();
+
       const writeOptions: any = {
         path: fileName,
-        data: base64ForCapacitor,
-        directory: Directory.Documents
+        data: cleanBase64,
+        directory: Directory.ExternalStorage
       };
       
       // Only add encoding for text files, not for binary files
       if (fileType.startsWith('text/') || fileType === 'application/json') {
         writeOptions.encoding = Encoding.UTF8;
-        console.log('📝 Using UTF8 encoding for text file');
-      } else {
-        console.log('📦 Using binary mode for non-text file');
       }
       
       const result = await Filesystem.writeFile(writeOptions);
-      
-      console.log('✅ File saved successfully:', result.uri);
-      console.log('📂 File location:', result.uri);
-      
-      // Show success message (you can customize this)
-      // Note: On Android, the file will be saved to the Documents folder
-      // Users can find it in their file manager
+      alert(`File saved successfully: ${result.uri}`);
       
     } catch (error: any) {
-      console.error('❌ Error saving file to device:', error);
-      console.error('❌ Error details:', {
-        name: error.name,
-        message: error.message,
-        stack: error.stack
-      });
+      alert(`Error saving file to device: ${error.message}`);
       throw error;
     }
   }
@@ -565,68 +510,4 @@ export class DigitalFileService {
     });
   }
 
-  /**
-   * Convert base64 string to ArrayBuffer
-   */
-  private base64ToArrayBuffer(base64: string): ArrayBuffer {
-    const binaryString = atob(base64);
-    const bytes = new Uint8Array(binaryString.length);
-    for (let i = 0; i < binaryString.length; i++) {
-      bytes[i] = binaryString.charCodeAt(i);
-    }
-    return bytes.buffer;
-  }
-
-  /**
-   * Convert ArrayBuffer to base64 string
-   */
-  private arrayBufferToBase64(buffer: ArrayBuffer): string {
-    const bytes = new Uint8Array(buffer);
-    let binary = '';
-    for (let i = 0; i < bytes.byteLength; i++) {
-      binary += String.fromCharCode(bytes[i]);
-    }
-    return btoa(binary);
-  }
-
-  /**
-   * Validate if string is valid base64
-   */
-  private isValidBase64(str: string): boolean {
-    try {
-      // Check if string is not empty
-      if (!str || str.length === 0) {
-        console.log('❌ Base64 validation failed: Empty string');
-        return false;
-      }
-
-      // Check if string length is multiple of 4
-      if (str.length % 4 !== 0) {
-        console.log('❌ Base64 validation failed: Length not multiple of 4');
-        return false;
-      }
-
-      // Check if string contains only valid base64 characters
-      const base64Regex = /^[A-Za-z0-9+/]*={0,2}$/;
-      if (!base64Regex.test(str)) {
-        console.log('❌ Base64 validation failed: Invalid characters');
-        return false;
-      }
-
-      // Try to decode and re-encode to verify
-      const decoded = atob(str);
-      const reEncoded = btoa(decoded);
-      
-      if (reEncoded !== str) {
-        console.log('❌ Base64 validation failed: Decode/re-encode mismatch');
-        return false;
-      }
-
-      console.log('✅ Base64 validation passed');
-      return true;
-    } catch (error) {
-      console.log('❌ Base64 validation failed with error:', error);
-      return false;
-    }
-  }
 }

@@ -12,7 +12,6 @@ import { DigitalFileService } from '../../services/digital-file.service';
 import { UserAccessService } from '../../services/user-access.service';
 import { PurchaseService } from '../../services/purchase.service';
 import { PurchaseFormData } from '../../models/purchase.model';
-import { Capacitor } from '@capacitor/core';
 
 import { formatFileSize } from '../../models/marketplace.utils';
 
@@ -60,14 +59,6 @@ export class ShopComponent implements OnInit {
   currentUserId: string | null = null;
   isRefreshingAccess = false; // Add flag to prevent multiple simultaneous refreshes
 
-  // DEBUG: Remove after debugging - Debug panel properties
-  debugLogs: string[] = [];
-  debugPlatform = '';
-  debugCapacitorAvailable = false;
-  debugLastDownloadAttempt: any = null;
-  debugLastError: any = null;
-  showDebugPanel = true; // Set to false to hide debug panel
-
   
   constructor(
     private _router: Router,
@@ -87,9 +78,6 @@ export class ShopComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // DEBUG: Initialize debug information
-    this.initializeDebugInfo();
-    
     // Load files immediately - everyone can browse shop
     this.loadFiles();
     this.setupLanguageDetection();
@@ -379,69 +367,23 @@ export class ShopComponent implements OnInit {
    * Downloads a file (for users who have access)
    */
   downloadFile(file: DigitalFile): void {
-    // DEBUG: Log download attempt
-    this.addDebugLog(`🚀 Starting download for: ${file.title}`);
-    this.addDebugLog(`📱 Platform: ${this.debugPlatform}`);
-    this.addDebugLog(`🔧 Capacitor available: ${this.debugCapacitorAvailable}`);
-    this.addDebugLog(`👤 User logged in: ${this.isLoggedIn}`);
-    this.addDebugLog(`🔑 User ID: ${this.currentUserId}`);
-    this.addDebugLog(`📁 File ID: ${file.id}`);
-    this.addDebugLog(`🌐 File URL: ${file.fileUrl}`);
-    this.addDebugLog(`📄 File Type: ${file.fileType}`);
-    this.addDebugLog(`📊 File Size: ${file.fileSize} bytes`);
-    
-    this.debugLastDownloadAttempt = {
-      fileId: file.id,
-      fileName: file.title,
-      fileUrl: file.fileUrl,
-      fileType: file.fileType,
-      fileSize: file.fileSize,
-      timestamp: new Date().toISOString(),
-      platform: this.debugPlatform,
-      capacitorAvailable: this.debugCapacitorAvailable,
-      userLoggedIn: this.isLoggedIn,
-      userId: this.currentUserId
-    };
-
     if (!this.hasAccess(file.id)) {
-      const errorMsg = 'User does not have access to this file';
-      console.error(errorMsg);
-      this.addDebugLog(`❌ ${errorMsg}`);
-      this.debugLastError = { message: errorMsg, timestamp: new Date().toISOString() };
+      console.error('User does not have access to this file');
       return;
     }
-
-    this.addDebugLog(`✅ User has access to file: ${file.id}`);
 
     this._digitalFileService.downloadFile(file).subscribe({
       next: (success: boolean) => {
         if (success) {
-          const successMsg = `File download successful: ${file.title}`;
-          console.log('✅', successMsg);
-          this.addDebugLog(`✅ ${successMsg}`);
+          console.log('✅ File download successful:', file.title);
           alert(`File "${file.title}" downloaded successfully! Check your Downloads folder.`);
         } else {
-          const failMsg = `File download failed: ${file.title}`;
-          console.error('❌', failMsg);
-          this.addDebugLog(`❌ ${failMsg}`);
-          this.debugLastError = { message: failMsg, timestamp: new Date().toISOString() };
+          console.error('❌ File download failed:', file.title);
           alert(`Failed to download "${file.title}". Please try again.`);
         }
       },
       error: (error) => {
-        const errorMsg = `Error downloading file: ${error.message || 'Unknown error'}`;
-        console.error('❌', errorMsg);
-        console.error('❌ Full error object:', error);
-        this.addDebugLog(`❌ ${errorMsg}`);
-        this.addDebugLog(`❌ Error type: ${error.name || 'Unknown'}`);
-        this.addDebugLog(`❌ Error stack: ${error.stack || 'No stack trace'}`);
-        this.debugLastError = { 
-          message: errorMsg, 
-          error: error,
-          errorType: error.name || 'Unknown',
-          errorStack: error.stack || 'No stack trace',
-          timestamp: new Date().toISOString() 
-        };
+        console.error('❌ Error downloading file:', error);
         alert(`Error downloading "${file.title}": ${error.message || 'Unknown error'}`);
       }
     });
@@ -627,67 +569,5 @@ Telefon (Viber): ${phoneNumber}`;
    */
   isPhysicalProduct(file: DigitalFile): boolean {
     return !this.isDigitalProduct(file);
-  }
-
-  // DEBUG: Remove after debugging - Debug methods
-  /**
-   * Initialize debug information
-   */
-  private initializeDebugInfo(): void {
-    this.debugPlatform = Capacitor.getPlatform();
-    this.debugCapacitorAvailable = typeof Capacitor !== 'undefined';
-    this.addDebugLog(`🔧 Debug panel initialized`);
-    this.addDebugLog(`📱 Platform: ${this.debugPlatform}`);
-    this.addDebugLog(`🔧 Capacitor available: ${this.debugCapacitorAvailable}`);
-    this.addDebugLog(`🌐 User Agent: ${navigator.userAgent}`);
-    this.addDebugLog(`⏰ Current time: ${new Date().toISOString()}`);
-  }
-
-  /**
-   * Add a debug log entry
-   */
-  private addDebugLog(message: string): void {
-    const timestamp = new Date().toLocaleTimeString();
-    this.debugLogs.unshift(`[${timestamp}] ${message}`);
-    
-    // Keep only last 50 logs to prevent memory issues
-    if (this.debugLogs.length > 50) {
-      this.debugLogs = this.debugLogs.slice(0, 50);
-    }
-    
-    console.log(`[DEBUG] ${message}`);
-  }
-
-  /**
-   * Clear debug logs
-   */
-  clearDebugLogs(): void {
-    this.debugLogs = [];
-    this.debugLastError = null;
-    this.debugLastDownloadAttempt = null;
-    this.addDebugLog('🧹 Debug logs cleared');
-  }
-
-  /**
-   * Toggle debug panel visibility
-   */
-  toggleDebugPanel(): void {
-    this.showDebugPanel = !this.showDebugPanel;
-    this.addDebugLog(`🔧 Debug panel ${this.showDebugPanel ? 'shown' : 'hidden'}`);
-  }
-
-  /**
-   * Get debug info as JSON string
-   */
-  getDebugInfoAsJson(): string {
-    return JSON.stringify({
-      platform: this.debugPlatform,
-      capacitorAvailable: this.debugCapacitorAvailable,
-      userAgent: navigator.userAgent,
-      currentTime: new Date().toISOString(),
-      lastDownloadAttempt: this.debugLastDownloadAttempt,
-      lastError: this.debugLastError,
-      logs: this.debugLogs.slice(0, 10) // Last 10 logs
-    }, null, 2);
   }
 }
