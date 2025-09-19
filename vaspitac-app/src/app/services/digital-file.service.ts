@@ -462,17 +462,13 @@ export class DigitalFileService {
    */
   private async downloadFileNative(base64Content: string, fileName: string, fileType: string): Promise<void> {
     try {
-      // Convert base64 to binary data
-      const binaryData = this.base64ToArrayBuffer(base64Content);
-      
-      // Create a Blob from the binary data
-      const blob = new Blob([binaryData], { type: fileType });
-      
-      // Write file using the blob data
+      console.log('📱 Native platform detected, using Capacitor Filesystem...');
+    
+      // Write file directly with base64 string (no Blob conversion needed)
       const result = await Filesystem.writeFile({
         path: fileName,
-        data: await this.blobToBase64(blob),
-        directory: Directory.Documents, // Use Documents directory for better access
+        data: base64Content, // Pass base64 string directly
+        directory: Directory.Documents,
         encoding: Encoding.UTF8
       });
       
