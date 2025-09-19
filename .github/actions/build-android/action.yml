@@ -1,0 +1,407 @@
+name: 'Build Android Application'
+description: 'Build Android APK and AAB with Capacitor'
+
+inputs:
+  environment:
+    description: 'Environment (development/production)'
+    required: true
+  build-type:
+    description: 'Build type (debug/release)'
+    required: true
+  working-directory:
+    description: 'Working directory for Android project'
+    required: false
+    default: 'vaspitac-app'
+  upload-artifacts:
+    description: 'Whether to upload build artifacts'
+    required: false
+    default: 'true'
+  # Signing inputs (for release builds)
+  keystore-base64:
+    description: 'Base64 encoded keystore file (required for release builds)'
+    required: false
+  keystore-password:
+    description: 'Keystore password (required for release builds)'
+    required: false
+  key-alias:
+    description: 'Key alias (required for release builds)'
+    required: false
+  key-password:
+    description: 'Key password (required for release builds)'
+    required: false
+
+outputs:
+  apk-path:
+    description: 'Path to generated APK'
+    value: ${{ steps.build-paths.outputs.apk-path }}
+  aab-path:
+    description: 'Path to generated AAB'
+    value: ${{ steps.build-paths.outputs.aab-path }}
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Setup Java and Android SDK
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'zulu'
+        java-version: '17'
+
+    - name: Setup Android SDK
+      uses: android-actions/setup-android@v3
+
+    - name: Create google-services.json
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}/android/app
+      run: |
+        echo "🔧 Creating google-services.json..."
+        echo "📁 Current directory: $(pwd)"
+        echo "📁 Directory contents before:"
+        ls -la
+        
+        echo '${{ env.GOOGLE_SERVICES_JSON }}' > google-services.json
+        
+        if [ -f "google-services.json" ]; then
+          echo "✅ google-services.json created successfully"
+          echo "📊 File size: $(du -sh google-services.json | cut -f1)"
+          echo "🔍 First few lines of google-services.json:"
+          head -5 google-services.json || echo "Could not read file content"
+        else
+          echo "❌ Failed to create google-services.json"
+          exit 1
+        fi
+
+    - name: Setup Android keystore (Release builds only)
+      if: ${{ inputs.build-type == 'release' }}
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}/android
+      run: |
+        if [ -n "${{ inputs.keystore-base64 }}" ]; then
+          echo "🔐 Setting up release keystore..."
+          echo "${{ inputs.keystore-base64 }}" | base64 -d > app/release-key.keystore
+          
+          cat > signing.properties << EOF
+        storeFile=release-key.keystore
+        storePassword=${{ inputs.keystore-password }}
+        keyAlias=${{ inputs.key-alias }}
+        keyPassword=${{ inputs.key-password }}
+        EOF
+          
+          echo "✅ Keystore setup completed"
+        else
+          echo "⚠️  No keystore provided - release build will be unsigned"
+          echo "⚠️  Add the following secrets to enable signed releases:"
+          echo "   - ANDROID_KEYSTORE_BASE64"
+          echo "   - ANDROID_KEYSTORE_PASSWORD"
+          echo "   - ANDROID_KEY_ALIAS"
+          echo "   - ANDROID_KEY_PASSWORD"
+        fi
+
+    - name: Sync Capacitor
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      run: |
+        echo "🔄 Syncing Capacitor..."
+        echo "📁 Current directory: $(pwd)"
+        echo "📁 Directory contents:"
+        ls -la
+        
+        echo "🔍 Checking Capacitor config:"
+        if [ -f "capacitor.config.ts" ]; then
+          echo "✅ capacitor.config.ts found"
+          cat capacitor.config.ts
+        else
+          echo "❌ capacitor.config.ts not found"
+        fi
+        
+        echo "🔍 Checking dist directory:"
+        if [ -d "dist" ]; then
+          echo "✅ dist directory found"
+          echo "📊 Dist size: $(du -sh dist | cut -f1)"
+          echo "📁 Dist contents:"
+          ls -la dist/
+        else
+          echo "❌ dist directory not found"
+          echo "📁 Available directories:"
+          ls -la
+          exit 1
+        fi
+        
+        echo "🚀 Starting Capacitor sync..."
+        npx cap sync android
+        echo "✅ Capacitor sync completed"
+        
+        echo "🔍 Post-sync Android directory:"
+        if [ -d "android" ]; then
+          ls -la android/
+          
+          echo "🔍 Checking Android app assets:"
+          if [ -d "android/app/src/main/assets/public" ]; then
+            echo "✅ Assets copied to Android"
+            echo "📊 Assets size: $(du -sh android/app/src/main/assets/public | cut -f1)"
+            echo "📁 Assets contents (first 10 items):"
+            ls -la android/app/src/main/assets/public/ 2>/dev/null | head -10 || echo "Could not list assets contents"
+            
+            echo "🔍 Checking for index.html in assets:"
+            if [ -f "android/app/src/main/assets/public/index.html" ]; then
+              echo "✅ index.html found in Android assets"
+              echo "📊 index.html size: $(du -sh android/app/src/main/assets/public/index.html | cut -f1)"
+              echo "🔍 First few lines of index.html:"
+              head -5 android/app/src/main/assets/public/index.html 2>/dev/null || echo "Could not read index.html"
+            else
+              echo "❌ index.html NOT found in Android assets"
+              echo "📁 Files in assets/public directory:"
+              ls -la android/app/src/main/assets/public/ 2>/dev/null | grep -E '\.(html|js|css)$' | head -5 || echo "No web files found"
+            fi
+          else
+            echo "❌ Assets directory not found in Android project"
+            echo "📁 Available directories in android/app/src/main/:"
+            ls -la android/app/src/main/ || echo "main directory not found"
+          fi
+        else
+          echo "❌ Android directory not found after sync"
+          exit 1
+        fi
+
+    - name: Make gradlew executable
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}/android
+      run: |
+        echo "🔧 Making gradlew executable..."
+        echo "📁 Current directory: $(pwd)"
+        echo "📁 Android directory contents:"
+        ls -la
+        
+        if [ -f "gradlew" ]; then
+          echo "✅ gradlew found"
+          echo "🔍 Current permissions:"
+          ls -la gradlew
+          chmod +x gradlew
+          echo "🔍 New permissions:"
+          ls -la gradlew
+          echo "✅ gradlew made executable"
+        else
+          echo "❌ gradlew not found"
+          exit 1
+        fi
+
+    - name: Build Android APK
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}/android
+      run: |
+        echo "🏗️ Building ${{ inputs.environment }} ${{ inputs.build-type }} APK..."
+        echo "📁 Current directory: $(pwd)"
+        echo "🔍 Environment: ${{ inputs.environment }}"
+        echo "🔍 Build type: ${{ inputs.build-type }}"
+        
+        echo "🔍 Gradle version:"
+        ./gradlew --version
+        
+        echo "🔍 Available Gradle tasks:"
+        ./gradlew tasks --group="build" | head -20
+        
+        echo "🧹 Cleaning previous builds..."
+        ./gradlew clean --info
+        
+        echo "🔍 Build directory after clean:"
+        ls -la app/build/ || echo "Build directory doesn't exist yet"
+        
+        echo "🚀 Starting APK build..."
+        if [ "${{ inputs.build-type }}" = "debug" ]; then
+          BUILD_TASK="assemble${{ inputs.environment == 'development' && 'Development' || 'Production' }}Debug"
+        else
+          BUILD_TASK="assemble${{ inputs.environment == 'development' && 'Development' || 'Production' }}Release"
+        fi
+        
+        echo "🔍 Running task: $BUILD_TASK"
+        ./gradlew $BUILD_TASK --info --stacktrace
+        
+        echo "✅ APK build completed"
+        echo "🔍 Build outputs:"
+        find app/build/outputs -name "*.apk" -type f || echo "No APK files found"
+
+    - name: Build Android AAB
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}/android
+      run: |
+        echo "🏗️ Building ${{ inputs.environment }} ${{ inputs.build-type }} AAB..."
+        
+        if [ "${{ inputs.build-type }}" = "debug" ]; then
+          BUILD_TASK="bundle${{ inputs.environment == 'development' && 'Development' || 'Production' }}Debug"
+        else
+          BUILD_TASK="bundle${{ inputs.environment == 'development' && 'Development' || 'Production' }}Release"
+        fi
+        
+        echo "🔍 Running task: $BUILD_TASK"
+        ./gradlew $BUILD_TASK --info --stacktrace
+        
+        echo "✅ AAB build completed"
+        echo "🔍 Bundle outputs:"
+        find app/build/outputs -name "*.aab" -type f || echo "No AAB files found"
+
+    - name: Set build paths
+      id: build-paths
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}/android
+      run: |
+        ENV_SUFFIX=${{ inputs.environment == 'development' && 'development' || 'production' }}
+        BUILD_SUFFIX=${{ inputs.build-type }}
+        
+        APK_PATH="app/build/outputs/apk/${ENV_SUFFIX}/${BUILD_SUFFIX}/app-${ENV_SUFFIX}-${BUILD_SUFFIX}.apk"
+        AAB_PATH="app/build/outputs/bundle/${ENV_SUFFIX}${BUILD_SUFFIX^}/app-${ENV_SUFFIX}-${BUILD_SUFFIX}.aab"
+        
+        echo "apk-path=${APK_PATH}" >> $GITHUB_OUTPUT
+        echo "aab-path=${AAB_PATH}" >> $GITHUB_OUTPUT
+        
+        echo "📱 Build paths:"
+        echo "   APK: ${APK_PATH}"
+        echo "   AAB: ${AAB_PATH}"
+
+    - name: Verify build outputs
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}/android
+      run: |
+        APK_PATH="${{ steps.build-paths.outputs.apk-path }}"
+        AAB_PATH="${{ steps.build-paths.outputs.aab-path }}"
+        
+        echo "🔍 Verifying build outputs..."
+        
+        if [ -f "$APK_PATH" ]; then
+          echo "✅ APK found: $APK_PATH"
+          echo "📊 APK size: $(du -sh "$APK_PATH" | cut -f1)"
+        else
+          echo "❌ APK not found at: $APK_PATH"
+          echo "📁 Available APK files:"
+          find app/build/outputs/apk -name "*.apk" -type f || echo "No APK files found"
+          exit 1
+        fi
+        
+        if [ -f "$AAB_PATH" ]; then
+          echo "✅ AAB found: $AAB_PATH"
+          echo "📊 AAB size: $(du -sh "$AAB_PATH" | cut -f1)"
+        else
+          echo "❌ AAB not found at: $AAB_PATH"
+          echo "📁 Available AAB files:"
+          find app/build/outputs/bundle -name "*.aab" -type f || echo "No AAB files found"
+          exit 1
+        fi
+
+    - name: Upload APK artifact
+      if: ${{ inputs.upload-artifacts == 'true' }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: apk-${{ inputs.environment }}-${{ inputs.build-type }}
+        path: ${{ inputs.working-directory }}/android/${{ steps.build-paths.outputs.apk-path }}
+        retention-days: 30
+
+    - name: Upload AAB artifact
+      if: ${{ inputs.upload-artifacts == 'true' }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: aab-${{ inputs.environment }}-${{ inputs.build-type }}
+        path: ${{ inputs.working-directory }}/android/${{ steps.build-paths.outputs.aab-path }}
+        retention-days: 30
+
+    - name: Debug build environment (on failure)
+      if: failure()
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      run: |
+        echo "🚨 BUILD FAILED - Collecting debug information..."
+        echo "=================================="
+        
+        echo "🔍 System Information:"
+        echo "OS: $(uname -a)"
+        echo "Java version: $(java -version 2>&1)"
+        echo "Node version: $(node --version)"
+        echo "NPM version: $(npm --version)"
+        
+        echo "🔍 Environment Variables:"
+        echo "ANDROID_HOME: ${ANDROID_HOME:-'Not set'}"
+        echo "ANDROID_SDK_ROOT: ${ANDROID_SDK_ROOT:-'Not set'}"
+        echo "PATH: $PATH"
+        
+        echo "🔍 Working Directory Structure:"
+        echo "Current directory: $(pwd)"
+        find . -maxdepth 3 -type d 2>/dev/null | head -20 || echo "Directory listing failed"
+        
+        echo "🔍 Capacitor Configuration:"
+        if [ -f "capacitor.config.ts" ]; then
+          cat capacitor.config.ts
+        else
+          echo "capacitor.config.ts not found"
+        fi
+        
+        echo "🔍 Package.json scripts:"
+        if [ -f "package.json" ]; then
+          grep -A 20 '"scripts"' package.json || echo "No scripts section found"
+        fi
+        
+        echo "🔍 Android Directory:"
+        if [ -d "android" ]; then
+          echo "Android directory contents:"
+          ls -la android/
+          
+          echo "🔍 Android App Directory:"
+          if [ -d "android/app" ]; then
+            ls -la android/app/
+            
+            echo "🔍 google-services.json status:"
+            if [ -f "android/app/google-services.json" ]; then
+              echo "✅ google-services.json exists"
+              echo "Size: $(du -sh android/app/google-services.json | cut -f1)"
+            else
+              echo "❌ google-services.json missing"
+            fi
+          fi
+          
+          echo "🔍 Gradle files:"
+          find android/ -name "*.gradle" -type f 2>/dev/null | head -10 || echo "No Gradle files found"
+          
+          echo "🔍 Build directory:"
+          if [ -d "android/app/build" ]; then
+            echo "Build directory exists"
+            find android/app/build -name "*.apk" -o -name "*.aab" 2>/dev/null | head -10 || echo "No build artifacts found"
+          else
+            echo "Build directory doesn't exist"
+          fi
+          
+          echo "🔍 Gradle logs (last 50 lines):"
+          if [ -f "android/app/build/reports/profile/profile-*.html" ]; then
+            echo "Gradle build reports found"
+          fi
+          
+          echo "🔍 Last Gradle daemon log:"
+          find ~/.gradle/daemon -name "*.log" -type f 2>/dev/null -exec ls -la {} \; | tail -5 2>/dev/null || echo "No Gradle daemon logs found"
+        else
+          echo "❌ Android directory doesn't exist"
+        fi
+        
+        echo "🔍 Dist Directory:"
+        if [ -d "dist" ]; then
+          echo "Dist directory exists"
+          echo "Size: $(du -sh dist | cut -f1)"
+          echo "Contents (first 10 items):"
+          ls -la dist/ 2>/dev/null | head -10 || echo "Could not list dist contents"
+          
+          echo "🔍 Key files in dist:"
+          [ -f "dist/index.html" ] && echo "✅ index.html exists" || echo "❌ index.html missing"
+          [ -d "dist/assets" ] && echo "✅ assets directory exists" || echo "❌ assets directory missing"
+        else
+          echo "❌ Dist directory doesn't exist"
+        fi
+        
+        echo "🔍 NPX Capacitor Info:"
+        npx cap doctor || echo "Capacitor doctor failed"
+        
+        echo "=================================="
+        echo "🚨 Debug information collection completed"
+
+    - name: Clean up keystore
+      if: ${{ inputs.build-type == 'release' && inputs.keystore-base64 != '' }}
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}/android
+      run: |
+        rm -f app/release-key.keystore
+        rm -f signing.properties
+        echo "🧹 Keystore cleanup completed"

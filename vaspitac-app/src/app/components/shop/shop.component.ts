@@ -375,14 +375,16 @@ export class ShopComponent implements OnInit {
     this._digitalFileService.downloadFile(file).subscribe({
       next: (success: boolean) => {
         if (success) {
-          // File download successful
+          console.log('✅ File download successful:', file.title);
+          alert(`File "${file.title}" downloaded successfully! Check your Downloads folder.`);
         } else {
-          console.error('File download failed:', file.title);
+          console.error('❌ File download failed:', file.title);
+          alert(`Failed to download "${file.title}". Please try again.`);
         }
       },
       error: (error) => {
-        console.error('Error downloading file:', error);
-        // You can add an error notification here
+        console.error('❌ Error downloading file:', error);
+        alert(`Error downloading "${file.title}": ${error.message || 'Unknown error'}`);
       }
     });
   }

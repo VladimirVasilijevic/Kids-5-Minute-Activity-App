@@ -1,0 +1,234 @@
+name: Android Build Development
+
+on:
+  push:
+    branches: [develop]
+  pull_request:
+    branches: [develop]
+  workflow_dispatch:
+
+env:
+  NODE_VERSION: '18'
+
+jobs:
+  # Security scan job (runs first)
+  security-scan:
+    runs-on: ubuntu-latest
+    environment: development
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js and dependencies
+        uses: ./.github/actions/setup-node
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Run security scan
+        uses: ./.github/actions/security-scan
+        with:
+          scan-dependencies: 'true'
+          scan-code: 'true'
+
+  # Build web application (prerequisite for Android builds)
+  build-web:
+    runs-on: ubuntu-latest
+    environment: development
+    needs: security-scan
+    outputs:
+      web-build-artifact: web-build-development
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js and dependencies
+        uses: ./.github/actions/setup-node
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Create environment configuration
+        uses: ./.github/actions/create-environment
+        with:
+          environment: 'development'
+          firebase-project: ${{ secrets.FIREBASE_PROJECT_ID }}
+          firebase-api-key: ${{ secrets.FIREBASE_API_KEY }}
+          firebase-auth-domain: ${{ secrets.FIREBASE_AUTH_DOMAIN }}
+          firebase-storage-bucket: ${{ secrets.FIREBASE_STORAGE_BUCKET }}
+          firebase-messaging-sender-id: ${{ secrets.FIREBASE_MESSAGING_SENDER_ID }}
+          firebase-app-id: ${{ secrets.FIREBASE_APP_ID }}
+          firebase-measurement-id: ${{ secrets.FIREBASE_MEASUREMENT_ID }}
+
+      - name: Build web application
+        uses: ./.github/actions/build-web
+        with:
+          configuration: 'development'
+          base-href: './'
+          upload-artifact: 'true'
+
+  # Android Debug Build (parallel with Release)
+  build-android-debug:
+    runs-on: ubuntu-latest
+    environment: development
+    needs: build-web
+    env:
+      GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js and dependencies
+        uses: ./.github/actions/setup-node
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Download web build
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ needs.build-web.outputs.web-build-artifact }}
+          path: vaspitac-app/dist
+
+      - name: Verify web build artifact (Debug)
+        working-directory: vaspitac-app
+        run: |
+          echo "🔍 [DEBUG] Verifying downloaded web build..."
+          echo "📁 Current directory: $(pwd)"
+          echo "📁 Directory contents:"
+          ls -la
+          
+          echo "📁 Dist directory:"
+          if [ -d "dist" ]; then
+            echo "✅ Dist directory found"
+            echo "📊 Size: $(du -sh dist | cut -f1)"
+            echo "📁 Contents:"
+            ls -la dist/ | head -10
+            
+            echo "🔍 Key files check:"
+            [ -f "dist/index.html" ] && echo "✅ index.html found" || echo "❌ index.html missing"
+            [ -d "dist/assets" ] && echo "✅ assets directory found" || echo "❌ assets directory missing"
+          else
+            echo "❌ Dist directory not found"
+            echo "📁 Available directories:"
+            ls -la
+            exit 1
+          fi
+
+      - name: Build Android Debug
+        uses: ./.github/actions/build-android
+        with:
+          environment: 'development'
+          build-type: 'debug'
+          upload-artifacts: 'true'
+
+  # Android Release Build (parallel with Debug)
+  build-android-release:
+    runs-on: ubuntu-latest
+    environment: development
+    needs: build-web
+    env:
+      GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js and dependencies
+        uses: ./.github/actions/setup-node
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Download web build
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ needs.build-web.outputs.web-build-artifact }}
+          path: vaspitac-app/dist
+
+      - name: Verify web build artifact (Release)
+        working-directory: vaspitac-app
+        run: |
+          echo "🔍 [RELEASE] Verifying downloaded web build..."
+          echo "📁 Current directory: $(pwd)"
+          echo "📁 Directory contents:"
+          ls -la
+          
+          echo "📁 Dist directory:"
+          if [ -d "dist" ]; then
+            echo "✅ Dist directory found"
+            echo "📊 Size: $(du -sh dist | cut -f1)"
+            echo "📁 Contents:"
+            ls -la dist/ | head -10
+            
+            echo "🔍 Key files check:"
+            [ -f "dist/index.html" ] && echo "✅ index.html found" || echo "❌ index.html missing"
+            [ -d "dist/assets" ] && echo "✅ assets directory found" || echo "❌ assets directory missing"
+          else
+            echo "❌ Dist directory not found"
+            echo "📁 Available directories:"
+            ls -la
+            exit 1
+          fi
+
+      - name: Build Android Release
+        uses: ./.github/actions/build-android
+        with:
+          environment: 'development'
+          build-type: 'release'
+          upload-artifacts: 'true'
+          # TODO: Add signing secrets when available
+          # keystore-base64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          # keystore-password: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          # key-alias: ${{ secrets.ANDROID_KEY_ALIAS }}
+          # key-password: ${{ secrets.ANDROID_KEY_PASSWORD }}
+
+  # Verification job (runs after both builds complete)
+  verify-builds:
+    runs-on: ubuntu-latest
+    needs: [build-android-debug, build-android-release]
+    if: always()
+    steps:
+      - name: Check build results
+        run: |
+          echo "🔍 Checking build results..."
+          echo "Debug build result: ${{ needs.build-android-debug.result }}"
+          echo "Release build result: ${{ needs.build-android-release.result }}"
+          
+          if [ "${{ needs.build-android-debug.result }}" = "success" ] && [ "${{ needs.build-android-release.result }}" = "success" ]; then
+            echo "✅ Both builds succeeded"
+          elif [ "${{ needs.build-android-debug.result }}" = "success" ]; then
+            echo "⚠️  Debug build succeeded, Release build failed"
+          elif [ "${{ needs.build-android-release.result }}" = "success" ]; then
+            echo "⚠️  Release build succeeded, Debug build failed"
+          else
+            echo "❌ Both builds failed"
+          fi
+
+      - name: Verify development builds (Success)
+        if: ${{ needs.build-android-debug.result == 'success' && needs.build-android-release.result == 'success' }}
+        run: |
+          echo "🚀 Development Android builds completed successfully!"
+          echo "📱 Generated artifacts:"
+          echo "   - APK Debug: apk-development-debug"
+          echo "   - AAB Debug: aab-development-debug"
+          echo "   - APK Release: apk-development-release"
+          echo "   - AAB Release: aab-development-release"
+          echo ""
+          echo "💡 Note: Release builds are unsigned until signing certificates are configured"
+          echo "✅ All builds verified!"
+
+      - name: Report build failures
+        if: ${{ needs.build-android-debug.result != 'success' || needs.build-android-release.result != 'success' }}
+        run: |
+          echo "🚨 Some builds failed!"
+          echo ""
+          echo "📋 Troubleshooting steps:"
+          echo "1. Check the build logs above for detailed error messages"
+          echo "2. Look for the '🚨 BUILD FAILED' debug section for system information"
+          echo "3. Verify that GOOGLE_SERVICES_JSON secret is properly configured"
+          echo "4. Ensure the web build completed successfully"
+          echo "5. Check if Capacitor configuration is correct"
+          echo ""
+          echo "🔍 Common issues:"
+          echo "- Missing or invalid google-services.json"
+          echo "- Capacitor sync failures"
+          echo "- Gradle build configuration issues"
+          echo "- Missing Android SDK components"
+          echo ""
+          exit 1

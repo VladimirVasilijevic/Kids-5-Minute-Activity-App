@@ -5,6 +5,8 @@ import { AngularFireFunctions } from '@angular/fire/compat/functions';
 import { Observable, of, map, catchError, switchMap, filter, take, firstValueFrom } from 'rxjs';
 import { DigitalFile, DigitalFileFormData } from '../models/digital-file.model';
 import { validateFileForUpload, generateId, getFileTypeFromName } from '../models/marketplace.utils';
+import { Filesystem, Directory, Encoding } from '@capacitor/filesystem';
+import { Capacitor } from '@capacitor/core';
 
 @Injectable({
   providedIn: 'root'
@@ -421,24 +423,91 @@ export class DigitalFileService {
 
   /**
    * Create a download from base64 file content
+   * Works on both web browsers and Android apps
    */
   private async createDownloadFromContent(base64Content: string, fileName: string, fileType: string): Promise<void> {
     try {
-      // Create a temporary anchor element to trigger the download
-      const link = document.createElement('a');
-      link.href = `data:${fileType};base64,${base64Content}`; // Create a data URL
-      link.download = fileName; // Use the provided filename
-      link.target = '_blank';
-      
-      // Append to DOM, click, and remove
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      
-
-    } catch (error) {
+      // Check if we're running on a native platform (Android/iOS)
+      if (Capacitor.isNativePlatform()) {
+        await this.downloadFileNative(base64Content, fileName, fileType);
+      } else {
+        await this.downloadFileWeb(base64Content, fileName, fileType);
+      }
+    } catch (error: any) {
       console.error('Error creating download from content:', error);
-      throw new Error('Failed to create download from content');
+      throw new Error(`Failed to create download from content: ${error.message}`);
     }
   }
+
+  /**
+   * Download file on web browsers
+   */
+  private async downloadFileWeb(base64Content: string, fileName: string, fileType: string): Promise<void> {
+    // Create a temporary anchor element to trigger the download
+    const link = document.createElement('a');
+    link.href = `data:${fileType};base64,${base64Content}`; // Create a data URL
+    link.download = fileName; // Use the provided filename
+    link.target = '_blank';
+    
+    // Append to DOM, click, and remove
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+
+  /**
+   * Download file on native platforms (Android/iOS)
+   */
+  private async downloadFileNative(base64Content: string, fileName: string, fileType: string): Promise<void> {
+    try {
+      // Check if we have valid base64 content
+      if (!base64Content || base64Content.length === 0) {
+        throw new Error('Base64 content is empty or invalid');
+      }
+      
+      // For Capacitor, we need to pass the data without encoding parameter for binary files
+      // Clean base64 (strip "data:application/pdf;base64," prefix)
+      const cleanBase64 = base64Content.includes(',')
+      ? base64Content.split(',')[1]
+      : base64Content;
+
+      await Filesystem.requestPermissions();
+
+      const writeOptions: any = {
+        path: fileName,
+        data: cleanBase64,
+        directory: Directory.Data
+      };
+      
+      // Only add encoding for text files, not for binary files
+      if (fileType.startsWith('text/') || fileType === 'application/json') {
+        writeOptions.encoding = Encoding.UTF8;
+      }
+      
+      const result = await Filesystem.writeFile(writeOptions);
+      alert(`File saved successfully: ${result.uri}`);
+      
+    } catch (error: any) {
+      alert(`Error saving file to device: ${error.message}`);
+      throw error;
+    }
+  }
+
+  /**
+   * Convert Blob to base64 string
+   */
+  private async blobToBase64(blob: Blob): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const result = reader.result as string;
+        // Remove data URL prefix to get just the base64 part
+        const base64 = result.split(',')[1];
+        resolve(base64);
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+  }
+
 }

@@ -9,6 +9,7 @@
 
 # Capacitor build output
 **/android/app/build/
+**/android/app/src/main/assets/
 **/ios/build/
 
 # Android/Gradle

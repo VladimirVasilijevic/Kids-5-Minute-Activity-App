@@ -1,0 +1,65 @@
+name: 'Setup Android Keystore'
+description: 'Sets up Android keystore for signing APKs and AABs'
+inputs:
+  keystore-base64:
+    description: 'Base64 encoded keystore file'
+    required: true
+  keystore-password:
+    description: 'Keystore password'
+    required: true
+  key-alias:
+    description: 'Key alias'
+    required: true
+  key-password:
+    description: 'Key password'
+    required: true
+  working-directory:
+    description: 'Working directory for Android project'
+    required: false
+    default: 'vaspitac-app/android'
+
+outputs:
+  keystore-path:
+    description: 'Path to the created keystore file'
+    value: ${{ steps.create-keystore.outputs.path }}
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Create keystore from secrets
+      id: create-keystore
+      shell: bash
+      run: |
+        # Create keystore directory
+        mkdir -p android-keystore
+        
+        # Decode base64 keystore from secrets
+        echo "${{ inputs.keystore-base64 }}" | base64 -d > android-keystore/release-key.keystore
+        
+        # Set output path
+        echo "path=$(pwd)/android-keystore/release-key.keystore" >> $GITHUB_OUTPUT
+        
+        # Verify keystore exists
+        if [ -f "android-keystore/release-key.keystore" ]; then
+          echo "✅ Keystore created successfully"
+        else
+          echo "❌ Keystore creation failed"
+          exit 1
+        fi
+
+    - name: Setup keystore for signing
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      run: |
+        # Copy keystore to Android project
+        cp ../../android-keystore/release-key.keystore app/release-key.keystore
+        
+        # Create signing properties
+        cat > signing.properties << EOF
+        storeFile=release-key.keystore
+        storePassword=${{ inputs.keystore-password }}
+        keyAlias=${{ inputs.key-alias }}
+        keyPassword=${{ inputs.key-password }}
+        EOF
+        
+        echo "✅ Keystore setup completed for signing"
