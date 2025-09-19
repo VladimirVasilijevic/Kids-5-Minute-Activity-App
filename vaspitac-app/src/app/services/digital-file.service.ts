@@ -479,13 +479,22 @@ export class DigitalFileService {
       
       console.log('🔍 Base64 content preview:', base64Content.substring(0, 50) + '...');
       
+      // Convert base64 to binary data first
+      console.log('🔄 Converting base64 to binary data...');
+      const binaryData = this.base64ToArrayBuffer(base64Content);
+      console.log('📊 Binary data size:', binaryData.byteLength, 'bytes');
+      
+      // Convert binary data back to base64 for Capacitor (it expects base64 encoded data)
+      console.log('🔄 Converting binary to base64 for Capacitor...');
+      const base64ForCapacitor = this.arrayBufferToBase64(binaryData);
+      console.log('📊 Base64 for Capacitor size:', base64ForCapacitor.length, 'characters');
+      
       // For Capacitor, we need to pass the data without encoding parameter for binary files
-      // or use the correct encoding based on file type
       console.log('💾 Writing file to Documents directory...');
       
-      let writeOptions: any = {
+      const writeOptions: any = {
         path: fileName,
-        data: base64Content,
+        data: base64ForCapacitor,
         directory: Directory.Documents
       };
       
@@ -544,5 +553,17 @@ export class DigitalFileService {
       bytes[i] = binaryString.charCodeAt(i);
     }
     return bytes.buffer;
+  }
+
+  /**
+   * Convert ArrayBuffer to base64 string
+   */
+  private arrayBufferToBase64(buffer: ArrayBuffer): string {
+    const bytes = new Uint8Array(buffer);
+    let binary = '';
+    for (let i = 0; i < bytes.byteLength; i++) {
+      binary += String.fromCharCode(bytes[i]);
+    }
+    return btoa(binary);
   }
 }
