@@ -323,15 +323,28 @@ export class DigitalFileService {
     return new Observable(observer => {
       downloadFileContent({ fileId: file.id }).subscribe({
         next: (result: any) => {
+          console.log('🔍 Firebase Function result received:', result);
+          console.log('🔍 Result type:', typeof result);
+          console.log('🔍 Result keys:', Object.keys(result || {}));
+          
           // Firebase Functions return data directly, not wrapped in result.data
           // Check both possible locations: result.data and result
           let downloadData: any;
           
           if (result?.data && typeof result.data === 'object') {
             downloadData = result.data;
+            console.log('📦 Using result.data');
           } else if (result && typeof result === 'object') {
             downloadData = result;
+            console.log('📦 Using result directly');
           }
+          
+          console.log('📦 Download data:', downloadData);
+          console.log('📦 Has access:', downloadData?.hasAccess);
+          console.log('📦 File content length:', downloadData?.fileContent?.length || 0);
+          console.log('📦 File content preview:', downloadData?.fileContent?.substring(0, 100) + '...');
+          console.log('📦 File name:', downloadData?.fileName);
+          console.log('📦 File type:', downloadData?.fileType);
           
           if (downloadData?.hasAccess && downloadData?.fileContent) {
             // Create download from base64 content
@@ -429,6 +442,15 @@ export class DigitalFileService {
     try {
       console.log('🚀 Starting download process...');
       console.log('📊 Download parameters:', { fileName, fileType, contentLength: base64Content?.length || 0 });
+      
+      // Validate base64 content
+      console.log('🔍 Validating base64 content...');
+      const isValidBase64 = this.isValidBase64(base64Content);
+      console.log('✅ Base64 valid:', isValidBase64);
+      
+      if (!isValidBase64) {
+        throw new Error('Invalid base64 content received from server');
+      }
       
       // Check if we're running on a native platform (Android/iOS)
       if (Capacitor.isNativePlatform()) {
@@ -565,5 +587,46 @@ export class DigitalFileService {
       binary += String.fromCharCode(bytes[i]);
     }
     return btoa(binary);
+  }
+
+  /**
+   * Validate if string is valid base64
+   */
+  private isValidBase64(str: string): boolean {
+    try {
+      // Check if string is not empty
+      if (!str || str.length === 0) {
+        console.log('❌ Base64 validation failed: Empty string');
+        return false;
+      }
+
+      // Check if string length is multiple of 4
+      if (str.length % 4 !== 0) {
+        console.log('❌ Base64 validation failed: Length not multiple of 4');
+        return false;
+      }
+
+      // Check if string contains only valid base64 characters
+      const base64Regex = /^[A-Za-z0-9+/]*={0,2}$/;
+      if (!base64Regex.test(str)) {
+        console.log('❌ Base64 validation failed: Invalid characters');
+        return false;
+      }
+
+      // Try to decode and re-encode to verify
+      const decoded = atob(str);
+      const reEncoded = btoa(decoded);
+      
+      if (reEncoded !== str) {
+        console.log('❌ Base64 validation failed: Decode/re-encode mismatch');
+        return false;
+      }
+
+      console.log('✅ Base64 validation passed');
+      return true;
+    } catch (error) {
+      console.log('❌ Base64 validation failed with error:', error);
+      return false;
+    }
   }
 }
